@@ -1,0 +1,2311 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html xmlns="http://www.w3.org/1999/html" lang="en">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../lib/styles-v1.css">
+
+    <title>Constructive Operational Type Theory</title>
+
+</head>
+<body>
+
+<div class="section">
+
+    <div class="headings">
+        <h1>Constructive Operational Type Theory</h1>
+        <h2>Total, Reversible, Emergent Constructions</h2>
+    </div>
+
+    <div class="section-title">
+        Table of Contents
+    </div>
+    <ol>
+        <li>
+            <a href="#section-1">
+                Introduction
+            </a>
+        </li>
+        <li>
+            <a href="#section-2">
+                Zero as a Differential Operator
+            </a>
+        </li>
+        <li>
+            <a href="#section-3">
+                Multiplication by Zero as Structural Marking
+            </a>
+        </li>
+        <li>
+            <a href="#section-4">
+                Multiplicative Discharge and Totalized Division
+            </a>
+        </li>
+        <li>
+            <a href="#section-5">
+                Exponentiation with Boundary Elements
+            </a>
+        </li>
+        <li>
+            <a href="#section-6">
+                Logarithms with Boundary Bases
+            </a>
+        </li>
+        <li>
+            <a href="#section-7">
+                Emergence of the Imaginary Unit
+            </a>
+        </li>
+        <li>
+            <a href="#section-8">
+                Zero-Generated Phase
+            </a>
+        </li>
+        <li>
+            <a href="#section-9">
+                Rational Powers of Negative Numbers
+            </a>
+        </li>
+        <li>
+            <a href="#section-10">
+                Exact Values as Terminal Constructions
+            </a>
+        </li>
+    </ol>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        Published under the <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title" id="section-1">
+        1. Introduction
+    </div>
+
+    <p class="narration">
+        I’ve had this idea for a long time, and I suspect others have too:
+        that what we call "types" often seem to emerge less from intrinsic properties and more from which operations happen to work together.
+        For example, if you want subtraction to always make sense, you are effectively forced to move from the natural numbers to the integers.
+        Likewise, insisting that division be total pushes you from the integers to the rational numbers.
+        In each case, the domain is enlarged not for its own sake, but to preserve the coherence of the operations we care about.
+    </p>
+    <p class="narration">
+        And why not insist on totality?
+        After all, mathematical tools are typically valued for the questions they can answer, and the frequency with which an operation fails to apply places a real constraint on how useful it is.
+        This is part of the motivation behind extending the real numbers to the complex numbers: allowing operations like roots and exponentiation to remain defined even when their real-valued interpretations break down.
+    </p>
+    <p class="narration">
+        Division by zero, however, is usually treated as a different kind of failure altogether, and one that many frameworks explicitly refuse to accommodate.
+        Various attempts have been made to soften this boundary.
+        Wheel theory, for example, defines a reciprocal for zero and allows computation to proceed further than usual, at the cost of introducing a distinguished "bottom" element that represents a terminal collapse of information rather than a conventional value.
+    </p>
+    <p class="narration">
+        But zero misbehaves even before we try division.
+        In algebra, we usually expect that performing the same operation on both sides of an equation preserves equality.
+        Multiplying both sides by zero technically respects this rule, yet it immediately destroys the information we had, leaving the equation effectively unusable - functionally equivalent to an information-destroying reset.
+        In short, while division typically fails to be total, multiplication fails to be generally reversible.
+    </p>
+    <p class="narration">
+        This train of thought eventually led me to ask:
+        What if every arithmetic operation were total, and every operation had a reversible counterpart?
+        Imagine mathematics with no dead ends, no unrecoverable errors, and no branch ambiguities.
+        Could such a system exist? Could it be practical?
+    </p>
+    <p>
+        First, let's observe that "total" and "reversible" apply not to numbers themselves, but to the operations that act on them.
+        And even the word "number" is used liberally here - we don't care what qualifies as a number, as long as all the primitive operations are total and reversible for every member of the type.
+        We make no prior categorical commitments; any such structure must emerge from the operational constraints themselves, guided only by the requirements of totality and reversibility.
+    </p>
+    <p>
+        By totality, I mean that every primitive operation is defined on all elements of the type.
+        When an operation would normally be undefined or indeterminate, the response is not to forbid it, but to represent the unresolved structure explicitly.
+        Rather than collapsing expressions at the point of failure, operations are deferred in a way that preserves the information needed to resolve them later.
+    </p>
+    <p>
+        Reversibility is more subtle.
+        In broad terms, it means that every operation admits a way of being undone, though not necessarily by a simple inverse function.
+        The reverse of an operation may involve multiple steps, auxiliary structure, or a re-expression of the original term.
+        In this sense, reversibility does not imply bijectivity, injectivity, or surjectivity in the usual sense, but rather the absence of irreversible collapse.
+    </p>
+    <p>
+        Operational deferral implies that some values exist even when no immediate numeric representation is available.
+        In such cases, a value is better understood not as a static number, but as the result of a history of operations that has not yet been collapsed.
+    </p>
+    <p>
+        From this perspective, a type is not characterized by intrinsic properties of its elements, but by the operations that can act on them without loss of information.
+        In particular, a type is defined by the operations it admits and remains stable under.
+    </p>
+    <p>
+        This motivates the following definition:
+    </p>
+    <p class="font-lg">
+        A type is defined by the total, reversible operations it admits.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        <em>In the following sections, we'll explore what kinds of structures emerge when enforcing totality and reversibility.</em>
+    </div>
+
+</div>
+<div class="section">
+    <div class="section-title" id="section-2">
+        2. Zero as a Differential Operator
+    </div>
+
+    <div class="narration">
+        <p>To make this concrete, consider the differential of a function
+            <span class="variable">f</span>
+            <span class="symbol">(</span>
+            <span class="variable">x</span>
+            <span class="symbol">)</span>
+            . In the COTT framework, we begin by multiplying the expression by zero:</p>
+    </div>
+
+    <div class="expression">
+        <!-- 0 · f ( x ) -->
+        <span class="symbol">0</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">f</span>
+        <span class="symbol">(</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+    </div>
+
+    <p>
+        At first glance, this looks trivial.
+        But in COTT, it has a precise structural meaning:
+        it computes a zero-magnitude displacement of the function’s input,
+    </p>
+
+    <div class="expression">
+        <!-- 0 · f ( x ) = f ( x + 0 x ) - f ( x ) -->
+        <span class="symbol">0</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">f</span>
+        <span class="symbol">(</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+        <span class="symbol">=</span>
+        <span class="variable">f</span>
+        <span class="symbol">(</span>
+        <span class="variable">x</span>
+        <span class="symbol">+</span>
+        <span class="symbol">0</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+        <span class="symbol">-</span>
+        <span class="variable">f</span>
+        <span class="symbol">(</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+    </div>
+
+    <p>
+        <em>
+            Note: <span class="symbol">0</span><span class="variable">x</span>
+            is a symbolic object that will be described in more detail in the next section.
+        </em>
+    </p>
+
+    <p>
+        Here, multiplying by zero does not annihilate information.
+        Instead, it produces a <strong>structural differential</strong> that preserves the form of the expression,
+        while maintaining equality, totality, and reversibility.
+        <em>Any subsequent cancellation arises from the additive identity, not from zero itself.</em>
+    </p>
+
+    <p>
+        As a concrete example, consider the function
+        <span class="variable">f</span>
+        <span class="symbol">(</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+        <span class="symbol">=</span>
+        <span class="variable">x</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">+</span>
+        <span class="variable">c</span>
+
+        . Applying the COTT differential gives:
+    </p>
+
+    <div class="expression">
+        <!-- 0 x^2  = ( x + 0 x )^2 + c - x^2 - c -->
+        <span class="symbol">0</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">x</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="symbol">(</span>
+        <span class="variable">x</span>
+        <span class="symbol">+</span>
+        <span class="symbol">0</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">+</span>
+        <span class="variable">c</span>
+        <span class="symbol">-</span>
+        <span class="variable">x</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">-</span>
+        <span class="variable">c</span>
+    </div>
+
+    <div class="expression">
+        <!-- = ( x ^2 + 2 x ( 0 x ) + ( 0 x ) ^2 ) + c - x ^2 - c -->
+        <span class="symbol">=</span>
+        <span class="symbol">(</span>
+        <span class="variable">x</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">+</span>
+        <span class="number">2</span>
+        <span class="variable">x</span>
+        <span class="symbol">(</span>
+        <span class="symbol">0</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+        <span class="symbol">+</span>
+        <span class="symbol">(</span>
+        <span class="symbol">0</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">)</span>
+        <span class="symbol">+</span>
+        <span class="variable">c</span>
+        <span class="symbol">-</span>
+        <span class="variable">x</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">-</span>
+        <span class="variable">c</span>
+    </div>
+
+    <div class="expression">
+        <!-- = 2 x ( 0 x ) + ( 0 x ) ^2 -->
+        <span class="symbol">=</span>
+        <span class="number">2</span>
+        <span class="variable">x</span>
+        <span class="symbol">(</span>
+        <span class="symbol">0</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+        <span class="symbol">+</span>
+        <span class="symbol">(</span>
+        <span class="symbol">0</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+    </div>
+
+    <p>
+        Notably, no appeal to limits or infinitesimals is required;
+        the differential arises entirely from algebraic expansion under a zero-magnitude displacement.
+    </p>
+
+    <p>Continuing this example:</p>
+
+    <div class="expression">
+        <!-- 0 · x^2 = 2x( 0 x ) + ( 0 x )^2 -->
+        <span class="symbol">0</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">x</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">2</span>
+        <span class="variable">x</span>
+        <span class="symbol">(</span>
+        <span class="symbol">0</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+        <span class="symbol">+</span>
+        <span class="symbol">(</span>
+        <span class="symbol">0</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+    </div>
+
+    <p>
+        At this stage, division by
+        <span class="symbol">0</span><span class="variable">x</span>
+        is permitted because
+        <span class="symbol">0</span><span class="variable">x</span>
+        denotes a structured zero-displacement, not a scalar zero, and cannot be freely reassociated or canceled.
+    </p>
+
+    <div class="expression">
+        <!-- 0 · x ^2
+/
+0 x
+ =
+2 x ( 0 x ) + ( 0 x ) ^2
+/
+0 x
+ = 2 x + 0 x -->
+        <span class="fraction">
+            <span class="numerator">
+                <span class="copyonly">(</span>
+                <span class="symbol">0</span>
+                <span class="symbol">&middot;</span>
+                <span class="variable">x</span>
+                <sup>
+                    <span class="copyonly">^</span>
+                    <span class="number">2</span>
+                </sup>
+                <span class="copyonly">)</span>
+            </span>
+            <span class="h-divider">/</span>
+            <span class="denominator">
+                <span class="copyonly">(</span>
+                <span class="symbol">0</span>
+                <span class="variable">x</span>
+                <span class="copyonly">)</span>
+            </span>
+        </span>
+        <span class="symbol">=</span>
+        <span class="fraction">
+            <span class="numerator">
+                <span class="copyonly">(</span>
+                <span class="number">2</span>
+                <span class="variable">x</span>
+                <span class="symbol">(</span>
+                <span class="symbol">0</span>
+                <span class="variable">x</span>
+                <span class="symbol">)</span>
+                <span class="symbol">+</span>
+                <span class="symbol">(</span>
+                <span class="symbol">0</span>
+                <span class="variable">x</span>
+                <span class="symbol">)</span>
+                <sup>
+                    <span class="copyonly">^</span>
+                    <span class="number">2</span>
+                </sup>
+                <span class="copyonly">)</span>
+            </span>
+            <span class="h-divider">/</span>
+            <span class="denominator">
+                <span class="copyonly">(</span>
+                <span class="symbol">0</span>
+                <span class="variable">x</span>
+                <span class="copyonly">)</span>
+            </span>
+        </span>
+        <span class="symbol">=</span>
+        <span class="number">2</span>
+        <span class="variable">x</span>
+        <span class="symbol">+</span>
+        <span class="symbol">0</span>
+        <span class="variable">x</span>
+    </div>
+
+    <p>
+        The quadratic term remains present as a higher-order residue, explicitly visible rather than silently discarded.
+        The derivative is obtained by projecting onto the component independent of the zero displacement:
+    </p>
+
+    <span class="expression">
+        <!-- 2 x + 0 x ≈ 2 x -->
+        <span class="number">2</span>
+        <span class="variable">x</span>
+        <span class="symbol">+</span>
+        <span class="symbol">0</span>
+        <span class="variable">x</span>
+        <span class="symbol">&approx;</span>
+        <span class="number">2</span>
+        <span class="variable">x</span>
+    </span>
+
+    <p>
+        Formally, this is a linear projection in the sense that the derivative is the component of the differential independent of the zero displacement. The term
+        <span class="symbol">0</span><span class="variable">x</span>
+        remains present and can be used in further algebraic manipulations. The <span class="symbol">&approx;</span> symbol denotes selection of the linear component, not destruction of information.
+    </p>
+
+    <p>
+        Conceptually, this is reminiscent of dual numbers, which encode derivatives via a nilpotent displacement.
+        Unlike traditional dual numbers, however, COTT retains higher-order structure and enforces reversibility and totality throughout.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        <em>
+            In the next section, we'll clarify how COTT handles multiplication by zero.
+        </em>
+    </div>
+
+</div>
+
+
+<div class="section">
+    <div class="section-title" id="section-3">
+        3. Multiplication by Zero as Structural Marking
+    </div>
+
+    <p>
+        Historically, arithmetic systems that lacked an explicit zero treated cancellation as erasure rather than structure.
+        Roman numerals, for example, never introduced a symbol for zero;
+        absence simply removed terms.
+        In COTT, annihilation is not a primitive act but an operational outcome of invariance.
+    </p>
+
+    <p>
+        <em>Zero erases only when the result is invariant under the surrounding operation.</em>
+        We refer to this principle as the <strong>invariance condition for discharge</strong>.
+        When invariance is not achieved, annihilation cannot discharge and zero remains bound to its context,
+        where it functions as a boundary marker.
+        Invariance is always evaluated relative to the operation under which discharge is being considered.
+    </p>
+
+    <p>
+        We call zero a boundary marker in a loose, operational sense: it marks the transition point of an arithmetic
+        act when annihilation fails to discharge, without introducing new values or erasing structure.
+    </p>
+
+    <p>
+        The limit formalism can be understood as a reconciliation ritual:
+        algebraic expressions are manipulated beyond their sanctioned domain,
+        then forgiven by appeal to a limiting process that retroactively justifies the result.
+        COTT refuses to accept the premise of reconciliation.
+        Instead of appealing to limits or other formal rituals,
+        it preserves all displacements and operations within a unified syntax,
+        ensuring that structure and information are never discarded.
+    </p>
+
+    <p>
+        First, a note on syntax:
+    </p>
+
+    <ul>
+        <li><span class="symbol font-lg">=</span> means information-conserving rewrite under permitted operations.</li>
+        <li><span class="symbol font-lg">&approx;</span> means contextual identification involving truncation, partiality, or loss.</li>
+        <li><span class="symbol font-lg">:=</span> introduces structure; it does not assert equivalence.</li>
+    </ul>
+
+    <div class="subsection-title">
+        3.1 Zero Bound to a Constant
+    </div>
+
+    <p>
+        When zero binds to a constant, no structural dependency is introduced.
+        The result is therefore observationally zero, but not erased.
+        Any residual is carried as bookkeeping structure,
+        preserving reversibility even when no dependency is introduced.
+    </p>
+
+    <div class="subsection-title">
+        3.2 Zero Bound to a Variable
+    </div>
+
+    <p>
+        When zero binds to a variable, it produces a tagged zero-magnitude displacement:
+    </p>
+
+    <div class="expression">
+        <span class="number">0</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">x</span>
+        <span class="number">:=</span>
+        <span class="number">0</span>
+        <span class="variable">x</span>
+    </div>
+
+    <p>
+        No assumption of nilpotency or idempotency is made.
+        Truncation of higher-order structure is treated as a domain-specific permission, not a default algebraic rule.
+        Once bound, a zero-displacement may not be canceled, absorbed, or freely reassociated,
+        unless a domain-specific rule explicitly permits discharge.
+        The zero does not vanish; it remains attached to its operand.
+    </p>
+
+    <p>
+        This is the simplest nontrivial manifestation of zero as a boundary marker.
+    </p>
+
+    <div class="subsection-title">
+        3.3 Zero Bound to an Expression
+    </div>
+
+    <p>
+        When zero binds to an expression, it structurally lifts, producing a differential:
+    </p>
+
+    <div class="expression">
+        <!-- 0 · f ( x ) = f ( x + 0 x ) - f ( x ) -->
+        <span class="number">0</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">f</span>
+        <span class="symbol">(</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+        <span class="number">:=</span>
+        <span class="variable">f</span>
+        <span class="symbol">(</span>
+        <span class="variable">x</span>
+        <span class="symbol">+</span>
+        <span class="number">0</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+        <span class="symbol">-</span>
+        <span class="variable">f</span>
+        <span class="symbol">(</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+    </div>
+
+    <p>
+        Here, zero does not erase the expression.
+        It generates a structured offset that preserves form and enables algebraic rewrite without appeal to limits.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        <em>With zero's role as a boundary marker clarified, we may move on to totalizing division.</em>
+    </div>
+
+</div>
+
+
+<div class="section">
+    <div class="section-title" id="section-4">
+        4. Multiplicative Discharge and Totalized Division
+    </div>
+
+    <p>
+        If annihilation is only allowed to erase under invariance, then division by zero cannot be forbidden.
+        It must either be represented structurally, or the system is incomplete.
+    </p>
+
+    <p>
+        In calculus, this prohibition is routinely circumvented by replacing the zero denominator with a nonzero
+        placeholder, such as <em>dx</em>, and then appealing to a limiting argument.
+        The algebraic manipulation occurs outside its strictly valid domain and is later reconciled by a limit.
+    </p>
+
+    <p>
+        COTT takes a different approach: division is defined as multiplicative discharge
+        (i.e., cancellation under multiplication), and the arithmetic is extended with explicit structure to preserve totality.
+    </p>
+
+    <p>
+        We introduce a symbol <span class="symbol">&omega;</span>, defined by
+    </p>
+
+    <div class="expression">
+        <span class="number">1</span>
+        <span class="symbol">/</span>
+        <span class="number">0</span>
+        <span class="symbol">:=</span>
+        <span class="symbol">&omega;</span>.
+    </div>
+
+    <p>
+        <span class="symbol">&omega;</span> is a distinguished symbol introduced to totalize division.
+        Like zero-bound structure, it does not permit unrestricted reassociation or cancellation outside invariant contexts.
+    </p>
+
+    <p>
+        By multiplicativity, for any <span class="variable">x</span>,
+    </p>
+
+    <div class="expression">
+        <span class="variable">x</span>
+        <span class="symbol">/</span>
+        <span class="number">0</span>
+        <span class="symbol">=</span>
+        <span class="symbol">&omega;</span>
+        <span class="variable">x</span>.
+    </div>
+
+    <p>
+        To satisfy the invariance condition for discharge under multiplication,
+        <span class="symbol">&omega;</span> is defined such that
+    </p>
+
+    <div class="expression">
+        <span class="number">0</span>
+        <span class="symbol">&middot;</span>
+        <span class="symbol">&omega;</span>
+        <span class="symbol">=</span>
+        <span class="number">1</span>.
+    </div>
+
+    <p>
+        Operationally, <span class="symbol">&omega;</span> represents the unresolved scale factor required to complete multiplicative
+        discharge when annihilation alone is insufficient.
+    </p>
+
+    <p>
+        As a result, cancellation becomes total rather than conditional.
+    </p>
+
+    <p>
+        Since discharge must be invariant, the identity
+        <span class="variable">x</span>
+        <span class="symbol">/</span>
+        <span class="variable">x</span>
+        <span class="symbol">=</span>
+        <span class="number">1</span>
+        holds without exception. Applied to zero, this yields
+    </p>
+
+    <div class="expression">
+        <span class="number">0</span>
+        <span class="symbol">/</span>
+        <span class="number">0</span>
+        <span class="symbol">=</span>
+        <span class="number">1</span>.
+    </div>
+
+    <p>
+        This equality is not an assertion about classical arithmetic; it arises naturally as a structural consequence
+        of extending the multiplicative system so that zero participates symmetrically rather than exceptionally.
+    </p>
+
+    <p>
+        The purpose of introducing <span class="symbol">&omega;</span> is not to collapse distinctions,
+        but to remove the need for exceptional cases.
+        Expressions that traditionally require domain exclusions or limiting arguments remain algebraic and total,
+        with all cancellations made explicit.
+    </p>
+
+    <div class="copyonly">---</div>
+
+    <div class="section-footer">
+        <em>
+            Wheel theory explores related extensions, though with different choices regarding collapse, equivalence,
+            and information loss.
+        </em>
+    </div>
+</div>
+
+
+
+<div class="section">
+    <div class="section-title" id="section-5">
+        5. Exponentiation with Boundary Elements
+    </div>
+
+    <p>
+        Our goal in this section is to extend exponentiation to a zero or <span class="symbol">&omega;</span> base while preserving internal
+        consistency and totality. Rather than introducing new axioms ad hoc, all values will be derived from identities
+        that already govern exponentiation and inversion elsewhere in the system.
+    </p>
+
+    <p>
+        We begin with identities that are universally accepted for exponentiation over arbitrary bases.
+    </p>
+
+    <p>
+        For any base <span class="variable">x</span>,
+    </p>
+
+    <div class="expression">
+        <!-- x^0 = 1 -->
+        <span class="variable">x</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="number">0</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">1</span>
+    </div>
+
+    <p>
+        Applying this identity uniformly yields
+    </p>
+
+    <div class="expression">
+        <!-- 0^0 = 1 -->
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="number">0</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">1</span>
+    </div>
+
+    <p>
+        Similarly, for any base <span class="variable">x</span>,
+    </p>
+
+    <div class="expression">
+        <!-- x^1 = x -->
+        <span class="variable">x</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="number">1</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="variable">x</span>
+    </div>
+
+    <p>
+        And therefore:
+    </p>
+
+    <div class="expression">
+        <!-- 0^1 = 0 -->
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="number">1</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">0</span>
+    </div>
+
+    <p>
+        For higher positive powers, no further simplification is imposed.
+        These expressions remain well-formed and tractable:
+    </p>
+
+    <div class="expression">
+        <!-- 0^2 = 0 · 0 -->
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">0</span>
+        <span class="symbol">&middot;</span>
+        <span class="number">0</span>
+    </div>
+
+    <div class="expression">
+        <!-- 0^3 = 0 · 0 · 0 -->
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="number">3</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">0</span>
+        <span class="symbol">&middot;</span>
+        <span class="number">0</span>
+        <span class="symbol">&middot;</span>
+        <span class="number">0</span>
+    </div>
+
+    <p>
+        and so on.
+    </p>
+
+    <p>
+        Negative exponents are defined via multiplicative inversion. Since division is totalized in COTT, zero admits a reciprocal, denoted
+        <span class="symbol">&omega;</span>:
+    </p>
+
+    <div class="expression">
+        <!-- 0^(-1) = ω -->
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^(</span>
+            <span class="number">-1</span>
+            <span class="copyonly">)</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="symbol">&omega;</span>
+    </div>
+
+    <div class="expression">
+        <!-- 0^(-2) = ω ^2 -->
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^(</span>
+            <span class="number">-2</span>
+            <span class="copyonly">)</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="symbol">&omega;</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+    </div>
+    <p>
+        and in general
+    </p>
+
+    <div class="expression">
+        <!-- 0^(-n) = ω^n -->
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^(</span>
+            <span class="number">-</span><!--
+         --><span class="variable">n</span>
+            <span class="copyonly">)</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="symbol">&omega;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="variable">n</span>
+        </sup>
+    </div>
+
+    <p>
+        We follow the same approach in defining exponentiation for <span class="symbol">&omega;</span>:
+    </p>
+
+    <div class="expression">
+        <!-- ω ^0 = 1 -->
+        <span class="symbol">&omega;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="number">0</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">1</span>
+    </div>
+
+    <div class="expression">
+        <!-- ω^1 = ω -->
+        <span class="symbol">&omega;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="number">1</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="symbol">&omega;</span>
+    </div>
+
+    <div class="expression">
+        <!-- ω^2 = ω · ω -->
+        <span class="symbol">&omega;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="symbol">&omega;</span>
+        <span class="symbol">&middot;</span>
+        <span class="symbol">&omega;</span>
+    </div>
+
+    <div class="expression">
+        <!-- ω^(-1) = 0 -->
+        <span class="symbol">&omega;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^(</span>
+            <span class="number">-1</span>
+            <span class="copyonly">)</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">0</span>
+    </div>
+
+    <div class="expression">
+        <!-- ω^(-2) = 0^2 -->
+        <span class="symbol">&omega;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^(</span>
+            <span class="number">-2</span>
+            <span class="copyonly">)</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+    </div>
+
+    <div class="expression">
+        <!-- ω^(-n) = 0^n -->
+        <span class="symbol">&omega;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^(</span>
+            <span class="number">-</span><!--
+         --><span class="variable">n</span>
+            <span class="copyonly">)</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="variable">n</span>
+        </sup>
+    </div>
+
+    <p>
+        Only two values remain unspecified:
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="symbol">&omega;</span>
+        </sup>
+        and
+        <span class="symbol">&omega;</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="symbol">&omega;</span>
+        </sup>. Requiring closure and reversibility uniquely determines both:
+    </p>
+
+    <div class="expression">
+        <!-- 0^ω = ω^ω = -1 -->
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="symbol">&omega;</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="symbol">&omega;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="symbol">&omega;</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">-1</span>
+    </div>
+
+    <p>
+        Exponentiation over a zero or <span class="symbol">&omega;</span> base is defined for all integer exponents without contradiction.
+    </p>
+
+    <p>
+        Zero-base exponentiation is iterated: values may appear at higher exponential depth.
+    </p>
+
+    <div class="expression font-lg">
+        <!-- 0^(0^n) = n, -->
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="copyonly">(</span>
+
+            <span class="number">0</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span>
+                <span class="variable">n</span>
+            </sup>
+            <span class="copyonly">)</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="variable">n</span>
+    </div>
+
+    <div class="expression font-lg">
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+        <span class="copyonly">(</span>
+
+        <span class="symbol">&omega;</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span>
+            <span class="variable">n</span>
+        </sup>
+        <span class="copyonly">)</span>
+    </sup>
+        <span class="symbol">=</span>
+        <span class="variable">-n</span>
+    </div>
+
+    <p>
+        This iteration generates the integers structurally, without introducing sign or magnitude as primitives.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        <em>
+            At this stage, the integer case displays a striking reversal symmetry.
+            Whether this apparent involution persists under extension to non-integer exponents remains an open question.
+            The same pattern, however, reappears for logarithms.
+        </em>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title" id="section-6">
+        6. Logarithms with Boundary Bases
+    </div>
+
+    <p>
+        Having established exponentiation over boundary bases, we now examine its inverse.
+    </p>
+
+    <p>
+        Rather than defining logarithms from scratch, we proceed exactly as before: by pairing each
+        exponential identity with its logarithmic counterpart and requiring that both remain valid for boundary bases.
+    </p>
+
+    <p>
+        The logarithm log<sub>0</sub> is defined as the inverse of zero-base exponentiation on its image,
+        including values arising at higher exponential depth.
+    </p>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>
+                <h3 class="expression">
+                    <!-- 0^a = b -->
+                    <span class="number">0</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">a</span>
+                    </sup>
+                    <span class="symbol">=</span>
+                    <span class="variable">b</span>
+                </h3>
+            </th>
+            <th>
+                <h3 class="expression">
+                    <!-- log_0 b = a -->
+                    <span class="variable">log</span><sub><span class="copyonly">_</span><span class="number">0</span></sub>
+                    <span class="variable">b</span>
+                    <span class="symbol">=</span>
+                    <span class="variable">a</span>
+                </h3>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <div class="expression">
+                    <!-- 0^0 = 1 -->
+                    <span class="number">0</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span>
+                        <span class="number">0</span>
+                    </sup>
+                    <span class="symbol">=</span>
+                    <span class="number">1</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression">
+                    <!-- log_0 (1 )= 0 -->
+                    <span class="variable">log</span><sub><span class="copyonly">_</span><span class="number">0</span></sub>
+                    <span class="copyonly">(</span>
+                    <span class="number">1</span>
+                    <span class="copyonly">)</span>
+                    <span class="symbol">=</span>
+                    <span class="number">0</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression">
+                    <!-- 0^1 = 0 -->
+                    <span class="number">0</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span>
+                        <span class="number">1</span>
+                    </sup>
+                    <span class="symbol">=</span>
+                    <span class="number">0</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression">
+                    <!-- log_0 (0 )= 1 -->
+                    <span class="variable">log</span><sub><span class="copyonly">_</span><span class="number">0</span></sub>
+                    <span class="copyonly">(</span>
+                    <span class="number">0</span>
+                    <span class="copyonly">)</span>
+                    <span class="symbol">=</span>
+                    <span class="number">1</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression">
+                    <!-- 0^n = 0 · 0 · ... -->
+                    <span class="number">0</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span>
+                        <span class="variable">n</span>
+                    </sup>
+                    <span class="symbol">=</span>
+                    <span class="number">0</span>
+                    <span class="symbol">&middot;</span>
+                    <span class="number">0</span>
+                    <span class="symbol">&middot;</span>
+                    <span class="symbol">...</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression">
+                    <!-- log_0 (0^n )= n -->
+                    <span class="variable">log</span><sub><span class="copyonly">_</span><span class="number">0</span></sub>
+                    <span class="copyonly">(</span>
+                    <span class="number">0</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span>
+                    <span class="variable">n</span>
+                    </sup>
+                    <span class="copyonly">)</span>
+                    <span class="symbol">=</span>
+                    <span class="variable">n</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression">
+                    <!-- 0^(0^n) = n -->
+                    <span class="number">0</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span>
+                        <span class="copyonly">(</span>
+                        <span class="number">0</span><!--
+                     --><sup><!--
+                         --><span class="copyonly">^</span>
+                            <span class="variable">n</span>
+                        </sup>
+                        <span class="copyonly">)</span>
+                    </sup>
+                    <span class="symbol">=</span>
+                    <span class="variable">n</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression">
+                    <!-- log_0 (n )= 0^n -->
+                    <span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_</span><!--
+                     --><span class="number">0</span>
+                    </sub>
+                    <span class="copyonly">(</span>
+                    <span class="variable">n</span>
+                    <span class="copyonly">)</span>
+                    <span class="symbol">=</span>
+                    <span class="number">0</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span>
+                        <span class="variable">n</span>
+                    </sup>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression">
+                    <!-- 0^(-n) = ω^n -->
+                    <span class="number">0</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^(</span>
+                        <span class="variable">-n</span>
+                        <span class="copyonly">)</span>
+                    </sup>
+                    <span class="symbol">=</span>
+                    <span class="symbol">&omega;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span>
+                        <span class="variable">n</span>
+                    </sup>
+                </div>
+            </td>
+            <td>
+                <div class="expression">
+                    <span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_</span><!--
+                     --><span class="number">0</span>
+                    </sub>
+                    <span class="copyonly">(</span>
+                    <span class="symbol">&omega;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span>
+                        <span class="variable">n</span>
+                    </sup>
+                    <span class="copyonly">)</span>
+                    <span class="symbol">=</span>
+                    <span class="variable">-n</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression">
+                    <span class="number">0</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^(</span>
+                        <span class="symbol">&omega;</span><!--
+                     --><sup><!--
+                         --><span class="copyonly">^</span>
+                            <span class="variable">n</span>
+                        </sup>
+                        <span class="copyonly">)</span>
+                    </sup>
+                    <span class="symbol">=</span>
+                    <span class="variable">-n</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression">
+                    <span class="variable">log</span><sub><span class="copyonly">_</span><span class="number">0</span></sub>
+                    <span class="copyonly">(</span>
+                    <span class="variable">-n</span>
+                    <span class="copyonly">)</span>
+                    <span class="symbol">=</span>
+                    <span class="symbol">&omega;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span>
+                        <span class="variable">n</span>
+                    </sup>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>
+        We write <span class="variable">n</span> without restriction to emphasize that no structural obstruction appears
+        at the integer level; whether these identities extend beyond it is a matter of analysis, not exception.
+    </p>
+
+    <p>
+        Observe that log<sub>0</sub> inverts zero-base exponentiation exactly on its image,
+        preserving the correspondence at higher exponential depths.
+    </p>
+
+    <p>
+        Crucially, we now observe that
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="number">0</span>
+        </sub>
+        is not a separate primitive operation.
+        On its domain, it coincides exactly with exponentiation by zero:
+    </p>
+
+    <div class="expression">
+        <!-- log_0 (n )= 0^n -->
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="number">0</span>
+        </sub>
+        <span class="copyonly">(</span>
+        <span class="variable">n</span>
+        <span class="copyonly">)</span>
+        <span class="symbol">=</span>
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span>
+            <span class="variable">n</span>
+        </sup>
+    </div>
+
+    <p>
+        This identification is not definitional but structural.
+        Both operations produce identical outputs for identical inputs across their shared image.
+    </p>
+
+    <p>
+        Likewise, zero-base exponentiation is self-resolving at higher depth:
+    </p>
+
+    <div class="expression">
+        <!-- 0^(0^n) = n -->
+        <span class="number">0</span><!--
+     --><sup><!--
+        --><span class="copyonly">^</span>
+            <span class="copyonly">(</span>
+            <span class="number">0</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span>
+                <span class="variable">n</span>
+            </sup>
+            <span class="copyonly">)</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="variable">n</span>
+    </div>
+
+    <p>
+        Together, these identities show that logarithms with boundary base do not introduce a new operator.
+        Instead, they reveal a reuse of the existing exponential structure at a different depth.
+    </p>
+
+    <p>
+        Thus, logarithm and exponentiation are not opposing operations here,
+        but the same operation viewed at different levels of the boundary hierarchy.
+    </p>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        <em>
+            With exponentiation and logarithms over boundary bases now defined,
+            we are positioned to explore the natural emergence of the imaginary unit.
+        </em>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title" id="section-7">
+        7. Emergence of the Imaginary Unit
+    </div>
+
+    <p>
+        We freely use logarithmic identities inherited from exponentiation, since logarithms in COTT are defined solely as inverses of existing exponential structure.
+    </p>
+
+    <p>
+        We now examine the square root of −1.
+    </p>
+
+    <div class="expression">
+        <!-- √( -1 )= ( -1 ) ^(1/2) -->
+        <span class="sqrt">
+            <span class="symbol">&radic;</span><!--
+         --><span class="copyonly">(</span>
+            <span class="number radicand">-1</span>
+            <span class="copyonly">)</span>
+        </span>
+        <span class="symbol">=</span>
+        <span class="symbol">(</span>
+        <span class="number">-1</span>
+        <span class="symbol">)</span>
+        <sup>
+            <span class="copyonly">^(</span>
+            <span class="number">1/2</span>
+            <span class="copyonly">)</span>
+        </sup>
+    </div>
+    <div class="narrative">
+        Rather than introducing a new symbol or postulating an external extension,
+        we re-express the exponentiation using zero-base exponentiation and its inverse.
+        This introduces no new assumptions;
+        it merely re-expresses the operation within the existing structure.
+    </div>
+
+    <div class="expression font-lg">
+        <!-- = 0^(log_0 ( -1^(1 / 2) )) -->
+        <span class="symbol">(</span>
+        <span class="number">-1</span>
+        <span class="symbol">)</span>
+        <sup>
+            <span class="copyonly">^(</span>
+            <span class="number">1/2</span>
+            <span class="copyonly">)</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">0</span><!--
+      --><sup><!--
+         --><span class="copyonly">^(</span>
+            <span class="variable">log</span><!--
+         --><sub><!--
+             --><span class="copyonly">_</span><!--
+             --><span class="number">0</span>
+            </sub>
+            <span class="symbol">(</span>
+            <span class="number">-1</span><!--
+         --><sup><!--
+             --><span class="copyonly">^(</span>
+                <span class="number">1</span>
+                <span class="symbol">/</span>
+                <span class="number">2</span>
+                <span class="copyonly">)</span>
+            </sup>
+            <span class="symbol">)</span>
+            <span class="copyonly">)</span>
+        </sup>
+    </div>
+    <p>
+        This step is not required for correctness;
+        it exposes the internal mechanics of the expression by making the boundary operators explicit.
+    </p>
+
+    <p>
+        Using the standard logarithmic identity, we obtain:
+    </p>
+    <div class="expression font-lg">
+        <!-- = 0^(1/2 · log_0( -1 )) -->
+        <span class="symbol">=</span>
+        <span class="number">0</span><!--
+     --><span class="copyonly">^(</span><!--
+     --><sup><!--
+         --><span class="symbol">(</span>
+            <span class="number">1</span>
+            <span class="symbol">/</span>
+            <span class="number">2</span>
+            <span class="symbol">)</span>
+            <span class="symbol">&middot;</span>
+            <span class="variable">log</span><!--
+         --><span class="copyonly">_</span><!--
+         --><sub><!--
+             --><span class="number">0</span><!--
+         --></sub><!--
+         --><span class="symbol">(</span>
+            <span class="number">-1</span>
+            <span class="symbol">)</span>
+        </sup>
+        <span class="copyonly">)</span>
+    </div>
+    <p>
+        From the results of the previous section,
+        the logarithm of −1 with respect to the zero base is already determined:
+    </p>
+    <div class="expression font-lg">
+        <span class="variable">log</span><!--
+     --><sub class="copyonly">_</sub><!--
+     --><sub class="number">0</sub><!--
+     --><span class="symbol">(</span>
+        <span class="number">-1</span>
+        <span class="symbol">)</span>
+        <span class="symbol">=</span>
+        <span class="symbol">&omega;</span>
+    </div>
+    <p>Substituting, we find:</p>
+    <div class="expression font-lg">
+        <!-- = 0^(ω / 2) -->
+        <span class="symbol">=</span>
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^(</span>
+            <span class="symbol">&omega;</span>
+            <span class="symbol">/</span>
+            <span class="number">2</span>
+            <span class="copyonly">)</span>
+        </sup>
+    </div>
+    <p>
+        Thus,
+    </p>
+    <div class="expression font-lg">
+        <!-- √( -1 )= 0^(ω / 2) -->
+        <span class="sqrt">
+            <span class="symbol">&radic;</span><!--
+         --><span class="copyonly">(</span>
+            <span class="number radicand">-1</span>
+            <span class="copyonly">)</span>
+        </span>
+        <span class="symbol">=</span>
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^(</span>
+            <span class="symbol">&omega;</span>
+            <span class="symbol">/</span>
+            <span class="number">2</span>
+            <span class="copyonly">)</span>
+        </sup>
+    </div>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        <em>
+            Our new definition of <span class="variable">i</span> is not assumed or imposed;
+            it emerges as the structural square root of <span class="number">−1</span> under zero-base exponentiation.
+        </em>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title" id="section-8">
+        8. Zero-Generated Phase
+    </div>
+    <div class="narration">
+        <p>
+            The derivation of <span class="variable">i</span> is structurally reminiscent of Euler's identity.
+        </p>
+        <div class="expression font-lg">
+            <span class="variable">e</span>
+            <sup>
+                <span class="copyonly">^(</span>
+                <span class="variable">i</span>
+                <span class="symbol">&pi;</span>
+                <span class="copyonly">)</span>
+            </sup>
+            <span class="symbol">&approx;</span>
+            <span class="number">0</span>
+            <span class="copyonly">^</span>
+            <sup><span class="symbol">&omega;</span></sup>
+            <span class="symbol">=</span>
+            <span class="symbol">-</span>
+            <span class="number">1</span>
+        </div>
+        <div class="expression font-lg">
+            <span class="variable">e</span>
+            <sup>
+                <span class="copyonly">^(</span>
+                <span class="variable">i</span>
+                <span class="symbol">&pi;</span>
+                <span class="variable">&theta;</span>
+                <span class="copyonly">)</span>
+            </sup>
+            <span class="symbol">&approx;</span>
+            <span class="number">0</span>
+            <sup>
+                <span class="copyonly">^(</span>
+                <span class="variable">&theta;</span>
+                <span class="symbol">&omega;</span>
+                <span class="copyonly">)</span>
+            </sup>
+        </div>
+        <p>
+            Here &ldquo;<span class="symbol">&approx;</span>&rdquo; denotes phase correspondence rather than algebraic equality:
+            both expressions generate the same phase outcomes under iteration, though they arise from different constructions.
+        </p>
+        <p>
+            In this system, the default "zero" orientation is zero rather than one:
+            phase begins from annihilation rather than identity.
+        </p>
+        <p>
+            (Recall:
+            <span class="number">0</span>
+            <span class="symbol">&omega;</span>
+            <span class="symbol">=</span>
+            <span class="number">1</span>
+            ,
+            <span class="number">0</span>
+            <sup>
+                <span class="copyonly">^</span>
+                <span class="number">1</span>
+            </sup>
+            <span class="symbol">=</span>
+            <span class="number">0</span>)
+        </p>
+        <div class="expression font-lg">
+            <span class="variable">&theta;</span>
+            <span class="symbol">=</span>
+            <span class="number">0</span>
+            ,
+            <span class="number">0</span>
+            <sup>
+                <span class="copyonly">^(</span>
+                <span class="number">0</span>
+                <span class="symbol">&omega;</span>
+                <span class="copyonly">)</span>
+            </sup>
+            <span class="symbol">=</span>
+            <span class="number">0</span>
+        </div>
+        <div class="expression font-lg">
+            <span class="variable">&theta;</span>
+            <span class="symbol">=</span>
+            <span class="number">1</span>
+            ,
+            <span class="number">0</span>
+            <sup>
+                <span class="copyonly">^</span>
+                <span class="symbol">&omega;</span>
+            </sup>
+            <span class="symbol">=</span>
+            <span class="number">-1</span>
+        </div>
+        <p>
+            From here, integer phase advances multiplicatively.
+        </p>
+        <div class="expression font-lg">
+            <span class="variable">&theta;</span>
+            <span class="symbol">=</span>
+            <span class="number">2</span>
+            ,
+            <span class="number">0</span>
+            <sup>
+                <span class="copyonly">^(</span>
+                <span class="number">2</span>
+                <span class="symbol">&omega;</span>
+                <span class="copyonly">)</span>
+            </sup>
+            <span class="symbol">=</span>
+            <span class="number">1</span>
+        </div>
+        <div class="expression font-lg">
+            <span class="variable">&theta;</span>
+            <span class="symbol">=</span>
+            <span class="number">3</span>
+            ,
+            <span class="number">0</span>
+            <sup>
+                <span class="copyonly">^(</span>
+                <span class="number">3</span>
+                <span class="symbol">&omega;</span>
+                <span class="copyonly">)</span>
+            </sup>
+            <span class="symbol">=</span>
+            <span class="number">-1</span>
+        </div>
+        <p>
+            Fractional phase interpolates this oscillation.
+        </p>
+        <div class="expression font-lg">
+            <span class="variable">&theta;</span>
+            <span class="symbol">=</span>
+            <span class="fraction">
+                <span class="numerator">1</span>
+                <span class="h-divider">/</span>
+                <span class="denominator">2</span>
+            </span>
+            ,
+            <span class="number">0</span>
+            <sup>
+                <span class="copyonly">^(</span>
+                <span class="symbol">(</span>
+                <span class="number">1</span>
+                <span class="symbol">/</span>
+                <span class="number">2</span>
+                <span class="symbol">)</span>
+                <span class="symbol">&omega;</span>
+                <span class="copyonly">)</span>
+            </sup>
+            <span class="symbol">&approx;</span>
+            <span class="variable">i</span>
+        </div>
+        <p>
+            The phase <span class="number">1</span>/<span class="number">3</span> is our first example of a non-dyadic phase.
+            It can be represented in terms of <span class="variable">i</span>, but not generated by it alone.
+        </p>
+    </div>
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        <em>
+            In this section we explored phase as construction.
+            Phase arises from zero-base exponentiation rather than geometric rotation,
+            explaining why non-dyadic phases resist simple representation in classical complex numbers.
+        </em>
+    </div>
+</div>
+
+
+<div class="section">
+    <div class="section-title" id="section-9">
+        9. Rational Powers of Negative Numbers
+    </div>
+    <div class="narration">
+        <p>
+            We now derive a closed expression for rational powers of negative numbers, using only structures already introduced.
+        </p>
+        <p>
+            The key observation is that, in COTT, logarithms are not primitive. For the zero base we have the identity
+        </p>
+        <div class="expression font-lg">
+            <span class="variable">log</span><span class="copyonly">_</span><sub class="number">0</sub>
+            <span class="variable">x</span>
+            <span class="symbol">=</span>
+            <span class="number">0</span>
+            <sup><span class="variable">x</span></sup>
+        </div>
+        <p>
+            We begin with a negative base written explicitly.
+        </p>
+        <div class="expression font-lg">
+            <span class="symbol">(</span><span class="symbol">-</span><span class="variable">x</span><span class="symbol">)</span>
+            <sup><span class="copyonly">^(</span><span class="variable">p</span><span class="symbol">/</span><span class="variable">q</span><span class="copyonly">)</span></sup>
+        </div>
+        <p>
+            Rewriting exponentiation through zero-base exponentiation and its inverse gives
+        </p>
+        <div class="expression font-lg">
+            <span class="symbol">=</span>
+            <span class="number">0</span>
+            <sup>
+                <span class="copyonly">^(</span>
+                <span class="symbol">(</span><span class="variable">p</span><span class="symbol">/</span><span class="variable">q</span><span class="symbol">)</span>
+                <span class="variable">log</span><span class="copyonly">_</span><sub class="number">0</sub>
+                <span class="symbol">(</span><span class="symbol">-</span><span class="variable">x</span><span class="symbol">)</span>
+                <span class="copyonly">)</span>
+            </sup>
+        </div>
+        <p>
+            From earlier results, the logarithm of a negative value separates cleanly into magnitude and boundary contribution:
+        </p>
+        <div class="expression font-lg">
+            <span class="variable">log</span><span class="copyonly">_</span><sub class="number">0</sub>
+            <span class="symbol">(</span><span class="symbol">-</span><span class="variable">x</span><span class="symbol">)</span>
+            <span class="symbol">=</span>
+            <span class="symbol">&omega;</span><sup><span class="variable">x</span></sup>
+        </div>
+        <p>
+            Substituting, we obtain the compact form
+        </p>
+        <div class="expression font-xl">
+            <span class="symbol">=</span>
+            <span class="number">0</span>
+            <sup>
+                <span class="copyonly">^(</span>
+                <span class="symbol">(</span><span class="variable">p</span><span class="symbol">/</span><span class="variable">q</span><span class="symbol">)</span>
+                <span class="symbol">&middot;</span>
+                <span class="symbol">&omega;</span><sup><span class="variable">x</span></sup>
+                <span class="copyonly">)</span>&nbsp;
+            </sup>
+        </div>
+        <p>
+            This expression defines all rational powers of negative numbers without branch cuts or external conventions.
+        </p>
+        <p>
+            As an example, consider a non-dyadic case:
+        </p>
+        <div class="expression font-lg">
+            <span class="symbol">(</span><span class="symbol">-</span><span class="number">1</span><span class="symbol">)</span>
+            <sup><span class="copyonly">^(</span><span class="number">1</span><span class="symbol">/</span><span class="number">3</span><span class="copyonly">)</span></sup>
+            <span class="symbol">=</span>
+            <span class="number">0</span>
+            <sup>
+                <span class="copyonly">^(</span>
+                <span class="symbol">(</span><span class="number">1</span><span class="symbol">/</span><span class="number">3</span><span class="symbol">)</span>
+                <span class="symbol">&middot;</span>
+                <span class="symbol">&omega;</span>
+                <span class="copyonly">)</span>
+            </sup>
+            <span class="symbol">&approx;</span>
+            <span class="variable">e</span>
+            <sup>
+                <span class="copyonly">^(</span>
+                <span class="variable">i</span><span class="variable">&pi;</span>
+                <span class="symbol">&middot;</span>
+                <span class="symbol">(</span>
+                <span class="number">1</span>
+                <span class="symbol">/</span>
+                <span class="number">3</span>
+                <span class="symbol">)</span>
+                <span class="copyonly">)</span>
+            </sup>
+            <span class="symbol">=</span>
+            <span class="variable">e</span>
+            <sup>
+                <span class="copyonly">^(</span>
+                <span class="symbol">(</span>
+                <span class="number">1</span>
+                <span class="symbol">/</span>
+                <span class="number">3</span>
+                <span class="symbol">)</span>
+                <span class="symbol">&middot;</span>
+                <span class="variable">log</span>
+                <span class="symbol">(</span>
+                <span class="number">-1</span>
+                <span class="symbol">)</span>
+                <span class="copyonly">)</span>
+            </sup>
+        </div>
+    </div>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        <em>COTT provides an origin story for the rational complex exponential, of which Euler's equations are the analytic continuation.</em>
+    </div>
+
+</div>
+
+<div class="section">
+    <div class="section-title" id="section-10">
+        10. Exact Values as Terminal Constructions
+    </div>
+
+    <p>
+       We begin with the simplest dyadic phase:
+    </p>
+
+    <div class="expression">
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^(</span>
+            <span class="symbol">&omega;</span>
+            <span class="symbol">/</span>
+            <span class="number">2</span>
+            <span class="copyonly">)</span>
+        </sup>
+    </div>
+    <div class="expression">
+        <span class="symbol">=</span>
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="symbol">&omega;</span>
+        </sup>
+        <span class="symbol">-</span>
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+    </div>
+    <div class="expression">
+        <span class="symbol">=</span>
+        <span class="number">-1</span>
+        <span class="symbol">-</span>
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+    </div>
+
+    <p>
+        This tells us we have a terminal construction with a coefficient of −1 and a residual boundary contribution
+        on the second-order axis.
+    </p>
+
+    <p>
+        In COTT, rational phase is not an angle but a discrete axis structure whose dimensionality is determined by
+        the denominator and whose coupling depends on its factorization.
+    </p>
+
+    <p>
+        Taking a non-dyadic example:
+    </p>
+
+    <div class="expression">
+        <!-- 0 ^(ω · 2 / 5) -->
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^(</span>
+            <span class="symbol">&omega;</span>
+            <span class="symbol">&middot;</span>
+            <span class="number">2</span>
+            <span class="symbol">/</span>
+            <span class="number">5</span>
+            <span class="copyonly">)</span>
+        </sup>
+    </div>
+    <div class="expression">
+        <!-- = -1 + 0 ^2 - 0 ^5 -->
+        <span class="symbol">=</span>
+        <span class="number">-1</span>
+        <span class="symbol">+</span>
+        <span class="symbol">(</span>
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">-</span>
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">5</span>
+        </sup>
+        <span class="symbol">)</span>
+    </div>
+
+    <p>
+        The denominator does not indicate magnitude but the dimensionality of the phase interaction;
+        coprime factors generate independent signed axes.
+    </p>
+
+    <p>
+        Even irrational phases can be analyzed, although determining the terminal construction is a bit more complicated.
+    </p>
+
+    <p>
+        Here the quantity is not itself a phase, but the projection of a higher-order construction onto the level-0 reference frame.
+    </p>
+
+    <div class="expression font-lg">
+        <!-- √( 3)/2 -->
+        <span class="fraction">
+            <span class="numerator">
+            <span class="sqrt">
+                <span class="symbol">&radic;</span><!--
+             --><span class="copyonly">(</span>
+                <span class="number radicand">3</span>
+                <span class="copyonly">)</span>
+            </span>
+            </span>
+            <span class="h-divider">/</span>
+            <span class="denominator">
+                2
+            </span>
+        </span>
+    </div>
+
+    <p>
+        We begin by applying the involution to bases of exponentiation.
+        This involution lifts the quantity into a construction space where phase can be resolved before projection.
+        The initial reference frame is level 0.
+    </p>
+
+    <div class="expression font-lg">
+        <!-- [ 0^0 ^( 3 ) ^(1 / 2) ] / 0^0 ^2 -->
+        <span class="symbol">[</span>
+        <sub>
+            <span class="number">0</span><!--
+         --><span class="copyonly">^</span><!--
+     --></sub><!--
+     --><span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="symbol">(</span>
+            <span class="number">3</span>
+            <span class="symbol">)</span>
+            <sup>
+                <span class="copyonly">^(</span>
+                <span class="number">1</span>
+                <span class="symbol">/</span>
+                <span class="number">2</span>
+                <span class="copyonly">)</span>
+            </sup>
+        </sup>
+        <span class="symbol">]</span>
+        <span class="symbol">/</span>
+        <sub>
+            <span class="number">0</span><!--
+         --><span class="copyonly">^</span><!--
+     --></sub><!--
+     --><span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+    </div>
+
+    <p>
+        Apply the power rule to the lifted base:
+    </p>
+
+    <div class="expression font-lg">
+        <!-- [ 0 ^(( 1 / 2 ) · 0 ^3) ] / 0^0 ^2 -->
+        <span class="symbol">[</span>
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^(</span>
+            <span class="symbol">(</span>
+            <span class="number">1</span>
+            <span class="symbol">/</span>
+            <span class="number">2</span>
+            <span class="symbol">)</span>
+            <span class="symbol">&middot;</span>
+            <span class="number">0</span>
+            <sup>
+                <span class="copyonly">^</span>
+                <span class="number">3</span>
+            </sup>
+            <span class="copyonly">)</span>
+        </sup>
+        <span class="symbol">]</span>
+        <span class="symbol">/</span>
+        <sub>
+            <span class="number">0</span><!--
+         --><span class="copyonly">^</span><!--
+     --></sub><!--
+     --><span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+    </div>
+
+    <p>
+        Split the exponent: multiplication becomes addition.
+    </p>
+
+    <div class="expression font-lg">
+        <!-- [ 0 ^(1 / 2) + 0^0 ^3 ] / 0^0 ^2 -->
+        <span class="symbol">[</span>
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^(</span>
+            <span class="number">1</span>
+            <span class="symbol">/</span>
+            <span class="number">2</span>
+            <span class="copyonly">)</span>
+        </sup>
+        <span class="symbol">+</span>
+        <sub>
+            <span class="number">0</span><!--
+         --><span class="copyonly">^</span><!--
+     --></sub><!--
+     --><span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">3</span>
+        </sup>
+        <span class="symbol">]</span>
+        <span class="symbol">/</span>
+        <sub>
+            <span class="number">0</span><!--
+         --><span class="copyonly">^</span><!--
+     --></sub><!--
+     --><span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+    </div>
+
+    <p>
+        Split the exponent: division becomes subtraction.
+    </p>
+
+    <div class="expression font-lg">
+        <!-- [ 0 ^1 − 0 ^2 + 0^0 ^3 ] / 0^0 ^2 -->
+        <span class="symbol">[</span>
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">1</span>
+        </sup>
+        <span class="symbol">−</span>
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">+</span>
+        <sub>
+            <span class="number">0</span><!--
+         --><span class="copyonly">^</span><!--
+     --></sub><!--
+     --><span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">3</span>
+        </sup>
+        <span class="symbol">]</span>
+        <span class="symbol">/</span>
+        <sub>
+            <span class="number">0</span><!--
+         --><span class="copyonly">^</span><!--
+     --></sub><!--
+     --><span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+    </div>
+
+    <p>
+        We rewrite
+        <span class="number">1</span>
+        as
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">0</span>
+        </sup>
+        .
+    </p>
+
+    <div class="expression font-lg">
+        <!-- [ 0^0 ^ 0 − 0 ^ 2 + 0^0 ^ 3 ] / 0^0 ^2 -->
+        <span class="symbol">[</span>
+        <sub>
+            <span class="number">0</span><!--
+         --><span class="copyonly">^</span><!--
+     --></sub><!--
+     --><span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">0</span>
+        </sup>
+        <span class="symbol">−</span>
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">+</span>
+        <sub>
+            <span class="number">0</span><!--
+         --><span class="copyonly">^</span><!--
+     --></sub><!--
+     --><span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">3</span>
+        </sup>
+        <span class="symbol">]</span>
+        <span class="symbol">/</span>
+        <sub>
+            <span class="number">0</span><!--
+         --><span class="copyonly">^</span><!--
+     --></sub><!--
+     --><span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+    </div>
+
+    <p>
+        Double-involution on the
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+    </p>
+
+    <div class="expression font-lg">
+        <!-- [ 0^0 ^0 − 0^0 ^(0 ^ 2) + 0^0 ^3 ] / 0^0 ^2 -->
+        <span class="symbol">[</span>
+        <sub>
+            <span class="number">0</span><!--
+         --><span class="copyonly">^</span><!--
+     --></sub><!--
+     --><span class="number">0</span>
+        <sup><!--
+            --><span class="copyonly">^</span><!--
+         --><span class="number">0</span>
+        </sup>
+        <span class="symbol">−</span>
+        <sub>
+            <span class="number">0</span><!--
+         --><span class="copyonly">^</span><!--
+     --></sub><!--
+     --><span class="number">0</span>
+        <sup>
+            <span class="copyonly">^(</span>
+            <span class="number">0</span>
+            <sup>
+                <span class="copyonly">^</span>
+                <span class="number">2</span>
+            </sup>
+            <span class="copyonly">)</span>
+        </sup>
+        <span class="symbol">+</span>
+        <sub>
+            <span class="number">0</span><!--
+         --><span class="copyonly">^</span><!--
+     --></sub><!--
+     --><span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">3</span>
+        </sup>
+        <span class="symbol">]</span>
+        <span class="symbol">/</span>
+        <sub>
+            <span class="number">0</span><!--
+         --><span class="copyonly">^</span><!--
+     --></sub><!--
+     --><span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+    </div>
+
+    <p>
+        Now all terms have the same base, so we resolve the redundant involutions, not by cancelling them out,
+        but by shifting the reference frame up two levels, preserving construction history instead of erasing it.
+        We are now on level 2.
+    </p>
+
+    <div class="expression font-lg">
+        <!-- ( 0 − 0 ^2 + 3 ) / 2 -->
+        <span class="symbol">(</span>
+        <span class="number">0</span>
+        <span class="symbol">−</span>
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">+</span>
+        <span class="number">3</span>
+        <span class="symbol">)</span>
+        <span class="symbol">/</span>
+        <span class="number">2</span>
+    </div>
+
+    <p>
+
+    </p>
+
+    <div class="expression font-lg">
+        <!-- 1/2 · 0 ^1 − 1/2 · 0 ^2 + 3/2 -->
+        <span class="fraction">
+            <span class="numerator">
+                <span class="number">1</span>
+            </span>
+            <span class="h-divider">/</span>
+            <span class="denominator">
+                <span class="number">2</span>
+            </span>
+        </span>
+        <span class="symbol">&middot;</span>
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">1</span>
+        </sup>
+        <span class="symbol">−</span>
+        <span class="fraction">
+            <span class="numerator">
+                <span class="number">1</span>
+            </span>
+            <span class="h-divider">/</span>
+            <span class="denominator">
+                <span class="number">2</span>
+            </span>
+        </span>
+        <span class="symbol">&middot;</span>
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="number">2</span>
+        </sup>
+        <span class="symbol">+</span>
+        <span class="fraction">
+            <span class="numerator">
+                <span class="number">3</span>
+            </span>
+            <span class="h-divider">/</span>
+            <span class="denominator">
+                <span class="number">2</span>
+            </span>
+        </span>
+    </div>
+
+    <p>
+        This terminal construction represents the projection of a three-axis interaction onto the level-0 frame,
+        with signed residual structure retained rather than normalized away.
+    </p>
+
+    <p>
+        We can now compute with phase without angles,
+        rotation without normalization,
+        and dimensionality without basis vectors.
+    </p>
+
+    <div class="section-footer">
+        While prior constructive number systems such as the surreal numbers emphasize universality and completeness,
+        they do not provide a clear operational substrate for computation, simulation, or physical modeling.
+        COTT instead prioritizes reversible construction and boundary interaction,
+        allowing dimensional structure to emerge directly from construction.
+    </div>
+
+</div>
+
+<script>
+</script>
+</body>
+</html>

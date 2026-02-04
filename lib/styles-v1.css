@@ -1,0 +1,257 @@
+
+/******************/
+/* Tag Formatting */
+
+body {
+    font-family: "IBM Plex Sans", sans-serif;
+    max-width: 800px;
+}
+h1 {
+    font-family: "IBM Plex Serif", serif;
+    text-align: center;
+}
+h2 {
+    font-family: "IBM Plex Serif", serif;
+    font-style: italic;
+    font-weight: normal;
+    text-align: center;
+}
+
+h3 {
+    font-family: "IBM Plex Serif", serif;
+    font-weight: 600;
+    text-align: center;
+}
+
+table {
+    font-family: "IBM Plex Sans", sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+table.fixed {
+    table-layout: fixed;
+    width: 100%;
+}
+tr {
+    border: none
+}
+th {
+    border: 2px solid black;
+}
+td {
+    border: 1px solid #999;
+}
+table .expression {
+    text-align: center;
+}
+
+sup {
+    display: inline-block;
+    position: relative;
+    top:-0.1em;
+    line-height: 1;
+    font-size: 0.8em;
+}
+
+sub {
+    display: inline-block;
+    position: relative;
+    bottom:-0.1em;
+    line-height: 1;
+    font-size: 0.9em;
+}
+
+a,
+a:active,
+a:target {
+    color: #0066cc;
+    text-decoration: none;
+}
+
+a:hover,
+a:focus {
+    color: #004080;
+    text-decoration: underline;
+}
+
+/*************************/
+/* Formatting Extensions */
+
+/* Main Sections */
+
+.headings {
+    padding: 1em 0 1em 0;
+    margin: 2em 0 2em 0;
+}
+
+.section-title {
+    font-family: "IBM Plex Serif", serif;
+    margin: 0 0 1em 0;
+    padding: 0 0 1em 0;
+    font-weight: 600;
+    font-size: 1.2em;
+    border-bottom: 1px solid #999
+}
+
+.subsection-title {
+    font-family: "STIX Two Text", "Cambria Math", "Latin Modern Math", serif;
+    margin: 1.5em 0;
+    font-weight: 600;
+    font-size: 1.2em;
+    border-bottom: 1px solid #999
+}
+.emphasis {
+    font-weight: 600;
+}
+.section-footer {
+    margin: 1em 0 0 0;
+    padding: 1em 0 0 0;
+    border-top: 1px solid #999
+}
+.section {
+    margin: 2em;
+    padding: 2em;
+    background-color: beige;
+    border-radius: 2em;
+    border: 2px solid #999;
+    box-shadow: #aaa 0.5em 0.5em 2em;
+    break-inside: avoid;
+}
+
+/* Alternate Sections */
+
+.section-alt {
+    margin: 1em;
+    padding: 1em;
+    background-color: #aef;
+    border-radius: 2em;
+    border: 2px solid #999;
+}
+
+/********************/
+/* Math Expressions */
+
+.expression {
+    font-family: "STIX Two Text", "Cambria Math", "Latin Modern Math", serif;
+    font-size: 1.2em;
+    margin: 1rem;
+    white-space: nowrap;
+}
+
+.expr-label {
+    display: inline;
+    font-weight: bold;
+    padding-right: 1em;
+    font-size: 1.2rem;
+}
+
+.font-lg {
+    font-size: 1.5em;
+}
+.font-xl {
+    font-size: 2em;
+}
+span.variable, span.symbol, span.number, sup, sub, .fraction {
+    white-space: nowrap;
+}
+
+.variable {
+    font-family: "STIX Two Text", "Cambria Math", "Latin Modern Math", serif;
+    font-style: italic;
+}
+.symbol {
+    font-family: "Libertinus Math", system-ui;
+    display: inline;
+}
+.symbol.italics {
+    font-style: italic;
+}
+.symbol.invisible {
+    position: absolute;
+    color: rgba(1,1,1,50%)
+}
+.fraction {
+    display: inline-flex;
+    flex-direction: column;
+    vertical-align: middle;
+    margin: 0 0.1em;
+}
+p .fraction {
+    margin: 0 0.2em;
+    font-size: 0.8em;
+}
+.numerator {
+    display: inline;
+    vertical-align: middle;
+    align-self: center;
+}
+.denominator {
+    display: inline;
+    vertical-align: middle;
+    align-self: center;
+}
+.h-divider {
+    display: inline;
+    height: 1px;
+    border-top:1px solid black;
+    color: rgba(1,1,1,0%);
+    white-space: nowrap;
+}
+.parens-group {
+    margin: 0 -0.4em;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+}
+.parens-group > .parens-content {
+    display: flex;
+}
+
+.sqrt {
+    font-family: "Libertinus Math", system-ui;
+}
+
+.sqrt .radicand {
+    font-family: "STIX Two Text", "Cambria Math", "Latin Modern Math", serif;
+    border-top: 0.07em solid currentColor;
+    padding-top: 0.11em;
+    margin-left: -0.28em;
+}
+
+.copyonly {
+    position: absolute;
+    opacity: 0;
+    padding: 0;
+    margin: 0;
+    width: 0;
+    height: 0;
+}
+
+.narration sup {
+    margin-right: -0.2em;
+    display: inline;
+}
+.w50 {
+    width: 50%;
+}
+
+/* Print Media */
+@media print {
+    .section {
+        background: none;
+        border: none;
+        box-shadow: none;
+    }
+    a,
+    a:active,
+    a:target {
+        color: black;
+        text-decoration: none;
+    }
+
+    a:hover,
+    a:focus {
+        color: black;
+        text-decoration: none;
+    }
+}
