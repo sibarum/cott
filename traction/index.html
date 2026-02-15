@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html xmlns="http://www.w3.org/1999/html" lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../lib/styles-v1.css">
+
+    <title>Tractions: An Exception-Free Algebra</title>
+
+</head>
+<body>
+
+<div class="section">
+
+    <div class="headings">
+        <h1>Tractions: An Exception-Free Algebra</h1>
+        <h2>with Total Exponential and Logarithmic Operators</h2>
+    </div>
+
+    <div class="section-title">
+        Table of Contents
+    </div>
+    <ol>
+        <li>
+            <a href="#section-1">
+                Preface
+            </a>
+        </li>
+    </ol>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        Published under the <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-1">
+        1. Preface
+    </div>
+
+    <div class="subsection-title">
+        1.1 Motivation
+    </div>
+
+    <p>
+        At its core, algebra is the symbolic manipulation of expressions subject to logical invariance.
+        Valid manipulations preserve truth while revealing structure.
+
+        We call an algebra <strong>maximally tractable</strong> if it admits every manipulation that preserves the invariants of an expression,
+        allowing structure to be extracted without introducing exceptional cases or undefined behavior.
+
+        We call an algebra <strong>consistent</strong> if it forbids manipulations that would invalidate those invariants,
+        ensuring that symbolic transformations do not alter semantic truth.
+
+        A <strong>traction</strong> is an algebra designed to be both consistent and maximally tractable:
+        it permits all invariant-preserving transformations while prohibiting those that would break correctness.
+    </p>
+
+    <div class="subsection-title">
+        1.2 Operational Type Extensions
+    </div>
+
+    <p>
+        To achieve an exception-free algebra, tractions define not only new algebraic structures but also new semantics.
+        In classical algebra, operations are implicitly assumed to simplify to a single numeric element - a "number" with digit-wise representation.
+        Tractions remove this restriction:
+        <strong>operations are not required to evaluate to a numeric value.</strong>
+        Instead, the unevaluated expression itself serves as the
+        <strong>canonical symbolic representative</strong>
+        of a distinct algebraic element.
+    </p>
+
+    <p>
+        This shift in perspective carries an immediate consequence.
+        Classical types are defined as sets of numeric elements, not unevaluated expressions.
+        To accommodate symbolic elements, tractions adopt an <strong>operational type extension</strong>,
+        in which types are defined not only by their numeric members
+        but also by closure under all admissible operations.
+        In this way, numbers and symbolic expressions coexist seamlessly within the same algebraic framework.
+    </p>
+
+    <p>
+        Crucially, undefinedness is no longer a possibility - it is simply an expression that fails to
+        project to a single, exact, numeric value.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-2">
+        2. Tires
+    </div>
+
+    <div>
+        Tires are a wheel-like algebra wherein the additive identity
+        <span class="number">0</span>
+        and its multiplicative reciprocal
+        <span class="symbol">&omega;</span>
+        are fully included, ensuring the system is exception-free and maximally tractable.
+        Addition is a closed abelian group.
+        Multiplication is nearly abelian, if not for additional binding constraints on the identities.
+        Equality is structural, not purely equational.
+    </div>
+
+    <div class="subsection-title">
+        2.1 Additive Inverse
+    </div>
+
+    <p>
+        For every term <span class="variable">t</span>, there exists a term called its additive inverse, written:
+    </p>
+
+    <div class="expression">
+        <span class="symbol">&ndash;</span>
+        <span class="variable">t</span>
+    </div>
+
+    <p>
+        Negation is a unary operation satisfying the involution law
+    </p>
+
+    <div class="expression">
+        <span class="symbol">&ndash;</span>
+        <span class="symbol">(</span>
+        <span class="symbol">&ndash;</span>
+        <span class="variable">t</span>
+        <span class="symbol">)</span>
+        <span class="symbol">=</span>
+        <span class="variable">t</span>
+    </div>
+
+    <p>
+        Negation is purely structural: forming
+        <span class="symbol">&ndash;</span>
+        <span class="variable">t</span>
+        does not evaluate or simplify
+        <span class="variable">t</span>;
+        it constructs a new term.
+    </p>
+
+
+    <div class="subsection-title">
+        2.2 Addition
+    </div>
+
+    <p>
+        Addition is a total binary operation on terms. For all terms
+        <span class="variable">a</span>,
+        <span class="variable">b</span>,
+        <span class="variable">c</span>,
+    </p>
+
+    <div class="expression">
+        <span class="variable">a</span>
+        <span class="symbol">+</span>
+        <span class="variable">b</span>
+        <span class="symbol">=</span>
+        <span class="variable">c</span>
+    </div>
+
+    <p>
+        implies the recovery laws
+    </p>
+
+    <div class="expression">
+        <span class="variable">c</span>
+        <span class="symbol">+</span>
+        <span class="symbol">(</span>
+        <span class="symbol">-</span>
+        <span class="variable">a</span>
+        <span class="symbol">)</span>
+        <span class="symbol">=</span>
+        <span class="variable">b</span>,
+    </div>
+
+    <div class="expression">
+        <span class="variable">c</span>
+        <span class="symbol">+</span>
+        <span class="symbol">(</span>
+        <span class="symbol">-</span>
+        <span class="variable">b</span>
+        <span class="symbol">)</span>
+        <span class="symbol">=</span>
+        <span class="variable">a</span>.
+    </div>
+
+    <p>
+        Addition further satisfies associativity and commutativity:
+    </p>
+
+    <div class="expression">
+        <span class="symbol">(</span>
+        <span class="variable">a</span>
+        <span class="symbol">+</span>
+        <span class="variable">b</span>
+        <span class="symbol">)</span>
+        <span class="symbol">+</span>
+        <span class="variable">c</span>
+        <span class="symbol">=</span>
+        <span class="variable">a</span>
+        <span class="symbol">+</span>
+        <span class="symbol">(</span>
+        <span class="variable">b</span>
+        <span class="symbol">+</span>
+        <span class="variable">c</span>
+        <span class="symbol">)</span>
+    </div>
+
+    <div class="expression">
+        <span class="variable">a</span>
+        <span class="symbol">+</span>
+        <span class="variable">b</span>
+        <span class="symbol">=</span>
+        <span class="variable">b</span>
+        <span class="symbol">+</span>
+        <span class="variable">a</span>
+    </div>
+
+
+    <div class="subsection-title">
+        2.3 Additive Identity
+    </div>
+
+    <p>
+        There exists a term
+        <span class="number">0</span>
+        such that for every term
+        <span class="variable">t</span>,
+    </p>
+
+    <div class="expression">
+        <span class="variable">t</span>
+        <span class="symbol">+</span>
+        <span class="symbol">(</span>
+        <span class="symbol">&ndash;</span>
+        <span class="variable">t</span>
+        <span class="symbol">)</span>
+        <span class="symbol">=</span>
+        <span class="number">0</span>.
+    </div>
+
+    <p>
+        From the recovery laws, it follows that
+    </p>
+
+    <div class="expression">
+        <span class="variable">t</span>
+        <span class="symbol">+</span>
+        <span class="number">0</span>
+        <span class="symbol">=</span>
+        <span class="variable">t</span>,
+    </div>
+
+    <p>
+        so <span class="number">0</span> acts as an additive identity.
+    </p>
+
+    <div class="subsection-title">
+        2.4 Multiplicative Inverse
+    </div>
+
+    <p>
+        For every term <span class="variable">t</span>,
+        there exists a term called its multiplicative inverse, written
+    </p>
+
+    <div class="expression">
+        <span class="variable">t</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span>
+        </sup>
+    </div>
+
+    <p>
+        This inverse is defined structurally and satisfies the involution law
+    </p>
+
+    <div class="expression">
+        <span class="symbol">(</span>
+        <span class="variable">t</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span>
+        </sup>
+        <span class="symbol">)</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="variable">t</span>
+    </div>
+
+    <p>
+        Forming
+        <span class="variable">t</span><!--
+     --><span class="copyonly">^</span><!--
+     --><span class="symbol">&ndash;</span>
+        <span class="number">1</span>
+        does not evaluate
+        <span class="variable">t</span>;
+        it constructs a new term.
+    </p>
+
+    <div class="subsection-title">
+        2.5 Multiplication
+    </div>
+
+    <p>
+        Multiplication is a total binary operation.
+        For all terms
+        <span class="variable">a</span>,
+        <span class="variable">b</span>,
+        <span class="variable">c</span>,
+    </p>
+
+    <div class="expression">
+        <span class="variable">a</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">b</span>
+        <span class="symbol">=</span>
+        <span class="variable">c</span>
+    </div>
+
+    <p>
+        implies the <strong>recovery laws</strong>
+    </p>
+
+    <div class="expression">
+        <span class="variable">c</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">a</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="variable">b</span>,
+    </div>
+
+    <div class="expression">
+        <span class="variable">c</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">b</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="variable">a</span>.
+    </div>
+
+    <p>
+        Multiplication is associative and commutative:
+    </p>
+
+    <div class="expression">
+        <span class="symbol">(</span>
+        <span class="variable">a</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">b</span>
+        <span class="symbol">)</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">c</span>
+        <span class="symbol">=</span>
+        <span class="variable">a</span>
+        <span class="symbol">&middot;</span>
+        <span class="symbol">(</span>
+        <span class="variable">b</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">c</span>
+        <span class="symbol">)</span>
+    </div>
+
+    <div class="expression">
+        <span class="variable">a</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">b</span>
+        <span class="symbol">=</span>
+        <span class="variable">b</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">a</span>
+    </div>
+
+    <div class="subsection-title">
+        2.6 Multiplicative Identity
+    </div>
+
+    <p>
+        There exists a term
+        <span class="number">1</span>
+        such that for every term
+        <span class="variable">t</span>,
+    </p>
+
+    <div class="expression">
+        <span class="variable">t</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">t</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">1</span>.
+    </div>
+
+    <p>
+        From the recovery laws it follows that
+    </p>
+
+    <div class="expression">
+        <span class="variable">t</span>
+        <span class="symbol">&middot;</span>
+        <span class="number">1</span>
+        <span class="symbol">=</span>
+        <span class="variable">t</span>.
+    </div>
+
+    <p>
+        The inverse of the multiplicative identity is the multiplicative identity.
+    </p>
+
+    <div class="expression">
+        <span class="number">1</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">1</span>.
+    </div>
+
+    <div class="subsection-title">
+        2.7 Zero and <span class="number">&omega;</span>
+    </div>
+
+    <p>
+        The behavior of zero in a tire is not the familiar absorbing element.
+    </p>
+
+    <p>
+        Zero does not cause erasure when within a multiplicative association with any other terms.
+    </p>
+
+    <div class="expression">
+        <span class="number">0</span>
+        <span class="symbol">+</span>
+        <span class="symbol">(</span>
+        <span class="symbol">&ndash;</span>
+        <span class="number">0</span>
+        <span class="symbol">)</span>
+        <span class="symbol">=</span>
+        <span class="number">0</span>
+    </div>
+
+    <p>
+        Zero has a multiplicative inverse, for which we give a convenient alias:
+    </p>
+
+    <div class="expression">
+        <span class="number">0</span>
+        <sup>
+            <span class="copyonly">^</span>
+            <span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="number">&omega;</span>
+    </div>
+
+    <p>
+        Zero and its inverse multiply to the multiplicative identity:
+    </p>
+
+    <div class="expression">
+        <span class="number">0</span>
+        <span class="symbol">&middot;</span>
+        <span class="symbol">&omega;</span>
+        <span class="symbol">=</span>
+        <span class="number">1</span>
+    </div>
+
+    <p>
+        The additive identity is unique.
+    </p>
+
+    <div class="subsection-title">
+        2.8 Binding Law
+    </div>
+
+    <p>
+        If
+        <span class="variable">x</span>
+        <span class="symbol">&ne;</span>
+        <span class="symbol">&omega;</span>
+        then
+        <span class="number">0</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">x</span>
+        is a bound term written
+        <span class="number">0</span>
+        <span class="variable">x</span>
+        that does not reassociate into additive form.
+    </p>
+
+    <p>
+        If
+        <span class="variable">x</span>
+        <span class="symbol">&ne;</span>
+        <span class="number">0</span>
+        then
+        <span class="symbol">&omega;</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">x</span>
+        is a bound term written
+        <span class="symbol">&omega;</span>
+        <span class="variable">x</span>
+        that does not reassociate into additive form.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        <em>
+            A tire is a totalized, two-group algebra with a distinguished inverse pair
+            (0, <span class="symbol">&omega;</span>)
+            and boundary-sensitive reassociation rules.
+        </em>
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-3">
+
+    </div>
+</div>
+
+<script>
+</script>
+</body>
+</html>
