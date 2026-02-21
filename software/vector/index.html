@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html xmlns="http://www.w3.org/1999/html" lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../lib/styles-v1.css">
+    <script type="text/javascript" src="vector.js"></script>
+    <script type="text/javascript" src="graph.js"></script>
+
+    <title>Vectorized Feature Sets</title>
+
+</head>
+<body>
+
+<div class="section">
+
+    <div class="headings">
+        <h1>Vectorized Feature Sets</h1>
+        <h2>Deterministic encodings for sets of structured features</h2>
+    </div>
+
+    <div class="centered">
+        <canvas id="canvas-title"></canvas>
+    </div>
+<script type="text/javascript">
+(function() {
+    const graph = new GRAPH.Graph("canvas-title");
+    let sineWave = new VECTOR.WAVEFORM.Sine();
+    sineWave.addPhaseModifier((phase) => phase * phase);
+    graph.drawSampler(sineWave);
+})();
+</script>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        Published under the <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">
+        1. Motivation
+    </div>
+
+    <p>
+        Vector indices have emerged as a valuable tool in the arsenal of AI researchers and developers.
+        But they are hardly ever presented as a tool to use outside of this context.
+        It's generally assumed that vector indices encode values via machine learning:
+        trained data-to-vector models grouping instances by semantic relevance.
+        These architectures tend to involve non-structured data and non-deterministic querying accuracy.
+    </p>
+
+    <p>
+        This document explores the use of vector indices for structured data and deterministic querying.
+    </p>
+
+    <div class="subsection-title">
+        1.1 Tone and Interactivity
+    </div>
+
+    <p>
+        This document was designed to be understood by any technically-capable person.
+        It is not a rigorous proof or a formal whitepaper; it's plain english with
+        interactive examples.
+    </p>
+
+    <p>
+        This document was intended for the web, but it's also printer-friendly.
+        The printed version of this document will not contain interactive examples, obviously.
+    </p>
+
+</div>
+
+<div class="section">
+    <div class="section-title">
+        2. Background
+    </div>
+
+    <div class="subsection-title">
+        2.1 Vectors
+    </div>
+
+    <div class="subsection-title">
+        2.2 Vector Indices
+    </div>
+
+    <div class="subsection-title">
+        2.3 Similarity Search
+    </div>
+
+    <div class="subsection-title">
+        2.4 Features and Featuresets
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">
+        3. Encoding Basis
+    </div>
+
+    <div class="subsection-title">
+        3.1 Waveforms
+    </div>
+
+    <div class="subsection-title">
+        3.3 Chirps
+    </div>
+
+    <div class="subsection-title">
+        3.4 Wavelets
+    </div>
+
+</div>
+
+<div class="section">
+    <div class="section-title">
+        4. Basis Composition
+    </div>
+
+    <div class="subsection-title">
+        4.1 Algebraic Composition
+    </div>
+
+    <div class="subsection-title">
+        4.2 Optimizing Feature Overlap
+    </div>
+
+    <div class="subsection-title">
+        4.3 Partial Feature Overlap
+    </div>
+
+    <div class="subsection-title">
+        4.4 Embedding Digital Data
+    </div>
+
+
+</div>
+
+<div class="section">
+    <div class="section-title">
+        5. Search Algorithms
+    </div>
+
+    <div class="subsection-title">
+        5.1 Cosine Similarity
+    </div>
+
+    <div class="subsection-title">
+        5.2 Dot Product
+    </div>
+
+    <div class="subsection-title">
+        5.3 Denormalized Dot Product
+    </div>
+
+    <div class="subsection-title">
+        5.4 Multi-Resolution Filtering/Masking
+    </div>
+
+    <div class="subsection-title">
+        5.5 Dynamic Range Aware Similarity
+    </div>
+
+</div>
+
+<div class="section">
+    <div class="section-title">
+        6. Clustering
+    </div>
+
+    <div class="subsection-title">
+        6.1 Classic Clustering Methods
+    </div>
+
+    <div class="subsection-title">
+        6.2 Mediant Clustering
+    </div>
+
+    <div class="subsection-title">
+        6.3 Cluster Aware Search
+    </div>
+
+</div>
+</body>
+</html>

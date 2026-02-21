@@ -74,14 +74,6 @@ a:focus {
     text-decoration: underline;
 }
 
-canvas {
-    image-rendering: auto;
-}
-
-li {
-    margin: 1em 0;
-}
-
 /*************************/
 /* Formatting Extensions */
 
@@ -139,7 +131,7 @@ li {
 /********************/
 /* Math Expressions */
 
-.expression, .expresssion-inline {
+.expression, .expression-inline {
     font-family: "STIX Two Text", "Cambria Math", "Latin Modern Math", serif;
     font-size: 1.2em;
     margin: 1rem;
@@ -148,6 +140,12 @@ li {
 
 .expression-inline {
     margin: 0;
+    font-size: 0;
+}
+
+.expression-inline span{
+    padding: 0 0.1em;
+    font-size: 1.2rem;
 }
 
 .expr-label {
@@ -176,11 +174,6 @@ span.variable, span.symbol, span.number, sup, sub, .fraction {
     font-family: "Libertinus Math", system-ui;
     display: inline;
 }
-
-.variable, .symbol {
-    padding: 0.1em;
-}
-
 .symbol.italics {
     font-style: italic;
 }
@@ -251,10 +244,6 @@ p .fraction {
 }
 .w50 {
     width: 50%;
-}
-
-.centered {
-    text-align: center;
 }
 
 /* Print Media */

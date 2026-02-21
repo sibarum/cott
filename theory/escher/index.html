@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html xmlns="http://www.w3.org/1999/html" lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../lib/styles-v1.css">
+
+    <title>Escher Theory: Logarithmic Involution Duality</title>
+
+</head>
+<body>
+
+<div class="section">
+
+    <div class="headings">
+        <h1>Escher Theory: Logarithmic Involution Duality</h1>
+        <h2>The Orthogonality of Sign and Magnitude</h2>
+    </div>
+
+    <div class="section-title">
+        Table of Contents
+    </div>
+    <ol>
+        <li>
+            <a href="#section-1">
+                Abstract
+            </a>
+        </li>
+    </ol>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        Published under the <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-1">
+        1. Abstract
+    </div>
+
+    <p>
+        We define an algebraic structure...
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+
+<div class="section">
+
+    <div class="section-title" id="section-2">
+        2. Signature
+    </div>
+
+    <p>
+        We define the formal language of Escher terms.
+    </p>
+
+    <div class="subsection-title">
+        2.1 Atomic Terms
+    </div>
+
+    <p>
+        The following are atomic terms:
+    </p>
+
+    <ol>
+        <li>
+            <p>
+                Every rational number
+            </p>
+            <div class="expression">
+                <span class="variable">n</span>
+                <span class="symbol">&isin;</span>
+                <span class="symbol">&rationals;</span>
+            </div>
+        </li>
+        <li>
+            <p>
+                The distinguished constants
+            </p>
+            <div class="expression">
+                <span class="variable">v</span>
+                <span class="symbol">&isin;</span>
+                <span class="symbol">{</span>
+                <span class="symbol">&alpha;</span>,
+                <span class="symbol">&omega;</span>
+                <span class="symbol">}</span>
+            </div>
+        </li>
+    </ol>
+
+    <p>
+        These symbols are primitive elements of the language.
+    </p>
+
+    <div class="subsection-title">
+        2.2 Formation of Terms
+    </div>
+
+    <p>
+        The set of terms is defined inductively:
+    </p>
+
+    <ol>
+        <li>
+            <p>
+                Every atomic term is a term.
+            </p>
+        </li>
+        <li>
+            <p>
+                If
+                <span class="variable">a</span>
+                and
+                <span class="variable">b</span>
+                are terms, then so are
+            </p>
+
+            <div class="expression">
+                <span class="variable">a</span>
+                <span class="symbol">+</span>
+                <span class="variable">b</span>
+            </div>
+
+            <div class="expression">
+                <span class="variable">a</span>
+                <span class="symbol">&middot;</span>
+                <span class="variable">b</span>
+            </div>
+
+            <div class="expression">
+                <span class="variable">a</span>
+                <sup>
+                    <span class="copyonly">^</span>
+                    <span class="variable">b</span>
+                </sup>
+            </div>
+        </li>
+    </ol>
+
+    <p>
+        Exponentiation is a primitive syntactic operation; no restrictions on term types are imposed at this stage.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        <em></em>
+    </div>
+
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-4">
+        3. Axioms
+    </div>
+
+    <p>
+        The distinguished symbols satisfy the defining relations:
+    </p>
+
+    <div class="subsection-title">
+        3.1 Reciprocity
+    </div>
+
+    <div class="expression">
+        <span class="symbol">&alpha;</span>
+        <span class="symbol">&middot;</span>
+        <span class="symbol">&omega;</span>
+        <span class="symbol">=</span>
+        <span class="number">1</span>
+    </div>
+
+    <div class="subsection-title">
+        3.2 Involution
+    </div>
+
+    <div class="expression">
+        <!-- 0^(0^n) = n -->
+        <span class="symbol">&alpha;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="copyonly">(</span>
+        <span class="symbol">&alpha;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="variable">n</span>
+        </sup>
+        <span class="copyonly">)</span>
+    </sup>
+        <span class="symbol">=</span>
+        <span class="variable">n</span>
+    </div>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        <em></em>
+    </div>
+
+</div>
+
+
+<div class="section">
+
+    <div class="section-title" id="section-5">
+        4. Derived Properties
+    </div>
+
+    <div class="subsection-title">
+        4.1 Derivation Semantics
+    </div>
+
+    <p>
+        All logarithmic and exponential identities are consequences of the single reciprocity axiom
+        <span class="expression-inline">
+            <span class="symbol">&alpha;</span>
+            <span class="symbol">&middot;</span>
+            <span class="symbol">&omega;</span>
+            <span class="symbol">=</span>
+            <span class="number">1</span>,
+        </span>
+        combined with the inductive term structure and primitive operations.
+    </p>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>
+                <h3 class="expression">
+                    <!-- 0^a = b -->
+                    <span class="variable">v</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">x</span>
+                </sup>
+                    <span class="symbol">=</span>
+                    <span class="variable">y</span>
+                </h3>
+            </th>
+            <th>
+                <h3 class="expression">
+                    <!-- log_0 b = a -->
+                    <span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_</span><!--
+                     --><span class="variable">v</span>
+                    </sub>
+                    <span class="variable">y</span>
+                    <span class="symbol">=</span>
+                    <span class="variable">x</span>
+                </h3>
+            </th>
+        </tr>
+        </thead>
+    </table>
+
+    <div class="subsection-title">
+        4.2 Reciprocity-Driven Mapping
+    </div>
+
+    <table class="fixed">
+    <tbody>
+        <tr>
+            <td>
+                <div class="expression">
+                    <!-- 0^(-n) = ω^n -->
+                    <span class="number">&alpha;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^(</span><!--
+                     --><span class="variable">-n</span>
+                    <span class="copyonly">)</span>
+                </sup>
+                    <span class="symbol">=</span>
+                    <span class="symbol">&omega;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">n</span>
+                </sup>
+                </div>
+            </td>
+            <td>
+                <div class="expression">
+                    <span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_</span><!--
+                     --><span class="number">&alpha;</span><!--
+                 --></sub><!--
+                 --><span class="copyonly">(</span>
+                    <span class="symbol">&omega;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">n</span>
+                </sup>
+                    <span class="copyonly">)</span>
+                    <span class="symbol">=</span>
+                    <span class="variable">-n</span>
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <div class="expression">
+                    <!-- 0^(0^n) = n -->
+                    <span class="number">&alpha;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="copyonly">(</span>
+                    <span class="number">&alpha;</span><!--
+                     --><sup><!--
+                         --><span class="copyonly">^</span><!--
+                         --><span class="variable">n</span>
+                    </sup>
+                    <span class="copyonly">)</span>
+                </sup>
+                    <span class="symbol">=</span>
+                    <span class="variable">n</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression">
+                    <!-- log_0 (n )= 0^n -->
+                    <span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_</span><!--
+                     --><span class="number">&alpha;</span><!--
+                 --></sub><!--
+                 --><span class="copyonly">(</span>
+                    <span class="variable">n</span>
+                    <span class="copyonly">)</span>
+                    <span class="symbol">=</span>
+                    <span class="number">&alpha;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">n</span>
+                </sup>
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <div class="expression">
+                    <span class="number">&alpha;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^(</span><!--
+                     --><span class="symbol">&omega;</span><!--
+                     --><sup><!--
+                         --><span class="copyonly">^</span><!--
+                         --><span class="variable">n</span>
+                </sup>
+                    <span class="copyonly">)</span>
+                </sup>
+                    <span class="symbol">=</span>
+                    <span class="variable">-n</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression">
+                    <span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_</span><!--
+                     --><span class="number">&alpha;</span><!--
+                 --></sub><!--
+                 --><span class="copyonly">(</span>
+                    <span class="variable">-n</span>
+                    <span class="copyonly">)</span>
+                    <span class="symbol">=</span>
+                    <span class="symbol">&omega;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">n</span>
+                </sup>
+                </div>
+            </td>
+        </tr>
+
+
+
+
+        <tr>
+            <td>
+                <div class="expression">
+                    <!-- 0^(-n) = ω^n -->
+                    <span class="number">&omega;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^(</span><!--
+                     --><span class="variable">-n</span>
+                    <span class="copyonly">)</span>
+                </sup>
+                    <span class="symbol">=</span>
+                    <span class="symbol">&alpha;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">n</span>
+                </sup>
+                </div>
+            </td>
+            <td>
+                <div class="expression">
+                    <span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_</span><!--
+                     --><span class="number">&alpha;</span><!--
+                 --></sub><!--
+                 --><span class="copyonly">(</span>
+                    <span class="symbol">&omega;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">n</span>
+                </sup>
+                    <span class="copyonly">)</span>
+                    <span class="symbol">=</span>
+                    <span class="variable">-n</span>
+                </div>
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                <div class="expression">
+                    <span class="number">&alpha;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^(</span><!--
+                     --><span class="symbol">&omega;</span><!--
+                     --><sup><!--
+                         --><span class="copyonly">^</span><!--
+                         --><span class="variable">n</span>
+                </sup>
+                    <span class="copyonly">)</span>
+                </sup>
+                    <span class="symbol">=</span>
+                    <span class="variable">-n</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression">
+                    <span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_</span><!--
+                     --><span class="number">&alpha;</span><!--
+                 --></sub><!--
+                 --><span class="copyonly">(</span>
+                    <span class="variable">-n</span>
+                    <span class="copyonly">)</span>
+                    <span class="symbol">=</span>
+                    <span class="symbol">&omega;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">n</span>
+                </sup>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="subsection-title">
+        4.2 Rewrite Rules
+    </div>
+
+    <div class="expression">
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="variable">v</span><!--
+     --></sub>
+        <span class="symbol">(</span>
+        <span class="variable">x</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">y</span>
+        <span class="symbol">)</span>
+
+        <span class="symbol">=</span>
+
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="variable">v</span><!--
+     --></sub>
+        <span class="symbol">(</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+        <span class="symbol">+</span>
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="variable">v</span><!--
+     --></sub>
+        <span class="symbol">(</span>
+        <span class="variable">y</span>
+        <span class="symbol">)</span>
+    </div>
+
+    <div class="expression">
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="variable">v</span><!--
+     --></sub>
+        <span class="symbol">(</span>
+        <span class="variable">x</span>
+        <span class="symbol">+</span>
+        <span class="variable">y</span>
+        <span class="symbol">)</span>
+
+        <span class="symbol">=</span>
+
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="variable">v</span><!--
+     --></sub>
+        <span class="symbol">(</span>
+        <span class="variable">x</span>
+        <span class="symbol">)</span>
+        <span class="symbol">&middot;</span>
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="variable">v</span><!--
+     --></sub>
+        <span class="symbol">(</span>
+        <span class="variable">y</span>
+        <span class="symbol">)</span>
+    </div>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+
+<div class="section">
+
+    <div class="section-title" id="section-6">
+        5. Derivations
+    </div>
+
+
+    <div class="subsection-title">
+        5.1 Reciprocity
+    </div>
+
+    <p>
+        The reciprocity axiom:
+    </p>
+
+    <div class="expression">
+        <span class="symbol">&alpha;</span>
+        <span class="symbol">&middot;</span>
+        <span class="symbol">&omega;</span>
+        <span class="symbol">=</span>
+        <span class="number">1</span>
+    </div>
+
+    <p>
+        Reciprocal rule of the exponential:
+    </p>
+
+
+    <div class="expression">
+        <span class="symbol">&alpha;</span><!--
+     --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="variable">-v</span>
+    </sup>
+        <span class="symbol">=</span>
+        <span class="symbol">ω</span><!--
+     --><sup><!--
+         --><span class="copyonly">^(</span><!--
+         --><span class="variable">v</span>
+        <span class="copyonly">)</span>
+    </sup>
+    </div>
+
+    <div class="expression">
+        <span class="symbol">&alpha;</span><!--
+     --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="variable">-n</span>
+        </sup>
+        <span class="symbol">=</span>
+        <span class="symbol">ω</span><!--
+     --><sup><!--
+         --><span class="copyonly">^(</span><!--
+         --><span class="variable">n</span>
+            <span class="copyonly">)</span>
+        </sup>
+    </div>
+
+
+
+    <p>
+        Reciprocal rule for logarithms:
+    </p>
+
+    <div class="expression">
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="variable">v</span><!--
+     --></sub><!--
+     --><span class="copyonly">(</span>
+        <span class="symbol">&alpha;</span>
+        <span class="copyonly">)</span>
+        <span class="symbol">=</span>
+        <span class="symbol">&ndash;</span>
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="variable">v</span><!--
+     --></sub><!--
+     --><span class="copyonly">(</span>
+        <span class="symbol">&omega;</span>
+
+        <span class="copyonly">)</span>
+    </div>
+
+    <div class="expression">
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="variable">v</span><!--
+     --></sub><!--
+     --><span class="copyonly">(</span>
+        <span class="symbol">&omega;</span>
+        <span class="copyonly">)</span>
+        <span class="symbol">=</span>
+        <span class="symbol">&ndash;</span>
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="variable">v</span><!--
+     --></sub><!--
+     --><span class="copyonly">(</span>
+        <span class="symbol">&alpha;</span>
+
+        <span class="copyonly">)</span>
+    </div>
+
+    <div class="expression">
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="variable">v</span><!--
+     --></sub><!--
+     --><span class="copyonly">(</span>
+        <span class="variable">n</span>
+        <span class="copyonly">)</span>
+        <span class="symbol">=</span>
+        <span class="symbol">&ndash;</span>
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="variable">v</span><!--
+     --></sub><!--
+     --><span class="copyonly">(</span>
+        <span class="fraction">
+            <span class="numerator">
+                <span class="number">1</span>
+            </span>
+            <span class="h-divider">
+                /
+            </span>
+            <span class="denominator">
+                <span class="variable">n</span>
+            </span>
+        </span>
+
+        <span class="copyonly">)</span>
+    </div>
+
+
+    <div class="subsection-title">
+        5.2 Involution
+    </div>
+
+    <p>
+        The involution axiom:
+    </p>
+
+    <div class="expression">
+        <!-- 0^(0^n) = n -->
+        <span class="symbol">&alpha;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="copyonly">(</span>
+        <span class="symbol">&alpha;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="variable">n</span>
+        </sup>
+        <span class="copyonly">)</span>
+    </sup>
+        <span class="symbol">=</span>
+        <span class="variable">n</span>
+    </div>
+
+    <p>
+        Forces:
+    </p>
+
+    <div class="expression">
+        <!-- log_0 (n )= 0^n -->
+        <span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_</span><!--
+                     --><span class="number">&alpha;</span><!--
+                 --></sub><!--
+                 --><span class="copyonly">(</span>
+        <span class="variable">n</span>
+        <span class="copyonly">)</span>
+        <span class="symbol">=</span>
+        <span class="number">&alpha;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">n</span>
+    </sup>
+    </div>
+
+    <p>
+        Substitute the reciprocal in the exponent:
+    </p>
+
+    <div class="expression">
+        <!-- 0^(0^n) = n -->
+        <span class="symbol">&alpha;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="copyonly">(</span>
+        <span class="symbol">&omega;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="variable">&ndash;n</span>
+        </sup>
+        <span class="copyonly">)</span>
+    </sup>
+        <span class="symbol">=</span>
+        <span class="variable">n</span>
+    </div>
+
+    <p>
+        Take the logarithm:
+    </p>
+
+    <div class="expression">
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="number">&alpha;</span><!--
+     --></sub><!--
+     --><span class="symbol">(</span>
+        <span class="symbol">&alpha;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="copyonly">(</span>
+            <span class="symbol">&omega;</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="variable">&ndash;n</span>
+            </sup>
+            <span class="copyonly">)</span>
+        </sup>
+        <span class="symbol">)</span>
+        <span class="symbol">=</span>
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="number">&alpha;</span><!--
+     --></sub>
+        <span class="variable">n</span>
+    </div>
+
+    <div class="expression">
+        <span class="symbol">&omega;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="variable">&ndash;n</span>
+        </sup>
+        <span class="symbol">&middot;</span>
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="number">&alpha;</span><!--
+     --></sub><!--
+     --><span class="symbol">(</span>
+        <span class="symbol">&alpha;</span>
+        <span class="symbol">)</span>
+        <span class="symbol">=</span>
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="number">&alpha;</span><!--
+     --></sub>
+        <span class="variable">n</span>
+    </div>
+
+
+</div>
+
+<script>
+</script>
+</body>
+</html>

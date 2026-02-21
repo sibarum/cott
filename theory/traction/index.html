@@ -3,9 +3,9 @@
 <html xmlns="http://www.w3.org/1999/html" lang="en">
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../lib/styles-v1.css">
+    <link rel="stylesheet" href="../../lib/styles-v1.css">
 
-    <title>Tractions: An Exception-Free Algebra</title>
+    <title>Traction Theory: An Exception-Free Algebra</title>
 
 </head>
 <body>
@@ -13,7 +13,7 @@
 <div class="section">
 
     <div class="headings">
-        <h1>Tractions: An Exception-Free Algebra</h1>
+        <h1>Traction Theory: An Exception-Free Algebra</h1>
         <h2>with Total Exponential and Logarithmic Operators</h2>
     </div>
 
@@ -86,6 +86,33 @@
         project to a single, exact, numeric value.
     </p>
 
+    <p>
+        Traction Theory is an implementation of Constructive Operational Type Theory.
+        Traction algebra is <strong>not</strong> an extension of
+        <span class="symbol">&reals;</span>
+        or
+        <span class="symbol">&complexes;</span>.
+        It may still be helpful to think of them as classic type extensions,
+        but this is technically problematic due to the redefinition and unconventional treatment
+        of zero (non-absorbing, information-preserving) and its reciprocal.
+        This requires the underlying type theory itself to be redefined.
+        Please visit <a href="https://sibarum.github.io/cott/">sibarum.github.io/cott</a>
+        for more information about these theories.
+    </p>
+
+    <p>
+        Wheels have some elements of tractions, such as a zero reciprocal <span class="symbol">&omega;</span>
+        to restore tractability at the singularity, but then collapses again with the introduction of the nullity
+        element <span class="number">&perp;</span>. This doesn't restore totality,
+        but rather converts it into zero-like structural collapse.
+    </p>
+
+    <p>
+        The goal of traction theory is to provide a structure that never collapses,
+        respects all universal invariants,
+        and remembers everything else.
+    </p>
+
     <div class="copyonly">---</div>
     <div class="section-footer">
     </div>
@@ -94,11 +121,11 @@
 <div class="section">
 
     <div class="section-title" id="section-2">
-        2. Tires
+        2. Tractions
     </div>
 
     <div>
-        Tires are a wheel-like algebra wherein the additive identity
+        Tractions are a wheel-like algebra wherein the additive identity
         <span class="number">0</span>
         and its multiplicative reciprocal
         <span class="symbol">&omega;</span>
@@ -450,7 +477,7 @@
     </div>
 
     <p>
-        The behavior of zero in a tire is not the familiar absorbing element.
+        The behavior of zero in a traction is not the familiar absorbing element.
     </p>
 
     <p>
@@ -536,7 +563,7 @@
     <div class="copyonly">---</div>
     <div class="section-footer">
         <em>
-            A tire is a totalized, two-group algebra with a distinguished inverse pair
+            A traction is a totalized, two-group algebra with a distinguished inverse pair
             (0, <span class="symbol">&omega;</span>)
             and boundary-sensitive reassociation rules.
         </em>

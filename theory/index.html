@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html xmlns="http://www.w3.org/1999/html" lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../lib/styles-v1.css">
+
+    <title>Constructive Operational Type Theory</title>
+
+</head>
+<body>
+
+<div class="section">
+
+    <div class="headings">
+        <h1>Constructive Operational Type Theory</h1>
+        <h2></h2>
+    </div>
+
+    <div class="section-title">
+        Table of Contents
+    </div>
+    <ol>
+        <li>
+            <a href="#section-1">
+                Introduction
+            </a>
+            <ul>
+                <li>Motivation: Operator-First Algebra</li>
+                <li>Limitations of Classical Number-First Systems</li>
+                <li>Scope and Contributions of COTT</li>
+            </ul>
+        </li>
+        <li>
+            <a href="#section-2">
+                Foundational Concepts
+            </a>
+            <ul>
+                <li>Operators vs. Scalars: Conceptual Shift</li>
+                <li>Reversibility and Totality in Operator Systems</li>
+                <li>Iteration and Emergence of Identities</li>
+            </ul>
+        </li>
+        <li>
+            <a href="#section-3">
+                The Primitive Operator 0
+            </a>
+            <ul>
+                <li>Definition and Interpretation as Infinitesimal Shift</li>
+                <li>Leibniz Rule and Action on Products</li>
+                <li>Non-Nilpotence and Higher-Order Shifts</li>
+            </ul>
+        </li>
+        <li>
+            <a href="#section-4">
+                0-Power Hierarchy
+            </a>
+            <ul>
+                <li>Integer Powers: 0ⁿ as Higher-Order Iteration</li>
+                <li>Fractional and Real Powers: Generalized Shifts</li>
+                <li>Power Multiplication and Additivity Rules</li>
+            </ul>
+        </li>
+        <li>
+            <a href="#section-5">
+                Emergent Identity and Boundary Operators
+            </a>
+            <ul>
+                <li>Definition: 0⁰ = 1</li>
+                <li>Identity as Zeroth Iteration of Reversible Operators</li>
+                <li>Operator Closure and Emergent Structure</li>
+            </ul>
+        </li>
+        <li>
+            <a href="#section-6">
+                Duality via the ω Operator
+            </a>
+            <ul>
+                <li>Definition and Interpretation as Anti-Derivative</li>
+                <li>Operator-Level Duality vs. Multiplicative Inversion</li>
+                <li>Interactions Between 0 and ω</li>
+            </ul>
+        </li>
+        <li>
+            <a href="#section-7">
+                Operator Action on Exponentiation
+            </a>
+            <ul>
+                <li>Higher-Order Derivations on Exponential Terms</li>
+                <li>Power Structure Encodings</li>
+                <li>Non-Classical Exponentiation Identities</li>
+            </ul>
+        </li>
+        <li>
+            <a href="#section-8">
+                Hierarchical Operator Algebra
+            </a>
+            <ul>
+                <li>Emergent Identities and Collapse Rules</li>
+                <li>Derived Laws vs. Classical ℝ Assumptions</li>
+                <li>Operator Compositions and Iterative Structures</li>
+            </ul>
+        </li>
+        <li>
+            <a href="#section-9">
+                Applications and Examples
+            </a>
+            <ul>
+                <li>Symbolic Computation with COTT</li>
+                <li>Fractional Iterations and Functional Calculus</li>
+                <li>Duality in Abstract Operator Models</li>
+            </ul>
+        </li>
+        <li>
+            <a href="#section-10">
+                Discussion and Conclusion
+            </a>
+            <ul>
+                <li>Philosophical Implications: Number vs. Operator Primacy</li>
+                <li>Connections to Fractional Calculus and Lie Algebras</li>
+                <li>Limitations and Open Questions</li>
+                <li>Summary of Contributions and Future Directions</li>
+            </ul>
+        </li>
+        <li>
+            <a href="#section-11">
+                Appendices
+            </a>
+            <ul>
+                <li>Notation and Conventions</li>
+                <li>Worked Examples of 0-Power Hierarchy</li>
+                <li>Proofs of Emergent Identity Properties</li>
+            </ul>
+        </li>
+    </ol>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        Published under the <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-1">
+        1. Primitive Operator
+    </div>
+
+    <p>
+        0 is the primitive operator
+    </p>
+
+    <div class="expression font-lg">
+        <span class="number">0</span>
+    </div>
+
+    <p>
+        Acts as a derivation / infinitesimal shift
+    </p>
+
+    <p>
+        Non-nilpotent: higher powers correspond to higher-order shifts
+    </p>
+
+    <p>
+        Obeys Leibniz:
+        <span class="expression-inline"><!--
+         --><span class="number">0</span><!--
+         --><span class="symbol">(</span><!--
+         --><span class="variable">f</span><!--
+         --><span class="variable">g</span><!--
+         --><span class="symbol">)</span><!--
+         --><span class="symbol">=</span><!--
+         --><span class="symbol">(</span><!--
+         --><span class="number">0</span><!--
+         --><span class="variable">f</span><!--
+         --><span class="symbol">)</span><!--
+         --><span class="variable">g</span><!--
+         --><span class="symbol">+</span><!--
+         --><span class="variable">f</span><!--
+         --><span class="symbol">(</span><!--
+         --><span class="number">0</span><!--
+         --><span class="variable">g</span><!--
+         --><span class="symbol">)</span><!--
+     --></span>
+    </p>
+
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-2">
+        2. 0-Power Hierarchy
+    </div>
+
+    <p>
+        <span class="expression-inline"><!--
+         --><span class="number">0</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="number">1</span><!--
+         --></sup><!--
+         --><span class="symbol">=</span><!--
+         --><span class="number">0</span><!--
+     --></span>
+        (first-order derivation)
+    </p>
+
+    <p>
+        <span class="expression-inline"><!--
+         --><span class="number">0</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="number">2</span><!--
+         --></sup><!--
+         --><span class="symbol">=</span><!--
+         --><span class="number">0</span><!--
+         --><span class="symbol">&middot;</span><!--
+         --><span class="number">0</span><!--
+     --></span>
+        (second-order shift)
+    </p>
+
+    <p>
+        <span class="expression-inline"><!--
+         --><span class="number">0</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="variable">n</span><!--
+         --></sup><!--
+     --></span>
+        for <span class="variable">n</span><span class="symbol">&isin;</span><span class="symbol">&naturals;</span>, or even fractional n
+    </p>
+
+    <p>
+        Multiplication of powers is additive:
+        <span class="expression-inline"><!--
+         --><span class="number">0</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="variable">m</span><!--
+         --></sup><!--
+         --><span class="symbol">&middot;</span><!--
+         --><span class="number">0</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="variable">n</span><!--
+         --></sup><!--
+         --><span class="symbol">=</span><!--
+         --><span class="number">0</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="variable">m</span><!--
+             --><span class="symbol">+</span><!--
+             --><span class="variable">n</span><!--
+         --></sup><!--
+     --></span>
+    </p>
+
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-3">
+        3. Emergent Identity
+    </div>
+
+    <p>
+        <span class="expression-inline"><!--
+         --><span class="number">0</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="number">0</span><!--
+         --></sup><!--
+         --><span class="symbol">=</span><!--
+         --><span class="number">1</span><!--
+     --></span>
+    </p>
+
+    <p>
+        1 is not a classical scalar; it is a boundary operator / emergent identity
+    </p>
+
+    <p>
+        Every 1 in the system is generated through the 0-operator structure
+    </p>
+
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-4">
+        4. Duality via ω
+    </div>
+
+    <p>
+        <span class="expression-inline"><!--
+         --><span class="number">0</span><!--
+         --><span class="symbol">&middot;</span><!--
+         --><span class="variable">ω</span><!--
+         --><span class="symbol">=</span><!--
+         --><span class="number">1</span><!--
+     --></span>
+    </p>
+
+    <p>
+        ω behaves like an inverse / anti-derivative operator
+    </p>
+
+    <p>
+        Duality is operator-level, not multiplicative
+    </p>
+
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-5">
+        5. Operator Action on Exponentiation
+    </div>
+
+    <p>
+        <span class="expression-inline"><!--
+         --><span class="number">0</span><!--
+         --><span class="symbol">&middot;</span><!--
+         --><span class="symbol">(</span><!--
+         --><span class="variable">α</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="variable">x</span><!--
+         --></sup><!--
+         --><span class="symbol">)</span><!--
+         --><span class="symbol">=</span><!--
+         --><span class="number">0</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="number">1</span><!--
+         --></sup><!--
+         --><span class="symbol">&middot;</span><!--
+         --><span class="number">0</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="variable">x</span><!--
+         --></sup><!--
+         --><span class="symbol">=</span><!--
+         --><span class="number">0</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="number">1</span><!--
+             --><span class="symbol">+</span><!--
+             --><span class="variable">x</span><!--
+         --></sup><!--
+     --></span>
+    </p>
+
+    <p>
+        Higher-order action of 0 on exponentiation is encoded in 0-power structure
+    </p>
+
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-6">
+        6. Operator Hierarchy Foundation
+    </div>
+
+    <p>
+        Classical identities like
+        <span class="expression-inline"><!--
+         --><span class="number">1</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="variable">α</span><!--
+         --></sup><!--
+         --><span class="symbol">=</span><!--
+         --><span class="number">1</span><!--
+     --></span>
+        are not assumed
+    </p>
+
+    <p>
+        Identity is emergent, not absolute
+    </p>
+
+    <p>
+        Collapses, dualities, and exponentiation rules derive from operator + power rules, not inherited from ℝ
+    </p>
+
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-7">
+        7. Big Picture
+    </div>
+
+    <p>
+        COTT is an operator-first algebra, not a number-first algebra
+    </p>
+
+    <p>
+        <span class="number">0</span> = derivation / shift primitive
+    </p>
+
+    <p>
+        <span class="symbol">&omega;</span> = dual / anti-derivative
+    </p>
+
+    <p>
+        <span class="number">1</span> = emergent boundary
+    </p>
+
+    <p>
+        Powers of 0 = higher-order structure
+    </p>
+
+    <p>
+        This explains why 1 can appear “illegal”, why exponentiation doesn’t inherit classical laws, and why everything cascades from the operator hierarchy.
+    </p>
+
+</div>
+
+
+
+<script>
+</script>
+</body>
+</html>
