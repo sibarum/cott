@@ -20,11 +20,50 @@
     <div class="section-title">
         Table of Contents
     </div>
-    <ol>
+    <ol class="nested">
         <li>
             <a href="#section-1">
                 Preface
             </a>
+            <ol class="nested">
+                <li>
+                    Motivation
+                </li>
+                <li>
+                    Operational Type Extensions
+                </li>
+            </ol>
+        </li>
+        <li>
+            <a href="#section-2">
+                Tractions
+            </a>
+            <ol class="nested">
+                <li>
+                    Additive Inverse
+                </li>
+                <li>
+                    Addition
+                </li>
+                <li>
+                    Additive Identity
+                </li>
+                <li>
+                    Multiplicative Inverse
+                </li>
+                <li>
+                    Multiplication
+                </li>
+                <li>
+                    Multiplicative Identity
+                </li>
+                <li>
+                    Zero and &omega;
+                </li>
+                <li>
+                    Binding Law
+                </li>
+            </ol>
         </li>
     </ol>
 
@@ -45,17 +84,20 @@
     </div>
 
     <p>
-        At its core, algebra is the symbolic manipulation of expressions subject to logical invariance.
-        Valid manipulations preserve truth while revealing structure.
-
-        We call an algebra <strong>maximally tractable</strong> if it admits every manipulation that preserves the invariants of an expression,
-        allowing structure to be extracted without introducing exceptional cases or undefined behavior.
-
-        We call an algebra <strong>consistent</strong> if it forbids manipulations that would invalidate those invariants,
-        ensuring that symbolic transformations do not alter semantic truth.
-
+        At its core, algebra is the symbolic manipulation of expressions subject to declared invariants.
+        Valid manipulations preserve declared invariants while revealing structure.
+    </p>
+    <p>
+        We call an algebra <strong>maximally tractable</strong> if it admits every transformation shown to preserve
+        all declared invariants of an expression.
+        Projection, when defined, must map invariant-preserving equivalent expressions to equal projections.
+    </p>
+    <p>
+        We call an algebra <strong>consistent</strong> if it forbids manipulations that would invalidate those invariants.
+    </p>
+    <p>
         A <strong>traction</strong> is an algebra designed to be both consistent and maximally tractable:
-        it permits all invariant-preserving transformations while prohibiting those that would break correctness.
+        it permits all invariant-preserving transformations and forbids those that violate them.
     </p>
 
     <div class="subsection-title">
@@ -63,54 +105,51 @@
     </div>
 
     <p>
-        To achieve an exception-free algebra, tractions define not only new algebraic structures but also new semantics.
-        In classical algebra, operations are implicitly assumed to simplify to a single numeric element - a "number" with digit-wise representation.
+        To achieve an exception-free algebra, tractions define new algebraic structures
+        and explicitly specify how symbolic expressions behave under admissible operations,
+        unlike classical algebra, where operations are implicitly assumed to reduce to a single numeric value.
         Tractions remove this restriction:
-        <strong>operations are not required to evaluate to a numeric value.</strong>
-        Instead, the unevaluated expression itself serves as the
-        <strong>canonical symbolic representative</strong>
-        of a distinct algebraic element.
+        <strong>operations are not required to evaluate numerically.</strong>
+        Instead, the unevaluated expression serves as the canonical representative of a distinct algebraic element.
     </p>
 
     <p>
-        This shift in perspective carries an immediate consequence.
-        Classical types are defined as sets of numeric elements, not unevaluated expressions.
-        To accommodate symbolic elements, tractions adopt an <strong>operational type extension</strong>,
-        in which types are defined not only by their numeric members
-        but also by closure under all admissible operations.
-        In this way, numbers and symbolic expressions coexist seamlessly within the same algebraic framework.
+        This shift in perspective has an immediate consequence: classical types are defined as sets of numeric elements,
+        not unevaluated expressions.
+        To accommodate symbolic elements, tractions adopt an operational type extension:
+        <strong>types are defined by their numeric members and by closure under all admissible operations.</strong>
+        In this way, numeric and symbolic elements coexist seamlessly within the same algebraic framework.
     </p>
 
     <p>
-        Crucially, undefinedness is no longer a possibility - it is simply an expression that fails to
-        project to a single, exact, numeric value.
+        Crucially, undefinedness no longer exists;
+        an expression simply does not project to a single numeric value.
     </p>
 
     <p>
         Traction Theory is an implementation of Constructive Operational Type Theory.
-        Traction algebra is <strong>not</strong> an extension of
+        Traction algebra is not an extension of
         <span class="symbol">&reals;</span>
         or
         <span class="symbol">&complexes;</span>.
-        It may still be helpful to think of them as classic type extensions,
-        but this is technically problematic due to the redefinition and unconventional treatment
-        of zero (non-absorbing, information-preserving) and its reciprocal.
-        This requires the underlying type theory itself to be redefined.
-        Please visit <a href="https://sibarum.github.io/cott/">sibarum.github.io/cott</a>
-        for more information about these theories.
+        While it can be helpful to think of classical types as an analogy,
+        this is technically problematic:
+        zero is redefined as non-absorbing and information-preserving,
+        and its reciprocal is unconventional,
+        requiring the underlying type theory itself to be adjusted.
+        For more information, see
+        <a href="https://sibarum.github.io/cott/">sibarum.github.io/cott</a>.
     </p>
 
     <p>
-        Wheels have some elements of tractions, such as a zero reciprocal <span class="symbol">&omega;</span>
-        to restore tractability at the singularity, but then collapses again with the introduction of the nullity
-        element <span class="number">&perp;</span>. This doesn't restore totality,
-        but rather converts it into zero-like structural collapse.
+        Wheels partially implement traction ideas:
+        for example, the zero reciprocal <span class="symbol">&omega;</span> restores tractability at singularities,
+        but the introduction of the nullity element <span class="number">&perp;</span> causes structural collapse rather than totality.
     </p>
 
     <p>
         The goal of traction theory is to provide a structure that never collapses,
-        respects all universal invariants,
-        and remembers everything else.
+        respects all universal invariants, and preserves all symbolic information.
     </p>
 
     <div class="copyonly">---</div>
@@ -124,51 +163,50 @@
         2. Tractions
     </div>
 
-    <div>
-        Tractions are a wheel-like algebra wherein the additive identity
-        <span class="number">0</span>
-        and its multiplicative reciprocal
-        <span class="symbol">&omega;</span>
-        are fully included, ensuring the system is exception-free and maximally tractable.
-        Addition is a closed abelian group.
-        Multiplication is nearly abelian, if not for additional binding constraints on the identities.
-        Equality is structural, not purely equational.
-    </div>
+    <p>
+        Tractions are a wheel-like algebra in which the additive identity <span class="number">0</span>
+        and its multiplicative reciprocal <span class="symbol">&omega;</span> are explicitly treated as valid elements,
+        ensuring the system is exception-free and maximally tractable.
+        Addition forms a closed abelian group.
+        Multiplication is nearly abelian,
+        though additional constraints on the identities introduce subtle deviations.
+        Equality is structural rather than purely equational,
+        comparing the forms of expressions rather than just their numeric evaluation.
+    </p>
 
     <div class="subsection-title">
         2.1 Additive Inverse
     </div>
 
     <p>
-        For every term <span class="variable">t</span>, there exists a term called its additive inverse, written:
+        For every term
+        <span class="variable">t</span>,
+        there exists a corresponding additive inverse, written
     </p>
 
-    <div class="expression">
-        <span class="symbol">&ndash;</span>
-        <span class="variable">t</span>
+    <div class="expression"><!--
+     --><span class="variable">&ndash;t</span>
     </div>
 
     <p>
-        Negation is a unary operation satisfying the involution law
+        Negation is a unary operation satisfying the involution law:
     </p>
 
     <div class="expression">
-        <span class="symbol">&ndash;</span>
-        <span class="symbol">(</span>
-        <span class="symbol">&ndash;</span>
-        <span class="variable">t</span>
-        <span class="symbol">)</span>
-        <span class="symbol">=</span>
-        <span class="variable">t</span>
+        <span class="symbol">&ndash;</span><!--
+     --><span class="symbol">(</span><!--
+     --><span class="variable">&ndash;t</span><!--
+     --><span class="symbol">)</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="variable">t</span>
     </div>
 
     <p>
         Negation is purely structural: forming
-        <span class="symbol">&ndash;</span>
-        <span class="variable">t</span>
+        <span class="variable">&ndash;t</span>
         does not evaluate or simplify
         <span class="variable">t</span>;
-        it constructs a new term.
+        it constructs a new symbolic term.
     </p>
 
 
@@ -178,75 +216,75 @@
 
     <p>
         Addition is a total binary operation on terms. For all terms
-        <span class="variable">a</span>,
-        <span class="variable">b</span>,
-        <span class="variable">c</span>,
-    </p>
+        <span class="variable">a</span>,<!--
+     --><span class="variable">b</span>,<!--
+     --><span class="variable">c</span>:<!--
+ --></p>
+
+    <p>If</p>
 
     <div class="expression">
-        <span class="variable">a</span>
-        <span class="symbol">+</span>
-        <span class="variable">b</span>
-        <span class="symbol">=</span>
-        <span class="variable">c</span>
+        <span class="variable">a</span><!--
+     --><span class="symbol">+</span><!--
+     --><span class="variable">b</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="variable">c</span>
     </div>
 
     <p>
-        implies the recovery laws
+        then the recovery laws hold:
     </p>
 
     <div class="expression">
-        <span class="variable">c</span>
-        <span class="symbol">+</span>
-        <span class="symbol">(</span>
-        <span class="symbol">-</span>
-        <span class="variable">a</span>
-        <span class="symbol">)</span>
-        <span class="symbol">=</span>
-        <span class="variable">b</span>,
+        <span class="variable">c</span><!--
+     --><span class="symbol">+</span><!--
+     --><span class="symbol">(</span><!--
+     --><span class="variable">&ndash;a</span><!--
+     --><span class="symbol">)</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="variable">b</span>,
     </div>
 
     <div class="expression">
-        <span class="variable">c</span>
-        <span class="symbol">+</span>
-        <span class="symbol">(</span>
-        <span class="symbol">-</span>
-        <span class="variable">b</span>
-        <span class="symbol">)</span>
-        <span class="symbol">=</span>
-        <span class="variable">a</span>.
+        <span class="variable">c</span><!--
+     --><span class="symbol">+</span><!--
+     --><span class="symbol">(</span><!--
+     --><span class="variable">&ndash;b</span><!--
+     --><span class="symbol">)</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="variable">a</span>.
     </div>
 
     <p>
-        Addition further satisfies associativity and commutativity:
+        Addition further satisfies <strong>associativity</strong> and <strong>commutativity</strong>:
     </p>
 
     <div class="expression">
-        <span class="symbol">(</span>
-        <span class="variable">a</span>
-        <span class="symbol">+</span>
-        <span class="variable">b</span>
-        <span class="symbol">)</span>
-        <span class="symbol">+</span>
-        <span class="variable">c</span>
-        <span class="symbol">=</span>
-        <span class="variable">a</span>
-        <span class="symbol">+</span>
-        <span class="symbol">(</span>
-        <span class="variable">b</span>
-        <span class="symbol">+</span>
-        <span class="variable">c</span>
-        <span class="symbol">)</span>
+        <span class="symbol">(</span><!--
+     --><span class="variable">a</span><!--
+     --><span class="symbol">+</span><!--
+     --><span class="variable">b</span><!--
+     --><span class="symbol">)</span><!--
+     --><span class="symbol">+</span><!--
+     --><span class="variable">c</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="variable">a</span><!--
+     --><span class="symbol">+</span><!--
+     --><span class="symbol">(</span><!--
+     --><span class="variable">b</span><!--
+     --><span class="symbol">+</span><!--
+     --><span class="variable">c</span><!--
+     --><span class="symbol">)</span>
     </div>
 
     <div class="expression">
-        <span class="variable">a</span>
-        <span class="symbol">+</span>
-        <span class="variable">b</span>
-        <span class="symbol">=</span>
-        <span class="variable">b</span>
-        <span class="symbol">+</span>
-        <span class="variable">a</span>
+        <span class="variable">a</span><!--
+     --><span class="symbol">+</span><!--
+     --><span class="variable">b</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="variable">b</span><!--
+     --><span class="symbol">+</span><!--
+     --><span class="variable">a</span>
     </div>
 
 
@@ -258,18 +296,17 @@
         There exists a term
         <span class="number">0</span>
         such that for every term
-        <span class="variable">t</span>,
+        <span class="variable">t</span>:
     </p>
 
     <div class="expression">
-        <span class="variable">t</span>
-        <span class="symbol">+</span>
-        <span class="symbol">(</span>
-        <span class="symbol">&ndash;</span>
-        <span class="variable">t</span>
-        <span class="symbol">)</span>
-        <span class="symbol">=</span>
-        <span class="number">0</span>.
+        <span class="variable">t</span><!--
+     --><span class="symbol">+</span><!--
+     --><span class="symbol">(</span><!--
+     --><span class="variable">&ndash;t</span><!--
+     --><span class="symbol">)</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="number">0</span>.
     </div>
 
     <p>
@@ -277,15 +314,15 @@
     </p>
 
     <div class="expression">
-        <span class="variable">t</span>
-        <span class="symbol">+</span>
-        <span class="number">0</span>
-        <span class="symbol">=</span>
-        <span class="variable">t</span>,
+        <span class="variable">t</span><!--
+     --><span class="symbol">+</span><!--
+     --><span class="number">0</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="variable">t</span>,
     </div>
 
     <p>
-        so <span class="number">0</span> acts as an additive identity.
+        so <span class="number">0</span> acts as an <strong>additive identity</strong>.
     </p>
 
     <div class="subsection-title">
@@ -293,47 +330,46 @@
     </div>
 
     <p>
-        For every term <span class="variable">t</span>,
-        there exists a term called its multiplicative inverse, written
+        For every term
+        <span class="variable">t</span>,
+        there exists a corresponding multiplicative inverse, written
     </p>
 
     <div class="expression">
-        <span class="variable">t</span>
-        <sup>
-            <span class="copyonly">^</span>
-            <span class="symbol">&ndash;</span><!--
-         --><span class="number">1</span>
+        <span class="variable">t</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="number">&ndash;1</span>
         </sup>
     </div>
 
     <p>
-        This inverse is defined structurally and satisfies the involution law
+        This inverse is defined <strong>structurally</strong> and satisfies the involution law:
     </p>
 
     <div class="expression">
-        <span class="symbol">(</span>
-        <span class="variable">t</span>
-        <sup>
-            <span class="copyonly">^</span>
-            <span class="symbol">&ndash;</span><!--
-         --><span class="number">1</span>
-        </sup>
-        <span class="symbol">)</span>
-        <sup>
-            <span class="copyonly">^</span>
-            <span class="symbol">&ndash;</span><!--
-         --><span class="number">1</span>
-        </sup>
-        <span class="symbol">=</span>
-        <span class="variable">t</span>
+        <span class="symbol">(</span><!--
+     --><span class="variable">t</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="number">&ndash;1</span><!--
+     --></sup><!--
+     --><span class="symbol">)</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="number">&ndash;1</span><!--
+     --></sup><!--
+     --><span class="symbol">=</span><!--
+     --><span class="variable">t</span>
     </div>
 
     <p>
         Forming
         <span class="variable">t</span><!--
+     --><sup><!--
      --><span class="copyonly">^</span><!--
-     --><span class="symbol">&ndash;</span>
-        <span class="number">1</span>
+     --><span class="number">&ndash;1</span><!--
+     --></sup>
         does not evaluate
         <span class="variable">t</span>;
         it constructs a new term.
@@ -344,81 +380,82 @@
     </div>
 
     <p>
-        Multiplication is a total binary operation.
-        For all terms
-        <span class="variable">a</span>,
-        <span class="variable">b</span>,
-        <span class="variable">c</span>,
+        Multiplication is a total binary operation on terms. For all terms
+        <span class="variable">a</span>,<!--
+     --><span class="variable">b</span>,<!--
+     --><span class="variable">c</span>:
     </p>
 
-    <div class="expression">
-        <span class="variable">a</span>
-        <span class="symbol">&middot;</span>
-        <span class="variable">b</span>
-        <span class="symbol">=</span>
-        <span class="variable">c</span>
+    <p>
+        If
+    </p>
+
+    <div class="expression"><!--
+     --><span class="variable">a</span><!--
+     --><span class="symbol">&middot;</span><!--
+     --><span class="variable">b</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="variable">c</span>
     </div>
 
     <p>
-        implies the <strong>recovery laws</strong>
+        then the recovery laws hold:
     </p>
 
     <div class="expression">
-        <span class="variable">c</span>
-        <span class="symbol">&middot;</span>
-        <span class="variable">a</span>
-        <sup>
-            <span class="copyonly">^</span>
-            <span class="symbol">&ndash;</span><!--
-         --><span class="number">1</span>
-        </sup>
-        <span class="symbol">=</span>
-        <span class="variable">b</span>,
+        <span class="variable">c</span><!--
+     --><span class="symbol">&middot;</span><!--
+     --><span class="variable">a</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="number">&ndash;1</span><!--
+     --></sup><!--
+     --><span class="symbol">=</span><!--
+     --><span class="variable">b</span>,
     </div>
 
     <div class="expression">
-        <span class="variable">c</span>
-        <span class="symbol">&middot;</span>
-        <span class="variable">b</span>
-        <sup>
-            <span class="copyonly">^</span>
-            <span class="symbol">&ndash;</span><!--
-         --><span class="number">1</span>
-        </sup>
-        <span class="symbol">=</span>
-        <span class="variable">a</span>.
+        <span class="variable">c</span><!--
+     --><span class="symbol">&middot;</span><!--
+     --><span class="variable">b</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="number">&ndash;1</span><!--
+     --></sup><!--
+     --><span class="symbol">=</span><!--
+     --><span class="variable">a</span>
     </div>
 
     <p>
-        Multiplication is associative and commutative:
+        Multiplication further satisfies <strong>associativity</strong> and <strong>commutativity</strong>:
     </p>
 
     <div class="expression">
-        <span class="symbol">(</span>
-        <span class="variable">a</span>
-        <span class="symbol">&middot;</span>
-        <span class="variable">b</span>
-        <span class="symbol">)</span>
-        <span class="symbol">&middot;</span>
-        <span class="variable">c</span>
-        <span class="symbol">=</span>
-        <span class="variable">a</span>
-        <span class="symbol">&middot;</span>
-        <span class="symbol">(</span>
-        <span class="variable">b</span>
-        <span class="symbol">&middot;</span>
-        <span class="variable">c</span>
-        <span class="symbol">)</span>
+        <span class="symbol">(</span><!--
+     --><span class="variable">a</span><!--
+     --><span class="symbol">&middot;</span><!--
+     --><span class="variable">b</span><!--
+     --><span class="symbol">)</span><!--
+     --><span class="symbol">&middot;</span><!--
+     --><span class="variable">c</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="variable">a</span><!--
+     --><span class="symbol">&middot;</span><!--
+     --><span class="symbol">(</span><!--
+     --><span class="variable">b</span><!--
+     --><span class="symbol">&middot;</span><!--
+     --><span class="variable">c</span><!--
+     --><span class="symbol">)</span>
     </div>
 
-    <div class="expression">
-        <span class="variable">a</span>
-        <span class="symbol">&middot;</span>
-        <span class="variable">b</span>
-        <span class="symbol">=</span>
-        <span class="variable">b</span>
-        <span class="symbol">&middot;</span>
-        <span class="variable">a</span>
+    <div class="expression"><!--
+     --><span class="variable">a</span><!--
+     --><span class="symbol">&middot;</span><!--
+     --><span class="variable">b</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="variable">b</span><!--
+     --><span class="symbol">&middot;</span><!--
+     --><span class="variable">a</span>
     </div>
 
     <div class="subsection-title">
@@ -433,16 +470,15 @@
     </p>
 
     <div class="expression">
-        <span class="variable">t</span>
-        <span class="symbol">&middot;</span>
-        <span class="variable">t</span>
-        <sup>
-            <span class="copyonly">^</span>
-            <span class="symbol">&ndash;</span><!--
-         --><span class="number">1</span>
-        </sup>
-        <span class="symbol">=</span>
-        <span class="number">1</span>.
+        <span class="variable">t</span><!--
+     --><span class="symbol">&middot;</span><!--
+     --><span class="variable">t</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="number">&ndash;1</span><!--
+     --></sup><!--
+     --><span class="symbol">=</span><!--
+     --><span class="number">1</span>.
     </div>
 
     <p>
@@ -450,11 +486,11 @@
     </p>
 
     <div class="expression">
-        <span class="variable">t</span>
-        <span class="symbol">&middot;</span>
-        <span class="number">1</span>
-        <span class="symbol">=</span>
-        <span class="variable">t</span>.
+        <span class="variable">t</span><!--
+     --><span class="symbol">&middot;</span><!--
+     --><span class="number">1</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="variable">t</span>.
     </div>
 
     <p>
@@ -465,11 +501,10 @@
         <span class="number">1</span><!--
      --><sup><!--
          --><span class="copyonly">^</span><!--
-         --><span class="symbol">&ndash;</span><!--
-         --><span class="number">1</span>
-        </sup>
-        <span class="symbol">=</span>
-        <span class="number">1</span>.
+         --><span class="number">&ndash;1</span><!--
+     --></sup><!--
+     --><span class="symbol">=</span><!--
+     --><span class="number">1</span>.
     </div>
 
     <div class="subsection-title">
@@ -485,14 +520,13 @@
     </p>
 
     <div class="expression">
-        <span class="number">0</span>
-        <span class="symbol">+</span>
-        <span class="symbol">(</span>
-        <span class="symbol">&ndash;</span>
-        <span class="number">0</span>
-        <span class="symbol">)</span>
-        <span class="symbol">=</span>
-        <span class="number">0</span>
+        <span class="number">0</span><!--
+      --><span class="symbol">+</span><!--
+      --><span class="symbol">(</span><!--
+      --><span class="number">&ndash;0</span><!--
+      --><span class="symbol">)</span><!--
+      --><span class="symbol">=</span><!--
+      --><span class="number">0</span>
     </div>
 
     <p>
@@ -500,14 +534,13 @@
     </p>
 
     <div class="expression">
-        <span class="number">0</span>
-        <sup>
-            <span class="copyonly">^</span>
-            <span class="symbol">&ndash;</span><!--
-         --><span class="number">1</span>
-        </sup>
-        <span class="symbol">=</span>
-        <span class="number">&omega;</span>
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="number">&ndash;1</span><!--
+     --></sup><!--
+     --><span class="symbol">=</span><!--
+     --><span class="number">&omega;</span>
     </div>
 
     <p>
@@ -515,11 +548,11 @@
     </p>
 
     <div class="expression">
-        <span class="number">0</span>
-        <span class="symbol">&middot;</span>
-        <span class="symbol">&omega;</span>
-        <span class="symbol">=</span>
-        <span class="number">1</span>
+        <span class="number">0</span><!--
+     --><span class="symbol">&middot;</span><!--
+     --><span class="symbol">&omega;</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="number">1</span>
     </div>
 
     <p>

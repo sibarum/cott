@@ -257,6 +257,38 @@ p .fraction {
     text-align: center;
 }
 
+/* Bullets */
+
+ol.nested {
+    list-style-type: none;
+    counter-reset: level1;
+}
+
+ol.nested li {
+    counter-increment: level1;
+    position: relative;
+}
+ol.nested > li::before {
+    content: counter(level1) ". ";
+    display: inline-block;
+    width: 2em;
+    margin-left: -2em;
+}
+ol.nested > li > ol.nested {
+    list-style-type: none;
+    counter-reset: level2;
+}
+ol.nested > li > ol.nested > li {
+    counter-increment: level2;
+    position: relative;
+}
+ol.nested > li > ol.nested > li::before {
+    content: counter(level1) "." counter(level2);
+    display: inline-block;
+    width: 2.5em;
+    margin-left: -2.5em;
+}
+
 /* Print Media */
 @media print {
     .section {
