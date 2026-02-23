@@ -14,8 +14,8 @@
 <div class="section">
 
     <div class="headings">
-        <h1>Cantor's Diagonalization</h1>
-        <h2>Re-interpreting Cantor's construction as a diagnostic</h2>
+        <h1>A Critique of Cantor's Diagonalization</h1>
+        <h2>How first-order infinity-by-fiat leads to aleph-null</h2>
     </div>
 
     <div class="copyonly">---</div>
@@ -66,20 +66,377 @@
 
 <div class="section">
     <div class="section-title">
-        2.
+        2. Cantor's Diagonalization, Paraphrased
     </div>
+
+    <p>
+        If you're already familiar with Cantor's diagonalization, or if my explanation sucks,
+        you may skip this section.
+    </p>
+
+    <p>
+        Cantor explores the limits of infinite sets using a technique called "diagonalization."
+        I have some criticisms of specific details about how Cantor defines this process,
+        but I've deliberately avoided these aspects of the original proof.
+        I consider this a steelman - a faithful representation of the strongest elements
+        presented by Cantor.
+    </p>
+
+    <ol>
+        <li>
+            Assume some infinite list L of real numbers between 0 and 1 exists.
+        </li>
+        <li>
+            Construct a new real number R digit-by-digit:
+            <div>
+                (Start this procedure with N=1)
+            </div>
+            <ol>
+                <li>
+                    Let G represent the Nth digit to the right of the decimal place of the Nth element of L.
+                </li>
+                <li>
+                    Let D represent the Nth digit of R.
+                </li>
+                <li>
+                    Determine a value for D that differs from G.
+                    The precise method doesn't matter, but here's an example:
+                    <ol>
+                        <li>
+                            If G=0, D is determined to be 1.
+                        </li>
+                        <li>
+                            If G&ne;0, D is determined to be 0.
+                        </li>
+                    </ol>
+                </li>
+                <li>
+                    Increment the value of N by 1 and repeat this process for all elements of L.
+                </li>
+            </ol>
+        </li>
+        <li>
+            Consider the properties of the number R:
+            <ul>
+                <li>
+                    R differs from every element of L by at least one digit.
+                </li>
+                <li>
+                    Therefore, L does not contain R.
+                </li>
+            </ul>
+        </li>
+        <li>
+            Since this conclusion is valid for any infinite list of Real numbers,
+            then <strong>we conclude that any infinite list of Real numbers cannot contain all the Real numbers.</strong>
+        </li>
+    </ol>
+
+    <p>
+        The process can be visualized as a diagonal line cutting through L:
+    </p>
+<pre class="font-lg">
+R=
+0.00100001...
+</pre>
+<pre class="font-lg">
+Values of G:
+  <span class="color-inv">19014410</span>...
+</pre>
+<pre class="font-lg">
+L=
+0.<span class="color-inv">1</span>340840123471001...
+0.9<span class="color-inv">9</span>01300147591423...
+0.00<span class="color-inv">0</span>1247812849127...
+0.019<span class="color-inv">1</span>037488294283...
+0.7488<span class="color-inv">4</span>23164738142...
+0.42141<span class="color-inv">4</span>3477742148...
+0.111231<span class="color-inv">1</span>213413214...
+0.4752882<span class="color-inv">0</span>11043483...
+...
+</pre>
+
+    <p>
+        It's easy to see from this visualization how R is different from
+        all the numbers in L, regardless of how big/infinite L is.
+    </p>
 
 </div>
 
 <div class="section">
     <div class="section-title">
-        2. The Definition of <span class="symbol">&naturals;</span>
+        3. A Valid Construction
     </div>
+
+    <p>
+        Before I discuss what my exact criticisms are, I want to first clarify the elements I appreciate,
+        and explicitly disavow many of the concerns raised by Cantor's contemporaries.
+    </p>
+
+    <p>
+        As I stated in the preface, I think diagonalization is a perfectly valid and useful technique.
+        I don't reject Cantor's construction on any technical or ideological basis.
+        I am not an intuitionist, an ultrafinitist, or a classic constructivist, nor does my critique
+        appeal to any of these methodologies.
+    </p>
+
+    <p>
+        I could describe a procedure for preparing pizza and ask "would this pizza taste good?"
+        Depending on the procedure, the answer might be obvious, impossible to discern, or anywhere in-between.
+        Cantor's diagonalization is like a best-case scenario pizza recipe.
+        The dough is prepared perfectly, the sauce is traditional, and the mozzarella cheese is authentic.
+        I can't think of a reasonable argument that could be made to suggest the construction isn't palatable,
+        except for the classic "it's not what grandma used to make" or "I'm lactose intolerant".
+        You may not personally like pizza, but you can still know the pizza is good, and that's what matters.
+    </p>
+
+    <p>
+        Sure, you can't actually perform an infinite procedure. You can't have a computer do it either.
+        But you don't need to. That's not the point of the proof.
+        The point of the proof is to illustrate how <strong>iterating over an infinite list is problematic,</strong>
+        even if you could.
+    </p>
+
+    <p>
+        The problem doesn't arise until we start making claims about precisely how problematic it is,
+        and the impact it has on mathematics as a whole. Because the moment you claim New York style
+        pizza is better than Chicago deep dish, you'd better be ready for a fight. A food fight.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">
+        4. Flipping the Script
+    </div>
+
+    <p>
+        The truth is, Cantor's diagonalization is a giant spotlight pointed directly at a fissure
+        in the foundations of mathematics. It's a diagnostic, and it gave us an error code. But the code
+        wasn't recognised and addressed; it was internalized and canonicalized.
+        The error code was used as a calibration. The bug became a feature.
+    </p>
+
+    <p>
+        If Cantor had concluded "it's impossible to contain all the real numbers in any infinite list"
+        and stopped there, this article would never have been written. But that's not where it stopped.
+        Cantor took the implications too far. He concluded: <strong>the real numbers must be more numerous
+        than the natural numbers.</strong> Or, his exact words:
+        "...thus I have found the clear difference between a so‑called continuum
+        and a collection like the totality of real algebraic numbers."
+        [<a href="https://encyclopedia.pub/entry/32557">source</a>]
+    </p>
+
+    <p>
+        But here's the question I've never heard anybody ask:
+        <strong>Why can't diagonalization be performed on the digits to the left-hand side of the decimal place?</strong>
+    </p>
+
+    <p>
+        Let's perform diagonalization again, but modified.
+        This time we'll perform the procedure on the natural numbers, not the reals.
+    </p>
+
+    <ol>
+        <li>
+            Assume some infinite list L of natural numbers exists.
+        </li>
+        <li>
+            Construct a new whole number R digit-by-digit:
+            <div>
+                (Start this procedure with N=1)
+            </div>
+            <ol>
+                <li>
+                    Let G represent the Nth digit of the Nth element of L.
+                </li>
+                <li>
+                    Let D represent the Nth digit of R.
+                </li>
+                <li>
+                    Determine a value for D that differs from G.
+                    <ol>
+                        <li>
+                            If G=1, D is determined to be 0.
+                        </li>
+                        <li>
+                            If G&ne;1, D is determined to be 1.
+                        </li>
+                    </ol>
+                </li>
+                <li>
+                    Increment the value of N by 1 and repeat this process for all elements of L.
+                </li>
+            </ol>
+        </li>
+        <li>
+            Consider the properties of the number R:
+            <ul>
+                <li>
+                    R differs from every element of L by at least one digit.
+                </li>
+                <li>
+                    Therefore, L does not contain R.
+                </li>
+            </ul>
+        </li>
+    </ol>
+
+<pre class="font-lg">
+R=
+        ...10110110
+</pre>
+    <pre class="font-lg">
+Values of G:
+        ...<span class="color-inv">01441091</span>
+</pre>
+    <pre class="font-lg">
+L=
+...340840123471001<span class="color-inv">1</span>
+...01300147591423<span class="color-inv">9</span>9
+...1247812849127<span class="color-inv">0</span>00
+...037488294283<span class="color-inv">1</span>019
+...23164738142<span class="color-inv">4</span>7488
+...3477742148<span class="color-inv">4</span>42141
+...213413214<span class="color-inv">1</span>111231
+...11043483<span class="color-inv">0</span>4752882
+                ...
+</pre>
+
+    <p>
+        This construction, unlike Cantor's, is technically invalid.
+    </p>
+
+    <p>
+        It's a categorical error.
+    </p>
+
+    <p>
+        And that's the basis of my critique.
+        It goes deeper than Cantor:
+        it's a fundamental disagreement in how we define types.
+    </p>
 
 
     <div class="copyonly">---</div>
     <div class="section-footer">
     </div>
+</div>
+
+<div class="section">
+    <div class="section-title">
+        5. Stolen Infinite Valor
+    </div>
+
+    <p>
+        Suppose I have a collection of thumb drives.
+        Each thumb drive has a capacity of B bits.
+        If two thumb drives have bit-by-bit the exact same data stored on them,
+        then they represent the same value,
+        and so they are not considered unique values.
+        The maximum number of unique values among thumb drives is:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="number">2</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="variable">B</span>
+        </sup>
+    </div>
+
+    <p>
+        So, we can conclude that if B is finite, then the maximum number of unique values would also be finite.
+        And the only way the number of unique values could be infinite would be if B was infinite.
+    </p>
+
+    <p>
+        We would be lying if we said B was finite, but there are infinite possible unique values.
+    </p>
+
+    <p>
+        And yet, that's exactly how the natural numbers are defined.
+    </p>
+
+    <p>
+        The Axiom of Infinity defines <span class="symbol">&naturals;</span>
+        (the natural numbers) as being an infinite set.
+        Or, at least, that's how it's broadly understood.
+        The axiom itself doesn't actually use the term "infinity" anywhere.
+        It doesn't use any words at all, actually; it's a bunch of symbols.
+        And it doesn't actually refer to <span class="symbol">&naturals;</span>
+        - this is implied by its definition.
+        But regardless of the peculiar definition,
+        the Axiom of Infinity is the reason why mathematicians consider
+        <span class="symbol">&naturals;</span> <em>the canonical infinite set.</em>
+    </p>
+
+    <p>
+        And at the same time, each element of <span class="symbol">&naturals;</span>
+        is strictly finite. Although, the reason for this is even more obscure.
+    </p>
+
+    <p>
+        The naturals are defined primarily by the Peano Axioms.
+        I won't insult your intelligence; if you've made it this far, you know what
+        the Peano Axioms are.
+        What you may not have noticed is: There is no mention of the words "finite"
+        or "infinite" anywhere in the Peano Axioms.
+        So, that's not why natural numbers are strictly finite.
+    </p>
+
+    <p>
+        And only the "standard model" of type theory interprets natural numbers as finite.
+        There exist "non-standard models" of type theory that allow infinite natural numbers.
+        Coinductive type theory and ZF<span class="symbol">&reals;</span> both allow
+        infinite chains of successors.
+    </p>
+
+    <p>
+        In ZFC, the finiteness of natural numbers is made explicit by
+        "minimal inductive type" language. This interpretation is
+        most broadly shared and cited.
+    </p>
+
+    <p>
+        But whatever the reason, the canonical interpretation of <span class="symbol">&naturals;</span>
+        is:
+    </p>
+
+    <ul>
+        <li>
+            The size (cardinality) of <span class="symbol">&naturals;</span> is infinite.
+        </li>
+        <li>
+            Every element of <span class="symbol">&naturals;</span> is finite.
+        </li>
+    </ul>
+
+    <p>
+        Which, from an information theory standpoint, is the equivalent of saying
+        <strong>"I can fit an infinite amount of information into a thumb drive of finite capacity."</strong>
+        It's a blatant contradiction. And since it's definitional, it can't be wrong.
+        <em>That's where Cantor's "countable infinity" actually comes from.</em>
+    </p>
+
+    <p>
+        Even the name "countable infinity" betrays its own self-contradictory origins.
+        Go ahead: try counting to infinity.
+        Oh, don't worry, it's a "countable" infinity, not one of the uncountable kind -
+        should be a piece of cake, right?
+    </p>
+
+    <p>
+        <em>It's almost as if Cantor was trying to tell us something, but we just weren't listening closely enough.</em>
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+
 </div>
 
 </body>

@@ -256,6 +256,11 @@ p .fraction {
     text-align: center;
 }
 
+.color-inv {
+    color: beige;
+    background-color: black;
+}
+
 /* Bullets */
 
 ol.nested {
@@ -325,6 +330,12 @@ ol.nested > li > ol.nested > li::before {
         border: none;
         box-shadow: none;
         break-inside: avoid;
+    }
+
+    .color-inv {
+        color: black;
+        background-color: white;
+        border: 1px solid black;
     }
     a,
     a:active,
