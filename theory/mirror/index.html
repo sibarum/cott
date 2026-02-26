@@ -6,7 +6,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../lib/styles-v1.css">
 
-    <title>Escher Theory: Logarithmic Involution Duality</title>
+    <title>Mirror Calculus: Dual Duals</title>
 
 </head>
 <body>
@@ -14,8 +14,8 @@
 <div class="section">
 
     <div class="headings">
-        <h1>Escher Theory: Logarithmic Involution Duality</h1>
-        <h2>The Orthogonality of Sign and Magnitude</h2>
+        <h1>Mirror Calculus</h1>
+        <h2>The Calculus of Dual Duals</h2>
     </div>
 
     <div class="section-title">
@@ -58,7 +58,7 @@
     </div>
 
     <p>
-        We define the formal language of Escher terms.
+        We define the formal language of mirror terms.
     </p>
 
     <div class="subsection-title">
@@ -69,45 +69,36 @@
         The following are atomic terms:
     </p>
 
-    <ol>
+    <ul>
         <li>
-            <p>
-                Every rational number
-            </p>
-            <div class="expression">
-                <span class="variable">n</span>
-                <span class="symbol">&isin;</span>
-                <span class="symbol">&rationals;</span>
-            </div>
+            The distinguished element <span class="symbol">0</span>
         </li>
         <li>
-            <p>
-                The distinguished constants
-            </p>
-            <div class="expression">
-                <span class="variable">v</span>
-                <span class="symbol">&isin;</span>
-                <span class="symbol">{</span>
-                <span class="symbol">&alpha;</span>,
-                <span class="symbol">&omega;</span>
-                <span class="symbol">}</span>
-            </div>
+            The distinguished element <span class="symbol">&omega;</span>
         </li>
-    </ol>
+    </ul>
 
     <p>
         These symbols are primitive elements of the language.
     </p>
 
     <div class="subsection-title">
-        2.2 Formation of Terms
+        2.2 Function Symbols
     </div>
 
-    <p>
-        The set of terms is defined inductively:
-    </p>
+    <ul>
+        <li>
+            A unary function symbol
+            <span class="symbol">&#x1D54A;</span>
+            (successor)
+        </li>
+    </ul>
 
-    <ol>
+    <div class="subsection-title">
+        2.3 Formation of Terms
+    </div>
+
+    <ul>
         <li>
             <p>
                 Every atomic term is a term.
@@ -117,36 +108,82 @@
             <p>
                 If
                 <span class="variable">a</span>
-                and
-                <span class="variable">b</span>
-                are terms, then so are
+                is a term, then so is:
             </p>
 
-            <div class="expression">
+            <div class="expression"><!--
+             --><span class="symbol">&#8722;</span><!--
+             --><span class="variable">a</span>
+            </div>
+        </li>
+        <li>
+            <p>
+                If
                 <span class="variable">a</span>
-                <span class="symbol">+</span>
+                and
                 <span class="variable">b</span>
+                are terms, then the following are also terms:
+            </p>
+
+            <div class="expression"><!--
+             --><span class="symbol">&#x1D54A;</span><!--
+             --><sup><!--
+                 --><span class="copyonly">^</span><!--
+                 --><span class="variable">a</span><!--
+             --></sup><!--
+          --><span class="symbol">(</span><!--
+          --><span class="variable">b</span><!--
+          --><span class="symbol">)</span><!--
+         --></div>
+
+            <div class="expression"><!--
+             --><span class="variable">a</span><!--
+             --><span class="symbol">+</span><!--
+             --><span class="variable">b</span>
             </div>
 
-            <div class="expression">
-                <span class="variable">a</span>
-                <span class="symbol">&middot;</span>
-                <span class="variable">b</span>
+            <div class="expression"><!--
+             --><span class="variable">a</span><!--
+             --><span class="symbol">&middot;</span><!--
+             --><span class="variable">b</span>
             </div>
 
-            <div class="expression">
-                <span class="variable">a</span>
-                <sup>
-                    <span class="copyonly">^</span>
-                    <span class="variable">b</span>
+            <div class="expression"><!--
+             --><span class="variable">a</span><!--
+             --><sup><!--
+                 --><span class="copyonly">^</span><!--
+                 --><span class="variable">b</span>
                 </sup>
             </div>
         </li>
-    </ol>
+    </ul>
 
     <p>
-        Exponentiation is a primitive syntactic operation; no restrictions on term types are imposed at this stage.
+        Exponentiation is a primitive syntactic operation; at this stage, no semantic restrictions are imposed.
     </p>
+
+    <div class="subsection-title">
+        2.4 Notation
+    </div>
+
+    <div>
+        For each finite
+        natural number <span class="variable">n</span>,
+        we write:
+        <div>
+            <span class="variable">n</span><!--
+         --><span class="symbol">:=</span><!--
+         --><span class="symbol">&#x1D54A;</span><!--
+         --><sup><!--
+             --><span class="copyonly">^</span><!--
+             --><span class="variable">n</span><!--
+         --></sup><!--
+         --><span class="symbol">(</span><!--
+         --><span class="number">0</span><!--
+         --><span class="symbol">)</span>
+        </div>
+        as a notational convenience.
+    </div>
 
     <div class="copyonly">---</div>
     <div class="section-footer">
@@ -170,11 +207,11 @@
     </div>
 
     <div class="expression">
-        <span class="symbol">&alpha;</span>
-        <span class="symbol">&middot;</span>
-        <span class="symbol">&omega;</span>
-        <span class="symbol">=</span>
-        <span class="number">1</span>
+        <span class="symbol">0</span><!--
+     --><span class="symbol">&middot;</span><!--
+     --><span class="symbol">&omega;</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="number">1</span>
     </div>
 
     <div class="subsection-title">
@@ -209,21 +246,33 @@
 <div class="section">
 
     <div class="section-title" id="section-5">
-        4. Derived Properties
+        4. Standard Identities
+    </div>
+
+    <p>
+        These identities are standard for all terms
+    </p>
+
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-6">
+        5. Derived Properties
     </div>
 
     <div class="subsection-title">
-        4.1 Derivation Semantics
+        5.1 Derivation Semantics
     </div>
 
     <p>
         All logarithmic and exponential identities are consequences of the single reciprocity axiom
-        <span class="expression-inline">
-            <span class="symbol">&alpha;</span>
-            <span class="symbol">&middot;</span>
-            <span class="symbol">&omega;</span>
-            <span class="symbol">=</span>
-            <span class="number">1</span>,
+        <span class="expression-inline"><!--
+         --><span class="symbol">&alpha;</span><!--
+         --><span class="symbol">&middot;</span><!--
+         --><span class="symbol">&omega;</span><!--
+         --><span class="symbol">=</span><!--
+         --><span class="number">1</span>,
         </span>
         combined with the inductive term structure and primitive operations.
     </p>
@@ -541,13 +590,13 @@
 
 <div class="section">
 
-    <div class="section-title" id="section-6">
-        5. Derivations
+    <div class="section-title" id="section-7">
+        7. Derivations
     </div>
 
 
     <div class="subsection-title">
-        5.1 Reciprocity
+        7.1 Reciprocity
     </div>
 
     <p>

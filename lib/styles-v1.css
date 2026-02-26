@@ -43,6 +43,7 @@ td {
 }
 table .expression {
     text-align: center;
+    margin: 1em 0.1em;
 }
 
 sup {
@@ -164,7 +165,6 @@ li {
 }
 span.variable, span.symbol, span.number, sup, sub, .fraction {
     white-space: nowrap;
-    letter-spacing: 0.1em;
 }
 
 .variable {
@@ -177,7 +177,7 @@ span.variable, span.symbol, span.number, sup, sub, .fraction {
 }
 
 .variable, .symbol {
-    padding: 0.1em;
+    margin: 0.1em;
 }
 
 .symbol.italics {
@@ -206,6 +206,7 @@ p .fraction {
     display: inline;
     vertical-align: middle;
     align-self: center;
+    padding-top: 1px;
 }
 .h-divider {
     display: inline;

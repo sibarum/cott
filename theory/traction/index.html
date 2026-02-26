@@ -11,11 +11,12 @@
 </head>
 <body>
 
+
 <div class="section">
 
     <div class="headings">
-        <h1>Traction Theory: An Exception-Free Algebra</h1>
-        <h2>with Total Exponential and Logarithmic Operators</h2>
+        <h1>Traction Theory</h1>
+        <h2>an exception-free algebra</h2>
     </div>
 
     <div class="section-title">
@@ -24,49 +25,54 @@
     <ol class="nested">
         <li>
             <a href="#section-1">
-                Preface
+                Abstract
             </a>
-            <ol class="nested">
-                <li>
-                    Motivation
-                </li>
-                <li>
-                    Operational Type Extensions
-                </li>
-            </ol>
         </li>
         <li>
             <a href="#section-2">
-                Tractions
+                Introduction and Motivation
             </a>
-            <ol class="nested">
-                <li>
-                    Additive Inverse
-                </li>
-                <li>
-                    Addition
-                </li>
-                <li>
-                    Additive Identity
-                </li>
-                <li>
-                    Multiplicative Inverse
-                </li>
-                <li>
-                    Multiplication
-                </li>
-                <li>
-                    Multiplicative Identity
-                </li>
-                <li>
-                    Zero and &omega;
-                </li>
-                <li>
-                    Binding Law
-                </li>
-            </ol>
+        </li>
+        <li>
+            <a href="#section-3">
+                Addition
+            </a>
+        </li>
+        <li>
+            <a href="#section-4">
+                Multiplication
+            </a>
+        </li>
+        <li>
+            <a href="#section-5">
+                Exponentiation
+            </a>
         </li>
     </ol>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-1">
+        1. Abstract
+    </div>
+
+    <p>
+        Traction Theory introduces a novel algebraic structure called a <em>traction</em>,
+        designed to be total, reversible, and emergent.
+        Unlike classical algebras,
+        tractions treat operations as primary elements and avoid exceptions by allowing unevaluated symbolic
+        expressions as valid members.
+        The system incorporates the additive identity 0 and its multiplicative reciprocal
+        <span class="symbol">&omega;</span>
+        explicitly, ensuring consistency and maximal tractability without structural collapse.
+        This paper outlines the motivation, core definitions, and operations of addition, multiplication,
+        and exponentiation in tractions, emphasizing preservation of invariants and information.
+    </p>
 
     <div class="copyonly">---</div>
     <div class="section-footer">
@@ -76,82 +82,84 @@
 
 <div class="section">
 
-    <div class="section-title" id="section-1">
-        1. Preface
+    <div class="section-title" id="section-2">
+        2. Introduction and Motivation
     </div>
+
+    <p>
+        Algebra fundamentally involves the symbolic manipulation of expressions under declared invariants.
+        Valid manipulations preserve these invariants while uncovering underlying structure.
+        define an algebra as <em>maximally tractable</em> if it admits every transformation proven to preserve all declared
+        invariants of an expression.
+        When projection is defined (e.g., to numerical values),
+        it must map invariant-preserving equivalent expressions to equal projections.
+    </p>
+
+    <p>
+        An algebra is <em>consistent</em> if it prohibits manipulations that would invalidate its invariants.
+        A traction is an algebra engineered to be both consistent and maximally tractable:
+        it allows all invariant-preserving transformations and forbids those that violate invariants.
+    </p>
+
+    <p>
+        Classical algebras often suffer from exceptions, such as division by zero or undefined operations,
+        leading to loss of tractability.
+        Tractions address this by creating a "wheel-like" structure where the additive identity 0 and its
+        multiplicative reciprocal <span class="symbol">&omega;</span> are valid elements,
+        ensuring an exception-free system.
+    </p>
+
+    <p>
+        Traction Theory implements Constructive Operational Type Theory (COTT),
+        where operations are foundational, and evaluation is not mandatory.
+        For details on COTT, see <a href="/cott">sibarum.github.io/cott</a>.
+        Tractions are invariant-agnostic at the core, with universal invariants limited to operational identities;
+        other invariants are contextual and arise in projections.
+        Equality is structural rather than purely equational,
+        and terminal constructions maximize information compression without erasure.
+    </p>
+
+    <p>
+        This contrasts with related structures like wheels, which introduce a nullity element &perp; leading to collapse,
+        or meadows, which handle undefinedness differently.
+        Tractions aim for totality, respecting universal invariants while preserving symbolic information.
+    </p>
 
     <div class="subsection-title">
-        1.1 Motivation
+        2.1 Overview
     </div>
 
     <p>
-        At its core, algebra is the symbolic manipulation of expressions subject to declared invariants.
-        Valid manipulations preserve declared invariants while revealing structure.
-    </p>
-    <p>
-        We call an algebra <strong>maximally tractable</strong> if it admits every transformation shown to preserve
-        all declared invariants of an expression.
-        Projection, when defined, must map invariant-preserving equivalent expressions to equal projections.
-    </p>
-    <p>
-        We call an algebra <strong>consistent</strong> if it forbids manipulations that would invalidate those invariants.
-    </p>
-    <p>
-        A <strong>traction</strong> is an algebra designed to be both consistent and maximally tractable:
-        it permits all invariant-preserving transformations and forbids those that violate them.
-    </p>
-
-    <div class="subsection-title">
-        1.2 Operational Type Extensions
-    </div>
-
-    <p>
-        To achieve an exception-free algebra, tractions define new algebraic structures
-        and explicitly specify how symbolic expressions behave under admissible operations,
-        unlike classical algebra, where operations are implicitly assumed to reduce to a single numeric value.
-        Tractions remove this restriction:
-        <strong>operations are not required to evaluate numerically.</strong>
-        Instead, the unevaluated expression serves as the canonical representative of a distinct algebraic element.
+        A <em>traction</em> is a totalized algebra with two group-like structures (for addition and multiplication),
+        a distinguished inverse pair (0, <span class="symbol">&omega;</span>), and boundary-sensitive reassociation rules.
+        Types in tractions are extended operationally:
+        they include numeric members and are closed under all admissible operations.
+        Symbolic expressions are canonical representatives of distinct elements,
+        eliminating undefinedness—expressions simply may not project to single numeric values.
     </p>
 
     <p>
-        This shift in perspective has an immediate consequence: classical types are defined as sets of numeric elements,
-        not unevaluated expressions.
-        To accommodate symbolic elements, tractions adopt an operational type extension:
-        <strong>types are defined by their numeric members and by closure under all admissible operations.</strong>
-        In this way, numeric and symbolic elements coexist seamlessly within the same algebraic framework.
+        Traction algebra is not an extension of &reals; or &complexes; zero is non-absorbing and information-preserving,
+        necessitating adjustments to the type theory.
+        Operations are total and reversible, with recovery laws ensuring invertibility.
     </p>
 
     <p>
-        Crucially, undefinedness no longer exists;
-        an expression simply does not project to a single numeric value.
+        Key principles:
     </p>
 
-    <p>
-        Traction Theory is an implementation of Constructive Operational Type Theory.
-        Traction algebra is not an extension of
-        <span class="symbol">&reals;</span>
-        or
-        <span class="symbol">&complexes;</span>.
-        While it can be helpful to think of classical types as an analogy,
-        this is technically problematic:
-        zero is redefined as non-absorbing and information-preserving,
-        and its reciprocal is unconventional,
-        requiring the underlying type theory itself to be adjusted.
-        For more information, see
-        <a href="https://sibarum.github.io/cott/">sibarum.github.io/cott</a>.
-    </p>
+    <ul>
+        <li>
+            <strong>Totality:</strong> Every operation is defined for all elements.
+        </li>
+        <li>
+            <strong>Reversibility:</strong> Operations admit inverses or recovery mechanisms.
+        </li>
+        <li>
+            <strong>Emergence:</strong> Structure arises from interactions without erasure.
+        </li>
+    </ul>
 
-    <p>
-        Wheels partially implement traction ideas:
-        for example, the zero reciprocal <span class="symbol">&omega;</span> restores tractability at singularities,
-        but the introduction of the nullity element <span class="number">&perp;</span> causes structural collapse rather than totality.
-    </p>
-
-    <p>
-        The goal of traction theory is to provide a structure that never collapses,
-        respects all universal invariants, and preserves all symbolic information.
-    </p>
 
     <div class="copyonly">---</div>
     <div class="section-footer">
@@ -160,59 +168,47 @@
 
 <div class="section">
 
-    <div class="section-title" id="section-2">
-        2. Tractions
+    <div class="section-title" id="section-3">
+        3. Addition
     </div>
 
     <p>
-        Tractions are a wheel-like algebra in which the additive identity <span class="number">0</span>
-        and its multiplicative reciprocal <span class="symbol">&omega;</span> are explicitly treated as valid elements,
-        ensuring the system is exception-free and maximally tractable.
-        Addition forms a closed abelian group.
-        Multiplication is nearly abelian,
-        though additional constraints on the identities introduce subtle deviations.
-        Equality is structural rather than purely equational,
-        comparing the forms of expressions rather than just their numeric evaluation.
+        Addition in a traction forms a closed Abelian group.
     </p>
 
     <div class="subsection-title">
-        2.1 Additive Inverse
+        3.1 Additive Inverse
     </div>
 
     <p>
         For every term
         <span class="variable">t</span>,
-        there exists a corresponding additive inverse, written
-    </p>
-
-    <div class="expression"><!--
-     --><span class="variable">&ndash;t</span>
-    </div>
-
-    <p>
-        Negation is a unary operation satisfying the involution law:
+        there exists a corresponding additive inverse, denoted
+        <span class="symbol">&ndash;</span><!--
+     --><span class="variable">t</span>,
+        satisfying the involution:
     </p>
 
     <div class="expression">
         <span class="symbol">&ndash;</span><!--
      --><span class="symbol">(</span><!--
-     --><span class="variable">&ndash;t</span><!--
+     --><span class="symbol">&ndash;</span><!--
+     --><span class="variable">t</span><!--
      --><span class="symbol">)</span><!--
      --><span class="symbol">=</span><!--
      --><span class="variable">t</span>
     </div>
 
     <p>
-        Negation is purely structural: forming
-        <span class="variable">&ndash;t</span>
-        does not evaluate or simplify
-        <span class="variable">t</span>;
-        it constructs a new symbolic term.
+        Negation is structural:
+        <span class="symbol">&ndash;</span><!--
+     --><span class="variable">t</span>
+        constructs a new symbolic term without evaluation or simplification.
     </p>
 
 
     <div class="subsection-title">
-        2.2 Addition
+        3.2 Addition Operation
     </div>
 
     <p>
@@ -222,17 +218,12 @@
      --><span class="variable">c</span>:<!--
  --></p>
 
-    <p>If</p>
-
-    <div class="expression">
+    <p>If
         <span class="variable">a</span><!--
      --><span class="symbol">+</span><!--
      --><span class="variable">b</span><!--
      --><span class="symbol">=</span><!--
-     --><span class="variable">c</span>
-    </div>
-
-    <p>
+     --><span class="variable">c</span>,
         then the recovery laws hold:
     </p>
 
@@ -240,7 +231,8 @@
         <span class="variable">c</span><!--
      --><span class="symbol">+</span><!--
      --><span class="symbol">(</span><!--
-     --><span class="variable">&ndash;a</span><!--
+     --><span class="symbol">&ndash;</span><!--
+     --><span class="variable">a</span><!--
      --><span class="symbol">)</span><!--
      --><span class="symbol">=</span><!--
      --><span class="variable">b</span>,
@@ -250,7 +242,8 @@
         <span class="variable">c</span><!--
      --><span class="symbol">+</span><!--
      --><span class="symbol">(</span><!--
-     --><span class="variable">&ndash;b</span><!--
+     --><span class="symbol">&ndash;</span><!--
+     --><span class="variable">b</span><!--
      --><span class="symbol">)</span><!--
      --><span class="symbol">=</span><!--
      --><span class="variable">a</span>.
@@ -290,7 +283,7 @@
 
 
     <div class="subsection-title">
-        2.3 Additive Identity
+        3.3 Additive Identity
     </div>
 
     <p>
@@ -304,14 +297,15 @@
         <span class="variable">t</span><!--
      --><span class="symbol">+</span><!--
      --><span class="symbol">(</span><!--
-     --><span class="variable">&ndash;t</span><!--
+     --><span class="symbol">&ndash;</span><!--
+     --><span class="variable">t</span><!--
      --><span class="symbol">)</span><!--
      --><span class="symbol">=</span><!--
      --><span class="number">0</span>.
     </div>
 
     <p>
-        From the recovery laws, it follows that
+        From the recovery laws:
     </p>
 
     <div class="expression">
@@ -323,29 +317,41 @@
     </div>
 
     <p>
-        so <span class="number">0</span> acts as an <strong>additive identity</strong>.
+        so 0 is the additive identity.
+    </p>
+
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-4">
+        4. Multiplication
+    </div>
+
+    <p>
+        Multiplication forms a near-Abelian group, with subtle deviations due to constraints on identities.
     </p>
 
     <div class="subsection-title">
-        2.4 Multiplicative Inverse
+        4.1 Multiplicative Inverse
     </div>
 
     <p>
         For every term
         <span class="variable">t</span>,
-        there exists a corresponding multiplicative inverse, written
-    </p>
-
-    <div class="expression">
+        there exists a corresponding multiplicative inverse, denoted
         <span class="variable">t</span><!--
      --><sup><!--
          --><span class="copyonly">^</span><!--
-         --><span class="number">&ndash;1</span>
-        </sup>
-    </div>
-
-    <p>
-        This inverse is defined <strong>structurally</strong> and satisfies the involution law:
+         --><span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span><!--
+     --></sup>,
+        satisfying the involution:
     </p>
 
     <div class="expression">
@@ -353,31 +359,25 @@
      --><span class="variable">t</span><!--
      --><sup><!--
          --><span class="copyonly">^</span><!--
-         --><span class="number">&ndash;1</span><!--
+     --><span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span><!--
      --></sup><!--
      --><span class="symbol">)</span><!--
      --><sup><!--
          --><span class="copyonly">^</span><!--
-         --><span class="number">&ndash;1</span><!--
+     --><span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span><!--
      --></sup><!--
      --><span class="symbol">=</span><!--
      --><span class="variable">t</span>
     </div>
 
     <p>
-        Forming
-        <span class="variable">t</span><!--
-     --><sup><!--
-     --><span class="copyonly">^</span><!--
-     --><span class="number">&ndash;1</span><!--
-     --></sup>
-        does not evaluate
-        <span class="variable">t</span>;
-        it constructs a new term.
+        Inversion is structural, constructing a new term without evaluation.
     </p>
 
     <div class="subsection-title">
-        2.5 Multiplication
+        4.2 Multiplication Operation
     </div>
 
     <p>
@@ -389,17 +389,11 @@
 
     <p>
         If
-    </p>
-
-    <div class="expression"><!--
-     --><span class="variable">a</span><!--
+        <span class="variable">a</span><!--
      --><span class="symbol">&middot;</span><!--
      --><span class="variable">b</span><!--
      --><span class="symbol">=</span><!--
-     --><span class="variable">c</span>
-    </div>
-
-    <p>
+     --><span class="variable">c</span>,
         then the recovery laws hold:
     </p>
 
@@ -409,7 +403,8 @@
      --><span class="variable">a</span><!--
      --><sup><!--
          --><span class="copyonly">^</span><!--
-         --><span class="number">&ndash;1</span><!--
+         --><span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span><!--
      --></sup><!--
      --><span class="symbol">=</span><!--
      --><span class="variable">b</span>,
@@ -421,7 +416,8 @@
      --><span class="variable">b</span><!--
      --><sup><!--
          --><span class="copyonly">^</span><!--
-         --><span class="number">&ndash;1</span><!--
+         --><span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span><!--
      --></sup><!--
      --><span class="symbol">=</span><!--
      --><span class="variable">a</span>
@@ -460,7 +456,7 @@
     </div>
 
     <div class="subsection-title">
-        2.6 Multiplicative Identity
+        4.3 Multiplicative Identity
     </div>
 
     <p>
@@ -476,14 +472,15 @@
      --><span class="variable">t</span><!--
      --><sup><!--
          --><span class="copyonly">^</span><!--
-         --><span class="number">&ndash;1</span><!--
+         --><span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span><!--
      --></sup><!--
      --><span class="symbol">=</span><!--
      --><span class="number">1</span>.
     </div>
 
     <p>
-        From the recovery laws it follows that
+        From the recovery laws:
     </p>
 
     <div class="expression">
@@ -495,57 +492,42 @@
     </div>
 
     <p>
-        The inverse of the multiplicative identity is the multiplicative identity.
+        The inverse of 1 is itself:
     </p>
 
     <div class="expression">
         <span class="number">1</span><!--
      --><sup><!--
          --><span class="copyonly">^</span><!--
-         --><span class="number">&ndash;1</span><!--
+         --><span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span><!--
      --></sup><!--
      --><span class="symbol">=</span><!--
      --><span class="number">1</span>.
     </div>
 
     <div class="subsection-title">
-        2.7 Zero and <span class="number">&omega;</span>
+        4.4 Zero and <span class="number">&omega;</span>
     </div>
 
     <p>
-        The behavior of zero in a traction is not the familiar absorbing element.
-    </p>
-
-    <p>
-        Zero does not cause erasure when within a multiplicative association with any other terms.
-    </p>
-
-    <div class="expression">
-        <span class="number">0</span><!--
-      --><span class="symbol">+</span><!--
-      --><span class="symbol">(</span><!--
-      --><span class="number">&ndash;0</span><!--
-      --><span class="symbol">)</span><!--
-      --><span class="symbol">=</span><!--
-      --><span class="number">0</span>
-    </div>
-
-    <p>
-        Zero has a multiplicative inverse, for which we give a convenient alias:
+        Zero is non-absorbing and preserves information in multiplications.
+        It has a multiplicative inverse, aliased as <span class="number">&omega;</span>:
     </p>
 
     <div class="expression">
         <span class="number">0</span><!--
      --><sup><!--
          --><span class="copyonly">^</span><!--
-         --><span class="number">&ndash;1</span><!--
+         --><span class="symbol">&ndash;</span><!--
+         --><span class="number">1</span><!--
      --></sup><!--
      --><span class="symbol">=</span><!--
      --><span class="number">&omega;</span>
     </div>
 
     <p>
-        Zero and its inverse multiply to the multiplicative identity:
+        They satisfy:
     </p>
 
     <div class="expression">
@@ -561,53 +543,675 @@
     </p>
 
     <div class="subsection-title">
-        2.8 Binding Law
+        4.5 Binding Law
     </div>
 
     <p>
-        If
-        <span class="variable">x</span>
-        <span class="symbol">&ne;</span>
-        <span class="symbol">&omega;</span>
-        then
-        <span class="number">0</span>
-        <span class="symbol">&middot;</span>
-        <span class="variable">x</span>
-        is a bound term written
-        <span class="number">0</span>
-        <span class="variable">x</span>
-        that does not reassociate into additive form.
+        For any unassigned variable
+        <span class="variable">x</span>:
     </p>
-
-    <p>
-        If
-        <span class="variable">x</span>
-        <span class="symbol">&ne;</span>
-        <span class="number">0</span>
-        then
-        <span class="symbol">&omega;</span>
-        <span class="symbol">&middot;</span>
-        <span class="variable">x</span>
-        is a bound term written
-        <span class="symbol">&omega;</span>
-        <span class="variable">x</span>
-        that does not reassociate into additive form.
-    </p>
+    <ul>
+        <li>
+            <span class="number">0</span><!--
+            --><span class="symbol">&middot;</span><!--
+            --><span class="variable">x</span>
+            is a <strong>bound term</strong> denoted
+            <span class="number">0</span><!--
+            --><span class="variable">x</span>
+            which does not reassociate into additive form.
+        </li>
+        <li>
+            <span class="symbol">&omega;</span><!--
+            --><span class="symbol">&middot;</span><!--
+            --><span class="variable">x</span>
+            is a <strong>bound term</strong> denoted
+            <span class="symbol">&omega;</span><!--
+            --><span class="variable">x</span>
+            which does not reassociate into additive form.
+        </li>
+        <li>
+            Standard additive property in the exponent (when it does not conflict with binding):
+        </li>
+    </ul>
 
     <div class="copyonly">---</div>
     <div class="section-footer">
-        <em>
-            A traction is a totalized, two-group algebra with a distinguished inverse pair
-            (0, <span class="symbol">&omega;</span>)
-            and boundary-sensitive reassociation rules.
-        </em>
     </div>
 </div>
 
 <div class="section">
 
-    <div class="section-title" id="section-3">
+    <div class="section-title" id="section-5">
+        5. Exponentiation
+    </div>
 
+    <p>
+        Exponentiation is a total binary operation on terms, written
+        <span class="variable">a</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="variable">b</span>
+        </sup>.
+        It extends classical exponentiation while ensuring totality even when the base is 0 or the exponent involves
+        <span class="symbol">&omega;</span>,
+        without absorption or collapse.
+    </p>
+
+
+
+    <div class="subsection-title">
+        5.1 General Laws
+    </div>
+
+    <p>
+        For all terms
+        <span class="variable">a</span>,<!--
+     --><span class="variable">b</span>,<!--
+     --><span class="variable">c</span>,
+        where the expressions are defined in the usual sense (non-zero base or non-boundary cases):
+    </p>
+
+    <ul>
+        <li>
+            <strong>Power-tower associativity</strong> (right-associative by convention, but explicit here):
+            <div class="expression font-lg">
+                <span class="symbol">(</span><!--
+             --><span class="variable">a</span><!--
+             --><sup><!--
+                 --><span class="copyonly">^</span><!--
+                 --><span class="variable">b</span><!--
+             --></sup><!--
+             --><span class="symbol">)</span><!--
+             --><sup><!--
+                 --><span class="copyonly">^</span><!--
+                 --><span class="variable">c</span><!--
+             --></sup><!--
+             --><span class="symbol">=</span><!--
+             --><span class="variable">a</span><!--
+             --><sup><!--
+                 --><span class="copyonly">^(</span><!--
+                 --><span class="variable">b</span><!--
+                 --><span class="symbol">&middot;</span><!--
+                 --><span class="variable">c</span><!--
+                 --><span class="copyonly">)</span><!--
+             --></sup><!--
+         --></div>
+        </li>
+        <li>
+            <strong>Negative exponent as inverse</strong>
+            <div class="expression font-lg"><!--
+             --><span class="variable">a</span><!--
+             --><sup><!--
+                 --><span class="copyonly">^</span><!--
+                 --><span class="symbol">&ndash;</span><!--
+                 --><span class="variable">b</span><!--
+             --></sup><!--
+             --><span class="symbol">=</span><!--
+             --><span class="symbol">(</span><!--
+             --><span class="variable">a</span><!--
+             --><sup><!--
+                 --><span class="copyonly">^</span><!--
+                 --><span class="symbol">&ndash;</span><!--
+                 --><span class="number">1</span><!--
+             --></sup><!--
+             --><span class="symbol">)</span><!--
+             --><sup><!--
+                 --><span class="copyonly">^</span><!--
+                 --><span class="variable">b</span><!--
+             --></sup><!--
+             --><span class="symbol">=</span><!--
+             --><span class="fraction"><!--
+                 --><span class="numerator"><!--
+                     -->1<!--
+                 --></span><!--
+                 --><span class="h-divider">/</span><!--
+                 --><span class="denominator"><!--
+                     --><span class="copyonly">(</span><!--
+                     --><span class="variable">a</span><!--
+                     --><sup><!--
+                         --><span class="copyonly">^</span><!--
+                         --><span class="variable">b</span><!--
+                     --></sup><!--
+                     --><span class="copyonly">)</span><!--
+                 --></span><!--
+             --></span><!--
+         --></div>
+            <p>
+                (where / is multiplication by the multiplicative inverse)
+            </p>
+        </li>
+        <li>
+            <strong>Standard additive property in the exponent</strong> (when it does not conflict with binding):
+            <div class="expression font-lg">
+                <span class="variable">a</span><!--
+             --><sup><!--
+                 --><span class="copyonly">^(</span><!--
+                 --><span class="variable">b</span><!--
+                 --><span class="symbol">+</span><!--
+                 --><span class="variable">c</span><!--
+                 --><span class="copyonly">)</span><!--
+             --></sup><!--
+             --><span class="symbol">=</span><!--
+             --><span class="variable">a</span><!--
+             --><sup><!--
+                 --><span class="copyonly">^</span><!--
+                 --><span class="variable">b</span><!--
+             --></sup><!--
+             --><span class="symbol">&middot;</span><!--
+             --><span class="variable">a</span><!--
+             --><sup><!--
+                 --><span class="copyonly">^</span><!--
+                 --><span class="variable">c</span><!--
+             --></sup>
+            </div>
+        </li>
+        <li>
+            <strong>Multiplicative property in the base</strong>
+            <div class="expression font-lg"><!--
+             --><span class="symbol">(</span><!--
+             --><span class="variable">a</span><!--
+             --><span class="symbol">&middot;</span><!--
+             --><span class="variable">b</span><!--
+             --><span class="symbol">)</span><!--
+             --><sup><!--
+                 --><span class="copyonly">^</span><!--
+                 --><span class="variable">c</span><!--
+             --></sup><!--
+             --><span class="symbol">=</span><!--
+             --><span class="variable">a</span><!--
+             --><sup><!--
+                 --><span class="copyonly">^</span><!--
+                 --><span class="variable">c</span><!--
+             --></sup><!--
+             --><span class="symbol">&middot;</span><!--
+             --><span class="variable">b</span><!--
+             --><sup><!--
+                 --><span class="copyonly">^</span><!--
+                 --><span class="variable">c</span><!--
+             --></sup><!--
+         --></div>
+
+        </li>
+    </ul>
+
+    <div class="subsection-title">
+        5.2 Zero Lift and Boundary Rules
+    </div>
+
+    <p>
+        To establish the zero lift in a way that preserves reversibility and totality,
+        we define exponentiation and its structural logarithm base 0 on key boundary cases as follows.
+        These rules extend the familiar exponentiation laws while ensuring that
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="number">0</span>
+        </sub>
+        serves as a recovery operation (right-inverse) for terms of the form
+        <span class="number">0</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="variable">x</span>
+        </sup>.
+    </p>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>
+                <div>
+                    <span class="copyonly">|</span>
+                    Classical/General Rule
+                    <span class="copyonly">|</span>
+                </div>
+            </th>
+            <th>
+                <div>
+                    <span class="copyonly">|</span>
+                    Zero-Lifted Expression
+                    <span class="copyonly">|</span>
+                </div>
+            </th>
+            <th>
+                <div>
+                    <span class="copyonly">|</span>
+                    Structural Log Inverse
+                    <span class="copyonly">|</span>
+                </div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression"><!--
+                 --><span class="variable">b</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="number">0</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="number">1</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="number">0</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="number">0</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="number">1</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="number">0</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="number">1</span><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="number">0</span><!--
+             --></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression"><!--
+                 --><span class="variable">b</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="number">1</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="variable">b</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="number">0</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="number">1</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="number">0</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="number">0</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="number">0</span><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="number">1</span><!--
+             --></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression"><!--
+                 --><span class="variable">b</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="symbol">&ndash;</span><!--
+                     --><span class="number">1</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="number">1</span><!--
+                 --><span class="symbol">/</span><!--
+                 --><span class="variable">b</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="number">0</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="symbol">&ndash;</span><!--
+                     --><span class="number">1</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="symbol">&omega;</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="number">0</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="symbol">&omega;</span><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="symbol">&ndash;</span><!--
+                 --><span class="number">1</span><!--
+             --></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression"><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="variable">b</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="symbol">(</span><!--
+                 --><span class="variable">b</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">x</span><!--
+                 --></sup><!--
+                 --><span class="symbol">)</span><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="variable">x</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="number">0</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^(</span><!--
+                     --><span class="variable">log</span><!--
+                     --><sub><!--
+                         --><span class="copyonly">_{</span><!--
+                         --><span class="number">0</span><!--
+                         --><span class="copyonly">}</span><!--
+                     --></sub><!--
+                     --><span class="variable">x</span><!--
+                     --><span class="copyonly">)</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="variable">x</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="number">0</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="symbol">(</span><!--
+                 --><span class="number">0</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">x</span><!--
+                 --></sup><!--
+                 --><span class="symbol">)</span><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="variable">x</span><!--
+             --></div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>
+        The first two rows maintain continuity with classical conventions.
+        The third row lifts the inverse of zero to <span class="symbol">&omega;</span>,
+        consistent with the multiplicative structure
+        <span class="number">0</span><!--
+     --><span class="symbol">&middot;</span><!--
+     --><span class="symbol">&omega;</span><!--
+     --><span class="symbol">=</span><!--
+     --><span class="number">1</span>.
+        The final row asserts that
+        <span class="variable">log</span><sub><span class="number">0</span></sub>
+        behaves invertibly on both sides for these symbolic terms,
+        mirroring the general logarithm property.
+    </p>
+
+    <div class="subsection-title">
+        5.3 <span class="symbol">&omega;</span> Lift
+    </div>
+
+    <p>
+        The same conventions must be followed for <span class="symbol">&omega;</span>,
+        ensuring symmetric treatment of the distinguished inverse pair (0, <span class="symbol">&omega;</span>).
+        These rules extend the familiar exponentiation laws while guaranteeing that
+        <span class="variable">log</span><!--
+     --><sub><!--
+         --><span class="copyonly">_</span><!--
+         --><span class="symbol">&omega;</span>
+        </sub>
+        serves as a recovery operation (right-inverse,
+        and two-sided in the final case) for terms of the form
+        <span class="symbol">&omega;</span><!--
+     --><sup><!--
+         --><span class="copyonly">^</span><!--
+         --><span class="variable">x</span><!--
+     --></sup>.
+    </p>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>
+                <div>
+                    <span class="copyonly">|</span>
+                    Classical/General Rule
+                    <span class="copyonly">|</span>
+                </div>
+            </th>
+            <th>
+                <div>
+                    <span class="copyonly">|</span>
+                    Zero-Lifted Expression
+                    <span class="copyonly">|</span>
+                </div>
+            </th>
+            <th>
+                <div>
+                    <span class="copyonly">|</span>
+                    Structural Log Inverse
+                    <span class="copyonly">|</span>
+                </div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression"><!--
+                 --><span class="variable">b</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="number">0</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="number">1</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="symbol">&omega;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="number">0</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="number">1</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="symbol">&omega;</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="number">1</span><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="number">0</span><!--
+             --></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression"><!--
+                 --><span class="variable">b</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="number">1</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="variable">b</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="symbol">&omega;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="number">1</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="symbol">&omega;</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="symbol">&omega;</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="symbol">&omega;</span><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="number">1</span><!--
+             --></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression"><!--
+                 --><span class="variable">b</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="symbol">&ndash;</span><!--
+                     --><span class="number">1</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="number">1</span><!--
+                 --><span class="symbol">/</span><!--
+                 --><span class="variable">b</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="symbol">&omega;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="symbol">&ndash;</span><!--
+                     --><span class="number">1</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="number">0</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="symbol">&omega;</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="symbol">0</span><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="symbol">&ndash;</span><!--
+                 --><span class="number">1</span><!--
+             --></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression"><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="variable">b</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="symbol">(</span><!--
+                 --><span class="variable">b</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">x</span><!--
+                 --></sup><!--
+                 --><span class="symbol">)</span><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="variable">x</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="symbol">&omega;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^(</span><!--
+                     --><span class="variable">log</span><!--
+                     --><sub><!--
+                         --><span class="copyonly">_{</span><!--
+                         --><span class="symbol">&omega;</span><!--
+                         --><span class="copyonly">}</span><!--
+                     --></sub><!--
+                     --><span class="variable">x</span><!--
+                     --><span class="copyonly">)</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="variable">x</span><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="symbol">&omega;</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="symbol">(</span><!--
+                 --><span class="symbol">&omega;</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">x</span><!--
+                 --></sup><!--
+                 --><span class="symbol">)</span><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="variable">x</span><!--
+             --></div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
     </div>
 </div>
 
