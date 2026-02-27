@@ -316,10 +316,8 @@ ol.nested > li > ol.nested > li::before {
         box-shadow:  #aaa 0.25em 0.25em 1em;
     }
     .expression {
-        white-space: wrap;
         box-sizing: border-box;
         width: 100%;
-        word-break: break-word;
     }
 
 }

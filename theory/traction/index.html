@@ -45,7 +45,7 @@
         </li>
         <li>
             <a href="#section-5">
-                Exponentiation
+                Exponentiation &amp; Logarithm
             </a>
         </li>
     </ol>
@@ -582,7 +582,7 @@
 <div class="section">
 
     <div class="section-title" id="section-5">
-        5. Exponentiation
+        5. Exponentiation &amp; Logarithm
     </div>
 
     <p>
@@ -901,65 +901,6 @@
              --></div>
             </td>
         </tr>
-        <tr>
-            <td>
-                <div class="copyonly">---</div>
-                <div class="expression"><!--
-                 --><span class="variable">log</span><!--
-                 --><sub><!--
-                     --><span class="copyonly">_{</span><!--
-                     --><span class="variable">b</span><!--
-                     --><span class="copyonly">}</span><!--
-                 --></sub><!--
-                 --><span class="symbol">(</span><!--
-                 --><span class="variable">b</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^</span><!--
-                     --><span class="variable">x</span><!--
-                 --></sup><!--
-                 --><span class="symbol">)</span><!--
-                 --><span class="symbol">=</span><!--
-                 --><span class="variable">x</span><!--
-             --></div>
-            </td>
-            <td>
-                <div class="expression"><!--
-                 --><span class="number">0</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^(</span><!--
-                     --><span class="variable">log</span><!--
-                     --><sub><!--
-                         --><span class="copyonly">_{</span><!--
-                         --><span class="number">0</span><!--
-                         --><span class="copyonly">}</span><!--
-                     --></sub><!--
-                     --><span class="variable">x</span><!--
-                     --><span class="copyonly">)</span><!--
-                 --></sup><!--
-                 --><span class="symbol">=</span><!--
-                 --><span class="variable">x</span><!--
-             --></div>
-            </td>
-            <td>
-                <div class="expression"><!--
-                 --><span class="variable">log</span><!--
-                 --><sub><!--
-                     --><span class="copyonly">_{</span><!--
-                     --><span class="number">0</span><!--
-                     --><span class="copyonly">}</span><!--
-                 --></sub><!--
-                 --><span class="symbol">(</span><!--
-                 --><span class="number">0</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^</span><!--
-                     --><span class="variable">x</span><!--
-                 --></sup><!--
-                 --><span class="symbol">)</span><!--
-                 --><span class="symbol">=</span><!--
-                 --><span class="variable">x</span><!--
-             --></div>
-            </td>
-        </tr>
         </tbody>
     </table>
 
@@ -1146,43 +1087,71 @@
              --></div>
             </td>
         </tr>
+        </tbody>
+    </table>
+
+    <div class="subsection-title">
+        5.4 Required Structural Identities
+    </div>
+
+    <p>
+        The following identities must hold structurally for all terms in any traction implementation.
+        They extend the classical exponentiation and logarithm properties to the totalized setting,
+        ensuring that the structural logarithms base 0 and base <span class="symbol">&omega;</span>
+        behave as proper inverses without exception.
+        These are consequences of the operational definitions and recovery laws already introduced;
+        they are reiterated here for clarity and to affirm that standard algebraic manipulations remain
+        valid away from boundaries.
+    </p>
+
+    <p>
+        For base
+        <span class="variable">v</span><!--
+     --><span class="symbol">&isin;</span><!--
+     --><span class="symbol">{</span><!--
+     --><span class="number">0</span>,<!--
+     --><span class="symbol">&omega;</span><!--
+     --><span class="symbol">}</span>
+        and all terms
+        <span class="variable">a</span>,<!--
+     --><span class="variable">b</span>,<!--
+     --><span class="variable">c</span>:
+    </p>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>
+                <span class="copyonly">|</span>
+                Exponentiation
+                <span class="copyonly">|</span>
+            </th>
+            <th>
+                <span class="copyonly">|</span>
+                Logarithm
+                <span class="copyonly">|</span>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
         <tr>
             <td>
                 <div class="copyonly">---</div>
                 <div class="expression"><!--
-                 --><span class="variable">log</span><!--
-                 --><sub><!--
-                     --><span class="copyonly">_{</span><!--
-                     --><span class="variable">b</span><!--
-                     --><span class="copyonly">}</span><!--
-                 --></sub><!--
-                 --><span class="symbol">(</span><!--
-                 --><span class="variable">b</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^</span><!--
-                     --><span class="variable">x</span><!--
-                 --></sup><!--
-                 --><span class="symbol">)</span><!--
-                 --><span class="symbol">=</span><!--
-                 --><span class="variable">x</span><!--
-             --></div>
-            </td>
-            <td>
-                <div class="expression"><!--
-                 --><span class="symbol">&omega;</span><!--
+                 --><span class="variable">v</span><!--
                  --><sup><!--
                      --><span class="copyonly">^(</span><!--
                      --><span class="variable">log</span><!--
                      --><sub><!--
                          --><span class="copyonly">_{</span><!--
-                         --><span class="symbol">&omega;</span><!--
+                         --><span class="variable">v</span><!--
                          --><span class="copyonly">}</span><!--
                      --></sub><!--
-                     --><span class="variable">x</span><!--
+                     --><span class="variable">a</span><!--
                      --><span class="copyonly">)</span><!--
                  --></sup><!--
                  --><span class="symbol">=</span><!--
-                 --><span class="variable">x</span><!--
+                 --><span class="variable">a</span><!--
              --></div>
             </td>
             <td>
@@ -1190,24 +1159,145 @@
                  --><span class="variable">log</span><!--
                  --><sub><!--
                      --><span class="copyonly">_{</span><!--
-                     --><span class="symbol">&omega;</span><!--
+                     --><span class="variable">v</span><!--
                      --><span class="copyonly">}</span><!--
                  --></sub><!--
                  --><span class="symbol">(</span><!--
-                 --><span class="symbol">&omega;</span><!--
+                 --><span class="variable">v</span><!--
                  --><sup><!--
                      --><span class="copyonly">^</span><!--
-                     --><span class="variable">x</span><!--
+                     --><span class="variable">a</span><!--
                  --></sup><!--
                  --><span class="symbol">)</span><!--
                  --><span class="symbol">=</span><!--
-                 --><span class="variable">x</span><!--
+                 --><span class="variable">a</span><!--
+             --></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression"><!--
+                 --><span class="variable">v</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">a</span><!--
+                 --></sup><!--
+                 --><span class="symbol">&middot;</span><!--
+                 --><span class="variable">v</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">b</span><!--
+                 --></sup><!--
+                 --><span class="symbol">=</span><!--
+                 --><span class="variable">v</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^(</span><!--
+                     --><span class="variable">a</span><!--
+                     --><span class="symbol">+</span><!--
+                     --><span class="variable">b</span><!--
+                     --><span class="copyonly">)</span><!--
+                 --></sup><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="variable">v</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="symbol">(</span><!--
+                 --><span class="variable">a</span><!--
+                 --><span class="symbol">&middot;</span><!--
+                 --><span class="variable">b</span><!--
+                 --><span class="symbol">)</span><!--
+                 --><wbr><span class="symbol">=</span><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="variable">v</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="variable">a</span><!--
+                 --><span class="symbol">+</span><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="variable">v</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="variable">b</span><!--
+             --></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression"><!--
+                 --><span class="symbol">(</span><!--
+                 --><span class="variable">v</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">a</span><!--
+                 --></sup><!--
+                 --><span class="symbol">)</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^</span><!--
+                     --><span class="variable">b</span><!--
+                 --></sup><!--
+                 --><wbr><span class="symbol">=</span><!--
+                 --><span class="variable">v</span><!--
+                 --><sup><!--
+                     --><span class="copyonly">^(</span><!--
+                     --><span class="variable">a</span><!--
+                     --><span class="symbol">&middot;</span><!--
+                     --><span class="variable">b</span><!--
+                     --><span class="copyonly">)</span><!--
+                 --></sup><!--
+             --></div>
+            </td>
+            <td>
+                <div class="expression"><!--
+                 --><span class="variable">b</span><!--
+                 --><span class="symbol">&middot;</span><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="variable">v</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="variable">a</span><!--
+                 --><wbr><span class="symbol">=</span><!--
+                 --><span class="variable">log</span><!--
+                 --><sub><!--
+                     --><span class="copyonly">_{</span><!--
+                     --><span class="variable">v</span><!--
+                     --><span class="copyonly">}</span><!--
+                 --></sub><!--
+                 --><span class="symbol">(</span><!--
+                 --><span class="variable">a</span><!--
+                 --><span class="symbol">&middot;</span><!--
+                 --><span class="variable">b</span><!--
+                 --><span class="symbol">)</span><!--
              --></div>
             </td>
         </tr>
         </tbody>
     </table>
 
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-6">
+        6.
+    </div>
 
 
     <div class="copyonly">---</div>
