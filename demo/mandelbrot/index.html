@@ -42,33 +42,12 @@
             const refreshExpression = function(newValue) {
                 const tokens = INTERPRET.tokenize(newValue);
                 console.log(tokens);
-                //const ast = INTERPRET.tokensToAst(tokens);
-                //console.log(ast);
             }
             refreshExpression(expressionInput.value);
-
 
             expressionInput.addEventListener('input', (e) => {
                 refreshExpression(e.target.value);
             });
-
-            // let expressionContainer = document.getElementById("dynamicExpression");
-            // const refreshExpression = function(newValue) {
-            //     expressionContainer.replaceChildren();
-            //     let ast = null;
-            //     try {
-            //         ast = TRACTION.parseExpressionToAST(newValue);
-            //         const markup = TRACTION.generateMarkupForAST(ast);
-            //         expressionContainer.appendChild(markup);
-            //     } catch(e) {
-            //         expressionContainer.textContent = "Parse Error";
-            //         console.log(e);
-            //     }
-            // }
-            // expressionInput.addEventListener('input', (e) => {
-            //     refreshExpression(e.target.value);
-            // });
-            // refreshExpression(expressionInput.value);
         })();
     </script>
 
