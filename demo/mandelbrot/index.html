@@ -42,6 +42,8 @@
             const refreshExpression = function(newValue) {
                 const tokens = INTERPRET.tokenize(newValue);
                 console.log(tokens);
+                //const ast = INTERPRET.tokensToAst(tokens);
+                //console.log(ast);
             }
             refreshExpression(expressionInput.value);
 
