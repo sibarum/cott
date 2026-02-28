@@ -39,9 +39,11 @@
     <script type="text/javascript">
         (() => {
             const expressionInput = document.getElementById("dynamicExpressionInput");
+            const expressionOutput = document.getElementById("dynamicExpression");
             const refreshExpression = function(newValue) {
-                const tokens = INTERPRET.tokenize(newValue);
+                const tokens = INTERPRET.parseExpression(newValue);
                 console.log(tokens);
+                expressionOutput.textContent = INTERPRET.print(tokens);
             }
             refreshExpression(expressionInput.value);
 
