@@ -5,7 +5,7 @@
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../lib/styles-v1.css">
-    <script type="text/javascript" src="../../lib/traction.js"></script>
+    <script type="text/javascript" src="../../lib/traction-interpret.js"></script>
     <script type="text/javascript" src="graph.js"></script>
 
     <title>Discrete Mandelbrot</title>
@@ -33,30 +33,40 @@
         <label>
             Expression
             <br>
-            <input type="text" id="dynamicExpressionInput" value="0^(w/2+4)" />
+            <input type="text" id="dynamicExpressionInput" value="0^(log_0(2*w))" />
         </label>
     </div>
     <script type="text/javascript">
         (() => {
             const expressionInput = document.getElementById("dynamicExpressionInput");
-            let expressionContainer = document.getElementById("dynamicExpression");
             const refreshExpression = function(newValue) {
-                expressionContainer.replaceChildren();
-                let ast = null;
-                try {
-                    ast = TRACTION.parseExpressionToAST(newValue);
-                    const markup = TRACTION.generateMarkupForAST(ast);
-                    expressionContainer.appendChild(markup);
-                } catch(e) {
-                    expressionContainer.textContent = "Parse Error";
-                    console.log(e);
-                    console.log(ast);
-                }
+                const tokens = INTERPRET.tokenize(newValue);
+                console.log(tokens);
             }
+            refreshExpression(expressionInput.value);
+
+
             expressionInput.addEventListener('input', (e) => {
                 refreshExpression(e.target.value);
             });
-            refreshExpression(expressionInput.value);
+
+            // let expressionContainer = document.getElementById("dynamicExpression");
+            // const refreshExpression = function(newValue) {
+            //     expressionContainer.replaceChildren();
+            //     let ast = null;
+            //     try {
+            //         ast = TRACTION.parseExpressionToAST(newValue);
+            //         const markup = TRACTION.generateMarkupForAST(ast);
+            //         expressionContainer.appendChild(markup);
+            //     } catch(e) {
+            //         expressionContainer.textContent = "Parse Error";
+            //         console.log(e);
+            //     }
+            // }
+            // expressionInput.addEventListener('input', (e) => {
+            //     refreshExpression(e.target.value);
+            // });
+            // refreshExpression(expressionInput.value);
         })();
     </script>
 
