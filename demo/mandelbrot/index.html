@@ -43,7 +43,7 @@
             const refreshExpression = function(newValue) {
                 const tokens = INTERPRET.parseExpression(newValue);
                 console.log(tokens);
-                expressionOutput.textContent = INTERPRET.print(tokens);
+                expressionOutput.innerHTML = INTERPRET.printMarkup(tokens);
             }
             refreshExpression(expressionInput.value);
 
