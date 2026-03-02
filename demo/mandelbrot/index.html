@@ -34,17 +34,24 @@
         <label>
             Expression
             <br>
-            <input type="text" id="dynamicExpressionInput" value="(2+4)*(3+2)" />
+            <input type="text" id="dynamicExpressionInput" value="0^(w/2)^2+0^(2+w)" />
         </label>
+        <pre id="dynamicExpressionErrorMessage"></pre>
     </div>
     <script type="text/javascript">
         (() => {
             const expressionInput = document.getElementById("dynamicExpressionInput");
             const expressionOutput = document.getElementById("dynamicExpression");
+            const expressionErrorMessage = document.getElementById("dynamicExpressionErrorMessage");
             const refreshExpression = function(newValue) {
                 const parsed = INTERPRET.parseExpression(newValue);
-                const html = INTERPRET.printToHtml(parsed);
-                expressionOutput.innerHTML = html;
+                if (!parsed.error) {
+                    expressionErrorMessage.innerHTML = "";
+                    const html = INTERPRET.printToHtml(parsed);
+                    expressionOutput.innerHTML = html;
+                } else {
+                    expressionErrorMessage.innerHTML = parsed.message;
+                }
             }
             refreshExpression(expressionInput.value);
 
