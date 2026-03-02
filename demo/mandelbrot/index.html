@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <html xmlns="http://www.w3.org/1999/html" lang="en">
 <head>
+    <script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../lib/styles-v1.css">
     <script type="text/javascript" src="../../lib/traction-interpret.js"></script>
@@ -33,7 +34,7 @@
         <label>
             Expression
             <br>
-            <input type="text" id="dynamicExpressionInput" value="0^(log_0(2*w))+(2+4)" />
+            <input type="text" id="dynamicExpressionInput" value="(2+4)*(3+2)" />
         </label>
     </div>
     <script type="text/javascript">
@@ -41,9 +42,9 @@
             const expressionInput = document.getElementById("dynamicExpressionInput");
             const expressionOutput = document.getElementById("dynamicExpression");
             const refreshExpression = function(newValue) {
-                const tokens = INTERPRET.parseExpression(newValue);
-                console.log(tokens);
-                expressionOutput.innerHTML = INTERPRET.printMarkup(tokens);
+                const parsed = INTERPRET.parseExpression(newValue);
+                const html = INTERPRET.printToHtml(parsed);
+                expressionOutput.innerHTML = html;
             }
             refreshExpression(expressionInput.value);
 
