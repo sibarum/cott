@@ -294,6 +294,19 @@ ol.nested > li > ol.nested > li::before {
     margin-left: -2.5em;
 }
 
+/* Misc */
+
+.icon-back {
+    width: 2em;
+    position: absolute;
+    aspect-ratio: 1/1;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url(./img/back-icon.png);
+    cursor: pointer;
+}
+
 /* Mobile styles */
 @media only screen and (max-width: 600px) {
     body {
@@ -347,5 +360,9 @@ ol.nested > li > ol.nested > li::before {
     a:focus {
         color: black;
         text-decoration: none;
+    }
+
+    .icon-back {
+        display: none;
     }
 }
