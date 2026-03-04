@@ -54,12 +54,24 @@ sup {
     font-size: 0.8em;
 }
 
+sup.smaller {
+    font-size: 0.65em;
+}
+
+sup.smaller sup.smaller {
+    font-size: 0.9em;
+}
+
 sub {
     display: inline-block;
     position: relative;
     bottom:-0.1em;
     line-height: 1;
     font-size: 0.9em;
+}
+
+sub.smaller {
+    font-size: 0.6em;
 }
 
 a,
@@ -193,6 +205,10 @@ span.variable, span.symbol, span.number, sup, sub, .fraction {
     vertical-align: middle;
     margin: 0 0.1em;
 }
+sup .fraction {
+    display: inline;
+    margin: 0;
+}
 p .fraction {
     margin: 0 0.2em;
     font-size: 0.8em;
@@ -215,6 +231,11 @@ p .fraction {
     color: rgba(1,1,1,0%);
     white-space: nowrap;
 }
+sup .h-divider {
+    height: auto;
+    border: none;
+    color: inherit;
+}
 .parens-group {
     margin: 0 -0.4em;
     display: inline-flex;
@@ -233,7 +254,7 @@ p .fraction {
     font-family: "STIX Two Text", "Cambria Math", "Latin Modern Math", serif;
     border-top: 0.07em solid currentColor;
     padding-top: 0.11em;
-    margin-left: -0.28em;
+    margin-left: -0.18em;
 }
 
 .copyonly {
@@ -305,6 +326,18 @@ ol.nested > li > ol.nested > li::before {
     background-repeat: no-repeat;
     background-image: url(./img/back-icon.png);
     cursor: pointer;
+}
+
+.tiny-error {
+    display: inline-block;
+    font-family: monospace;
+    white-space-collapse: preserve;
+    background-color: white;
+    color:red;
+    font-size: 0.5em;
+    min-width: 0;
+    padding: 0.2em;
+    border: 1px solid red;
 }
 
 /* Mobile styles */
