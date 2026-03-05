@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<html xmlns="http://www.w3.org/1999/html" lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../lib/styles-v1.css">
+    <script src="../../lib/traction-interpret.js"></script>
+
+    <title>Hot Take: Quantum Inferiority</title>
+
+</head>
+<body>
+
+<div class="section">
+
+    <a href="/cott">
+        <div class="icon-back"></div>
+    </a>
+
+    <div class="headings">
+        <h1>Quantum Inferiority</h1>
+        <h2>The impracticality of going quantum</h2>
+    </div>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        Published under the <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">
+        1. Silicon's Plateau
+    </div>
+
+    <p>
+        As a Millennial, I've been spoiled by the rapid pace of technological advancement that defined the
+        late 90's and early 2000's. I remember when having internet access was a luxury, because many of my friends had
+        to visit the library to play Runescape. I remember when my grandparents had a corded phone installed in their
+        Buick, and it blew my mind. And by the time I was in high school, I had my own Nokia flip phone.
+        And it wasn't long before I was cruising the internet over broadband wifi on a Macbook Pro with a 17" monitor.
+    </p>
+
+    <p>
+        Transistors proved to be ubiquitously disruptive. Moore's Law had its impacts on everything - it changed how
+        we communicate, how we work, how we learn, how we think... And it made us have a certain kind of opinion about technology.
+    </p>
+
+    <p>
+        I think my generation is making the mistake of assuming Moore's Law applies to everything,
+        and you can't blame us: that's been the experience our entire lives. But there's an important factor to consider:
+        Lithography.
+    </p>
+
+    <p>
+        Lithography is the process they use for printing PCBs (printed circuit boards). In the early days of PCB manufacture,
+        the primary limitation in transistor density was optics - essentially the precision of photo development.
+        The science was well-known, it had a clear path forward, and the manufacturers who succeeded were always looking
+        far enough ahead to anticipate the next set of lithographic limitations.
+    </p>
+
+    <p>
+        In other words, the writing was on the wall. Clearly, it was only a matter of iterative improvements using evermore
+        sophisticated lithographic techniques, and the rate of progress would continue. That is, until the next physical
+        limitation presented itself, which it inevitably did.
+    </p>
+
+
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">
+        2. The Quantum Promise
+    </div>
+
+    <p>
+        I remember hearing about quantum computers when I was young, I remember learning about the double slit experiment
+        and the "spooky action at a distance" and quantum entanglement from videos on YouTube. I was definitely left with
+        the impression that quantum phenomena were quite remarkable, almost magical in some sense. It seemed to challenge
+        every intuition I had about reality. Surely some smart person would figure out how to exploit this bizarre behavior
+        and build some kind of machine that could predict the future, or something equally impressive.
+    </p>
+
+    <p>
+        Ok, maybe predicting the future was a stretch. But invalidating practically every form of cryptography currently
+        in use today? That could cause a radical paradigm shift; all forms of internet-based business would suddenly
+        be entirely reliant on "quantum safe" cryptography, which have comparatively weaker hardness assumptions
+        (although this is my own speculation) than their prime-number-factorization counterparts.
+    </p>
+
+    <p>
+        But is it even feasible? Could such a quantum computer actually exist sometime soon, or ever?
+    </p>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">
+        3. The Ideal Quantum Computer
+    </div>
+
+    <p>
+        You've probably been told that the "computational power" of a quantum computer is directly proportional
+        to its qubit count. More qubits means faster qu-computer. But that's actually not true. It's like saying
+        a 64-bit processor is faster than a 32-bit processor: it's categorically wrong. The number of bits doesn't tell
+        you anything. The clock speed might mean something, but even that can be misleading. The most reliable metric
+        we use for classic computer is: the number of transistors. Bits are not transistors, and qubits are not
+        quantum gates.
+    </p>
+
+    <p>
+        If a quantum computer matches the specifications described by Shor's algorithm, we'll call it "Shor Complete,"
+        a nod to the Turing completeness of classic computers.
+    </p>
+
+    <p>
+        For a quantum computer to be considered "Shor Complete," it must be fully connected. Fully connected means
+        that every qubit is directly connected to every other qubit via quantum gates. Technically this requires
+        3 gates between each pair of qubits to be Shor complete.
+    </p>
+
+    <p>
+        In order to reduce the security effectiveness of the globally-standard RSA encrpytion scheme, you'd need
+        a quantum computer with thousands of fully connected qubits.
+        Now, imagine we were talking about classic computers for a moment: how difficult would it be to directly
+        connect a single transistor to thousands of little copper traces?
+    </p>
+
+    <p>
+        Modern lithography techniques can have roughly 50 layers on a PCB before you start reaching physical limitations.
+        And even so, where would all those traces go? The further the distance between qubits, the higher the likelihood
+        of decoherence. It's simply not practical to build.
+    </p>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">
+        4. Error Correction and SWAP
+    </div>
+
+    <p>
+        So a perfect quantum computer is impossible to build, sure, but a perfect Turing machine is
+        impossible to build also. That doesn't mean quantum computers couldn't be a disruptive technology, right?
+    </p>
+
+    <p>
+        Modern techniques exist to alleviate many of the shortcoming of quantum computation. Error correction and SWAP
+        are the primary features of a quantum computer that allow it to be productive despite the other physical limitations.
+        But these features also impose limitations on the reliability and accuracy of quantum algorithms.
+    </p>
+
+    <p>
+        But, error correction and SWAP don't matter. They are completely unnecessary.
+    </p>
+
+    <p>
+        In fact, a quantum computer is 100% realizable, just not as an analog device.
+    </p>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">
+        5. Quantum Simulation
+    </div>
+
+    <p>
+        Modern GPU technology has blossomed with the advent of machine learning.
+        Companies like nVidia manufacture extreme computation environments with unfathomable shared memory caches
+        available to enormous networks of tensor processing units (TPUs), designed for AI but also perfect for,
+        you guessed it, quantum simulations.
+    </p>
+
+    <p>
+        The best thing about a quantum simulation is: there's no uncertainty principle.
+        Coherence is always guaranteed, and the runtime can be debugged like any other program.
+        Unlike the analog quantum computer, the simulation can be paused at any time, and resumed with perfect coherence.
+    </p>
+
+    <p>
+        The common objection to quantum simulations is the Hilbert representation of the quantum state.
+        It's believed that due to the sheer size of the Hilbert,
+        <span class="dynamicexpr">n^q</span> where n is the number of bits of precision, and q is the
+        number of qubits being simulated. Obviously, a memory of that size, even
+        <span class="dynamicexpr">2^1000</span> is beyond anything a classic computer could possibly handle.
+        It's unfathomably big, MUCH bigger than the observable universe.
+    </p>
+
+    <p>
+        The Hilbert, at least on paper, appears devastating for classic quantum simulations - it looks
+        like an insurmountable problem. But it's not.
+    </p>
+
+    <p>
+        Saying quantum simulations are impossible at scale is like saying fluid simulations are impossible
+        because you'd never be able to account for each and every atom in the volume.
+    </p>
+
+    <p>
+        It's silly, frankly, to suggest the Hilbert representation imposes any limitations whatsoever on
+        quantum simulations. Sure, maybe it's not the kind of problem a college graduate could solve during a hackathon.
+        But SHA-256 wasn't designed that way either, nor was the Google Search algorithm.
+        Overcoming the size of the Hilbert in simulations is just another difficult technical problem that will
+        be overcome, and it likely already is.
+    </p>
+
+    <p>
+        Even current implementations of the "sparse Hilbert" - a technique used to reduce the memory footprint to a tiny
+        fraction of its full theoretic size, running on a state-of-the-art nVidia TPU datacenter, can already break
+        low-security RSA tokens.
+    </p>
+
+    <p>
+        And companies operating in this space have a tendency to publish results combining an analog quantum computer
+        with a simulation - the simulation likely contributing the lion's share of actual computation.
+        I can't help but notice that these Fortune-100 companies fundraising for quantum side-hustles
+        are spending their own money on GPUs. It's as if they're not stupid.
+    </p>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+
+</div>
+
+
+</body>
+</html>
