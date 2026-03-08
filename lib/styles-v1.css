@@ -151,7 +151,7 @@ li {
 /********************/
 /* Math Expressions */
 
-.expression, .expresssion-inline {
+.expression, .expression-inline {
     font-family: "STIX Two Text", "Cambria Math", "Latin Modern Math", serif;
     font-size: 1.2em;
     margin: 1rem;
