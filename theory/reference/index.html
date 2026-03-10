@@ -434,6 +434,105 @@
         and base-&omega;.
     </p>
 
+    <p>
+        For base
+        <span class="variable">v</span><!--
+     --><span class="symbol">&isin;</span><!--
+     --><span class="symbol">{</span><!--
+     --><span class="number">0</span>,<!--
+     --><span class="symbol">&omega;</span><!--
+     --><span class="symbol">}</span>
+        and all terms
+        <span class="variable">a</span>,<!--
+     --><span class="variable">b</span>,<!--
+     --><span class="variable">c</span>:
+    </p>
+
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>
+                <span class="copyonly">|</span>
+                Exponentiation
+                <span class="copyonly">|</span>
+            </th>
+            <th>
+                <span class="copyonly">|</span>
+                Logarithm
+                <span class="copyonly">|</span>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">v^{log_{v}{a}}=a</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{v}{v^a}=a</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">v^a * v^b = v^{a+b}</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{v}{a*b}=log_{v}{a}+log_{v}{b}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">{v^a}/{v^b}=v^{a-b}</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{v}{a/b}=log_{v}{a}-log_{v}{b}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">(v^a)^b=v^{a*b}</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">b*log_{v}{a}=log_{v}{a^b}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="copyonly">---</div>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">v^a=v^b <=> a=b</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{v}{a}=log_{v}{b}<=>a=b</span>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
 
     <div class="subsection-title" id="section-3_3_1">
         3.3.1 Base 0
@@ -536,8 +635,8 @@
         </tbody>
     </table>
 
-    <div class="subsection-title" id="section-3_3_1">
-        3.3.1 Base &omega;
+    <div class="subsection-title" id="section-3_3_2">
+        3.3.2 Base &omega;
     </div>
 
     <p>
@@ -647,15 +746,79 @@
     </div>
 
     <p>
-        Finally: The fun stuff!
+        We started with a simple principle: a total, reversible algebra.
+        Every aspect of classic mathematics fought against us.
+        We had to essentially reinvent everything from the ground up,
+        just to remove the restrictions on zero.
+        But, we didn't contrive any new structure - we merely took existing
+        structure and reframed it.
+        Addition, subtraction, multiplication, division, exponentiation,
+        and logarithm are still the same as they were before, but
+        extended to a framework that allows zero-magnitude displacement
+        and a reciprocal of zero. Beyond this, we didn't invent anything new.
+    </p>
+
+    <p>
+        And now, we shall discover the fruit of our labor: the emergence of
+        zero-magnitude algebra.
     </p>
 
     <div class="subsection-title" id="section-4_1">
         4.1 Rational Powers of a Negative Base
     </div>
 
+    <div class="expression font-lg">
+        <span class="dynamicexpr">(-x)^{p/q}</span>
+        <span class="symbol">=</span>
+        <span class="dynamicexpr">0^{p/q * log_{0}(-x)}</span>
+    </div>
+
+    <p>
+        Derivation:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">(-x)^{p/q}</span>
+    </div>
+
+    <div class="expression font-lg">
+        <span class="symbol">=</span>
+        <span class="dynamicexpr">0^{log_{0}(-x^{p/q})}</span>
+    </div>
+
+    <div class="expression font-lg">
+        <span class="symbol">=</span>
+        <span class="dynamicexpr">0^{p/q * log_{0}(-x)}</span>
+    </div>
+
     <div class="subsection-title" id="section-4_2">
         4.2 The Dyadic Imaginary Unit
+    </div>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">sqrt(-1)</span>
+        <span class="symbol">=</span>
+        <span class="dynamicexpr">0^{w/2}</span>
+    </div>
+
+    <p>
+        Derivation:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">(-1)^{1/2}</span>
+        <span class="symbol">=</span>
+        <span class="dynamicexpr">0^{1/2 * log_{0}(-1)}</span>
+    </div>
+
+    <div class="expression font-lg">
+        <span class="symbol">=</span>
+        <span class="dynamicexpr">0^{1/2 * w}</span>
+    </div>
+
+    <div class="expression font-lg">
+        <span class="symbol">=</span>
+        <span class="dynamicexpr">0^{w/2}</span>
     </div>
 
     <div class="subsection-title" id="section-4_3">

@@ -66,6 +66,10 @@ sup.smaller sup.smaller {
     font-size: 0.9em;
 }
 
+sup.smaller sub.smaller {
+    font-size: 0.9em;
+}
+
 sub {
     display: inline-block;
     position: relative;
