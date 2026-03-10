@@ -386,7 +386,7 @@
 
     <table class="fixed centered">
         <tr>
-            <th>&times;</th>
+            <th>&darr; &times; &rarr;</th>
             <th>1</th>
             <th>0</th>
             <th>-1</th>
@@ -419,6 +419,48 @@
             <td>1</td>
             <td>-<span class="symbol">&omega;</span></td>
             <td><span class="dynamicexpr">w^2</span></td>
+        </tr>
+    </table>
+
+    <p>
+        Division mixes equivalence classes:
+    </p>
+
+    <table class="fixed centered">
+        <tr>
+            <th>&darr; &divide; &rarr;</th>
+            <th>1</th>
+            <th>0</th>
+            <th>-1</th>
+            <th><span class="symbol">&omega;</span></th>
+        </tr>
+        <tr>
+            <th>1</th>
+            <td>1</td>
+            <td><span class="symbol">&omega;</span></td>
+            <td>-1</td>
+            <td>0</td>
+        </tr>
+        <tr>
+            <th>0</th>
+            <td>0</td>
+            <td>1</td>
+            <td>-0</td>
+            <td><span class="dynamicexpr">0^2</span></td>
+        </tr>
+        <tr>
+            <th>-1</th>
+            <td>-1</td>
+            <td>-<span class="symbol">&omega;</span></td>
+            <td>1</td>
+            <td>-0</td>
+        </tr>
+        <tr>
+            <th><span class="symbol">&omega;</span></th>
+            <td><span class="symbol">&omega;</span></td>
+            <td><span class="dynamicexpr">w^2</span></td>
+            <td>-<span class="symbol">&omega;</span></td>
+            <td>1</td>
         </tr>
     </table>
 
@@ -742,7 +784,101 @@
 <div class="section">
 
     <div class="section-title" id="section-4">
-        4. Derivations
+        4. Justifications
+    </div>
+
+    <p>
+        This theory starts with a simple goal: a total, reversible algebra.
+        The intent is to make the fewest changes necessary to achieve this goal.
+        However, every aspect of classic mathematics fights against totality and reversibility.
+        Undefinedness and erasure are so deeply rooted, that a complete overhaul was necessary.
+    </p>
+
+    <p>
+        Every design choice of this theory will be justified on the basis of supporting totality and reversibility.
+        Any design choice that does not directly support the stated goal is considered a mistake.
+    </p>
+
+    <div class="subsection-title" id="section-4_1">
+        4.1 Number Generators and Projections
+    </div>
+
+    <p>
+        Number generators were chosen due to the need for different equivalence classes when defining the operations.
+        Traditionally, two numbers are considered equal if they have the same magnitude.
+        Complex numbers break this pattern, as phase determines equality regardless of magnitude.
+        Number generators are a generalization of this concept: values are constructed by an
+        operational history, with invariants defined by known equivalences, identities, and rewrite rules.
+        Context-specific and informal invariants may be defined by projections - this is no different
+        from what is practiced classically: we're just saying the quiet part out loud.
+    </p>
+
+    <div class="subsection-title" id="section-4_2">
+        4.2 Addition and Subtraction
+    </div>
+
+    <p>
+        The intent is for addition and subtraction to work exactly the same as before,
+        but without 0 being an absorbing element. Classically, the additive identity
+        forces all structure to collapse when in multiplicative associativity with 0.
+        So the only change here is to make the additive identity apply only to magnitude,
+        and to limit erasure to <span class="dynamicexpr">x-x</span> expressions.
+    </p>
+
+    <div class="subsection-title" id="section-4_3">
+        4.3 Multiplication and Division
+    </div>
+
+    <p>
+        This is where the major changes begin to occur. Zero now has a reciprocal,
+        expressions like <span class="dynamicexpr">2*0</span> don't collapse,
+        and we begin to see why types are defined as the closure of operations
+        rather than as collections of numbers - because many of these expressions
+        cannot be evaluated numerically.
+    </p>
+
+    <div class="subsection-title" id="section-4_4">
+        4.4 Logarithm and Exponentiation
+    </div>
+
+    <p>
+        This section is where the real work happens. Let's walk through it step by step.
+    </p>
+
+    <p>
+        For any base <span class="dynamicexpr">x</span>, we know <span class="dynamicexpr">x^0=1</span>.
+        Therefore, <span class="dynamicexpr">0^0=1</span> and <span class="dynamicexpr">w^0=1</span>.
+    </p>
+
+    <p>
+        And, <span class="dynamicexpr">x^1=x</span>.
+        Therefore, <span class="dynamicexpr">0^1=0</span> and <span class="dynamicexpr">w^1=w</span>.
+    </p>
+
+    <p>
+        We've defined <span class="dynamicexpr">1/0=w</span>,
+        and we know <span class="dynamicexpr">x^{-1}=1/x</span>.
+        Therefore, <span class="dynamicexpr">0^{-1}=w</span> and <span class="dynamicexpr">w^{-1}=0</span>.
+    </p>
+
+    <p>
+        This leaves only <span class="dynamicexpr">0^{w}</span> and <span class="dynamicexpr">w^{w}</span>,
+        so to complete the image we define them both as <span class="dynamicexpr">0^{w}=-1</span>
+        and <span class="dynamicexpr">w^{w}=-1</span>.
+    </p>
+
+    <p>
+        These identities appear to be forced, once totality and reversibility are required, and no additional structure
+        is permitted for definition. Therefore, it is a minimal and emergent structure.
+    </p>
+
+
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-5">
+        5. Derivations
     </div>
 
     <p>
@@ -763,8 +899,8 @@
         zero-magnitude algebra.
     </p>
 
-    <div class="subsection-title" id="section-4_1">
-        4.1 Rational Powers of a Negative Base
+    <div class="subsection-title" id="section-5_1">
+        5.1 Rational Powers of a Negative Base
     </div>
 
     <div class="expression font-lg">
@@ -791,8 +927,8 @@
         <span class="dynamicexpr">0^{p/q * log_{0}(-x)}</span>
     </div>
 
-    <div class="subsection-title" id="section-4_2">
-        4.2 The Dyadic Imaginary Unit
+    <div class="subsection-title" id="section-5_2">
+        5.2 The Dyadic Imaginary Unit
     </div>
 
     <div class="expression font-lg">
@@ -821,12 +957,12 @@
         <span class="dynamicexpr">0^{w/2}</span>
     </div>
 
-    <div class="subsection-title" id="section-4_3">
-        4.3 Powers of Zero
+    <div class="subsection-title" id="section-5_3">
+        5.3 Powers of Zero
     </div>
 
-    <div class="subsection-title" id="section-4_4">
-        4.4 Bivectors
+    <div class="subsection-title" id="section-5_4">
+        5.4 Bivectors
     </div>
 
 
