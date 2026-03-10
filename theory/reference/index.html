@@ -353,7 +353,7 @@
 
     <p>
         Dividing 1 by any term produces its reciprocal.
-        Dividing any term by itself is universally invariant.
+        Dividing any term by itself produces unity.
     </p>
 
     <div class="expression">
@@ -423,6 +423,248 @@
     </table>
 
 
+    <div class="subsection-title" id="section-3_3">
+        3.3 Exponentiation and Logarithm
+    </div>
+
+    <p>
+        The analytic extensions of exp and log are broadly understood.
+        Those details will not be duplicated here.
+        Instead, this section focuses on their extension into base-0
+        and base-&omega;.
+    </p>
+
+
+    <div class="subsection-title" id="section-3_3_1">
+        3.3.1 Base 0
+    </div>
+
+    <p>
+        Given any integer n:
+    </p>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>
+                <h3 class="expression font-lg">
+                    <span class="dynamicexpr">0^a = b</span>
+                </h3>
+            </th>
+            <th>
+                <h3 class="expression font-lg">
+                    <span class="dynamicexpr">log_{0}{b} = a</span>
+                </h3>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">0^0 = 1</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{0}{1}=0</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">0^1 = 0</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{0}{0}=1</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">0^n = 0 * 0</span><!--
+                 --><span class="symbol">&middot;</span><!--
+                 --><span class="symbol">...</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{0}{0^n}=n</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">0^{0^n} = n</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{0}{n}= 0^n</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">0^{-n}=w^n</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{0}{w^n}=-n</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">0^{w^n}=-n</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{0}(-n)=w^n</span>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="subsection-title" id="section-3_3_1">
+        3.3.1 Base &omega;
+    </div>
+
+    <p>
+        Given any integer n:
+    </p>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>
+                <h3 class="expression font-lg">
+                    <span class="dynamicexpr">w^a = b</span>
+                </h3>
+            </th>
+            <th>
+                <h3 class="expression font-lg">
+                    <span class="dynamicexpr">log_{w}{b} = a</span>
+                </h3>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">w^0 = 1</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{w}{1}=0</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">w^1 = w</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{w}{w}=1</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">w^n = w * w</span><!--
+                 --><span class="symbol">&middot;</span><!--
+                 --><span class="symbol">...</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{w}{w^n}=-n</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">w^{w^n} = 1/{-n}</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{w}{1/{-n}}= w^n</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">w^{-n}=0^n</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{w}{0^n}=-n</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">w^{0^n}=-n</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">log_{w}(-n)=0^n</span>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-4">
+        4. Derivations
+    </div>
+
+    <p>
+        Finally: The fun stuff!
+    </p>
+
+    <div class="subsection-title" id="section-4_1">
+        4.1 Rational Powers of a Negative Base
+    </div>
+
+    <div class="subsection-title" id="section-4_2">
+        4.2 The Dyadic Imaginary Unit
+    </div>
+
+    <div class="subsection-title" id="section-4_3">
+        4.3 Powers of Zero
+    </div>
+
+    <div class="subsection-title" id="section-4_4">
+        4.4 Bivectors
+    </div>
 
 
 </div>
