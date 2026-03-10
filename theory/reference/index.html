@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<html xmlns="http://www.w3.org/1999/html" lang="en">
+<head>
+    <script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../lib/styles-v1.css">
+    <script src="../../lib/traction-interpret.js"></script>
+
+    <title>COTT Reference Notebook</title>
+
+</head>
+<body>
+
+
+<div class="section">
+
+    <a href="/cott">
+        <div class="icon-back"></div>
+    </a>
+
+    <div class="headings">
+        <h1>COTT Reference Notebook</h1>
+        <h2>identities, derivations, examples</h2>
+    </div>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        Published under the <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license
+
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-1">
+        1. Theory Overview
+    </div>
+
+    <p>
+        <strong>Constructive Operational Type Theory (COTT)</strong> is a work-in-progress theory of mathematics,
+        wherein operations are recognised as the primitive objects of math, and numbers as merely representations.
+        It's a combination of theories including Principled Emergence Metatheory, Traction Theory, and
+        Mirror Calculus.
+    </p>
+
+    <p>
+        <strong>Principled Emergence Metatheory (PEM)</strong> is intended to be a formalization of elegance applied
+        to mathematics, a set of criteria by which elegance can be measured and quantified, and a set of
+        guidelines for developing elegant theories. PEM emphasizes developing theories with fewer axioms,
+        justifying axioms from core principles, and re-using structure from existing theories ("reframing").
+        PEM encourages the development of theories for the sake of making mathematics more broadly approachable,
+        applicable, and inclusive, even if it sacrifices some level of precision or rigor.
+    </p>
+
+    <p>
+        <strong>Traction Theory</strong> is intended to be the algebra without limits (pun intended).
+        Following the guidelines of PEM, traction algebra is driven by a core principle of totality
+        (all operations are always defined for all values) and reversibility (no information loss).
+        This results in a "maximally tractable" algebra, wherein nothing is undefined, any expression may be rewritten,
+        and invariants are contextual.
+    </p>
+
+    <p>
+        <strong>Mirror Calculus</strong> is intended to be the calculus of zero and its reciprocal. Under this
+        theory, 0 represents differentiation, its reciprocal &omega; represents integration, and their composition
+        0&omega;=1. It emphasizes the utility of differentials over derivatives, the non-nilpotence of zero,
+        and how 0 and &omega; behave as boundary operators.
+    </p>
+
+    <div class="subsection-title">
+        1.1 Purpose of this document
+    </div>
+
+    <p>
+        This document serves as a notebook for me to keep track of all the work I've done so far
+        in a clear, concise format. It's a workbook for experimentation, and a reference book for everything COTT.
+        It may contain incorrect, outdated, or speculative details.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-2">
+        2. Unary Operations
+    </div>
+
+    <p>
+        Unary operations do not conserve information,
+        they either create or extract information.
+        Therefore, they exist outside an information-conservative type.
+    </p>
+
+    <p>
+        This doesn't imply that their use is off-limits, however.
+        It only means that their employment must be separated from
+        the symbolic manipulations of an information-conservative type.
+    </p>
+
+    <div class="subsection-title" id="section-2_1">
+        2.1 Number Generators
+    </div>
+
+    <p>
+        The most primitive elements of COTT are number generators.
+        There are four primitive number generators: 1, -1, 0, and &omega;.
+    </p>
+
+    <p>
+        These generators are defined as a formalization,
+        to emphasize how operations are more primitive than numbers,
+        because operations are required to construct numbers.
+        It's like Peano arithmetic, but with four generators instead of one.
+    </p>
+
+    <p>
+        Given <span class="variable">n</span> is a positive integer:
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">1(n)</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">-(n)</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">0(n)</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">w(n)</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        The <strong>1-generator</strong> generates successively larger numbers.
+        For convenience of notation,
+        <span class="dynamicexpr">1(n)</span> may be written as simply <span class="dynamicexpr">n</span>.
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">1(n+1) > 1(n)</span>
+    </div>
+
+    <p>
+        The <strong>negative-generator</strong> generates successively smaller numbers.
+        All negative numbers are smaller than any positive number.
+        For convenience of notation,
+        <span class="dynamicexpr">-(n)</span> may be written as simply <span class="dynamicexpr">-n</span>.
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">-(n+1) < -(n)</span>
+    </div>
+
+    <p>
+        The <strong>zero-generator</strong> generates zero-magnitude numbers.
+        All zero numbers are larger than any negative number and smaller than any positive number,
+        but they all have identical magnitude.
+        Unlike in classic arithmetic, equal magnitude does not necessarily mean equal value.
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">0(n+1) ~= 0(n)</span>
+    </div>
+
+    <p>
+        The <strong>&omega;-generator</strong> generates infinite-magnitude numbers.
+        All &omega; numbers are larger than all positive, negative, and zero numbers,
+        but similar to zero numbers, they all have identical magnitude.
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">w(n+1) ~= w(n)</span>
+    </div>
+
+    <div class="subsection-title" id="section-2_2">
+        2.2 Projections
+    </div>
+
+    <p>
+        Projections extract information from an expression,
+        erasing invariants.
+    </p>
+
+    <p>
+        <strong>Magnitude</strong> measures an expression as a positive 1-generator, 0, or &omega;,
+        whichever is largest.
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">|1(n)|=n</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">|0(n)|=0</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">|-(n)|=n</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">|w(n)|=w</span>
+    </div>
+
+    <p>
+        Projections to classic types are useful for taking measurements and comparing results between
+        COTT and more traditional techniques.
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">N(w)=undefined</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">C(0^2)=-1-i</span>
+    </div>
+
+    <p>
+        Or, for ad-hoc or contextual projections without a formal meaning, one may also use:
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">P(pi)=3.14</span>
+    </div>
+
+    <p>
+        Or, the more informal:
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">pi~=3.14</span>
+    </div>
+
+    <p>
+        Other projections such as <strong>sign</strong>, <strong>phase</strong>, <strong>residual</strong>,
+        and equivalence <strong>class</strong>
+        may be defined, alongside any other ad-hoc or contextual projections as necessary,
+        as they don't carry the burden of totality and reversibility.
+    </p>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-3">
+        3. Binary Operations
+    </div>
+
+    <p>
+        Binary operations must be total and reversible under COTT.
+        In classic algebraic theories, reversal operations (such as subtraction and division)
+        would be derived rather than defined.
+        But since reversibility is a requirement under COTT,
+        <em>we define both simultaneously as a single operation.</em>
+
+    </p>
+
+    <div class="subsection-title" id="section-3_1">
+        3.1 Addition and Subtraction
+    </div>
+
+    <p>
+        We define addition and subtraction mutual inverses.
+    </p>
+
+    <p>
+        Given any terms
+        <span class="variable">a</span>, <span class="variable">b</span>, and <span class="variable">c</span>:
+    </p>
+
+    <p>
+        Subtraction is addition of the inverse:
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">a + (-b) = a - b</span>
+    </div>
+
+    <p>
+        Subtraction recovers addition:
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">a+b=c <=> a=c-b</span>
+    </div>
+
+    <p>
+        Addition is associative:
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">(a+b)+c = a+(b+c)</span>
+    </div>
+
+    <p>
+        A zero displacement has no change in magnitude:
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">|a + 0| = |a|</span>
+    </div>
+
+    <p>
+        Subtraction of a term from itself results in erasure:
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">a - a = null</span>
+    </div>
+
+    <p>
+        Adding one always results in a greater value.
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">a + 1 > a</span>
+    </div>
+
+    <div class="subsection-title" id="section-3_2">
+        3.2 Multiplication and Division
+    </div>
+
+    <p>
+        We define multiplication and division as mutual inverses.
+    </p>
+
+    <p>
+        Given any integers <span class="variable">p</span> and <span class="variable">q</span>, and terms
+        <span class="variable">a</span>, <span class="variable">b</span>, and <span class="variable">c</span>:
+    </p>
+
+    <p>
+        Dividing 1 by any term produces its reciprocal.
+        Dividing any term by itself is universally invariant.
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">1/a = b <=> a*b = 1</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">a/a = 1</span>
+    </div>
+
+    <p>
+        Multiplication is associative:
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">(a*b)*c = a*(b*c)</span>
+    </div>
+
+    <p>
+        Multiplication is distributive over addition:
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">c(a+b) = a*c+b*c</span>
+    </div>
+
+    <p>
+        Multiplication mixes equivalence classes:
+    </p>
+
+    <table class="fixed centered">
+        <tr>
+            <th>&times;</th>
+            <th>1</th>
+            <th>0</th>
+            <th>-1</th>
+            <th><span class="symbol">&omega;</span></th>
+        </tr>
+        <tr>
+            <th>1</th>
+            <td>1</td>
+            <td>0</td>
+            <td>-1</td>
+            <td><span class="symbol">&omega;</span></td>
+        </tr>
+        <tr>
+            <th>0</th>
+            <td>0</td>
+            <td><span class="dynamicexpr">0^2</span></td>
+            <td>-0</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <th>-1</th>
+            <td>-1</td>
+            <td>-0</td>
+            <td>1</td>
+            <td>-<span class="symbol">&omega;</span></td>
+        </tr>
+        <tr>
+            <th><span class="symbol">&omega;</span></th>
+            <td><span class="symbol">&omega;</span></td>
+            <td>1</td>
+            <td>-<span class="symbol">&omega;</span></td>
+            <td><span class="dynamicexpr">w^2</span></td>
+        </tr>
+    </table>
+
+
+
+
+</div>
+
+
+<script>
+</script>
+</body>
+</html>

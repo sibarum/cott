@@ -1558,7 +1558,9 @@
         </div>
 
         <p>
-            All powers of 0 or w are phase residuals and translate directly to complex rotation primitives.
+            All powers of 0 or
+            <span class="expression-inline"><span class="dynamicexpr">w</span></span>
+            are phase residuals and translate directly to complex rotation primitives.
             But, determining how they translate is nontrivial.
         </p>
         <p>
@@ -1568,7 +1570,8 @@
             <span class="dynamicexpr">0^{w/2} + 0^2 = 0^{w/2 * 2} = 0^w = -1</span>
         </div>
         <p>
-            The question is: what is the value of 0^2?
+            The question is: what is the value of
+            <span class="expression-inline"><span class="dynamicexpr">0^2</span></span>?
         </p>
         <p>
             Solve for x:
@@ -1589,6 +1592,26 @@
             <span class="dynamicexpr">-1 - (-1-i) = i</span>
         </div>
 
+        <p>
+            We can do the same thing with
+            <span class="expression-inline"><span class="dynamicexpr">0^3</span></span>.
+            We know:
+        </p>
+        <div class="expression font-lg">
+            <span class="dynamicexpr">0^{3w/2} = -0^{w/2}</span>
+        </div>
+        <div class="expression font-lg">
+            <span class="dynamicexpr">0^{3w/2} = 0^3 + 0^{w/2}</span>
+        </div>
+        <p>
+            So we solve:
+        </p>
+        <div class="expression font-lg">
+            <span class="dynamicexpr">x + i = -i</span>
+        </div>
+        <div class="expression font-lg">
+            <span class="dynamicexpr">0^3 = -2*i</span>
+        </div>
 
     </div>
 

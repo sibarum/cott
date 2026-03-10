@@ -46,6 +46,10 @@ table .expression {
     margin: 1em 0.1em;
 }
 
+table.centered td {
+    text-align: center;
+}
+
 sup {
     display: inline-block;
     position: relative;
@@ -162,6 +166,14 @@ li {
     margin: 0;
 }
 
+.expression sup {
+    padding-right: 0.2em;
+}
+
+.expression-inline sup {
+    padding-right: 0.35em;
+}
+
 .expr-label {
     display: inline;
     font-weight: bold;
@@ -192,6 +204,11 @@ span.variable, span.symbol, span.number, sup, sub, .fraction {
     margin: 0.1em;
 }
 
+.symbol.stretch {
+    display: inline-block;
+    transform: scaleY(2);
+}
+
 .symbol.italics {
     font-style: italic;
 }
@@ -204,6 +221,7 @@ span.variable, span.symbol, span.number, sup, sub, .fraction {
     flex-direction: column;
     vertical-align: middle;
     margin: 0 0.1em;
+    font-size: 0.75em;
 }
 sup .fraction {
     display: inline;
