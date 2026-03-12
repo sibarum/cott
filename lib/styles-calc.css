@@ -1,0 +1,102 @@
+
+
+.calculator-border {
+    background-color: gray;
+    border: 1em solid darkgray;
+    border-radius: 1em;
+    box-shadow: #000 0 0 1em;
+    margin: 2em;
+}
+
+.calculator-body {
+    background-color: lightgray;
+    min-height: 10em;
+    border: 0.1em solid #888;
+    box-shadow: #fff 0 0 0.5em;
+}
+
+.calculator-display {
+    background-image: linear-gradient(to bottom, #ddd, #ccc, #aaa);
+    width: 100%;
+    min-height: 5rem;
+    box-sizing: border-box;
+    border: 0.1em solid #666;
+    text-align: center;
+    font-size: 2rem;
+    padding-top: 1rem;
+    z-index: -1;
+}
+
+.calculator-display span,
+.calculator-display sup,
+.calculator-display sub
+{
+    z-index: 1;
+    position: relative;
+    min-height: 0.5rem;
+    min-width: 0.1rem;
+}
+
+@keyframes blink {
+    to { visibility: hidden; }
+}
+
+#calculator-cursor {
+    width: 1px;
+    height: 1em;
+    animation: blink 1s steps(2, start) infinite;
+    position: absolute;
+    display: inline-block;
+    color: white;
+    background-color: black;
+    border: 0.1rem outset white;
+    margin-left: -0.1rem;
+    z-index: 0;
+}
+
+.button-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.button-row.centered {
+    width: 100%;
+    justify-content: center;
+}
+
+.button-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.calculator .btn {
+    background-image: linear-gradient(to bottom, #ddd, #ccc, #aaa);
+    border: 0.05em solid #888;
+    display: block;
+    cursor: pointer;
+    font-size: 1.75rem;
+    padding: 0.2em;
+    width: 4rem;
+    height: 4rem;
+    user-select: none;
+    margin: 0;
+}
+
+.calculator .btn:hover {
+    background-image: linear-gradient(to bottom, #ddd, #fff, #ddd);
+    border: 0.1em outset #aaa;
+}
+
+.calculator .btn:active {
+    background-image: linear-gradient(to right, #ddd, #888, #ddd);
+    border: 0.1em inset #aaa;
+}
+
+
+@media only screen and (max-width: 600px) {
+    .calculator .btn {
+        font-size: 1rem;
+        width: 2rem;
+        height: 2rem;
+    }
+}

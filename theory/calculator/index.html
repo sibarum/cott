@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<html xmlns="http://www.w3.org/1999/html" lang="en">
+<head>
+    <script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../lib/styles-v1.css">
+    <link rel="stylesheet" href="../../lib/styles-calc.css">
+    <script src="../../lib/traction-interpret.js"></script>
+    <script src="./calculator.js"></script>
+
+    <title>COTT Calculator</title>
+
+</head>
+<body>
+
+
+<div class="section">
+
+    <a href="/cott">
+        <div class="icon-back"></div>
+    </a>
+
+    <div class="headings">
+        <h1>COTT Calculator</h1>
+        <h2>Expression Evaluator</h2>
+    </div>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        Published under the <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license
+    </div>
+</div>
+
+<div class="calculator">
+    <div class="calculator-border">
+
+        <div class="calculator-body">
+            <div class="button-row centered" id="calculator-actionbar">
+                <button class="btn symbol" data-value="&del">&#9003;</button>
+                <button class="btn symbol" data-value="">&#8634;</button>
+                <button class="btn symbol" data-value="">&#11123;</button>
+                <button class="btn symbol" data-value="&clr">&empty;</button>
+            </div>
+            <div class="calculator-display" id="primary-display">
+                <span id="calculator-cursor"></span>
+            </div>
+            <div class="button-row centered" id="calculator-numpad">
+                <div class="button-column">
+                    <button class="btn number" data-value="1">1</button>
+                    <button class="btn symbol" data-value="&sqrt">&radic;</button>
+                    <button class="btn variable" data-value="&exp">a<sup>b</sup></button>
+                    <button class="btn variable" data-value="&log">log<sub>v</sub></button>
+                    <button class="btn symbol" data-value="&inv">+/-</button>
+                </div>
+                <div class="button-column">
+                    <button class="btn number" data-value="-">-1</button>
+                    <button class="btn symbol" data-value="(">(</button>
+                    <button class="btn symbol" data-value="+">+</button>
+                    <button class="btn symbol" data-value="-">&ndash;</button>
+                    <button class="btn symbol" data-value="&l">&lsaquo;</button>
+                </div>
+                <div class="button-column">
+                    <button class="btn number" data-value="0">0</button>
+                    <button class="btn symbol" data-value=")">)</button>
+                    <button class="btn symbol" data-value="*">&times;</button>
+                    <button class="btn symbol" data-value="/">&divide;</button>
+                    <button class="btn symbol" data-value="&r">&rsaquo;</button>
+                </div>
+                <div class="button-column">
+                    <button class="btn symbol" data-value="w">&omega;</button>
+                    <button class="btn variable">var</button>
+                    <button class="btn variable">f(x)</button>
+                    <button class="btn symbol">&approx;</button>
+                    <button class="btn symbol">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
