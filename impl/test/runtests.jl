@@ -1,8 +1,5 @@
 using Test
-
-# Load the module from the local source
-include(joinpath(@__DIR__, "..", "src", "Traction.jl"))
-using .Traction
+using Traction
 
 @testset "Traction Algebra" begin
 
