@@ -358,6 +358,9 @@ def format_complex(expr):
     if proj_str == orig_str:
         return ''
 
+    # Replace re(x)/im(x) with x/y for readability (matches plot axes)
+    proj_str = proj_str.replace('re(x)', 'x').replace('im(x)', 'y')
+
     return proj_str
 
 
@@ -604,7 +607,7 @@ class CalculatorApp:
         self.viz_image = None
         # Approximation mode: cycle through ~, ≃, ≈
         self.approx_modes = ['~', '\u2243', '\u2248']
-        self.approx_index = 1  # default to ≃
+        self.approx_index = 2  # default to ≃
 
         self._build_ui()
         self._bind_keys()
@@ -668,12 +671,11 @@ class CalculatorApp:
 
         # Action bar
         action_frame = tk.Frame(body, bg=BG_BODY)
-        action_frame.pack(pady=(6, 0))
+        action_frame.pack(anchor='w', pady=(6, 6), padx=(12, 0))
 
         action_buttons = [
             ('\u232b', self._backspace),      # backspace
             ('\u21ba', self._clear_entry),     # undo/clear entry
-            ('\u2205', lambda: self._insert('null')),  # null
             ('C', self._clear_all),
         ]
         for label, cmd in action_buttons:
@@ -681,16 +683,16 @@ class CalculatorApp:
 
         # Number pad + operators
         pad_frame = tk.Frame(body, bg=BG_BODY)
-        pad_frame.pack(pady=(2, 10))
+        pad_frame.pack(anchor='w', pady=(6, 12), padx=(12, 0))
 
         # Layout: 5 columns x 5 rows
         layout = [
-            # col 0          col 1          col 2          col 3           col 4
-            [('(', '('),     (')', ')'),     ('^', '^'),    ('\u00f7', '/'), ('log\u2080','log0(')],
-            [('7', '7'),     ('8', '8'),     ('9', '9'),    ('\u00d7', '*'),('log\u03c9','log\u03c9(')],
-            [('4', '4'),     ('5', '5'),     ('6', '6'),    ('\u2013', '-'),('x', 'x')],
-            [('1', '1'),     ('2', '2'),     ('3', '3'),    ('+', '+'),    ('\u03c9', '\u03c9')],
-            [('0', '0'),     ('\u2243', None),('', None),   ('=', None),   ('', None)],
+            # col 0             col 1            col 2            col 3            col 4
+            [('(', '('),        (')', ')'),      ('^', '^'),      ('\u00f7', '/'), ('log\u2080','log0(')],
+            [('7', '7'),        ('8', '8'),      ('9', '9'),      ('\u00d7', '*'), ('log\u03c9','log\u03c9(')],
+            [('4', '4'),        ('5', '5'),      ('6', '6'),      ('\u2013', '-'), ('x', 'x')],
+            [('1', '1'),        ('2', '2'),      ('3', '3'),      ('+', '+'),      ('i', '0^(\u03c9/2)')],
+            [('0', '0'),        ('\u03c9', '\u03c9'),('\u2248', None),('=', None),  ('', None)],
         ]
 
         for row_idx, row in enumerate(layout):
@@ -731,7 +733,6 @@ class CalculatorApp:
         self._make_button(btn_row, '\u2013', self._zoom_out, small=True).pack(side='left', padx=1)
         self._make_button(btn_row, '\u25cb', self._zoom_reset, small=True).pack(side='left', padx=1)
         self._make_button(btn_row, '+', self._zoom_in, small=True).pack(side='left', padx=1)
-        self._make_button(btn_row, '\u27f3 Plot', self._refresh_viz, small=True).pack(side='left', padx=(8, 1))
 
     def _make_button(self, parent, label, command, accent=False, small=False):
         bg = '#5a7d9a' if accent else BG_BTN
@@ -751,6 +752,7 @@ class CalculatorApp:
         self.display_expr.bind('<Escape>', lambda e: self._clear_all())
         # Intercept 'w' to insert ω instead
         self.display_expr.bind('w', self._insert_omega)
+        self.display_expr.bind('i', self._insert_i)
         # Allow 'x' through as-is (default Entry behavior handles it)
         # Keep focus on the entry
         self.display_expr.focus_set()
@@ -758,6 +760,10 @@ class CalculatorApp:
     def _insert_omega(self, event):
         self.display_expr.insert('insert', '\u03c9')
         return 'break'  # prevent default 'w' insertion
+
+    def _insert_i(self, event):
+        self.display_expr.insert('insert', '0^(\u03c9/2)')
+        return 'break'  # prevent default 'i' insertion
 
     def _insert(self, value):
         """Insert value at the current cursor position in the entry."""
@@ -820,8 +826,8 @@ class CalculatorApp:
             else:
                 self.display_approx.configure(text='')
 
-            # Clear entry for next expression
-            self.entry_var.set('')
+            # Refresh the phase plot (keeps expression in entry)
+            self._refresh_viz()
 
         except (ParseError, Exception) as e:
             self.display_result.configure(text=f'Error: {e}', fg='#aa3333')

@@ -67,7 +67,7 @@ class Zero(Expr):
         Base-0 exponentiation rules:
             0^0     = 1         0^1     = 0
             0^(-n)  = w^n       0^w     = -1
-            0^(0^n) = n         0^(w^n) = -n
+            0^(0^x) = x         0^(w^x) = -x
         """
         if exp == S.Zero or isinstance(exp, Zero):
             return S.One
@@ -78,11 +78,9 @@ class Zero(Expr):
         if isinstance(exp, Omega):
             return S.NegativeOne
         if isinstance(exp, Pow) and isinstance(exp.base, Zero):
-            if isinstance(exp.exp, Integer) and exp.exp.is_positive:
-                return exp.exp
+            return exp.exp        # 0^(0^x) = x for any x
         if isinstance(exp, Pow) and isinstance(exp.base, Omega):
-            if isinstance(exp.exp, Integer) and exp.exp.is_positive:
-                return -exp.exp
+            return -exp.exp       # 0^(w^x) = -x for any x
         return None
 
     def __mul__(self, other):
@@ -135,7 +133,7 @@ class Omega(Expr):
         Base-w exponentiation rules:
             w^0     = 1         w^1     = w
             w^(-n)  = 0^n       w^w     = -1
-            w^(0^n) = -n        w^(w^n) = -1/n
+            w^(0^x) = -x        w^(w^x) = -1/x
         """
         if exp == S.Zero or isinstance(exp, Zero):
             return S.One
@@ -146,11 +144,9 @@ class Omega(Expr):
         if isinstance(exp, Omega):
             return S.NegativeOne
         if isinstance(exp, Pow) and isinstance(exp.base, Zero):
-            if isinstance(exp.exp, Integer) and exp.exp.is_positive:
-                return -exp.exp
+            return -exp.exp       # w^(0^x) = -x for any x
         if isinstance(exp, Pow) and isinstance(exp.base, Omega):
-            if isinstance(exp.exp, Integer) and exp.exp.is_positive:
-                return Rational(-1, exp.exp)
+            return -S.One / exp.exp  # w^(w^x) = -1/x for any x
         return None
 
     def __mul__(self, other):
@@ -379,6 +375,36 @@ def zpow(n):
 def wpow(n):
     """Shorthand for w^n."""
     return Pow(Omega(), sympify(n))
+
+
+# ============================================================
+# Identity Resolution
+# ============================================================
+
+def resolve(expr):
+    """
+    Force simplification by wrapping an expression through a no-op identity cycle.
+
+    Uses 0^(0^(expr)) which equals expr by the generalized identity 0^(0^x) = x.
+    The intermediate step through the zero-power domain may trigger additional
+    simplifications that wouldn't fire on the original form.
+
+    Multiple wrappers are available — all are no-ops:
+        0^(0^x) = x         log_0(0^x) = x
+        0^(log_0(x)) = x    log_0(log_0(x)) = x
+    """
+    expr = traction_simplify(sympify(expr))
+    return traction_simplify(Pow(Zero(), Pow(Zero(), expr)))
+
+
+def resolve_log(expr):
+    """
+    Resolve via log_0(0^(expr)) = expr.
+    Alternative resolution path through logarithm.
+    """
+    expr = traction_simplify(sympify(expr))
+    wrapped = Pow(Zero(), expr)  # 0^expr
+    return log0(wrapped)         # log_0(0^expr) = expr
 
 
 # ============================================================
