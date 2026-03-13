@@ -542,7 +542,7 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0):
     brightness = np.clip(brightness, 0.12, 0.95)
     brightness[invalid] = 0.0
 
-    return phase, brightness
+    return phase, brightness, Z
 
 
 def phase_to_rgb(phase_grid, brightness=None):
@@ -605,6 +605,7 @@ class CalculatorApp:
         self.history = []
         self.viz_bounds = DEFAULT_BOUNDS
         self.viz_image = None
+        self.viz_Z = None  # complex grid for hover readout
         # Approximation mode: cycle through ~, ≃, ≈
         self.approx_modes = ['~', '\u2243', '\u2248']
         self.approx_index = 2  # default to ≃
@@ -725,8 +726,15 @@ class CalculatorApp:
         self.viz_canvas = tk.Canvas(viz_frame, width=CANVAS_TOTAL, height=CANVAS_TOTAL,
                                     bg='#282828', highlightthickness=0)
         self.viz_canvas.pack(padx=10, pady=(0, 4))
+        self.viz_canvas.bind('<Motion>', self._on_viz_hover)
+        self.viz_canvas.bind('<Leave>', self._on_viz_leave)
 
-        # Button row: zoom controls + plot
+        # Hover readout label
+        self.viz_hover = tk.Label(viz_frame, text='', font=self.font_label,
+                                  bg=BG_BODY, fg=FG_DIM, anchor='w')
+        self.viz_hover.pack(fill='x', padx=12, pady=(0, 2))
+
+        # Button row: zoom controls
         btn_row = tk.Frame(viz_frame, bg=BG_BODY)
         btn_row.pack(pady=(4, 10))
 
@@ -874,7 +882,8 @@ class CalculatorApp:
                 self.display_expr.focus_set()
                 return
 
-            phase, brightness = result
+            phase, brightness, Z = result
+            self.viz_Z = Z  # store complex grid for hover readout
             rgb = phase_to_rgb(phase, brightness)
             self._render_viz(rgb)
         except Exception:
@@ -928,6 +937,40 @@ class CalculatorApp:
             self.viz_canvas.create_text(AXIS_MARGIN - 6, y, text=label,
                                         fill='#aaaaaa', font=tick_font, anchor='e')
 
+    def _on_viz_hover(self, event):
+        """Display the complex value at the hovered pixel."""
+        if self.viz_Z is None:
+            return
+
+        # Convert canvas coords to grid indices
+        px = event.x - AXIS_MARGIN
+        py = event.y - AXIS_MARGIN
+        if px < 0 or py < 0 or px >= CANVAS_SIZE or py >= CANVAS_SIZE:
+            self.viz_hover.configure(text='')
+            return
+
+        h, w = self.viz_Z.shape
+        col = int(px / CANVAS_SIZE * w)
+        row = int(py / CANVAS_SIZE * h)
+        col = min(col, w - 1)
+        row = min(row, h - 1)
+
+        # Grid coordinates
+        bounds = self.viz_bounds
+        re_val = -bounds + (col / w) * 2 * bounds
+        im_val = bounds - (row / h) * 2 * bounds
+
+        # Complex value at this point
+        z = self.viz_Z[row, col]
+
+        # Format the readout
+        coord = _format_complex_short(complex(re_val, im_val))
+        value = _format_complex_short(z) if np.isfinite(z) else '\u221e'
+        self.viz_hover.configure(text=f'f({coord}) = {value}')
+
+    def _on_viz_leave(self, event):
+        self.viz_hover.configure(text='')
+
     def _zoom_in(self):
         self.viz_bounds = max(0.25, self.viz_bounds / 2)
         self._refresh_viz()
@@ -958,6 +1001,28 @@ def _tick_label(val):
     if val == int(val):
         return str(int(val))
     return f'{val:g}'
+
+
+def _format_complex_short(z):
+    """Format a complex number concisely for the hover readout."""
+    r, i = z.real, z.imag
+    # Threshold for "close to zero"
+    eps = 1e-10
+    if abs(r) < eps and abs(i) < eps:
+        return '0'
+    if abs(i) < eps:
+        return f'{r:.4g}'
+    if abs(r) < eps:
+        if abs(i - 1) < eps:
+            return 'i'
+        if abs(i + 1) < eps:
+            return '-i'
+        return f'{i:.4g}i'
+    sign = '+' if i >= 0 else '-'
+    ai = abs(i)
+    if abs(ai - 1) < eps:
+        return f'{r:.4g}{sign}i'
+    return f'{r:.4g}{sign}{ai:.4g}i'
 
 
 def main():
