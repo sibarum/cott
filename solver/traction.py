@@ -508,36 +508,20 @@ def _project_pow(expr):
     if isinstance(base, Omega):
         exponent = -exponent
 
-    # Now we have 0^exponent. Extract the w-coefficient.
+    # Now we have 0^exponent.
     exponent = traction_simplify(exponent)
 
-    # 0^0 = 1
+    # Quick exits for simple cases
     if exponent == S.Zero or isinstance(exponent, Zero):
         return S.One
-
-    # Pure w: 0^w = e^(i*pi) = -1
     if isinstance(exponent, Omega):
         return S.NegativeOne
 
-    # Extract w-coefficient: exponent = remainder + coeff * w
-    w_coeff = _omega_coeff(exponent)
-    remainder = traction_simplify(exponent - w_coeff * Omega()) if w_coeff != S.Zero else exponent
-
-    if w_coeff != S.Zero:
-        # Phase: e^(i*pi*t) where t is the w-coefficient
-        phase = sp_simplify(sp_exp(I * pi * _project(w_coeff)))
-
-        if remainder == S.Zero or isinstance(remainder, Zero):
-            # Pure phase: 0^(t*w) -> e^(i*pi*t)
-            return phase
-
-        # Mixed: 0^(r + t*w) -> e^(-W*r) * e^(i*pi*t)
-        proj_remainder = _project(remainder)
-        return sp_simplify(sp_exp(-W_CONST * proj_remainder) * phase)
-
-    # No w-component: 0^z -> e^(-W*z) via Lie exponential
-    # Project the exponent first (it may contain traction types from substitution)
-    proj_exp = _project(exponent)
+    # General case: 0^z = e^(-W*z)
+    # Substitute ω → W in the exponent (in exponents, ω acts as W),
+    # then project any remaining traction types (e.g. 0^(ω/2) → i).
+    exp_with_w = exponent.subs(Omega(), W_CONST) if exponent.has(Omega) else exponent
+    proj_exp = _project(exp_with_w)
     return sp_exp(-W_CONST * proj_exp)
 
 
