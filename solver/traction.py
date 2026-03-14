@@ -182,6 +182,7 @@ class Null(Expr):
     is_commutative = True
     is_number = False
     is_zero = False
+    _op_priority = 15.0
 
     def __new__(cls):
         return Expr.__new__(cls)
@@ -364,9 +365,6 @@ def logw(expr):
         log_w(w^n)  = n         log_w(0^n)  = -n
         log_w(-n)   = 0^n
 
-    Note: the reference doc shows log_w(w^n) = -n which contradicts
-    log_w(w) = 1. This implementation uses log_w(w^n) = n for consistency.
-
     Returns None if the expression cannot be simplified.
     """
     expr = sympify(expr)
@@ -525,14 +523,3 @@ def _project_pow(expr):
     return sp_exp(-W_CONST * proj_exp)
 
 
-def _omega_coeff(expr):
-    """
-    Extract the coefficient of w in an expression.
-    E.g. w/2 -> 1/2, 3 + 2*w -> 2, w -> 1, 5 -> 0.
-    """
-    expr = sympify(expr)
-    if isinstance(expr, Omega):
-        return S.One
-    if hasattr(expr, 'coeff'):
-        return expr.coeff(Omega())
-    return S.Zero

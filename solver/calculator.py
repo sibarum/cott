@@ -11,7 +11,7 @@ import tkinter as tk
 from tkinter import font as tkfont
 import numpy as np
 from sympy import S, Integer, Rational, Pow, Mul, Add, Symbol
-from sympy import I as symI, symbols, lambdify
+from sympy import symbols, lambdify
 from traction import Zero, Omega, Null, z, w, null, traction_simplify, log0, logw, project_complex
 
 
@@ -485,20 +485,6 @@ PHASE_COLORS = np.array([
     [0, 128, 128],      # teal    — phase 3*pi/2   (negative imaginary)
 ], dtype=np.float64)
 
-# Continuity model: two complementary triadic cycles, additively blended
-# Phase cycle (follows arg): red -> blue -> green -> red
-CONT_PHASE_COLORS = np.array([
-    [255, 0, 0],        # red
-    [0, 0, 255],        # blue
-    [0, 255, 0],        # green
-], dtype=np.float64)
-
-# Magnitude cycle (follows log|f|): magenta -> cyan -> yellow -> magenta
-CONT_MAG_COLORS = np.array([
-    [255, 0, 255],      # magenta
-    [0, 255, 255],      # cyan
-    [255, 255, 0],      # yellow
-], dtype=np.float64)
 
 
 def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0):
@@ -614,15 +600,6 @@ def phase_to_rgb(phase_grid, brightness=None):
 
     return rgb
 
-
-def _interp_triadic(t, colors):
-    """Interpolate through a 3-color cyclic gradient at position t in [0, 1)."""
-    segment = t * 3
-    idx = segment.astype(int) % 3
-    frac = (segment - segment.astype(int))[..., np.newaxis]
-    c1 = colors[idx]
-    c2 = colors[(idx + 1) % 3]
-    return c1 + frac * (c2 - c1)
 
 
 def continuity_to_rgb(phase_grid, log_mag):
@@ -1382,27 +1359,6 @@ def _scale_color(t):
             return f'#{r:02x}{g:02x}{b:02x}'
     return '#dc2800'
 
-
-def _format_complex_short(z):
-    """Format a complex number concisely for the hover readout."""
-    r, i = z.real, z.imag
-    # Threshold for "close to zero"
-    eps = 1e-10
-    if abs(r) < eps and abs(i) < eps:
-        return '0'
-    if abs(i) < eps:
-        return f'{r:.4g}'
-    if abs(r) < eps:
-        if abs(i - 1) < eps:
-            return 'i'
-        if abs(i + 1) < eps:
-            return '-i'
-        return f'{i:.4g}i'
-    sign = '+' if i >= 0 else '-'
-    ai = abs(i)
-    if abs(ai - 1) < eps:
-        return f'{r:.4g}{sign}i'
-    return f'{r:.4g}{sign}{ai:.4g}i'
 
 
 def main():
