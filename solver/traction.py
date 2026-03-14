@@ -228,8 +228,9 @@ def traction_simplify(expr):
         # x^0 = 1 for any x (Zero() exponent may not be caught by SymPy)
         if isinstance(exp, Zero):
             return S.One
-        # Collapse nested powers: (b^e1)^e2 -> b^(e1*e2) for traction bases
-        if isinstance(base, Pow) and isinstance(base.base, (Zero, Omega)):
+        # Universal power-of-power: (v^a)^b -> v^(a*b)
+        # In traction algebra, all operations are reversible — no branch cuts.
+        if isinstance(base, Pow):
             combined_exp = traction_simplify(Mul(base.exp, exp))
             return traction_simplify(Pow(base.base, combined_exp))
         return Pow(base, exp)
@@ -265,21 +266,38 @@ def _simplify_mul(expr):
     for a in args:
         flat.extend(Mul.make_args(a))
 
-    # Collect base-0 exponents (unifying omega via w^a = 0^(-a))
+    # Partition into zero-class and others
     zero_exp = S.Zero
+    has_definite_zero = False  # True only for bare Zero() or Pow(Zero(), positive_int)
     others = []
 
     for a in flat:
         if isinstance(a, Zero):
             zero_exp += S.One
+            has_definite_zero = True
         elif isinstance(a, Omega):
             zero_exp += S.NegativeOne
         elif isinstance(a, Pow) and isinstance(a.base, Zero):
             zero_exp += a.exp
+            if isinstance(a.exp, Integer) and a.exp.is_positive:
+                has_definite_zero = True
         elif isinstance(a, Pow) and isinstance(a.base, Omega):
             zero_exp -= a.exp
         else:
             others.append(a)
+
+    # -0 = 0: zero-class elements absorb sign.
+    # Negative zero cannot exist — 0-0 = null (erasure), so -0 reverts to 0.
+    # Only applies when we KNOW the element is zero-class (bare Zero or
+    # positive integer power of Zero), not for symbolic exponents like 0^x
+    # which might be omega-class.
+    if has_definite_zero:
+        new_others = []
+        for a in others:
+            if isinstance(a, Number) and a.is_negative:
+                a = -a  # absorb sign: |-n| * 0 = n * 0
+            new_others.append(a)
+        others = new_others
 
     # Reconstruct: 0^zero_exp (triggers _eval_power for known cases)
     if zero_exp != S.Zero:
@@ -478,9 +496,12 @@ def _project_pow(expr):
     exponent = expr.exp
 
     # Non-traction base: project base and exponent separately
+    # In exponents, ω acts as W (the structure constant): ω = W in exponent space
+    # Derived from: 0^(tω) = e^(-W·tω) = e^(iπt), so W·ω = -iπ = W², thus ω = W
     if not isinstance(base, (Zero, Omega)):
         pb = _project(base)
-        pe = _project(exponent)
+        exp_projected = exponent.subs(Omega(), W_CONST) if exponent.has(Omega) else exponent
+        pe = _project(exp_projected)
         return Pow(pb, pe)
 
     # Convert omega base to zero base: w^a = 0^(-a)
@@ -504,18 +525,20 @@ def _project_pow(expr):
 
     if w_coeff != S.Zero:
         # Phase: e^(i*pi*t) where t is the w-coefficient
-        phase = sp_simplify(sp_exp(I * pi * w_coeff))
+        phase = sp_simplify(sp_exp(I * pi * _project(w_coeff)))
 
         if remainder == S.Zero or isinstance(remainder, Zero):
             # Pure phase: 0^(t*w) -> e^(i*pi*t)
             return phase
 
         # Mixed: 0^(r + t*w) -> e^(-W*r) * e^(i*pi*t)
-        return sp_simplify(sp_exp(-W_CONST * remainder) * phase)
+        proj_remainder = _project(remainder)
+        return sp_simplify(sp_exp(-W_CONST * proj_remainder) * phase)
 
     # No w-component: 0^z -> e^(-W*z) via Lie exponential
-    # where W = sqrt(-i*pi), so W^2 = -i*pi
-    return sp_exp(-W_CONST * exponent)
+    # Project the exponent first (it may contain traction types from substitution)
+    proj_exp = _project(exponent)
+    return sp_exp(-W_CONST * proj_exp)
 
 
 def _omega_coeff(expr):

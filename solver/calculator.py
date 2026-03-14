@@ -102,6 +102,9 @@ class Parser:
         if self.peek() == '-':
             self.consume()
             operand = self.unary()
+            # -0 = 0: negative zero cannot exist (0-0 = null, not -0)
+            if isinstance(operand, Zero):
+                return operand
             return -operand
         return self.primary()
 
@@ -474,7 +477,7 @@ AXIS_MARGIN = 28  # pixels for tick labels
 CANVAS_TOTAL = CANVAS_SIZE + AXIS_MARGIN
 DEFAULT_BOUNDS = 3.0
 
-# Phase quadrant colors: cyan, magenta, yellow, teal
+# Phase model: cyan, magenta, yellow, teal (4 quadrants)
 PHASE_COLORS = np.array([
     [0, 255, 255],      # cyan    — phase 0        (positive real)
     [255, 0, 255],      # magenta — phase pi/2     (positive imaginary)
@@ -482,13 +485,32 @@ PHASE_COLORS = np.array([
     [0, 128, 128],      # teal    — phase 3*pi/2   (negative imaginary)
 ], dtype=np.float64)
 
+# Continuity model: two complementary triadic cycles, additively blended
+# Phase cycle (follows arg): red -> blue -> green -> red
+CONT_PHASE_COLORS = np.array([
+    [255, 0, 0],        # red
+    [0, 0, 255],        # blue
+    [0, 255, 0],        # green
+], dtype=np.float64)
+
+# Magnitude cycle (follows log|f|): magenta -> cyan -> yellow -> magenta
+CONT_MAG_COLORS = np.array([
+    [255, 0, 255],      # magenta
+    [0, 255, 255],      # cyan
+    [255, 255, 0],      # yellow
+], dtype=np.float64)
+
 
 def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0):
     """
     Compute a phase grid for a traction expression.
 
+    Native traction pipeline: substitutes in the traction domain first,
+    simplifies via traction rules (eliminating branch cuts), then projects
+    to C only at the final step.
+
     Two automatic modes:
-    - Single variable (x only): substitutes x -> a + b*i (complex plane mode)
+    - Single variable (x only): substitutes x -> a + b*0^(w/2) (complex plane)
     - Two variables (x and y): uses x,y directly as real coordinates
 
     Returns None if the expression has no plottable variables.
@@ -505,20 +527,25 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0):
     if not has_x and not has_y:
         return None
 
-    # Project traction elements to complex numbers
-    proj = project_complex(parsed)
-
     a, b = symbols('a b', real=True)
 
     if has_x and has_y:
-        # Two-variable mode: x=a (horizontal), y=b (vertical)
-        complex_expr = proj.subs([(x_sym, a), (y_sym, b)])
+        # Two-variable mode: substitute x=a, y=b in traction domain, then project
+        traction_expr = parsed.subs([(x_sym, a), (y_sym, b)])
+        traction_expr = traction_simplify(traction_expr)
+        complex_expr = project_complex(traction_expr)
     elif has_x:
-        # Single-variable mode: x -> a + b*i (complex plane)
-        complex_expr = proj.subs(x_sym, a + b * symI)
+        # Single-variable mode: substitute x -> a + b*0^(w/2) in traction domain
+        i_traction = Pow(Zero(), Mul(Omega(), Rational(1, 2)))
+        traction_expr = parsed.subs(x_sym, a + b * i_traction)
+        traction_expr = traction_simplify(traction_expr)
+        complex_expr = project_complex(traction_expr)
     else:
         # Only y present: treat as single-variable complex plane
-        complex_expr = proj.subs(y_sym, a + b * symI)
+        i_traction = Pow(Zero(), Mul(Omega(), Rational(1, 2)))
+        traction_expr = parsed.subs(y_sym, a + b * i_traction)
+        traction_expr = traction_simplify(traction_expr)
+        complex_expr = project_complex(traction_expr)
 
     try:
         complex_expr = complex_expr.expand()
@@ -580,6 +607,44 @@ def phase_to_rgb(phase_grid, brightness=None):
         rgb = rgb * brightness[..., np.newaxis]
 
     rgb = np.clip(rgb, 0, 255).astype(np.uint8)
+
+    # NaN -> dark gray
+    nan_mask = np.isnan(phase_grid)
+    rgb[nan_mask] = [40, 40, 40]
+
+    return rgb
+
+
+def _interp_triadic(t, colors):
+    """Interpolate through a 3-color cyclic gradient at position t in [0, 1)."""
+    segment = t * 3
+    idx = segment.astype(int) % 3
+    frac = (segment - segment.astype(int))[..., np.newaxis]
+    c1 = colors[idx]
+    c2 = colors[(idx + 1) % 3]
+    return c1 + frac * (c2 - c1)
+
+
+def continuity_to_rgb(phase_grid, log_mag):
+    """
+    Color continuity model: same CMYT palette as phase mode, but follows
+    magnitude instead of phase. Double-cover mapping ensures |f|->0 and
+    |f|->inf wrap to the same color (continuity at infinity).
+    No brightness modulation — pure color from magnitude.
+    """
+    # Magnitude -> [0, 1) via double cover of arctan(log|f|)
+    t_mag = np.arctan(log_mag) / np.pi + 0.5  # [0, 1) full magnitude range
+    t_mag = (2 * t_mag) % 1.0                  # double cover
+    t_mag = np.where(np.isfinite(t_mag), t_mag, 0)
+
+    # Same 4-color quadrant interpolation as phase mode
+    segment = t_mag * 4
+    idx = segment.astype(int) % 4
+    frac = (segment - segment.astype(int))[..., np.newaxis]
+
+    c1 = PHASE_COLORS[idx]
+    c2 = PHASE_COLORS[(idx + 1) % 4]
+    rgb = np.clip(c1 + frac * (c2 - c1), 0, 255).astype(np.uint8)
 
     # NaN -> dark gray
     nan_mask = np.isnan(phase_grid)
@@ -712,6 +777,7 @@ class CalculatorApp:
         self.viz_log_mag = None  # log magnitude grid for gradient lines
         self.show_tangent = False
         self.show_normal = False
+        self.color_mode = 'phase'  # 'phase' or 'continuity'
         # Approximation mode: cycle through ~, ≃, ≈
         self.approx_modes = ['~', '\u2243', '\u2248']
         self.approx_index = 2  # default to ≃
@@ -835,10 +901,12 @@ class CalculatorApp:
         self.viz_canvas.bind('<Motion>', self._on_viz_hover)
         self.viz_canvas.bind('<Leave>', self._on_viz_leave)
 
-        # Hover readout label
-        self.viz_hover = tk.Label(viz_frame, text='', font=self.font_label,
-                                  bg=BG_BODY, fg=FG_DIM, anchor='w')
-        self.viz_hover.pack(fill='x', padx=12, pady=(0, 2))
+        # Hover gauges: 3 scale boxes (Re, Im, |f|) + 1 phase compass
+        GAUGE_H = 60
+        GAUGE_W = CANVAS_TOTAL
+        self.gauge_canvas = tk.Canvas(viz_frame, width=GAUGE_W, height=GAUGE_H,
+                                      bg='#282828', highlightthickness=0)
+        self.gauge_canvas.pack(padx=10, pady=(2, 2))
 
         # Button row: zoom controls
         btn_row = tk.Frame(viz_frame, bg=BG_BODY)
@@ -851,6 +919,8 @@ class CalculatorApp:
         self.tangent_btn.pack(side='left', padx=(8, 1))
         self.normal_btn = self._make_button(btn_row, 'N', self._toggle_normal, small=True)
         self.normal_btn.pack(side='left', padx=1)
+        self.color_btn = self._make_button(btn_row, 'C', self._toggle_color_mode, small=True)
+        self.color_btn.pack(side='left', padx=(8, 1))
 
     def _make_button(self, parent, label, command, accent=False, small=False):
         bg = '#5a7d9a' if accent else BG_BTN
@@ -995,7 +1065,10 @@ class CalculatorApp:
             phase, brightness, Z, log_mag = result
             self.viz_Z = Z  # store complex grid for hover readout
             self.viz_log_mag = log_mag
-            rgb = phase_to_rgb(phase, brightness)
+            if self.color_mode == 'continuity':
+                rgb = continuity_to_rgb(phase, log_mag)
+            else:
+                rgb = phase_to_rgb(phase, brightness)
             self._render_viz(rgb)
         except Exception:
             self.viz_canvas.delete('all')
@@ -1102,8 +1175,21 @@ class CalculatorApp:
                 self.viz_canvas.delete('normal')
         self.display_expr.focus_set()
 
+    def _toggle_color_mode(self):
+        """Toggle between Phase and Continuity color models."""
+        if self.color_mode == 'phase':
+            self.color_mode = 'continuity'
+            self.color_btn.configure(relief='sunken', bg='#5a7d9a', fg='white')
+        else:
+            self.color_mode = 'phase'
+            self.color_btn.configure(relief='raised', bg=BG_BTN, fg=FG_TEXT)
+        # Re-render with the new color model
+        if self.viz_Z is not None:
+            self._refresh_viz()
+        self.display_expr.focus_set()
+
     def _on_viz_hover(self, event):
-        """Display the complex value at the hovered pixel."""
+        """Draw gauge readouts for the hovered pixel."""
         if self.viz_Z is None:
             return
 
@@ -1111,7 +1197,7 @@ class CalculatorApp:
         px = event.x - AXIS_MARGIN
         py = event.y - AXIS_MARGIN
         if px < 0 or py < 0 or px >= CANVAS_SIZE or py >= CANVAS_SIZE:
-            self.viz_hover.configure(text='')
+            self._clear_gauges()
             return
 
         h, w = self.viz_Z.shape
@@ -1120,21 +1206,121 @@ class CalculatorApp:
         col = min(col, w - 1)
         row = min(row, h - 1)
 
-        # Grid coordinates
-        bounds = self.viz_bounds
-        re_val = -bounds + (col / w) * 2 * bounds
-        im_val = bounds - (row / h) * 2 * bounds
-
-        # Complex value at this point
         z = self.viz_Z[row, col]
+        if not np.isfinite(z):
+            self._clear_gauges()
+            return
 
-        # Format the readout
-        coord = _format_complex_short(complex(re_val, im_val))
-        value = _format_complex_short(z) if np.isfinite(z) else '\u221e'
-        self.viz_hover.configure(text=f'f({coord}) = {value}')
+        self._draw_gauges(z.real, z.imag, abs(z), np.angle(z))
 
     def _on_viz_leave(self, event):
-        self.viz_hover.configure(text='')
+        self._clear_gauges()
+
+    def _clear_gauges(self):
+        self.gauge_canvas.delete('all')
+
+    def _draw_gauges(self, re, im, mag, phase):
+        """Draw 3 scale boxes (Re, Im, |f|) and 1 phase compass."""
+        gc = self.gauge_canvas
+        gc.delete('all')
+
+        gh = 60   # gauge area height
+        bw = 24   # box width
+        bh = 50   # box height
+        gap = 12  # gap between boxes
+        compass_r = 22  # compass radius
+
+        # Layout: [Re box] [Im box] [|f| box] ... [compass]
+        total_boxes_w = 3 * bw + 2 * gap
+        compass_d = compass_r * 2
+        total_w = total_boxes_w + gap + compass_d
+        x_start = (CANVAS_TOTAL - total_w) // 2
+        y_center = gh // 2
+        y_top = y_center - bh // 2
+        y_bot = y_center + bh // 2
+
+        # Draw the 3 scale boxes
+        labels = ['Re', 'Im', '|f|']
+        values = [re, im, mag]
+        for idx, (label, val) in enumerate(zip(labels, values)):
+            bx = x_start + idx * (bw + gap)
+            self._draw_scale_box(bx, y_top, bw, bh, val, label, is_magnitude=(idx == 2))
+
+        # Draw the phase compass
+        cx = x_start + total_boxes_w + gap + compass_r
+        cy = y_center
+        self._draw_compass(cx, cy, compass_r, phase)
+
+    def _draw_scale_box(self, x, y, w, h, value, label, is_magnitude=False):
+        """Draw a graduated scale box with logarithmic fill."""
+        gc = self.gauge_canvas
+        tick_font = tkfont.Font(family='Consolas', size=7)
+
+        # Box outline
+        gc.create_rectangle(x, y, x + w, y + h, outline='#666666', width=1)
+
+        # Compute fill level: log scale mapped to [0, 1]
+        if is_magnitude:
+            # Magnitude: always positive, log scale
+            if value <= 0:
+                fill_t = 0.0
+            else:
+                fill_t = min(1.0, (np.log10(value + 1e-15) + 4) / 8)  # -4 to +4 range
+            negative = False
+        else:
+            # Re/Im: signed, log scale of absolute value
+            negative = value < 0
+            av = abs(value)
+            if av < 1e-15:
+                fill_t = 0.0
+            else:
+                fill_t = min(1.0, (np.log10(av) + 4) / 8)
+
+        fill_t = max(0.0, fill_t)
+
+        # Fill color: maroon -> purple -> blue -> green(0) -> yellow -> red
+        color = _scale_color(fill_t)
+
+        # Fill direction: positive fills bottom-up, negative fills top-down
+        fill_h = int(fill_t * h)
+        if fill_h > 0:
+            if negative:
+                gc.create_rectangle(x + 1, y + 1, x + w - 1, y + fill_h,
+                                    fill=color, outline='')
+            else:
+                gc.create_rectangle(x + 1, y + h - fill_h, x + w - 1, y + h - 1,
+                                    fill=color, outline='')
+
+        # Graduation lines (5 ticks)
+        for i in range(1, 5):
+            ty = y + int(i * h / 5)
+            gc.create_line(x, ty, x + 3, ty, fill='#555555')
+
+        # Label below
+        gc.create_text(x + w // 2, y + h + 7, text=label,
+                        fill='#999999', font=tick_font)
+
+    def _draw_compass(self, cx, cy, r, phase):
+        """Draw a phase compass: circle with arrow pointing at the phase angle."""
+        gc = self.gauge_canvas
+        tick_font = tkfont.Font(family='Consolas', size=7)
+
+        # Circle outline
+        gc.create_oval(cx - r, cy - r, cx + r, cy + r, outline='#666666', width=1)
+
+        # Tick marks at 0, pi/2, pi, 3pi/2
+        for angle in [0, np.pi / 2, np.pi, 3 * np.pi / 2]:
+            tx = cx + (r - 3) * np.cos(angle)
+            ty = cy - (r - 3) * np.sin(angle)
+            tx2 = cx + r * np.cos(angle)
+            ty2 = cy - r * np.sin(angle)
+            gc.create_line(tx, ty, tx2, ty2, fill='#555555')
+
+        # Arrow from center to edge at the phase angle
+        ax = cx + (r - 4) * np.cos(phase)
+        ay = cy - (r - 4) * np.sin(phase)
+        gc.create_line(cx, cy, ax, ay, fill='#dddddd', width=2, arrow='last',
+                        arrowshape=(6, 8, 3))
 
     def _zoom_in(self):
         self.viz_bounds = max(0.25, self.viz_bounds / 2)
@@ -1166,6 +1352,35 @@ def _tick_label(val):
     if val == int(val):
         return str(int(val))
     return f'{val:g}'
+
+
+def _scale_color(t):
+    """
+    Map t in [0, 1] to a color string for the scale boxes.
+    Gradient: dark maroon -> purple -> blue -> green(0.5) -> yellow -> red
+    """
+    # 5-stop gradient
+    stops = [
+        (0.0, (80, 0, 0)),       # dark maroon
+        (0.25, (120, 0, 180)),    # purple
+        (0.5, (0, 80, 200)),      # blue
+        (0.7, (0, 200, 80)),      # green
+        (0.85, (220, 200, 0)),    # yellow
+        (1.0, (220, 40, 0)),      # red
+    ]
+    # Clamp
+    t = max(0.0, min(1.0, t))
+    # Find segment
+    for i in range(len(stops) - 1):
+        t0, c0 = stops[i]
+        t1, c1 = stops[i + 1]
+        if t <= t1:
+            f = (t - t0) / (t1 - t0) if t1 > t0 else 0
+            r = int(c0[0] + f * (c1[0] - c0[0]))
+            g = int(c0[1] + f * (c1[1] - c0[1]))
+            b = int(c0[2] + f * (c1[2] - c0[2]))
+            return f'#{r:02x}{g:02x}{b:02x}'
+    return '#dc2800'
 
 
 def _format_complex_short(z):
