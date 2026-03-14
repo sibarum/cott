@@ -542,7 +542,7 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0):
     brightness = np.clip(brightness, 0.12, 0.95)
     brightness[invalid] = 0.0
 
-    return phase, brightness, Z
+    return phase, brightness, Z, log_mag
 
 
 def phase_to_rgb(phase_grid, brightness=None):
@@ -567,6 +567,90 @@ def phase_to_rgb(phase_grid, brightness=None):
     rgb[nan_mask] = [40, 40, 40]
 
     return rgb
+
+
+# ============================================================
+# Gradient Streamlines
+# ============================================================
+
+def compute_streamlines(log_mag, num_seeds=10, steps=200, step_size=0.4, normal=False):
+    """
+    Trace gradient flow lines of log|f| from a grid of seed points.
+    Returns list of streamlines, each a list of (col, row) float pairs.
+    Traces both forward and backward from each seed.
+
+    If normal=False: tangent lines (following the gradient, zeros -> poles).
+    If normal=True:  normal lines (perpendicular to gradient, constant |f| contours).
+    """
+    h, w = log_mag.shape
+    # Gradient: dy[row,col], dx[row,col]
+    gy, gx = np.gradient(log_mag)
+
+    if normal:
+        # Rotate 90°: (gx, gy) -> (-gy, gx)
+        gx, gy = -gy, gx
+
+    # Seed points: evenly spaced interior grid
+    seeds = []
+    for si in range(1, num_seeds + 1):
+        for sj in range(1, num_seeds + 1):
+            r = si * h // (num_seeds + 1)
+            c = sj * w // (num_seeds + 1)
+            seeds.append((float(r), float(c)))
+
+    lines = []
+    for sr, sc in seeds:
+        # Trace forward
+        fwd = _trace_one(gx, gy, sr, sc, steps, step_size)
+        # Trace backward
+        bwd = _trace_one(gx, gy, sr, sc, steps, -step_size)
+        # Combine: reversed backward + forward
+        line = list(reversed(bwd)) + [(sc, sr)] + fwd
+        if len(line) >= 3:
+            lines.append(line)
+
+    return lines
+
+
+def _trace_one(gx, gy, start_r, start_c, steps, step_size):
+    """Trace a single streamline direction using midpoint (RK2) integration."""
+    h, w = gx.shape
+    points = []
+    r, c = start_r, start_c
+
+    for _ in range(steps):
+        ri, ci = int(r), int(c)
+        if ri < 1 or ri >= h - 1 or ci < 1 or ci >= w - 1:
+            break
+
+        # Sample gradient at current point
+        vx = gx[ri, ci]
+        vy = gy[ri, ci]
+        mag = np.sqrt(vx * vx + vy * vy)
+        if mag < 1e-12:
+            break
+
+        # Normalize
+        nx, ny = vx / mag, vy / mag
+
+        # Midpoint step (RK2)
+        mr = r + 0.5 * step_size * ny
+        mc = c + 0.5 * step_size * nx
+        mri, mci = int(mr), int(mc)
+        if mri < 1 or mri >= h - 1 or mci < 1 or mci >= w - 1:
+            break
+
+        mx = gx[mri, mci]
+        my = gy[mri, mci]
+        mm = np.sqrt(mx * mx + my * my)
+        if mm < 1e-12:
+            break
+
+        r += step_size * my / mm
+        c += step_size * mx / mm
+        points.append((c, r))  # (col, row)
+
+    return points
 
 
 # ============================================================
@@ -606,6 +690,9 @@ class CalculatorApp:
         self.viz_bounds = DEFAULT_BOUNDS
         self.viz_image = None
         self.viz_Z = None  # complex grid for hover readout
+        self.viz_log_mag = None  # log magnitude grid for gradient lines
+        self.show_tangent = False
+        self.show_normal = False
         # Approximation mode: cycle through ~, ≃, ≈
         self.approx_modes = ['~', '\u2243', '\u2248']
         self.approx_index = 2  # default to ≃
@@ -741,6 +828,10 @@ class CalculatorApp:
         self._make_button(btn_row, '\u2013', self._zoom_out, small=True).pack(side='left', padx=1)
         self._make_button(btn_row, '\u25cb', self._zoom_reset, small=True).pack(side='left', padx=1)
         self._make_button(btn_row, '+', self._zoom_in, small=True).pack(side='left', padx=1)
+        self.tangent_btn = self._make_button(btn_row, 'T', self._toggle_tangent, small=True)
+        self.tangent_btn.pack(side='left', padx=(8, 1))
+        self.normal_btn = self._make_button(btn_row, 'N', self._toggle_normal, small=True)
+        self.normal_btn.pack(side='left', padx=1)
 
     def _make_button(self, parent, label, command, accent=False, small=False):
         bg = '#5a7d9a' if accent else BG_BTN
@@ -882,8 +973,9 @@ class CalculatorApp:
                 self.display_expr.focus_set()
                 return
 
-            phase, brightness, Z = result
+            phase, brightness, Z, log_mag = result
             self.viz_Z = Z  # store complex grid for hover readout
+            self.viz_log_mag = log_mag
             rgb = phase_to_rgb(phase, brightness)
             self._render_viz(rgb)
         except Exception:
@@ -909,6 +1001,13 @@ class CalculatorApp:
 
         # Draw axis markings
         self._draw_axes()
+
+        # Draw flow lines if enabled
+        if self.viz_log_mag is not None:
+            if self.show_tangent:
+                self._draw_flow_lines(normal=False, tag='tangent', color='#ffffff')
+            if self.show_normal:
+                self._draw_flow_lines(normal=True, tag='normal', color='#aaaaaa')
 
     def _draw_axes(self):
         """Draw tick marks and labels along the top and left edges."""
@@ -936,6 +1035,53 @@ class CalculatorApp:
             self.viz_canvas.create_line(AXIS_MARGIN - 4, y, AXIS_MARGIN, y, fill='#aaaaaa')
             self.viz_canvas.create_text(AXIS_MARGIN - 6, y, text=label,
                                         fill='#aaaaaa', font=tick_font, anchor='e')
+
+    def _draw_flow_lines(self, normal, tag, color):
+        """Draw tangent or normal flow lines on the canvas."""
+        lines = compute_streamlines(self.viz_log_mag, normal=normal)
+        h, w = self.viz_log_mag.shape
+        scale_x = CANVAS_SIZE / w
+        scale_y = CANVAS_SIZE / h
+
+        for line in lines:
+            if len(line) < 3:
+                continue
+            coords = []
+            for col, row in line:
+                cx = AXIS_MARGIN + col * scale_x
+                cy = AXIS_MARGIN + row * scale_y
+                coords.extend([cx, cy])
+            self.viz_canvas.create_line(
+                *coords, fill=color, width=1, smooth=True, tags=tag
+            )
+
+    def _toggle_tangent(self):
+        """Toggle tangent lines (gradient flow) on/off."""
+        self.show_tangent = not self.show_tangent
+        if self.show_tangent:
+            self.tangent_btn.configure(relief='sunken', bg='#5a7d9a', fg='white')
+        else:
+            self.tangent_btn.configure(relief='raised', bg=BG_BTN, fg=FG_TEXT)
+        if self.viz_Z is not None:
+            if self.show_tangent:
+                self._draw_flow_lines(normal=False, tag='tangent', color='#ffffff')
+            else:
+                self.viz_canvas.delete('tangent')
+        self.display_expr.focus_set()
+
+    def _toggle_normal(self):
+        """Toggle normal lines (constant |f| contours) on/off."""
+        self.show_normal = not self.show_normal
+        if self.show_normal:
+            self.normal_btn.configure(relief='sunken', bg='#5a7d9a', fg='white')
+        else:
+            self.normal_btn.configure(relief='raised', bg=BG_BTN, fg=FG_TEXT)
+        if self.viz_Z is not None:
+            if self.show_normal:
+                self._draw_flow_lines(normal=True, tag='normal', color='#aaaaaa')
+            else:
+                self.viz_canvas.delete('normal')
+        self.display_expr.focus_set()
 
     def _on_viz_hover(self, event):
         """Display the complex value at the hovered pixel."""
