@@ -12,7 +12,9 @@ from tkinter import font as tkfont
 import numpy as np
 from sympy import S, Integer, Rational, Pow, Mul, Add, Symbol
 from sympy import symbols, lambdify
-from traction import Zero, Omega, Null, z, w, null, traction_simplify, log0, logw, project_complex
+from traction import Zero, Omega, Null, Log0, LogW, z, w, null, traction_simplify, log0, logw, project_complex
+import registry
+import projections  # auto-discovers and registers projection plugins
 
 
 # ============================================================
@@ -165,10 +167,7 @@ class Parser:
         self.consume('(')
         arg = self.expr()
         self.consume(')')
-        result = func(arg)
-        if result is None:
-            raise ParseError(f"{name} cannot simplify the given argument")
-        return result
+        return func(arg)
 
     def number(self):
         start = self.pos
@@ -227,6 +226,10 @@ def format_result(expr):
         return '\u2205'  # empty set symbol
     if isinstance(expr, Symbol):
         return str(expr)
+    if isinstance(expr, Log0):
+        return f'log\u2080({format_result(expr.args[0])})'
+    if isinstance(expr, LogW):
+        return f'log\u03c9({format_result(expr.args[0])})'
     if expr == S.NegativeOne:
         return '-1'
     if isinstance(expr, Integer):
@@ -487,19 +490,14 @@ PHASE_COLORS = np.array([
 
 
 
-def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0):
+def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0, projection_name='complex_lie'):
     """
-    Compute a phase grid for a traction expression.
+    Compute visualization data for a traction expression using a registered projection.
 
-    Native traction pipeline: substitutes in the traction domain first,
-    simplifies via traction rules (eliminating branch cuts), then projects
-    to C only at the final step.
+    Delegates to the named projection plugin for both symbolic projection
+    and numeric grid evaluation.
 
-    Two automatic modes:
-    - Single variable (x only): substitutes x -> a + b*0^(w/2) (complex plane)
-    - Two variables (x and y): uses x,y directly as real coordinates
-
-    Returns None if the expression has no plottable variables.
+    Returns dict with at least {phase, brightness, Z, log_mag} or None on failure.
     """
     parsed = parse_and_eval(expr_text)
     if parsed is None:
@@ -507,74 +505,31 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0):
 
     x_sym = Symbol('x')
     y_sym = Symbol('y')
-    has_x = parsed.has(x_sym)
-    has_y = parsed.has(y_sym)
+    if not parsed.has(x_sym) and not parsed.has(y_sym):
+        return None
 
-    if not has_x and not has_y:
+    # Get the active projection from the registry
+    proj = registry.get('projection', projection_name)
+    if proj is None:
         return None
 
     a, b = symbols('a b', real=True)
 
-    if has_x and has_y:
-        # Two-variable mode: substitute x=a, y=b in traction domain, then project
-        traction_expr = parsed.subs([(x_sym, a), (y_sym, b)])
-        traction_expr = traction_simplify(traction_expr)
-        complex_expr = project_complex(traction_expr)
-    elif has_x:
-        # Single-variable mode: substitute x -> a + b*0^(w/2) in traction domain
-        i_traction = Pow(Zero(), Mul(Omega(), Rational(1, 2)))
-        traction_expr = parsed.subs(x_sym, a + b * i_traction)
-        traction_expr = traction_simplify(traction_expr)
-        complex_expr = project_complex(traction_expr)
-    else:
-        # Only y present: treat as single-variable complex plane
-        i_traction = Pow(Zero(), Mul(Omega(), Rational(1, 2)))
-        traction_expr = parsed.subs(y_sym, a + b * i_traction)
-        traction_expr = traction_simplify(traction_expr)
-        complex_expr = project_complex(traction_expr)
-
-    try:
-        complex_expr = complex_expr.expand()
-    except Exception:
-        pass
-
-    # Lambdify for fast numeric evaluation
-    try:
-        f = lambdify((a, b), complex_expr, modules=['numpy'])
-    except Exception:
+    # Step 1: Symbolic projection
+    projected = proj.project_expr(parsed, a, b)
+    if projected is None:
         return None
 
-    # Create grid (flip y so up = positive imaginary)
+    # Step 2: Grid evaluation
     lin = np.linspace(-bounds, bounds, grid_res)
-    AA, BB = np.meshgrid(lin, lin[::-1])
+    AA, BB = np.meshgrid(lin, lin[::-1])  # flip y so up = positive
 
-    # Evaluate (suppress numpy warnings — inf/nan are handled by the invalid mask)
-    try:
-        with np.errstate(divide='ignore', invalid='ignore', over='ignore'):
-            Z = f(AA, BB)
-            if np.isscalar(Z) or (isinstance(Z, np.ndarray) and Z.ndim == 0):
-                Z = np.full_like(AA, complex(Z), dtype=complex)
-            Z = np.asarray(Z, dtype=complex)
-    except Exception:
+    result = proj.eval_grid(projected, a, b, AA, BB)
+    if result is None:
         return None
 
-    # Phase in [0, 2*pi)
-    phase = np.angle(Z)
-    phase = (phase + 2 * np.pi) % (2 * np.pi)
-
-    # Mask invalid points (zero, inf, nan)
-    invalid = ~np.isfinite(Z) | (np.abs(Z) < 1e-15)
-    phase[invalid] = np.nan
-
-    # Log-magnitude brightness: |z|=1 -> 0.5, |z|->inf -> ~1, |z|->0 -> ~0
-    mag = np.abs(Z)
-    log_mag = np.log(mag + 1e-15)
-    brightness = 0.5 + np.arctan(log_mag) / np.pi  # maps to (0, 1)
-    # Clamp to [0.12, 0.95] so colors stay visible
-    brightness = np.clip(brightness, 0.12, 0.95)
-    brightness[invalid] = 0.0
-
-    return phase, brightness, Z, log_mag
+    # Return the standard tuple that the rest of the calculator expects
+    return result['phase'], result['brightness'], result['Z'], result['log_mag']
 
 
 def phase_to_rgb(phase_grid, brightness=None):

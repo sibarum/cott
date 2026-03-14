@@ -27,9 +27,10 @@ Usage:
 """
 
 from sympy import (
-    Expr, S, sympify, Pow, Mul, Add,
+    Expr, S, sympify, Pow, Mul, Add, Function,
     Integer, Rational, Symbol, Number,
-    I, pi, sqrt as sp_sqrt, exp as sp_exp, simplify as sp_simplify, zoo
+    I, pi, sqrt as sp_sqrt, exp as sp_exp, log as sp_log,
+    simplify as sp_simplify, zoo
 )
 
 # Structure constant for 0^z = e^(-W*z), where W^2 = -i*pi
@@ -200,6 +201,30 @@ class Null(Expr):
         return 'null'
 
 
+class Log0(Function):
+    """
+    Unevaluated base-0 logarithm.
+    Stays symbolic until projected to C via log_0(y) = -ln(y)/W.
+    """
+    def _sympystr(self, printer):
+        return f'log_0({printer.doprint(self.args[0])})'
+
+    def _latex(self, printer):
+        return r'\log_{\mathbf{0}}\left(' + printer.doprint(self.args[0]) + r'\right)'
+
+
+class LogW(Function):
+    """
+    Unevaluated base-w logarithm.
+    Stays symbolic until projected to C via log_w(y) = ln(y)/W.
+    """
+    def _sympystr(self, printer):
+        return f'log_w({printer.doprint(self.args[0])})'
+
+    def _latex(self, printer):
+        return r'\log_{\omega}\left(' + printer.doprint(self.args[0]) + r'\right)'
+
+
 # ============================================================
 # Singleton Aliases
 # ============================================================
@@ -354,7 +379,8 @@ def log0(expr):
             return Pow(Zero(), expr)
         if expr.is_negative:
             return Pow(Omega(), -expr)
-    return None
+    # Can't simplify: return unevaluated symbolic form
+    return Log0(expr)
 
 
 def logw(expr):
@@ -365,7 +391,7 @@ def logw(expr):
         log_w(w^n)  = n         log_w(0^n)  = -n
         log_w(-n)   = 0^n
 
-    Returns None if the expression cannot be simplified.
+    Returns unevaluated LogW(expr) if it cannot be simplified.
     """
     expr = sympify(expr)
     if expr == S.One:
@@ -380,7 +406,8 @@ def logw(expr):
         return -expr.exp
     if isinstance(expr, Integer) and expr.is_negative:
         return Pow(Zero(), -expr)
-    return None
+    # Can't simplify: return unevaluated symbolic form
+    return LogW(expr)
 
 
 # ============================================================
@@ -467,6 +494,21 @@ def _project(expr):
     if isinstance(expr, Symbol):
         return expr
 
+    # Logarithms: log_0(y) = -ln(y)/W, log_w(y) = ln(y)/W
+    # Derived from 0^z = e^(-W*z) -> z = -ln(0^z)/W -> log_0(y) = -ln(y)/W
+    # Substitute ω → W in the argument (same principle as exponents)
+    if isinstance(expr, Log0):
+        arg = expr.args[0]
+        arg = arg.subs(Omega(), W_CONST) if arg.has(Omega) else arg
+        proj_arg = _project(arg)
+        return -sp_log(proj_arg) / W_CONST
+
+    if isinstance(expr, LogW):
+        arg = expr.args[0]
+        arg = arg.subs(Omega(), W_CONST) if arg.has(Omega) else arg
+        proj_arg = _project(arg)
+        return sp_log(proj_arg) / W_CONST
+
     # Powers
     if isinstance(expr, Pow):
         return _project_pow(expr)
@@ -476,14 +518,14 @@ def _project(expr):
         result = S.One
         for arg in expr.args:
             result = result * _project(arg)
-        return sp_simplify(result)
+        return result
 
     # Add: project each term
     if isinstance(expr, Add):
         result = S.Zero
         for arg in expr.args:
             result = result + _project(arg)
-        return sp_simplify(result)
+        return result
 
     return expr
 
