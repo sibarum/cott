@@ -29,8 +29,12 @@ Usage:
 from sympy import (
     Expr, S, sympify, Pow, Mul, Add,
     Integer, Rational, Symbol, Number,
-    I, pi, exp as sp_exp, simplify as sp_simplify, zoo
+    I, pi, sqrt as sp_sqrt, exp as sp_exp, simplify as sp_simplify, zoo
 )
+
+# Structure constant for 0^z = e^(-W*z), where W^2 = -i*pi
+# Connects traction algebra to Lie group exponential
+W_CONST = sp_sqrt(-I * pi)
 
 
 # ============================================================
@@ -506,13 +510,12 @@ def _project_pow(expr):
             # Pure phase: 0^(t*w) -> e^(i*pi*t)
             return phase
 
-        # Mixed: 0^(r + t*w) — project phase, leave zero-power remainder
-        # The remainder represents a zero-class component we can't yet map
-        return Mul(Pow(Zero(), remainder), phase)
+        # Mixed: 0^(r + t*w) -> e^(-W*r) * e^(i*pi*t)
+        return sp_simplify(sp_exp(-W_CONST * remainder) * phase)
 
-    # No w-component: 0^n for integer n, 0^x for symbolic x, etc.
-    # Cannot project without additional rules — return unevaluated
-    return expr
+    # No w-component: 0^z -> e^(-W*z) via Lie exponential
+    # where W = sqrt(-i*pi), so W^2 = -i*pi
+    return sp_exp(-W_CONST * exponent)
 
 
 def _omega_coeff(expr):

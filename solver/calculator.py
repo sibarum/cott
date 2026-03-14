@@ -137,10 +137,13 @@ class Parser:
             self.consume()
             return w
 
-        # Variable x
+        # Variables x, y
         if ch == 'x':
             self.consume()
             return Symbol('x')
+        if ch == 'y':
+            self.consume()
+            return Symbol('y')
 
         # null
         if self.match('null'):
@@ -482,26 +485,41 @@ PHASE_COLORS = np.array([
 
 def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0):
     """
-    Compute a phase grid for a traction expression containing x.
+    Compute a phase grid for a traction expression.
 
-    Substitutes x -> a + b*0^(w/2) (i.e. a + b*i in the complex projection),
-    evaluates on a grid, and returns phase angles in [0, 2*pi).
-    Returns None if the expression has no x or can't be evaluated.
+    Two automatic modes:
+    - Single variable (x only): substitutes x -> a + b*i (complex plane mode)
+    - Two variables (x and y): uses x,y directly as real coordinates
+
+    Returns None if the expression has no plottable variables.
     """
     parsed = parse_and_eval(expr_text)
     if parsed is None:
         return None
 
     x_sym = Symbol('x')
-    if not parsed.has(x_sym):
+    y_sym = Symbol('y')
+    has_x = parsed.has(x_sym)
+    has_y = parsed.has(y_sym)
+
+    if not has_x and not has_y:
         return None
 
     # Project traction elements to complex numbers
     proj = project_complex(parsed)
 
-    # Substitute x -> a + b*i
     a, b = symbols('a b', real=True)
-    complex_expr = proj.subs(x_sym, a + b * symI)
+
+    if has_x and has_y:
+        # Two-variable mode: x=a (horizontal), y=b (vertical)
+        complex_expr = proj.subs([(x_sym, a), (y_sym, b)])
+    elif has_x:
+        # Single-variable mode: x -> a + b*i (complex plane)
+        complex_expr = proj.subs(x_sym, a + b * symI)
+    else:
+        # Only y present: treat as single-variable complex plane
+        complex_expr = proj.subs(y_sym, a + b * symI)
+
     try:
         complex_expr = complex_expr.expand()
     except Exception:
@@ -517,12 +535,13 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0):
     lin = np.linspace(-bounds, bounds, grid_res)
     AA, BB = np.meshgrid(lin, lin[::-1])
 
-    # Evaluate
+    # Evaluate (suppress numpy warnings — inf/nan are handled by the invalid mask)
     try:
-        Z = f(AA, BB)
-        if np.isscalar(Z) or (isinstance(Z, np.ndarray) and Z.ndim == 0):
-            Z = np.full_like(AA, complex(Z), dtype=complex)
-        Z = np.asarray(Z, dtype=complex)
+        with np.errstate(divide='ignore', invalid='ignore', over='ignore'):
+            Z = f(AA, BB)
+            if np.isscalar(Z) or (isinstance(Z, np.ndarray) and Z.ndim == 0):
+                Z = np.full_like(AA, complex(Z), dtype=complex)
+            Z = np.asarray(Z, dtype=complex)
     except Exception:
         return None
 
@@ -779,8 +798,8 @@ class CalculatorApp:
             [('(', '('),        (')', ')'),      ('^', '^'),      ('\u00f7', '/'), ('log\u2080','log0(')],
             [('7', '7'),        ('8', '8'),      ('9', '9'),      ('\u00d7', '*'), ('log\u03c9','log\u03c9(')],
             [('4', '4'),        ('5', '5'),      ('6', '6'),      ('\u2013', '-'), ('x', 'x')],
-            [('1', '1'),        ('2', '2'),      ('3', '3'),      ('+', '+'),      ('i', '0^(\u03c9/2)')],
-            [('0', '0'),        ('\u03c9', '\u03c9'),('\u2248', None),('=', None),  ('', None)],
+            [('1', '1'),        ('2', '2'),      ('3', '3'),      ('+', '+'),      ('y', 'y')],
+            [('0', '0'),        ('\u03c9', '\u03c9'),('\u2248', None),('=', None),  ('i', '0^(\u03c9/2)')],
         ]
 
         for row_idx, row in enumerate(layout):
