@@ -31,6 +31,27 @@ tests = [
     ('logw(1)', '0'),
     ('logw(\u03c9)', '1'),
     ('log0(0^3)', '3'),
+    # Negative zero absorption
+    ('(-0)*w', '1'),
+    ('(-1)*0', '0'),
+    ('(-0)^(-1)', '\u03c9'),
+    ('(-2)*0', '2\u00b70'),
+    # Power combination
+    ('(0^2)*w', '0'),
+    ('0^5*w^2', '0^3'),
+    # Universal power-of-power
+    ('(x^2)^(1/2)', 'x'),
+    ('(x^4)^(1/4)', 'x'),
+    # Symbolic log
+    ('log0(x)', 'log\u2080(x)'),
+    ('logw(x)', 'log\u03c9(x)'),
+    # Variables
+    ('x+y', 'x+y'),
+    ('y^2', 'y^2'),
+    # Zero/omega interactions
+    ('0^(w/2)', '0^(1/2\u00b7\u03c9)'),
+    ('0/0', '1'),
+    ('w/w', '1'),
 ]
 
 passed = 0

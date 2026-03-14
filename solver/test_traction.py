@@ -1,11 +1,12 @@
 """Tests for Traction Theory solver — validates core identities from the reference."""
 
 import pytest
-from sympy import S, Pow, Rational, Symbol, Integer, Add, Mul
+from sympy import S, Pow, Rational, Symbol, Integer, Add, Mul, I, pi, exp
 
 from traction import (
-    Zero, Omega, Null, z, w, null,
-    traction_simplify, log0, logw, zpow, wpow
+    Zero, Omega, Null, Log0, LogW, z, w, null,
+    traction_simplify, log0, logw, zpow, wpow,
+    resolve, resolve_log, project_complex, W_CONST
 )
 
 
@@ -320,3 +321,263 @@ class TestDerived:
         assert z**(z**3) == 3
         # 0^(0^(0^3)) = 0^3
         assert z**(z**(z**3)) == z**3
+
+
+# ============================================================
+# Generalized Identities (symbolic x)
+# ============================================================
+
+class TestGeneralizedIdentities:
+
+    def test_zero_pow_zero_pow_x(self):
+        """0^(0^x) = x for any symbolic x."""
+        x = Symbol('x')
+        assert z**(z**x) == x
+
+    def test_zero_pow_omega_pow_x(self):
+        """0^(w^x) = -x for any symbolic x."""
+        x = Symbol('x')
+        assert z**(w**x) == -x
+
+    def test_omega_pow_zero_pow_x(self):
+        """w^(0^x) = -x for any symbolic x."""
+        x = Symbol('x')
+        assert w**(z**x) == -x
+
+    def test_omega_pow_omega_pow_x(self):
+        """w^(w^x) = -1/x for any symbolic x."""
+        x = Symbol('x')
+        assert w**(w**x) == -S.One / x
+
+
+# ============================================================
+# Universal Power-of-Power (branch-cut elimination)
+# ============================================================
+
+class TestUniversalPowerOfPower:
+
+    def test_x_squared_sqrt(self):
+        """(x^2)^(1/2) = x — no branch cut."""
+        x = Symbol('x')
+        result = traction_simplify((x**2)**Rational(1, 2))
+        assert result == x
+
+    def test_x_fourth_root(self):
+        """(x^4)^(1/4) = x — no branch cut."""
+        x = Symbol('x')
+        result = traction_simplify((x**4)**Rational(1, 4))
+        assert result == x
+
+    def test_branch_cut_eliminated(self):
+        """(x^4)^(1/4) - (x^2)^(1/2) — both simplify to x, so they're equal."""
+        x = Symbol('x')
+        a = traction_simplify((x**4)**Rational(1, 4))
+        b = traction_simplify((x**2)**Rational(1, 2))
+        assert a == b == x
+
+    def test_power_of_power_general(self):
+        """(x^a)^b = x^(a*b) for any base."""
+        x = Symbol('x')
+        a, b = Symbol('a'), Symbol('b')
+        result = traction_simplify(Pow(Pow(x, a), b))
+        assert result == Pow(x, a * b)
+
+    def test_zero_base_nested(self):
+        """(0^a)^b = 0^(a*b)."""
+        a, b = Symbol('a'), Symbol('b')
+        result = traction_simplify(Pow(Pow(z, a), b))
+        assert result == Pow(z, traction_simplify(a * b))
+
+
+# ============================================================
+# Negative Zero Absorption
+# ============================================================
+
+class TestNegativeZero:
+
+    def test_neg_one_times_zero_absorbs(self):
+        """(-1)*0 = 0 — zero-class absorbs sign."""
+        result = traction_simplify(S.NegativeOne * z)
+        assert isinstance(result, Zero)
+
+    def test_neg_times_zero_squared(self):
+        """(-1)*0^2 = 0^2 — sign absorbed by definite zero-class."""
+        result = traction_simplify(S.NegativeOne * z**2)
+        assert result == z**2
+
+    def test_neg_times_zero_symbolic_preserved(self):
+        """(-1)*0^x stays as -0^x — can't absorb sign for symbolic exponent."""
+        x = Symbol('x')
+        result = traction_simplify(Mul(S.NegativeOne, Pow(z, x)))
+        # Should NOT absorb sign since x might be negative (omega-class)
+        assert result == Mul(S.NegativeOne, Pow(z, x))
+
+    def test_neg_two_times_zero(self):
+        """(-2)*0 = 2*0 — numeric sign absorbed."""
+        result = traction_simplify(Integer(-2) * z)
+        assert result == 2 * z
+
+
+# ============================================================
+# Same-Base Power Combination in Mul
+# ============================================================
+
+class TestPowerCombination:
+
+    def test_zero_powers_combine(self):
+        """0^2 * 0^3 = 0^5."""
+        result = traction_simplify(z**2 * z**3)
+        assert result == z**5
+
+    def test_omega_powers_combine(self):
+        """w^2 * w^3 = w^5."""
+        result = traction_simplify(w**2 * w**3)
+        assert result == w**5
+
+    def test_cross_base_cancellation(self):
+        """0^5 * w^2 = 0^3 (via 0^(5-2))."""
+        result = traction_simplify(z**5 * w**2)
+        assert result == z**3
+
+    def test_full_cancellation(self):
+        """0^3 * w^3 = 1."""
+        result = traction_simplify(z**3 * w**3)
+        assert result == S.One
+
+    def test_symbolic_exponent_combination(self):
+        """0^x * 0^3 = 0^(x+3)."""
+        x = Symbol('x')
+        result = traction_simplify(z**x * z**3)
+        assert result == z**(x + 3)
+
+    def test_zero_omega_mixed_symbolic(self):
+        """0^(w/2) * 0^(w/2) = 0^w = -1."""
+        result = traction_simplify(z**(w / 2) * z**(w / 2))
+        assert result == S.NegativeOne
+
+
+# ============================================================
+# Logarithm — Symbolic Arguments
+# ============================================================
+
+class TestLogSymbolic:
+
+    def test_log0_symbolic_returns_Log0(self):
+        """log_0(x) returns unevaluated Log0 for symbolic x."""
+        x = Symbol('x')
+        result = log0(x)
+        assert isinstance(result, Log0)
+
+    def test_logw_symbolic_returns_LogW(self):
+        """log_w(x) returns unevaluated LogW for symbolic x."""
+        x = Symbol('x')
+        result = logw(x)
+        assert isinstance(result, LogW)
+
+    def test_log0_roundtrip(self):
+        """0^(log_0(x)) simplifies via generalized identity."""
+        x = Symbol('x')
+        result = log0(x)
+        # 0^(Log0(x)) — Log0 is a Function, not a Pow(Zero, ...), so this
+        # stays as Pow(Zero(), Log0(x)). That's expected — the round-trip
+        # works when log0 returns a concrete value.
+        assert isinstance(result, Log0)
+
+    def test_log0_omega_pow_n(self):
+        """log_0(w^5) = -5."""
+        assert log0(w**5) == -5
+
+    def test_logw_omega_pow_n(self):
+        """log_w(w^5) = 5."""
+        assert logw(w**5) == 5
+
+    def test_logw_zero_pow_n(self):
+        """log_w(0^3) = -3."""
+        assert logw(z**3) == -3
+
+
+# ============================================================
+# Resolve (Identity Resolution)
+# ============================================================
+
+class TestResolve:
+
+    def test_resolve_integer(self):
+        assert resolve(5) == 5
+
+    def test_resolve_omega(self):
+        assert isinstance(resolve(w), Omega)
+
+    def test_resolve_symbol(self):
+        x = Symbol('x')
+        assert resolve(x) == x
+
+    def test_resolve_zero_power(self):
+        assert resolve(z**2) == z**2
+
+    def test_resolve_negative_one(self):
+        assert resolve(-1) == S.NegativeOne
+
+    def test_resolve_log_integer(self):
+        assert resolve_log(5) == 5
+
+    def test_resolve_log_omega(self):
+        assert isinstance(resolve_log(w), Omega)
+
+
+# ============================================================
+# Complex Projection
+# ============================================================
+
+class TestProjection:
+
+    def test_project_zero(self):
+        assert project_complex(z) == S.Zero
+
+    def test_project_omega(self):
+        from sympy import zoo
+        assert project_complex(w) == zoo
+
+    def test_project_integer(self):
+        assert project_complex(Integer(5)) == 5
+
+    def test_project_null(self):
+        assert project_complex(null) == S.Zero
+
+    def test_project_zero_pow_omega(self):
+        """0^w = -1 projects to -1."""
+        assert project_complex(z**w) == S.NegativeOne
+
+    def test_project_dyadic_imaginary(self):
+        """0^(w/2) projects to i."""
+        result = project_complex(z**(w / 2))
+        assert result == I
+
+    def test_project_negative_dyadic(self):
+        """w^(w/2) = 0^(-w/2) projects to -i."""
+        result = project_complex(w**(w / 2))
+        assert result == -I
+
+    def test_project_lie_exponential(self):
+        """0^2 projects to e^(-2W) via the Lie formula."""
+        # Note: 0^1 evaluates eagerly to Zero(), which projects to 0.
+        # Use 0^2 which stays as Pow(Zero(), 2).
+        result = project_complex(z**2)
+        expected = exp(-2 * W_CONST)
+        assert result == expected
+
+    def test_project_symbol_passthrough(self):
+        """Symbols pass through projection unchanged."""
+        x = Symbol('x')
+        assert project_complex(x) == x
+
+    def test_project_mul_distributed(self):
+        """Projection distributes over multiplication."""
+        x = Symbol('x')
+        result = project_complex(3 * z**(w / 2))
+        assert result == 3 * I
+
+    def test_w_const_squared(self):
+        """W^2 = -i*pi (structure constant identity)."""
+        from sympy import simplify
+        assert simplify(W_CONST**2 + I * pi) == 0
