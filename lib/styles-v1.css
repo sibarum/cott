@@ -82,6 +82,13 @@ sub.smaller {
     font-size: 0.6em;
 }
 
+img.fullsize-image {
+    width: 100%;
+    height: auto;
+    background-size: cover;
+    box-shadow: #aaa 0 0 2em;
+}
+
 a,
 a:active,
 a:target {
