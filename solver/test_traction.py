@@ -582,3 +582,63 @@ class TestProjection:
         """W^2 = -i*pi (structure constant identity)."""
         from sympy import simplify
         assert simplify(W_CONST**2 + I * pi) == 0
+
+
+# ============================================================
+# Integration: full pipeline through calculator
+# ============================================================
+
+class TestPipeline:
+    """End-to-end tests through the calculator parse/eval/plot pipeline."""
+
+    def test_plot_with_poles(self):
+        """(1-(1/x)^2)^(1/x) — expression with poles at x=0, should plot and
+        produce valid streamlines without NaN crashes."""
+        from calculator import compute_phase_grid, compute_streamlines
+        result = compute_phase_grid('(1-(1/x)^2)^(1/x)')
+        assert result is not None
+        phase, brightness, Z, log_mag = result
+        # Should produce a grid with mostly valid values
+        import numpy as np
+        valid = np.count_nonzero(np.isfinite(Z))
+        assert valid > 20000  # most of the 22500 pixels should be valid
+        # Streamlines should not crash on NaN gradient values
+        tangent = compute_streamlines(log_mag, normal=False)
+        normal = compute_streamlines(log_mag, normal=True)
+        assert len(tangent) > 0
+        assert len(normal) > 0
+
+    def test_plot_zero_times_expr(self):
+        """0*sqrt(x^2+1) should plot (not blank) via C(0) = e^(-W)."""
+        from calculator import compute_phase_grid
+        import numpy as np
+        result = compute_phase_grid('0*((x^2+1)^(1/2))')
+        assert result is not None
+        _, _, Z, _ = result
+        # All pixels should be non-zero (C(0) = e^(-W), not 0)
+        valid_nonzero = np.count_nonzero(np.isfinite(Z) & (np.abs(Z) > 1e-15))
+        assert valid_nonzero == 150 * 150
+
+    def test_plot_omega_exponent(self):
+        """x^(w/3) should plot via omega=W in exponent space."""
+        from calculator import compute_phase_grid
+        result = compute_phase_grid('x^(w/3)')
+        assert result is not None
+
+    def test_plot_nested_traction(self):
+        """(0^(w/2))^x should plot (simplifies to 0^(x*w/2))."""
+        from calculator import compute_phase_grid
+        result = compute_phase_grid('(0^(w/2))^x')
+        assert result is not None
+
+    def test_plot_two_variable(self):
+        """x+y uses two-variable mode (no complex substitution)."""
+        from calculator import compute_phase_grid
+        result = compute_phase_grid('x+y')
+        assert result is not None
+
+    def test_plot_log0(self):
+        """log0(x) should plot via log_0(y) = -ln(y)/W."""
+        from calculator import compute_phase_grid
+        result = compute_phase_grid('log0(x)')
+        assert result is not None

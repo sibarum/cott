@@ -635,6 +635,9 @@ def _trace_one(gx, gy, start_r, start_c, steps, step_size):
     r, c = start_r, start_c
 
     for _ in range(steps):
+        # Bail on NaN (from poles/zeros in the function)
+        if not (np.isfinite(r) and np.isfinite(c)):
+            break
         ri, ci = int(r), int(c)
         if ri < 1 or ri >= h - 1 or ci < 1 or ci >= w - 1:
             break
@@ -642,6 +645,8 @@ def _trace_one(gx, gy, start_r, start_c, steps, step_size):
         # Sample gradient at current point
         vx = gx[ri, ci]
         vy = gy[ri, ci]
+        if not (np.isfinite(vx) and np.isfinite(vy)):
+            break
         mag = np.sqrt(vx * vx + vy * vy)
         if mag < 1e-12:
             break
@@ -652,12 +657,16 @@ def _trace_one(gx, gy, start_r, start_c, steps, step_size):
         # Midpoint step (RK2)
         mr = r + 0.5 * step_size * ny
         mc = c + 0.5 * step_size * nx
+        if not (np.isfinite(mr) and np.isfinite(mc)):
+            break
         mri, mci = int(mr), int(mc)
         if mri < 1 or mri >= h - 1 or mci < 1 or mci >= w - 1:
             break
 
         mx = gx[mri, mci]
         my = gy[mri, mci]
+        if not (np.isfinite(mx) and np.isfinite(my)):
+            break
         mm = np.sqrt(mx * mx + my * my)
         if mm < 1e-12:
             break
@@ -710,6 +719,8 @@ class CalculatorApp:
         self.show_tangent = False
         self.show_normal = False
         self.color_mode = 'phase'  # 'phase' or 'continuity'
+        self.projection_names = registry.names('projection')
+        self.projection_index = 0  # default to first registered (complex_lie)
         # Approximation mode: cycle through ~, ≃, ≈
         self.approx_modes = ['~', '\u2243', '\u2248']
         self.approx_index = 2  # default to ≃
@@ -722,6 +733,30 @@ class CalculatorApp:
         border = tk.Frame(self.root, bg=BG_FRAME, padx=12, pady=12)
         border.pack()
 
+        # ===== Top: Full-width input display =====
+        top_frame = tk.Frame(border, bg=BG_BODY, bd=1, relief='solid')
+        top_frame.pack(fill='x', pady=(0, 6))
+
+        self.entry_var = tk.StringVar()
+        self.entry_var.trace_add('write', lambda *_: self._on_entry_change())
+        self.display_expr = tk.Entry(
+            top_frame, textvariable=self.entry_var, font=self.font_display,
+            bg=BG_DISPLAY, fg=FG_TEXT, justify='left',
+            bd=0, highlightthickness=0, insertbackground=FG_TEXT
+        )
+        self.display_expr.pack(fill='x', padx=10, pady=6)
+
+        self.display_result = tk.Label(
+            top_frame, text='', font=self.font_result,
+            bg=BG_RESULT, fg=FG_RESULT, anchor='e', padx=10, pady=4,
+            height=1, relief='sunken', bd=1
+        )
+        self.display_result.pack(fill='x')
+
+        # Hidden stubs for removed display elements (code still references them)
+        self.display_approx = tk.Label(top_frame)
+        self.display_history = tk.Label(top_frame)
+
         # Horizontal container: calculator + visualization
         hframe = tk.Frame(border, bg=BG_FRAME)
         hframe.pack()
@@ -729,50 +764,6 @@ class CalculatorApp:
         # ===== Left: Calculator =====
         body = tk.Frame(hframe, bg=BG_BODY, bd=1, relief='solid')
         body.pack(side='left', padx=(0, 6))
-
-        # Title
-        title = tk.Label(body, text='COTT Calculator', font=self.font_label,
-                         bg=BG_BODY, fg=FG_DIM)
-        title.pack(pady=(8, 0))
-
-        # Display area
-        display_frame = tk.Frame(body, bg=BORDER_COLOR, padx=1, pady=1)
-        display_frame.pack(padx=10, pady=(4, 0), fill='x')
-
-        display_inner = tk.Frame(display_frame, bg=BG_DISPLAY)
-        display_inner.pack(fill='both')
-
-        self.entry_var = tk.StringVar()
-        self.entry_var.trace_add('write', lambda *_: self._on_entry_change())
-        self.display_expr = tk.Entry(
-            display_inner, textvariable=self.entry_var, font=self.font_display,
-            bg=BG_DISPLAY, fg=FG_TEXT, justify='right',
-            bd=0, highlightthickness=0, insertbackground=FG_TEXT
-        )
-        self.display_expr.pack(fill='x', padx=10, pady=6)
-
-        self.display_result = tk.Label(
-            display_inner, text='', font=self.font_result,
-            bg=BG_RESULT, fg=FG_RESULT, anchor='e', padx=10, pady=6,
-            width=20, height=1, relief='sunken', bd=1
-        )
-        self.display_result.pack(fill='x')
-
-        # Approximation display
-        self.display_approx = tk.Label(
-            display_inner, text='', font=self.font_result,
-            bg=BG_DISPLAY, fg=FG_DIM, anchor='e', padx=10, pady=4,
-            width=20, height=1
-        )
-        self.display_approx.pack(fill='x')
-
-        # History label
-        self.display_history = tk.Label(
-            display_inner, text='', font=self.font_label,
-            bg=BG_DISPLAY, fg=FG_DIM, anchor='e', padx=10,
-            width=20
-        )
-        self.display_history.pack(fill='x')
 
         # Action bar
         action_frame = tk.Frame(body, bg=BG_BODY)
@@ -823,9 +814,9 @@ class CalculatorApp:
         viz_frame = tk.Frame(hframe, bg=BG_BODY, bd=1, relief='solid')
         viz_frame.pack(side='left', padx=(6, 0), anchor='n')
 
-        viz_title = tk.Label(viz_frame, text='Phase Plot', font=self.font_label,
-                             bg=BG_BODY, fg=FG_DIM)
-        viz_title.pack(pady=(8, 4))
+        self.viz_title_label = tk.Label(viz_frame, text='Phase Plot', font=self.font_label,
+                                        bg=BG_BODY, fg=FG_DIM)
+        self.viz_title_label.pack(pady=(8, 4))
 
         self.viz_canvas = tk.Canvas(viz_frame, width=CANVAS_TOTAL, height=CANVAS_TOTAL,
                                     bg='#282828', highlightthickness=0)
@@ -834,7 +825,7 @@ class CalculatorApp:
         self.viz_canvas.bind('<Leave>', self._on_viz_leave)
 
         # Hover gauges: 3 scale boxes (Re, Im, |f|) + 1 phase compass
-        GAUGE_H = 60
+        GAUGE_H = 72
         GAUGE_W = CANVAS_TOTAL
         self.gauge_canvas = tk.Canvas(viz_frame, width=GAUGE_W, height=GAUGE_H,
                                       bg='#282828', highlightthickness=0)
@@ -853,6 +844,8 @@ class CalculatorApp:
         self.normal_btn.pack(side='left', padx=1)
         self.color_btn = self._make_button(btn_row, 'C', self._toggle_color_mode, small=True)
         self.color_btn.pack(side='left', padx=(8, 1))
+        self.proj_btn = self._make_button(btn_row, 'P', self._cycle_projection, small=True)
+        self.proj_btn.pack(side='left', padx=1)
 
     def _make_button(self, parent, label, command, accent=False, small=False):
         bg = '#5a7d9a' if accent else BG_BTN
@@ -988,7 +981,8 @@ class CalculatorApp:
             return
 
         try:
-            result = compute_phase_grid(expr_text, bounds=self.viz_bounds)
+            proj_name = self.projection_names[self.projection_index]
+            result = compute_phase_grid(expr_text, bounds=self.viz_bounds, projection_name=proj_name)
             if result is None:
                 self.viz_canvas.delete('all')
                 self.display_expr.focus_set()
@@ -1120,6 +1114,21 @@ class CalculatorApp:
             self._refresh_viz()
         self.display_expr.focus_set()
 
+    def _cycle_projection(self):
+        """Cycle through registered projection plugins."""
+        self.projection_index = (self.projection_index + 1) % len(self.projection_names)
+        name = self.projection_names[self.projection_index]
+        proj = registry.get('projection', name)
+        label = name.replace('_', ' ')
+        self.proj_btn.configure(text='P')
+        # Show the active projection name briefly in the viz title
+        if hasattr(self, 'viz_title_label'):
+            self.viz_title_label.configure(text=f'Phase Plot [{label}]')
+        # Re-render with new projection
+        if self.viz_Z is not None:
+            self._refresh_viz()
+        self.display_expr.focus_set()
+
     def _on_viz_hover(self, event):
         """Draw gauge readouts for the hovered pixel."""
         if self.viz_Z is None:
@@ -1156,9 +1165,10 @@ class CalculatorApp:
         gc = self.gauge_canvas
         gc.delete('all')
 
-        gh = 60   # gauge area height
+        gh = 72   # gauge area height
         bw = 24   # box width
-        bh = 50   # box height
+        bh = 46   # box height
+        label_h = 12  # space for labels below boxes
         gap = 12  # gap between boxes
         compass_r = 22  # compass radius
 
@@ -1167,9 +1177,9 @@ class CalculatorApp:
         compass_d = compass_r * 2
         total_w = total_boxes_w + gap + compass_d
         x_start = (CANVAS_TOTAL - total_w) // 2
-        y_center = gh // 2
-        y_top = y_center - bh // 2
-        y_bot = y_center + bh // 2
+        y_top = 4
+        y_bot = y_top + bh
+        y_center = y_top + (bh + label_h) // 2
 
         # Draw the 3 scale boxes
         labels = ['Re', 'Im', '|f|']
@@ -1178,9 +1188,9 @@ class CalculatorApp:
             bx = x_start + idx * (bw + gap)
             self._draw_scale_box(bx, y_top, bw, bh, val, label, is_magnitude=(idx == 2))
 
-        # Draw the phase compass
+        # Draw the phase compass (vertically centered on boxes)
         cx = x_start + total_boxes_w + gap + compass_r
-        cy = y_center
+        cy = y_top + bh // 2
         self._draw_compass(cx, cy, compass_r, phase)
 
     def _draw_scale_box(self, x, y, w, h, value, label, is_magnitude=False):
@@ -1211,7 +1221,7 @@ class CalculatorApp:
         fill_t = max(0.0, fill_t)
 
         # Fill color: maroon -> purple -> blue -> green(0) -> yellow -> red
-        color = _scale_color(fill_t)
+        color = _scale_color(fill_t, negative=negative)
 
         # Fill direction: positive fills bottom-up, negative fills top-down
         fill_h = int(fill_t * h)
@@ -1286,23 +1296,27 @@ def _tick_label(val):
     return f'{val:g}'
 
 
-def _scale_color(t):
+def _scale_color(t, negative=False):
     """
     Map t in [0, 1] to a color string for the scale boxes.
-    Gradient: dark maroon -> purple -> blue -> green(0.5) -> yellow -> red
+    Positive: green -> yellow -> red (low to high)
+    Negative: green -> cyan -> blue (low to high)
     """
-    # 5-stop gradient
-    stops = [
-        (0.0, (80, 0, 0)),       # dark maroon
-        (0.25, (120, 0, 180)),    # purple
-        (0.5, (0, 80, 200)),      # blue
-        (0.7, (0, 200, 80)),      # green
-        (0.85, (220, 200, 0)),    # yellow
-        (1.0, (220, 40, 0)),      # red
-    ]
-    # Clamp
     t = max(0.0, min(1.0, t))
-    # Find segment
+    if negative:
+        stops = [
+            (0.0, (0, 100, 40)),      # dark green
+            (0.4, (0, 200, 120)),     # green
+            (0.7, (0, 180, 200)),     # cyan
+            (1.0, (0, 60, 220)),      # blue
+        ]
+    else:
+        stops = [
+            (0.0, (0, 100, 40)),      # dark green
+            (0.4, (0, 200, 60)),      # green
+            (0.7, (220, 200, 0)),     # yellow
+            (1.0, (220, 40, 0)),      # red
+        ]
     for i in range(len(stops) - 1):
         t0, c0 = stops[i]
         t1, c1 = stops[i + 1]
@@ -1312,7 +1326,7 @@ def _scale_color(t):
             g = int(c0[1] + f * (c1[1] - c0[1]))
             b = int(c0[2] + f * (c1[2] - c0[2]))
             return f'#{r:02x}{g:02x}{b:02x}'
-    return '#dc2800'
+    return '#dc2800' if not negative else '#003cdc'
 
 
 

@@ -52,6 +52,8 @@ tests = [
     ('0^(w/2)', '0^(1/2\u00b7\u03c9)'),
     ('0/0', '1'),
     ('w/w', '1'),
+    # Complex expressions with poles
+    ('(1-(1/x)^2)^(1/x)', '(1-1\u00b7x^-2)^x^-1'),
 ]
 
 passed = 0
