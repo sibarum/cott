@@ -88,12 +88,16 @@
             <td>Default projection: <span class="dynamicexpr">0^z</span> &rarr; <em>e</em><sup>&minus;<em>Wz</em></sup></td>
         </tr>
         <tr>
+            <td><code>projections/q_surface.py</code></td>
+            <td>Q-norm surface projection for zero-power coordinates</td>
+        </tr>
+        <tr>
             <td><code>test_traction.py</code></td>
-            <td>99 pytest tests validating all identities</td>
+            <td>106 pytest tests validating all identities</td>
         </tr>
         <tr>
             <td><code>test_calculator.py</code></td>
-            <td>40 smoke tests for the parser/evaluator</td>
+            <td>42 smoke tests for the parser/evaluator</td>
         </tr>
         </tbody>
     </table>
@@ -388,10 +392,79 @@
         4.1 The Native Pipeline
     </div>
 
+    <div class="subsection-title" id="section-4_1a">
+        4.1.1 Variable System
+    </div>
+
     <p>
-        Given an expression containing <span class="variable">x</span>
-        (and optionally <span class="variable">y</span>):
+        Expressions use three variables with distinct roles:
     </p>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>Variable</th>
+            <th>Role</th>
+            <th>Substitution</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><span class="variable">p</span></td>
+            <td>Horizontal grid coordinate</td>
+            <td>Always the real horizontal axis</td>
+        </tr>
+        <tr>
+            <td><span class="variable">q</span></td>
+            <td>Vertical grid coordinate</td>
+            <td>Always the real vertical axis</td>
+        </tr>
+        <tr>
+            <td><span class="variable">x</span></td>
+            <td>Projection's native unit</td>
+            <td>Defined per projection (see below)</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>
+        <span class="variable">p</span> and <span class="variable">q</span> are
+        projection-agnostic &mdash; they always map directly to the grid axes.
+        <span class="variable">x</span> is the projection's <em>native coordinate</em>,
+        meaning the same expression <span class="dynamicexpr">0^x</span> has different
+        geometric meaning depending on which projection is active:
+    </p>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>Projection</th>
+            <th><span class="variable">x</span> =</th>
+            <th>Interpretation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Complex Lie</td>
+            <td><span class="variable">p</span> + <span class="variable">q</span>&middot;<span class="dynamicexpr">0^{w/2}</span></td>
+            <td>Complex plane</td>
+        </tr>
+        <tr>
+            <td>Q-surface</td>
+            <td><span class="dynamicexpr">0^{p + q*0^{w/2}}</span></td>
+            <td>Complex plane lifted into zero-power domain</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>
+        All three variables may appear in the same expression:
+        <span class="dynamicexpr">p^2 + x</span> uses both raw coordinates and the native unit.
+    </p>
+
+    <div class="subsection-title" id="section-4_1b">
+        4.1.2 Pipeline Steps
+    </div>
 
     <p>
         <strong>Step 1 &mdash; Parse:</strong>
@@ -400,13 +473,12 @@
     </p>
 
     <p>
-        <strong>Step 2 &mdash; Traction Substitution:</strong>
-        For single-variable mode, substitute
-        <span class="variable">x</span> &rarr; <span class="variable">a</span> + <span class="variable">b</span>&middot;<span class="dynamicexpr">0^{w/2}</span>,
-        where <span class="variable">a</span> and <span class="variable">b</span> are real symbols.
-        For two-variable mode (<span class="variable">x</span> and <span class="variable">y</span> both present),
-        substitute <span class="variable">x</span> = <span class="variable">a</span>,
-        <span class="variable">y</span> = <span class="variable">b</span> directly.
+        <strong>Step 2 &mdash; Substitute:</strong>
+        Replace <span class="variable">p</span> &rarr; <span class="variable">a</span>,
+        <span class="variable">q</span> &rarr; <span class="variable">b</span> (real grid symbols),
+        and <span class="variable">x</span> &rarr; the active projection's <code>native_x(a, b)</code>.
+        This substitution happens in the <em>traction domain</em> &mdash;
+        the expressions are still traction objects, not complex numbers.
     </p>
 
     <p>
@@ -419,10 +491,11 @@
     </p>
 
     <p>
-        <strong>Step 4 &mdash; Project to &Copf;:</strong>
-        Apply <code>project_complex</code>. All traction types are converted to
-        standard complex expressions: <span class="dynamicexpr">0</span> &rarr; <em>e</em><sup>&minus;<em>W</em></sup>,
-        &omega; &rarr; <em>W</em> (in exponents), etc.
+        <strong>Step 4 &mdash; Project:</strong>
+        The active projection converts the simplified traction expression to a form
+        suitable for numeric evaluation. For Complex Lie, this applies
+        <span class="dynamicexpr">0^z</span> &rarr; <em>e</em><sup>&minus;<em>Wz</em></sup>.
+        For Q-surface, it decomposes zero-powers into phase and magnitude coordinates.
     </p>
 
     <p>
@@ -444,11 +517,13 @@
     </div>
 
     <p>
-        The previous pipeline projected <em>first</em>, then substituted:
+        The key architectural decision: substitution and simplification happen in the
+        <em>traction domain</em>, before any projection to &Copf;.
+        An earlier design projected first, then substituted:
     </p>
 
     <p>
-        <code>expr &rarr; project_complex &rarr; subs x&rarr;a+bi &rarr; numpy</code>
+        <code>expr &rarr; project &rarr; subs x&rarr;a+bi &rarr; numpy (branch cuts!)</code>
     </p>
 
     <p>
@@ -459,7 +534,7 @@
     </p>
 
     <p>
-        <code>expr &rarr; subs x&rarr;a+b&middot;0<sup>&omega;/2</sup> &rarr; traction_simplify &rarr; project &rarr; numpy</code>
+        <code>expr &rarr; subs p,q,x &rarr; traction_simplify &rarr; project &rarr; numpy</code>
     </p>
 
     <p>
@@ -531,16 +606,23 @@
     <p>
         An alternative to the Lie exponential that maps zero-powers
         directly to coordinates on a <span class="variable">q</span>-norm unit surface.
-        Given <span class="dynamicexpr">0^{p/q}</span>:
+        Given <span class="dynamicexpr">0^t</span>:
     </p>
 
     <div class="expression font-lg">
         phase = <span class="variable">t</span>
         &emsp;&emsp;
         magnitude = (1 &minus; <span class="variable">t</span>&sup2;)<sup>1/<span class="variable">q</span></sup>
-        &emsp; where &emsp;
-        <span class="variable">t</span> = <span class="variable">p</span>/<span class="variable">q</span>
     </div>
+
+    <p>
+        The native unit for q-surface is
+        <span class="variable">x</span> = <span class="dynamicexpr">0^{p + q*0^{w/2}}</span>
+        &mdash; the same complex plane input as Complex Lie, but lifted into the zero-power domain.
+        This means the same expression (e.g. <span class="dynamicexpr">x^2</span>)
+        produces interesting zero-power structure on the q-surface
+        while appearing as a standard polynomial on Complex Lie.
+    </p>
 
     <p>
         The parameter <span class="variable">q</span> selects the geometry of the surface:
