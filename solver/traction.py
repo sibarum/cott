@@ -486,7 +486,9 @@ def _project(expr):
     if isinstance(expr, (Integer, Rational)):
         return expr
     if isinstance(expr, Zero):
-        return S.Zero
+        # 0 = 0^1, so C(0) = e^(-W) via the Lie formula.
+        # Using S.Zero here would make 0*f(x) project to 0 (blank plots).
+        return sp_exp(-W_CONST)
     if isinstance(expr, Omega):
         return zoo
     if isinstance(expr, Null):

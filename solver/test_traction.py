@@ -532,7 +532,8 @@ class TestResolve:
 class TestProjection:
 
     def test_project_zero(self):
-        assert project_complex(z) == S.Zero
+        """C(0) = C(0^1) = e^(-W) via Lie formula, not numeric 0."""
+        assert project_complex(z) == exp(-W_CONST)
 
     def test_project_omega(self):
         from sympy import zoo
