@@ -20,31 +20,14 @@ class ComplexLieProjection(Projection):
     description = 'Standard complex projection via Lie exponential (0^z = e^{-Wz})'
     output_keys = ['Re', 'Im', 'mag', 'phase']
 
+    def native_x(self, a, b):
+        """Complex Lie native unit: x = p + q*0^(w/2) (complex plane)."""
+        return a + b * Pow(Zero(), Mul(Omega(), Rational(1, 2)))
+
     def project_expr(self, traction_expr, a, b):
         """Project traction expression to a complex SymPy expression in (a, b)."""
-        from sympy import Symbol
-
-        x_sym = Symbol('x')
-        y_sym = Symbol('y')
-        has_x = traction_expr.has(x_sym)
-        has_y = traction_expr.has(y_sym)
-
-        if has_x and has_y:
-            # Two-variable mode: x=a (horizontal), y=b (vertical)
-            subst = traction_expr.subs([(x_sym, a), (y_sym, b)])
-        elif has_x:
-            # Single-variable complex plane: x -> a + b*0^(w/2)
-            i_traction = Pow(Zero(), Mul(Omega(), Rational(1, 2)))
-            subst = traction_expr.subs(x_sym, a + b * i_traction)
-        elif has_y:
-            # Only y: treat as single-variable complex plane
-            i_traction = Pow(Zero(), Mul(Omega(), Rational(1, 2)))
-            subst = traction_expr.subs(y_sym, a + b * i_traction)
-        else:
-            return None
-
-        simplified = traction_simplify(subst)
-        projected = project_complex(simplified)
+        # Expression arrives already substituted and simplified by compute_phase_grid
+        projected = project_complex(traction_expr)
 
         try:
             projected = projected.expand()

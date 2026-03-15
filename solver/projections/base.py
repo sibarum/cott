@@ -28,6 +28,15 @@ class Projection:
     # Keys this projection provides in eval_grid output
     output_keys = ['Re', 'Im', 'mag', 'phase']
 
+    def native_x(self, a, b):
+        """
+        Return the projection's native unit coordinate as a traction expression.
+        a = horizontal grid symbol (p), b = vertical grid symbol (q).
+
+        Each projection defines what 'x' means in its coordinate system.
+        """
+        raise NotImplementedError
+
     def project_expr(self, traction_expr, a, b):
         """
         Project a traction expression to the target domain.

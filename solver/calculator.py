@@ -142,13 +142,20 @@ class Parser:
             self.consume()
             return w
 
-        # Variables x, y
+        # Variables: p (horizontal), q (vertical), x (projection native unit)
+        if ch == 'p':
+            self.consume()
+            return Symbol('p')
+        if ch == 'q':
+            self.consume()
+            return Symbol('q')
         if ch == 'x':
             self.consume()
             return Symbol('x')
+        # Legacy: y still works as alias for q
         if ch == 'y':
             self.consume()
-            return Symbol('y')
+            return Symbol('q')
 
         # null
         if self.match('null'):
@@ -367,8 +374,9 @@ def format_complex(expr):
     if proj_str == orig_str:
         return ''
 
-    # Replace re(x)/im(x) with x/y for readability (matches plot axes)
-    proj_str = proj_str.replace('re(x)', 'x').replace('im(x)', 'y')
+    # Replace re/im decompositions with p/q for readability (matches plot axes)
+    proj_str = proj_str.replace('re(x)', 'p').replace('im(x)', 'q')
+    proj_str = proj_str.replace('re(p)', 'p').replace('im(p)', 'q')
 
     return proj_str
 
@@ -494,18 +502,26 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0, projection_name
     """
     Compute visualization data for a traction expression using a registered projection.
 
-    Delegates to the named projection plugin for both symbolic projection
-    and numeric grid evaluation.
+    Variable system:
+        p, q — raw grid coordinates (horizontal, vertical). Always the same.
+        x    — projection's native unit coordinate. Defined by each projection:
+               complex_lie: x = p + q*0^(w/2)
+               q_surface:   x = 0^(w*p/q)
 
-    Returns dict with at least {phase, brightness, Z, log_mag} or None on failure.
+    Returns tuple (phase, brightness, Z, log_mag) or None on failure.
     """
     parsed = parse_and_eval(expr_text)
     if parsed is None:
         return None
 
+    p_sym = Symbol('p')
+    q_sym = Symbol('q')
     x_sym = Symbol('x')
-    y_sym = Symbol('y')
-    if not parsed.has(x_sym) and not parsed.has(y_sym):
+    has_p = parsed.has(p_sym)
+    has_q = parsed.has(q_sym)
+    has_x = parsed.has(x_sym)
+
+    if not has_p and not has_q and not has_x:
         return None
 
     # Get the active projection from the registry
@@ -515,8 +531,21 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0, projection_name
 
     a, b = symbols('a b', real=True)
 
+    # Substitute variables:
+    # p -> a (horizontal), q -> b (vertical), x -> projection's native unit
+    subs = []
+    if has_p:
+        subs.append((p_sym, a))
+    if has_q:
+        subs.append((q_sym, b))
+    if has_x:
+        subs.append((x_sym, proj.native_x(a, b)))
+
+    traction_expr = parsed.subs(subs)
+    traction_expr = traction_simplify(traction_expr)
+
     # Step 1: Symbolic projection
-    projected = proj.project_expr(parsed, a, b)
+    projected = proj.project_expr(traction_expr, a, b)
     if projected is None:
         return None
 
@@ -786,9 +815,9 @@ class CalculatorApp:
             # col 0             col 1            col 2            col 3            col 4
             [('(', '('),        (')', ')'),      ('^', '^'),      ('\u00f7', '/'), ('log\u2080','log0(')],
             [('7', '7'),        ('8', '8'),      ('9', '9'),      ('\u00d7', '*'), ('log\u03c9','log\u03c9(')],
-            [('4', '4'),        ('5', '5'),      ('6', '6'),      ('\u2013', '-'), ('x', 'x')],
-            [('1', '1'),        ('2', '2'),      ('3', '3'),      ('+', '+'),      ('y', 'y')],
-            [('0', '0'),        ('\u03c9', '\u03c9'),('\u2248', None),('=', None),  ('i', '0^(\u03c9/2)')],
+            [('4', '4'),        ('5', '5'),      ('6', '6'),      ('\u2013', '-'), ('p', 'p')],
+            [('1', '1'),        ('2', '2'),      ('3', '3'),      ('+', '+'),      ('q', 'q')],
+            [('0', '0'),        ('\u03c9', '\u03c9'),('\u2248', None),('=', None),  ('x', 'x')],
         ]
 
         for row_idx, row in enumerate(layout):
@@ -865,9 +894,7 @@ class CalculatorApp:
         self.display_expr.bind('<Escape>', lambda e: self._clear_all())
         # Intercept 'w' to insert ω instead
         self.display_expr.bind('w', self._insert_omega)
-        self.display_expr.bind('i', self._insert_i)
-        # Allow 'x' through as-is (default Entry behavior handles it)
-        # Keep focus on the entry
+        # p, q, x pass through as-is (default Entry behavior)
         self.display_expr.focus_set()
 
     def _insert_omega(self, event):

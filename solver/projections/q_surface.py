@@ -35,6 +35,11 @@ class QSurfaceProjection(Projection):
     def __init__(self, q=2):
         self.q = q
 
+    def native_x(self, a, b):
+        """Q-surface native unit: x = 0^(p + q*0^(w/2)) (complex plane lifted into zero-power)."""
+        i_traction = Pow(Zero(), Mul(Omega(), Rational(1, 2)))
+        return Pow(Zero(), a + b * i_traction)
+
     def project_expr(self, traction_expr, a, b):
         """
         Project traction expression to q-surface coordinates.
@@ -43,28 +48,10 @@ class QSurfaceProjection(Projection):
         packed into a dict-like structure for eval_grid.
         We store them as a plain tuple attached to self for eval_grid to unpack.
         """
-        from sympy import Symbol
+        # Substitution is now handled by compute_phase_grid
+        # This method receives an expression already in terms of a, b
 
-        x_sym = Symbol('x')
-        y_sym = Symbol('y')
-        has_x = traction_expr.has(x_sym)
-        has_y = traction_expr.has(y_sym)
-
-        # Q-surface substitution: same as complex_lie
-        # Single-variable: x -> a + b*0^(w/2) (complex plane)
-        # Two-variable: x=a, y=b directly
-        if has_x and has_y:
-            subst = traction_expr.subs([(x_sym, a), (y_sym, b)])
-        elif has_x:
-            i_traction = Pow(Zero(), Mul(Omega(), Rational(1, 2)))
-            subst = traction_expr.subs(x_sym, a + b * i_traction)
-        elif has_y:
-            i_traction = Pow(Zero(), Mul(Omega(), Rational(1, 2)))
-            subst = traction_expr.subs(y_sym, a + b * i_traction)
-        else:
-            return None
-
-        simplified = traction_simplify(subst)
+        simplified = traction_simplify(traction_expr)
 
         # Project each term through the q-surface formula.
         # For Add expressions, decompose and project each term separately.

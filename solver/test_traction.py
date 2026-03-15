@@ -592,7 +592,7 @@ class TestPipeline:
     """End-to-end tests through the calculator parse/eval/plot pipeline."""
 
     def test_plot_with_poles(self):
-        """(1-(1/x)^2)^(1/x) — expression with poles at x=0, should plot and
+        """(1-(1/x)^2)^(1/x) — expression with poles, should plot and
         produce valid streamlines without NaN crashes."""
         from calculator import compute_phase_grid, compute_streamlines
         result = compute_phase_grid('(1-(1/x)^2)^(1/x)')
@@ -632,13 +632,19 @@ class TestPipeline:
         assert result is not None
 
     def test_plot_two_variable(self):
-        """x+y uses two-variable mode (no complex substitution)."""
+        """p+q uses raw grid coordinates."""
         from calculator import compute_phase_grid
-        result = compute_phase_grid('x+y')
+        result = compute_phase_grid('p+q')
         assert result is not None
 
     def test_plot_log0(self):
         """log0(x) should plot via log_0(y) = -ln(y)/W."""
         from calculator import compute_phase_grid
         result = compute_phase_grid('log0(x)')
+        assert result is not None
+
+    def test_plot_mixed_pqx(self):
+        """p^2 + x uses both raw coordinates and native unit."""
+        from calculator import compute_phase_grid
+        result = compute_phase_grid('p^2+x')
         assert result is not None
