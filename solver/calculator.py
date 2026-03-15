@@ -719,6 +719,8 @@ BG_RESULT = '#d4d4c8'
 BG_BTN = '#c8c8c8'
 BG_BTN_HOVER = '#e0e0e0'
 BG_BTN_ACTIVE = '#999999'
+BG_TOGGLE_ON = '#8faab8'
+BG_TOGGLE_ON_HOVER = '#a0bcc8'
 FG_TEXT = '#111111'
 FG_DIM = '#555555'
 FG_RESULT = '#1a1a2e'
@@ -747,6 +749,7 @@ class CalculatorApp:
         self.viz_log_mag = None  # log magnitude grid for gradient lines
         self.show_tangent = False
         self.show_normal = False
+        self.show_diamond = False
         self.color_mode = 'phase'  # 'phase' or 'continuity'
         self.projection_names = registry.names('projection')
         self.projection_index = 0  # default to first registered (complex_lie)
@@ -867,27 +870,56 @@ class CalculatorApp:
         self._make_button(btn_row, '\u2013', self._zoom_out, small=True).pack(side='left', padx=1)
         self._make_button(btn_row, '\u25cb', self._zoom_reset, small=True).pack(side='left', padx=1)
         self._make_button(btn_row, '+', self._zoom_in, small=True).pack(side='left', padx=1)
-        self.tangent_btn = self._make_button(btn_row, 'T', self._toggle_tangent, small=True)
-        self.tangent_btn.pack(side='left', padx=(8, 1))
-        self.normal_btn = self._make_button(btn_row, 'N', self._toggle_normal, small=True)
-        self.normal_btn.pack(side='left', padx=1)
-        self.color_btn = self._make_button(btn_row, 'C', self._toggle_color_mode, small=True)
-        self.color_btn.pack(side='left', padx=(8, 1))
-        self.proj_btn = self._make_button(btn_row, 'P', self._cycle_projection, small=True)
-        self.proj_btn.pack(side='left', padx=1)
+        self._make_button(btn_row, '\u2699', self._open_settings, small=True).pack(side='left', padx=(8, 1))
 
-    def _make_button(self, parent, label, command, accent=False, small=False):
+        # Hidden stub buttons for settings window _set_toggle references
+        self.tangent_btn = tk.Button(btn_row); self.tangent_btn._toggled = False; self.tangent_btn._is_toggle = True; self.tangent_btn._is_accent = False
+        self.normal_btn = tk.Button(btn_row); self.normal_btn._toggled = False; self.normal_btn._is_toggle = True; self.normal_btn._is_accent = False
+        self.color_btn = tk.Button(btn_row); self.color_btn._toggled = False; self.color_btn._is_toggle = True; self.color_btn._is_accent = False
+        self.proj_btn = tk.Button(btn_row); self.proj_btn._toggled = False; self.proj_btn._is_toggle = True; self.proj_btn._is_accent = False
+
+    def _make_button(self, parent, label, command, accent=False, small=False, toggle=False):
+        """Create a button. If toggle=True, uses chisel bevel style for toggle switches."""
         bg = '#5a7d9a' if accent else BG_BTN
         fg = 'white' if accent else FG_TEXT
+        relief = 'raised'
+        bd = 2 if toggle else 1
         btn = tk.Button(
             parent, text=label, font=self.font_btn_small if small else self.font_btn,
-            width=4, height=1, bd=1, relief='raised',
+            width=4, height=1, bd=bd, relief=relief,
             bg=bg, fg=fg, activebackground=BG_BTN_ACTIVE,
             command=command
         )
-        btn.bind('<Enter>', lambda e, b=btn, bg0=bg: b.configure(bg=BG_BTN_HOVER if not accent else '#6a9dba'))
-        btn.bind('<Leave>', lambda e, b=btn, bg0=bg: b.configure(bg=bg0))
+        btn._is_toggle = toggle
+        btn._is_accent = accent
+        btn._toggled = False
+        btn.bind('<Enter>', lambda e, b=btn: self._btn_enter(b))
+        btn.bind('<Leave>', lambda e, b=btn: self._btn_leave(b))
         return btn
+
+    def _btn_enter(self, btn):
+        if btn._toggled:
+            btn.configure(bg=BG_TOGGLE_ON_HOVER)
+        elif btn._is_accent:
+            btn.configure(bg='#6a9dba')
+        else:
+            btn.configure(bg=BG_BTN_HOVER)
+
+    def _btn_leave(self, btn):
+        if btn._toggled:
+            btn.configure(bg=BG_TOGGLE_ON)
+        elif btn._is_accent:
+            btn.configure(bg='#5a7d9a')
+        else:
+            btn.configure(bg=BG_BTN)
+
+    def _set_toggle(self, btn, state):
+        """Set a toggle button's visual state."""
+        btn._toggled = state
+        if state:
+            btn.configure(relief='sunken', bg=BG_TOGGLE_ON, fg=FG_TEXT, bd=2)
+        else:
+            btn.configure(relief='raised', bg=BG_BTN, fg=FG_TEXT, bd=2)
 
     def _bind_keys(self):
         self.display_expr.bind('<Return>', lambda e: self._evaluate())
@@ -1047,7 +1079,9 @@ class CalculatorApp:
         # Draw axis markings
         self._draw_axes()
 
-        # Draw flow lines if enabled
+        # Draw overlays
+        if self.show_diamond:
+            self._draw_diamond_grid()
         if self.viz_log_mag is not None:
             if self.show_tangent:
                 self._draw_flow_lines(normal=False, tag='tangent', color='#ffffff')
@@ -1081,6 +1115,62 @@ class CalculatorApp:
             self.viz_canvas.create_text(AXIS_MARGIN - 6, y, text=label,
                                         fill='#aaaaaa', font=tick_font, anchor='e')
 
+    def _draw_diamond_grid(self):
+        """Draw a diamond grid overlay at simple fraction intervals.
+
+        Diagonal lines where p+q = n and p-q = n form diamonds.
+        Additional lines at 1/2, 1/3, 2/3, 3/4 subdivisions.
+        """
+        bounds = self.viz_bounds
+        fractions = [0, 1/4, 1/3, 1/2, 2/3, 3/4]
+        # Generate all grid values: integer + fraction offsets
+        values = set()
+        int_min = int(-bounds) - 1
+        int_max = int(bounds) + 1
+        for n in range(int_min, int_max + 1):
+            for f in fractions:
+                v = float(n + f)
+                if -bounds <= v <= bounds:
+                    values.add(v)
+                v = float(n - f)
+                if -bounds <= v <= bounds:
+                    values.add(v)
+
+        def p2cx(p):
+            return AXIS_MARGIN + (p + bounds) / (2 * bounds) * CANVAS_SIZE
+
+        def q2cy(q):
+            return AXIS_MARGIN + (bounds - q) / (2 * bounds) * CANVAS_SIZE
+
+        # Clip boundaries
+        x_min = AXIS_MARGIN
+        x_max = AXIS_MARGIN + CANVAS_SIZE
+        y_min = AXIS_MARGIN
+        y_max = AXIS_MARGIN + CANVAS_SIZE
+
+        for s in sorted(values):
+            # Integer lines are brighter, fraction lines dimmer
+            is_int = abs(s - round(s)) < 1e-9
+            color = '#555555' if is_int else '#333333'
+            width = 1
+
+            # Diagonal p + q = s: line from (s-q, q) as q varies
+            # At q = -bounds: p = s+bounds, cx = p2cx(s+bounds), cy = q2cy(-bounds)
+            # At q = +bounds: p = s-bounds, cx = p2cx(s-bounds), cy = q2cy(+bounds)
+            x1, y1 = p2cx(s - (-bounds)), q2cy(-bounds)
+            x2, y2 = p2cx(s - bounds), q2cy(bounds)
+            # Clip to canvas
+            pts = _clip_line(x1, y1, x2, y2, x_min, y_min, x_max, y_max)
+            if pts:
+                self.viz_canvas.create_line(*pts, fill=color, width=width, tags='diamond')
+
+            # Diagonal p - q = s: line from (s+q, q) as q varies
+            x1, y1 = p2cx(s + (-bounds)), q2cy(-bounds)
+            x2, y2 = p2cx(s + bounds), q2cy(bounds)
+            pts = _clip_line(x1, y1, x2, y2, x_min, y_min, x_max, y_max)
+            if pts:
+                self.viz_canvas.create_line(*pts, fill=color, width=width, tags='diamond')
+
     def _draw_flow_lines(self, normal, tag, color):
         """Draw tangent or normal flow lines on the canvas."""
         lines = compute_streamlines(self.viz_log_mag, normal=normal)
@@ -1103,10 +1193,7 @@ class CalculatorApp:
     def _toggle_tangent(self):
         """Toggle tangent lines (gradient flow) on/off."""
         self.show_tangent = not self.show_tangent
-        if self.show_tangent:
-            self.tangent_btn.configure(relief='sunken', bg='#5a7d9a', fg='white')
-        else:
-            self.tangent_btn.configure(relief='raised', bg=BG_BTN, fg=FG_TEXT)
+        self._set_toggle(self.tangent_btn, self.show_tangent)
         if self.viz_Z is not None:
             if self.show_tangent:
                 self._draw_flow_lines(normal=False, tag='tangent', color='#ffffff')
@@ -1117,10 +1204,7 @@ class CalculatorApp:
     def _toggle_normal(self):
         """Toggle normal lines (constant |f| contours) on/off."""
         self.show_normal = not self.show_normal
-        if self.show_normal:
-            self.normal_btn.configure(relief='sunken', bg='#5a7d9a', fg='white')
-        else:
-            self.normal_btn.configure(relief='raised', bg=BG_BTN, fg=FG_TEXT)
+        self._set_toggle(self.normal_btn, self.show_normal)
         if self.viz_Z is not None:
             if self.show_normal:
                 self._draw_flow_lines(normal=True, tag='normal', color='#aaaaaa')
@@ -1132,11 +1216,9 @@ class CalculatorApp:
         """Toggle between Phase and Continuity color models."""
         if self.color_mode == 'phase':
             self.color_mode = 'continuity'
-            self.color_btn.configure(relief='sunken', bg='#5a7d9a', fg='white')
         else:
             self.color_mode = 'phase'
-            self.color_btn.configure(relief='raised', bg=BG_BTN, fg=FG_TEXT)
-        # Re-render with the new color model
+        self._set_toggle(self.color_btn, self.color_mode == 'continuity')
         if self.viz_Z is not None:
             self._refresh_viz()
         self.display_expr.focus_set()
@@ -1145,16 +1227,17 @@ class CalculatorApp:
         """Cycle through registered projection plugins."""
         self.projection_index = (self.projection_index + 1) % len(self.projection_names)
         name = self.projection_names[self.projection_index]
-        proj = registry.get('projection', name)
         label = name.replace('_', ' ')
         self.proj_btn.configure(text='P')
-        # Show the active projection name briefly in the viz title
         if hasattr(self, 'viz_title_label'):
             self.viz_title_label.configure(text=f'Phase Plot [{label}]')
-        # Re-render with new projection
         if self.viz_Z is not None:
             self._refresh_viz()
         self.display_expr.focus_set()
+
+    def _open_settings(self):
+        """Open the settings window (single-instance)."""
+        SettingsWindow(self)
 
     def _on_viz_hover(self, event):
         """Draw gauge readouts for the hovered pixel."""
@@ -1174,12 +1257,17 @@ class CalculatorApp:
         col = min(col, w - 1)
         row = min(row, h - 1)
 
+        # Grid coordinates (p = horizontal, q = vertical)
+        bounds = self.viz_bounds
+        p_val = -bounds + (col / w) * 2 * bounds
+        q_val = bounds - (row / h) * 2 * bounds
+
         z = self.viz_Z[row, col]
         if not np.isfinite(z):
             self._clear_gauges()
             return
 
-        self._draw_gauges(z.real, z.imag, abs(z), np.angle(z))
+        self._draw_gauges(z.real, z.imag, abs(z), np.angle(z), p_val, q_val)
 
     def _on_viz_leave(self, event):
         self._clear_gauges()
@@ -1187,8 +1275,8 @@ class CalculatorApp:
     def _clear_gauges(self):
         self.gauge_canvas.delete('all')
 
-    def _draw_gauges(self, re, im, mag, phase):
-        """Draw 3 scale boxes (Re, Im, |f|) and 1 phase compass."""
+    def _draw_gauges(self, re, im, mag, phase, p_val=0, q_val=0):
+        """Draw 3 scale boxes (Re, Im, |f|), 1 phase compass, and p/q coordinates."""
         gc = self.gauge_canvas
         gc.delete('all')
 
@@ -1199,14 +1287,13 @@ class CalculatorApp:
         gap = 12  # gap between boxes
         compass_r = 22  # compass radius
 
-        # Layout: [Re box] [Im box] [|f| box] ... [compass]
+        # Layout: [Re box] [Im box] [|f| box] ... [compass] ... [p,q text]
         total_boxes_w = 3 * bw + 2 * gap
         compass_d = compass_r * 2
         total_w = total_boxes_w + gap + compass_d
         x_start = (CANVAS_TOTAL - total_w) // 2
         y_top = 4
         y_bot = y_top + bh
-        y_center = y_top + (bh + label_h) // 2
 
         # Draw the 3 scale boxes
         labels = ['Re', 'Im', '|f|']
@@ -1219,6 +1306,14 @@ class CalculatorApp:
         cx = x_start + total_boxes_w + gap + compass_r
         cy = y_top + bh // 2
         self._draw_compass(cx, cy, compass_r, phase)
+
+        # Draw p,q coordinate labels to the right of the compass
+        coord_font = tkfont.Font(family='Consolas', size=8)
+        tx = cx + compass_r + 10
+        gc.create_text(tx, cy - 8, text=f'p={p_val:+.3g}', font=coord_font,
+                        fill='#bbbbbb', anchor='w')
+        gc.create_text(tx, cy + 8, text=f'q={q_val:+.3g}', font=coord_font,
+                        fill='#bbbbbb', anchor='w')
 
     def _draw_scale_box(self, x, y, w, h, value, label, is_magnitude=False):
         """Draw a graduated scale box with logarithmic fill."""
@@ -1355,6 +1450,243 @@ def _scale_color(t, negative=False):
             return f'#{r:02x}{g:02x}{b:02x}'
     return '#dc2800' if not negative else '#003cdc'
 
+
+
+def _clip_line(x1, y1, x2, y2, xmin, ymin, xmax, ymax):
+    """Clip a line segment to a rectangle using Cohen-Sutherland. Returns (x1,y1,x2,y2) or None."""
+    INSIDE, LEFT, RIGHT, BOTTOM, TOP = 0, 1, 2, 4, 8
+
+    def code(x, y):
+        c = INSIDE
+        if x < xmin: c |= LEFT
+        elif x > xmax: c |= RIGHT
+        if y < ymin: c |= TOP
+        elif y > ymax: c |= BOTTOM
+        return c
+
+    c1, c2 = code(x1, y1), code(x2, y2)
+    for _ in range(20):
+        if not (c1 | c2):
+            return (x1, y1, x2, y2)
+        if c1 & c2:
+            return None
+        c = c1 or c2
+        dx, dy = x2 - x1, y2 - y1
+        if c & TOP:
+            x = x1 + dx * (ymin - y1) / dy if dy else x1; y = ymin
+        elif c & BOTTOM:
+            x = x1 + dx * (ymax - y1) / dy if dy else x1; y = ymax
+        elif c & RIGHT:
+            y = y1 + dy * (xmax - x1) / dx if dx else y1; x = xmax
+        elif c & LEFT:
+            y = y1 + dy * (xmin - x1) / dx if dx else y1; x = xmin
+        if c == c1:
+            x1, y1, c1 = x, y, code(x, y)
+        else:
+            x2, y2, c2 = x, y, code(x, y)
+    return None
+
+
+class SettingsWindow:
+    """Single-instance settings window with tabbed interface."""
+
+    _instance = None
+
+    def __init__(self, parent_app):
+        if SettingsWindow._instance is not None:
+            # Focus existing window
+            SettingsWindow._instance.window.lift()
+            SettingsWindow._instance.window.focus_force()
+            return
+
+        self.app = parent_app
+        self.window = tk.Toplevel(parent_app.root)
+        self.window.title('Settings')
+        self.window.configure(bg=BG_BODY)
+        self.window.resizable(False, False)
+        self.window.protocol('WM_DELETE_WINDOW', self._on_close)
+        SettingsWindow._instance = self
+
+        # Tab bar
+        self.tab_bar = tk.Frame(self.window, bg=BG_FRAME)
+        self.tab_bar.pack(fill='x')
+
+        self.tab_frames = {}
+        self.tab_buttons = {}
+        self.active_tab = None
+
+        # Content area
+        self.content = tk.Frame(self.window, bg=BG_BODY, padx=16, pady=12)
+        self.content.pack(fill='both', expand=True)
+
+        # Add tabs
+        self._add_tab('Visualization', self._build_viz_tab)
+
+        # Show first tab
+        self.select_tab('Visualization')
+
+    def _add_tab(self, name, builder):
+        """Add a tab with a name and a builder function."""
+        font = tkfont.Font(family='Segoe UI', size=10)
+        btn = tk.Button(
+            self.tab_bar, text=name, font=font, bd=0, padx=12, pady=4,
+            bg=BG_FRAME, fg=FG_TEXT, activebackground=BG_BODY,
+            command=lambda: self.select_tab(name)
+        )
+        btn.pack(side='left')
+        self.tab_buttons[name] = btn
+
+        frame = tk.Frame(self.content, bg=BG_BODY)
+        builder(frame)
+        self.tab_frames[name] = frame
+
+    def select_tab(self, name):
+        """Switch to the named tab."""
+        if self.active_tab == name:
+            return
+        # Hide current
+        if self.active_tab and self.active_tab in self.tab_frames:
+            self.tab_frames[self.active_tab].pack_forget()
+            self.tab_buttons[self.active_tab].configure(bg=BG_FRAME, relief='flat')
+        # Show new
+        self.tab_frames[name].pack(fill='both', expand=True)
+        self.tab_buttons[name].configure(bg=BG_BODY, relief='flat')
+        self.active_tab = name
+
+    def _build_viz_tab(self, parent):
+        """Build the Visualization settings tab."""
+        font = tkfont.Font(family='Segoe UI', size=10)
+        font_small = tkfont.Font(family='Segoe UI', size=9)
+
+        # Section: Projection
+        tk.Label(parent, text='Projection', font=font, bg=BG_BODY, fg=FG_TEXT,
+                 anchor='w').pack(fill='x', pady=(0, 4))
+
+        proj_frame = tk.Frame(parent, bg=BG_BODY)
+        proj_frame.pack(fill='x', pady=(0, 12))
+
+        self.proj_var = tk.StringVar(value=self.app.projection_names[self.app.projection_index])
+        for name in self.app.projection_names:
+            entry = registry.get_entry('projection', name)
+            desc = entry.get('description', name) if entry else name
+            label = name.replace('_', ' ').title()
+            rb = tk.Radiobutton(
+                proj_frame, text=f'{label}', font=font_small,
+                variable=self.proj_var, value=name,
+                bg=BG_BODY, activebackground=BG_BODY,
+                command=self._on_projection_change
+            )
+            rb.pack(anchor='w')
+            tk.Label(proj_frame, text=f'  {desc}', font=font_small,
+                     bg=BG_BODY, fg=FG_DIM).pack(anchor='w', padx=(20, 0))
+
+        # Section: Color Mode
+        tk.Label(parent, text='Color Mode', font=font, bg=BG_BODY, fg=FG_TEXT,
+                 anchor='w').pack(fill='x', pady=(0, 4))
+
+        color_frame = tk.Frame(parent, bg=BG_BODY)
+        color_frame.pack(fill='x', pady=(0, 12))
+
+        self.color_var = tk.StringVar(value=self.app.color_mode)
+        for mode, desc in [('phase', 'Phase (CMYT quadrants + brightness)'),
+                           ('continuity', 'Continuity (magnitude, double-cover)')]:
+            rb = tk.Radiobutton(
+                color_frame, text=desc, font=font_small,
+                variable=self.color_var, value=mode,
+                bg=BG_BODY, activebackground=BG_BODY,
+                command=self._on_color_change
+            )
+            rb.pack(anchor='w')
+
+        # Section: Overlays
+        tk.Label(parent, text='Overlays', font=font, bg=BG_BODY, fg=FG_TEXT,
+                 anchor='w').pack(fill='x', pady=(0, 4))
+
+        self.tangent_var = tk.BooleanVar(value=self.app.show_tangent)
+        tk.Checkbutton(parent, text='Tangent lines (gradient flow)',
+                       variable=self.tangent_var, font=font_small,
+                       bg=BG_BODY, activebackground=BG_BODY,
+                       command=self._on_tangent_change).pack(anchor='w')
+
+        self.normal_var = tk.BooleanVar(value=self.app.show_normal)
+        tk.Checkbutton(parent, text='Normal lines (constant |f| contours)',
+                       variable=self.normal_var, font=font_small,
+                       bg=BG_BODY, activebackground=BG_BODY,
+                       command=self._on_normal_change).pack(anchor='w')
+
+        self.diamond_var = tk.BooleanVar(value=self.app.show_diamond)
+        tk.Checkbutton(parent, text='Diamond grid (simple fraction diagonals)',
+                       variable=self.diamond_var, font=font_small,
+                       bg=BG_BODY, activebackground=BG_BODY,
+                       command=self._on_diamond_change).pack(anchor='w')
+
+        # Section: Grid
+        tk.Label(parent, text='Grid', font=font, bg=BG_BODY, fg=FG_TEXT,
+                 anchor='w').pack(fill='x', pady=(12, 4))
+
+        bounds_frame = tk.Frame(parent, bg=BG_BODY)
+        bounds_frame.pack(fill='x')
+        tk.Label(bounds_frame, text='Bounds:', font=font_small, bg=BG_BODY).pack(side='left')
+        self.bounds_var = tk.StringVar(value=str(self.app.viz_bounds))
+        bounds_entry = tk.Entry(bounds_frame, textvariable=self.bounds_var, width=8,
+                                font=font_small)
+        bounds_entry.pack(side='left', padx=4)
+        bounds_entry.bind('<Return>', self._on_bounds_change)
+
+    def _on_projection_change(self):
+        name = self.proj_var.get()
+        idx = self.app.projection_names.index(name) if name in self.app.projection_names else 0
+        self.app.projection_index = idx
+        label = name.replace('_', ' ')
+        self.app.viz_title_label.configure(text=f'Phase Plot [{label}]')
+        if self.app.viz_Z is not None:
+            self.app._refresh_viz()
+
+    def _on_color_change(self):
+        self.app.color_mode = self.color_var.get()
+        self.app._set_toggle(self.app.color_btn, self.app.color_mode == 'continuity')
+        if self.app.viz_Z is not None:
+            self.app._refresh_viz()
+
+    def _on_tangent_change(self):
+        self.app.show_tangent = self.tangent_var.get()
+        self.app._set_toggle(self.app.tangent_btn, self.app.show_tangent)
+        if self.app.viz_Z is not None:
+            if self.app.show_tangent:
+                self.app._draw_flow_lines(normal=False, tag='tangent', color='#ffffff')
+            else:
+                self.app.viz_canvas.delete('tangent')
+
+    def _on_normal_change(self):
+        self.app.show_normal = self.normal_var.get()
+        self.app._set_toggle(self.app.normal_btn, self.app.show_normal)
+        if self.app.viz_Z is not None:
+            if self.app.show_normal:
+                self.app._draw_flow_lines(normal=True, tag='normal', color='#aaaaaa')
+            else:
+                self.app.viz_canvas.delete('normal')
+
+    def _on_diamond_change(self):
+        self.app.show_diamond = self.diamond_var.get()
+        if self.app.viz_Z is not None:
+            if self.app.show_diamond:
+                self.app._draw_diamond_grid()
+            else:
+                self.app.viz_canvas.delete('diamond')
+
+    def _on_bounds_change(self, event=None):
+        try:
+            val = float(self.bounds_var.get())
+            if 0.1 <= val <= 200:
+                self.app.viz_bounds = val
+                if self.app.viz_Z is not None:
+                    self.app._refresh_viz()
+        except ValueError:
+            pass
+
+    def _on_close(self):
+        SettingsWindow._instance = None
+        self.window.destroy()
 
 
 def main():
