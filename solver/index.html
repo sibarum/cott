@@ -78,6 +78,10 @@
             <td>GUI: parser, calculator pad, phase-plot visualizer, hover gauges</td>
         </tr>
         <tr>
+            <td><code>evaluator.py</code></td>
+            <td>Numeric traction evaluator: TractionValue class, hybrid + exact grid modes</td>
+        </tr>
+        <tr>
             <td><code>registry.py</code></td>
             <td>General-purpose function registry (category &rarr; name &rarr; object)</td>
         </tr>
@@ -501,10 +505,79 @@
     </p>
 
     <p>
-        <strong>Step 5 &mdash; Lambdify &amp; Evaluate:</strong>
-        SymPy's <code>lambdify</code> converts the projected expression to a numpy function.
-        This is evaluated on a 150&times;150 grid with
-        <code>np.errstate</code> suppressing warnings (inf/NaN are handled by the invalid mask).
+        <strong>Step 5 &mdash; Evaluate:</strong>
+        Three evaluator modes are available, selectable in the Settings panel:
+    </p>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>Evaluator</th>
+            <th>Method</th>
+            <th>Speed</th>
+            <th>Correctness</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Fast (numpy)</strong></td>
+            <td>SymPy <code>lambdify</code> &rarr; numpy vectorized</td>
+            <td>Instant</td>
+            <td>May have branch cuts at singularities; <span class="variable">p</span>/<span class="variable">q</span> at <span class="variable">q</span>=0 gives NaN</td>
+        </tr>
+        <tr>
+            <td><strong>Hybrid (TractionValue)</strong></td>
+            <td>Per-pixel Python loop with class-tracked arithmetic</td>
+            <td>Seconds</td>
+            <td>Correct zero/omega classes; <span class="variable">p</span>/<span class="variable">q</span> at <span class="variable">q</span>=0 gives <span class="variable">p</span>&middot;&omega;</td>
+        </tr>
+        <tr>
+            <td><strong>Exact (SymPy)</strong></td>
+            <td>Full <code>traction_simplify</code> + <code>project_complex</code> per pixel</td>
+            <td>Minutes</td>
+            <td>Exact &mdash; uses the full symbolic engine for every grid point</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>
+        The hybrid evaluator introduces <code>TractionValue</code> (<code>evaluator.py</code>),
+        a numeric type that tracks whether a value is a plain scalar, a zero-power
+        (<span class="dynamicexpr">0^{a+b*w}</span>), or an omega-scaled quantity (result of division by zero).
+        Each arithmetic operation preserves the class distinction:
+    </p>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>Operation</th>
+            <th>Class transition</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><span class="variable">p</span> / 0</td>
+            <td>SCALAR &rarr; OMEGA_VAL(<span class="variable">p</span>)</td>
+        </tr>
+        <tr>
+            <td><span class="dynamicexpr">0</span> ^ OMEGA_VAL(<span class="variable">p</span>)</td>
+            <td>&rarr; ZERO_POWER with &omega;-exponent &rarr; <em>e</em><sup><em>i</em>&pi;<em>p</em></sup></td>
+        </tr>
+        <tr>
+            <td>ZERO_POWER &times; ZERO_POWER</td>
+            <td>Exponents add: <span class="dynamicexpr">0^a * 0^b = 0^{a+b}</span></td>
+        </tr>
+        <tr>
+            <td>Scalar near 0 in base</td>
+            <td>Promoted to traction <span class="dynamicexpr">0</span></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>
+        The hybrid and exact evaluators run in a <strong>background thread</strong>,
+        keeping the GUI responsive. A progress indicator shows completion percentage,
+        and starting a new computation automatically cancels any in-progress one.
     </p>
 
     <p>
@@ -536,13 +609,15 @@
     </p>
 
     <p>
-        <code>expr &rarr; subs p,q,x &rarr; traction_simplify &rarr; project &rarr; numpy</code>
+        <code>expr &rarr; subs p,q,x &rarr; traction_simplify &rarr; project &rarr; evaluate</code>
     </p>
 
     <p>
-        By the time the expression reaches &Copf;,
+        By the time the expression reaches numeric evaluation,
         the traction simplifier has already collapsed the nested powers.
-        The branch cut never forms.
+        The branch cut never forms. And with the hybrid evaluator,
+        even the numeric layer preserves traction semantics &mdash;
+        division by zero produces &omega;, not NaN.
     </p>
 
     <div class="copyonly">---</div>
