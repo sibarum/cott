@@ -389,11 +389,21 @@ def _format_sympy_complex(expr):
     if expr.has(Zero) or expr.has(Omega) or expr.has(Null):
         return _format_mixed(expr)
 
-    # Try to simplify to a+bi form
+    # Try to simplify — but avoid expand() which blows up exponentials
     try:
-        expr = expr.rewrite(cos).simplify().expand()
+        simplified = expr.simplify()
+        # Only use simplified if it's shorter (avoid blowup)
+        if len(str(simplified)) <= len(str(expr)):
+            expr = simplified
     except Exception:
         pass
+
+    # For compact expressions with symbols, format directly rather than
+    # decomposing into re/im (which expands exponentials into trig).
+    if expr.free_symbols and len(str(expr)) < 80:
+        s = str(expr).replace('I', 'i').replace('**', '^').replace('*', '\u00b7')
+        s = s.replace('sqrt(pi)', '\u221a\u03c0').replace('sqrt(-i)', 'W')
+        return s
 
     # Check for pure real
     if expr.is_real:
@@ -763,9 +773,7 @@ class CalculatorApp:
         self.projection_names = registry.names('projection')
         self.projection_index = 0  # default to first registered (complex_lie)
         self.evaluator_mode = 'numpy'  # 'numpy', 'hybrid', 'sympy'
-        # Approximation mode: cycle through ~, ≃, ≈
-        self.approx_modes = ['~', '\u2243', '\u2248']
-        self.approx_index = 2  # default to ≃
+        self.approx_mode = '='  # '=' (exact traction) or '≈' (Euler approximation)
 
         self._build_ui()
         self._bind_keys()
@@ -788,12 +796,24 @@ class CalculatorApp:
         )
         self.display_expr.pack(fill='x', padx=10, pady=6)
 
-        self.display_result = tk.Label(
-            top_frame, text='', font=self.font_result,
-            bg=BG_RESULT, fg=FG_RESULT, anchor='e', padx=10, pady=4,
-            height=1, relief='sunken', bd=1
+        result_frame = tk.Frame(top_frame, bg=BG_RESULT, relief='sunken', bd=1)
+        result_frame.pack(fill='x')
+
+        self.approx_btn = tk.Button(
+            result_frame, text='=', font=self.font_btn_small,
+            width=2, bd=1, relief='flat', bg=BG_RESULT, fg=FG_DIM,
+            activebackground=BG_RESULT, command=self._toggle_approx_mode
         )
-        self.display_result.pack(fill='x')
+        self.approx_btn.pack(side='left', padx=(4, 0))
+
+        self.display_result_var = tk.StringVar()
+        self.display_result = tk.Entry(
+            result_frame, textvariable=self.display_result_var,
+            font=self.font_result, bg=BG_RESULT, fg=FG_RESULT,
+            justify='right', bd=0, highlightthickness=0,
+            readonlybackground=BG_RESULT, state='readonly'
+        )
+        self.display_result.pack(side='left', fill='x', expand=True, padx=(0, 10), pady=4)
 
         # Hidden stubs for removed display elements (code still references them)
         self.display_approx = tk.Label(top_frame)
@@ -830,7 +850,7 @@ class CalculatorApp:
             [('7', '7'),        ('8', '8'),      ('9', '9'),      ('\u00d7', '*'), ('log\u03c9','log\u03c9(')],
             [('4', '4'),        ('5', '5'),      ('6', '6'),      ('\u2013', '-'), ('p', 'p')],
             [('1', '1'),        ('2', '2'),      ('3', '3'),      ('+', '+'),      ('q', 'q')],
-            [('0', '0'),        ('\u03c9', '\u03c9'),('\u2248', None),('=', None),  ('x', 'x')],
+            [('0', '0'),        ('\u03c9', '\u03c9'),('i', '0^(\u03c9/2)'),('=', None),  ('x', 'x')],
         ]
 
         for row_idx, row in enumerate(layout):
@@ -842,9 +862,6 @@ class CalculatorApp:
                     continue
                 if label == '=':
                     btn = self._make_button(pad_frame, label, self._evaluate, accent=True)
-                elif label in ('~', '\u2243', '\u2248'):
-                    self.approx_btn = self._make_button(pad_frame, label, self._cycle_approx_mode)
-                    btn = self.approx_btn
                 elif value is not None:
                     small = label.startswith('log')
                     btn = self._make_button(pad_frame, label, lambda v=value: self._insert(v), small=small)
@@ -962,20 +979,55 @@ class CalculatorApp:
     def _clear_entry(self):
         self.entry_var.set('')
 
-    def _format_secondary(self, result):
-        """Get the secondary display text based on the current approximation mode."""
-        mode = self.approx_modes[self.approx_index]
-        if mode == '\u2248':  # ≈ — complex projection
-            return format_complex(result)
-        else:  # ~ or ≃ — decimal approximation
-            return format_approx(result)
-
-    def _cycle_approx_mode(self):
-        self.approx_index = (self.approx_index + 1) % len(self.approx_modes)
-        symbol = self.approx_modes[self.approx_index]
-        self.approx_btn.configure(text=symbol)
+    def _toggle_approx_mode(self):
+        """Toggle between = (exact traction) and ≈ (Euler approximation)."""
+        if self.approx_mode == '=':
+            self.approx_mode = '\u2248'
+        else:
+            self.approx_mode = '='
+        self.approx_btn.configure(text=self.approx_mode)
         self._update_live_preview()
         self.display_expr.focus_set()
+
+    def _format_display_result(self, parsed):
+        """Format the result for display, applying x-substitution and approx mode."""
+        from sympy import Symbol as Sym
+        x_sym = Sym('x')
+        p_sym = Sym('p')
+        q_sym = Sym('q')
+
+        result = parsed
+
+        # If expression contains x, substitute with the active projection's native_x
+        if result.has(x_sym):
+            proj = registry.get('projection', self.projection_names[self.projection_index])
+            if proj is not None:
+                native = proj.native_x(p_sym, q_sym)
+                result = result.subs(x_sym, native)
+                result = traction_simplify(result)
+
+        if self.approx_mode == '\u2248':
+            # Euler approximation: project to complex
+            euler = format_complex(result)
+            if euler:
+                return f'\u2248 {euler}'
+            # Fallback: decimal approximation
+            approx = format_approx(result)
+            if approx:
+                return f'\u2248 {approx}'
+            return f'= {format_result(result)}'
+        else:
+            return f'= {format_result(result)}'
+
+    def _set_result_text(self, text, fg=None):
+        """Set the result display text (Entry widget)."""
+        self.display_result.configure(state='normal')
+        self.display_result_var.set(text)
+        if fg:
+            self.display_result.configure(fg=fg)
+        self.display_result.configure(state='readonly')
+        # Scroll to end so the rightmost content is visible
+        self.display_result.xview_moveto(1.0)
 
     def _clear_all(self):
         self.entry_var.set('')
@@ -990,30 +1042,14 @@ class CalculatorApp:
             return
         try:
             result = parse_and_eval(expr_text)
-            result_str = format_result(result)
-
-            # Save to history
-            self.history.append(f'{expr_text} = {result_str}')
-            if len(self.history) > 3:
-                self.history.pop(0)
-
-            self.display_result.configure(text=f'= {result_str}', fg=FG_RESULT)
-            self.display_history.configure(text='\n'.join(self.history[-2:]))
-
-            # Update secondary display (approximation or complex projection)
-            secondary = self._format_secondary(result)
-            if secondary:
-                symbol = self.approx_modes[self.approx_index]
-                self.display_approx.configure(text=f'{symbol} {secondary}', fg=FG_DIM)
-            else:
-                self.display_approx.configure(text='')
+            display_text = self._format_display_result(result)
+            self._set_result_text(display_text, fg=FG_RESULT)
 
             # Refresh the phase plot (keeps expression in entry)
             self._refresh_viz()
 
         except (ParseError, Exception) as e:
-            self.display_result.configure(text=f'Error: {e}', fg='#aa3333')
-            self.display_approx.configure(text='')
+            self._set_result_text(f'Error: {e}', fg='#aa3333')
 
     def _on_entry_change(self):
         """Live preview: evaluate as you type."""
@@ -1024,20 +1060,12 @@ class CalculatorApp:
             expr_text = self.entry_var.get().strip()
             if expr_text:
                 result = parse_and_eval(expr_text)
-                result_str = format_result(result)
-                self.display_result.configure(text=f'= {result_str}', fg=FG_DIM)
-                secondary = self._format_secondary(result)
-                symbol = self.approx_modes[self.approx_index]
-                if secondary:
-                    self.display_approx.configure(text=f'{symbol} {secondary}')
-                else:
-                    self.display_approx.configure(text='')
+                display_text = self._format_display_result(result)
+                self._set_result_text(display_text, fg=FG_DIM)
             else:
-                self.display_result.configure(text='')
-                self.display_approx.configure(text='')
+                self._set_result_text('')
         except Exception:
-            self.display_result.configure(text='...', fg=FG_DIM)
-            self.display_approx.configure(text='')
+            self._set_result_text('...', fg=FG_DIM)
 
     # ===== Visualization =====
 
