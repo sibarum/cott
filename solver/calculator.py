@@ -498,7 +498,8 @@ PHASE_COLORS = np.array([
 
 
 
-def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0, projection_name='complex_lie'):
+def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
+                       projection_name='complex_lie', evaluator='numpy'):
     """
     Compute visualization data for a traction expression using a registered projection.
 
@@ -507,6 +508,8 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0, projection_name
         x    — projection's native unit coordinate. Defined by each projection:
                complex_lie: x = p + q*0^(w/2)
                q_surface:   x = 0^(w*p/q)
+
+    evaluator: 'numpy' (fast), 'hybrid' (TractionValue per-pixel), 'sympy' (exact, slow)
 
     Returns tuple (phase, brightness, Z, log_mag) or None on failure.
     """
@@ -550,18 +553,21 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0, projection_name
         return None
 
     # Step 2: Grid evaluation
-    # Nudge exact-zero grid points by epsilon so that p/q ≈ p*ω (large)
-    # instead of NaN. In traction, 1/0 = ω — this approximates that.
     lin = np.linspace(-bounds, bounds, grid_res)
-    lin[np.abs(lin) < 1e-14] = 1e-14
     AA, BB = np.meshgrid(lin, lin[::-1])  # flip y so up = positive
 
-    result = proj.eval_grid(projected, a, b, AA, BB)
-    if result is None:
+    eval_result = proj.eval_grid(projected, a, b, AA, BB,
+                                 evaluator=evaluator, traction_expr=traction_expr)
+    if eval_result is None:
         return None
 
-    # Return the standard tuple that the rest of the calculator expects
-    return result['phase'], result['brightness'], result['Z'], result['log_mag']
+    # For async evaluators (hybrid/sympy), return the GridComputation object
+    from evaluator import GridComputation
+    if isinstance(eval_result, GridComputation):
+        return eval_result  # caller handles async polling
+
+    # Sync result (numpy): return the standard tuple
+    return eval_result['phase'], eval_result['brightness'], eval_result['Z'], eval_result['log_mag']
 
 
 def phase_to_rgb(phase_grid, brightness=None):
@@ -756,6 +762,7 @@ class CalculatorApp:
         self.color_mode = 'phase'  # 'phase' or 'continuity'
         self.projection_names = registry.names('projection')
         self.projection_index = 0  # default to first registered (complex_lie)
+        self.evaluator_mode = 'numpy'  # 'numpy', 'hybrid', 'sympy'
         # Approximation mode: cycle through ~, ≃, ≈
         self.approx_modes = ['~', '\u2243', '\u2248']
         self.approx_index = 2  # default to ≃
@@ -1036,6 +1043,11 @@ class CalculatorApp:
 
     def _refresh_viz(self):
         """Compute and render the phase plot for the current expression."""
+        # Cancel any in-progress async computation
+        if hasattr(self, '_active_computation') and self._active_computation is not None:
+            self._active_computation.cancel()
+            self._active_computation = None
+
         expr_text = self.entry_var.get().strip()
         if not expr_text:
             self.viz_canvas.delete('all')
@@ -1044,23 +1056,66 @@ class CalculatorApp:
 
         try:
             proj_name = self.projection_names[self.projection_index]
-            result = compute_phase_grid(expr_text, bounds=self.viz_bounds, projection_name=proj_name)
+            result = compute_phase_grid(expr_text, bounds=self.viz_bounds,
+                                       projection_name=proj_name, evaluator=self.evaluator_mode)
             if result is None:
                 self.viz_canvas.delete('all')
                 self.display_expr.focus_set()
                 return
 
-            phase, brightness, Z, log_mag = result
-            self.viz_Z = Z  # store complex grid for hover readout
-            self.viz_log_mag = log_mag
-            if self.color_mode == 'continuity':
-                rgb = continuity_to_rgb(phase, log_mag)
-            else:
-                rgb = phase_to_rgb(phase, brightness)
-            self._render_viz(rgb)
+            # Check if result is async (GridComputation)
+            from evaluator import GridComputation
+            if isinstance(result, GridComputation):
+                self._active_computation = result
+                self.viz_title_label.configure(text='Computing... 0%')
+                self._poll_computation()
+                return
+
+            # Sync result (numpy)
+            self._apply_viz_result(result)
         except Exception:
             self.viz_canvas.delete('all')
         self.display_expr.focus_set()
+
+    def _poll_computation(self):
+        """Poll an async grid computation for completion."""
+        comp = self._active_computation
+        if comp is None:
+            return
+
+        if comp.is_done():
+            self._active_computation = None
+            if comp.error or comp.result is None:
+                self.viz_title_label.configure(text='Phase Plot')
+                self.viz_canvas.delete('all')
+                return
+            # Convert Z grid to metrics
+            from projections.complex_lie import _z_to_metrics
+            metrics = _z_to_metrics(comp.result)
+            self._apply_viz_result(
+                (metrics['phase'], metrics['brightness'], metrics['Z'], metrics['log_mag']))
+            return
+
+        # Still computing — update progress and poll again
+        pct = int(comp.progress * 100)
+        self.viz_title_label.configure(text=f'Computing... {pct}%')
+        self.root.after(100, self._poll_computation)
+
+    def _apply_viz_result(self, result):
+        """Apply a completed visualization result (phase, brightness, Z, log_mag)."""
+        phase, brightness, Z, log_mag = result
+        self.viz_Z = Z
+        self.viz_log_mag = log_mag
+
+        proj_name = self.projection_names[self.projection_index]
+        label = proj_name.replace('_', ' ')
+        self.viz_title_label.configure(text=f'Phase Plot [{label}]')
+
+        if self.color_mode == 'continuity':
+            rgb = continuity_to_rgb(phase, log_mag)
+        else:
+            rgb = phase_to_rgb(phase, brightness)
+        self._render_viz(rgb)
 
     def _render_viz(self, rgb):
         """Render an RGB numpy array to the visualization canvas."""
@@ -1591,6 +1646,25 @@ class SettingsWindow:
             tk.Label(proj_frame, text=f'  {desc}', font=font_small,
                      bg=BG_BODY, fg=FG_DIM).pack(anchor='w', padx=(20, 0))
 
+        # Section: Evaluator
+        tk.Label(parent, text='Evaluator', font=font, bg=BG_BODY, fg=FG_TEXT,
+                 anchor='w').pack(fill='x', pady=(0, 4))
+
+        eval_frame = tk.Frame(parent, bg=BG_BODY)
+        eval_frame.pack(fill='x', pady=(0, 12))
+
+        self.eval_var = tk.StringVar(value=self.app.evaluator_mode)
+        for mode, desc in [('numpy', 'Fast (numpy) — may have branch cuts at singularities'),
+                           ('hybrid', 'Hybrid (TractionValue) — correct zero/omega classes'),
+                           ('sympy', 'Exact (SymPy) — full traction simplify per pixel (slow!)')]:
+            rb = tk.Radiobutton(
+                eval_frame, text=desc, font=font_small,
+                variable=self.eval_var, value=mode,
+                bg=BG_BODY, activebackground=BG_BODY,
+                command=self._on_eval_change
+            )
+            rb.pack(anchor='w')
+
         # Section: Color Mode
         tk.Label(parent, text='Color Mode', font=font, bg=BG_BODY, fg=FG_TEXT,
                  anchor='w').pack(fill='x', pady=(0, 4))
@@ -1643,6 +1717,11 @@ class SettingsWindow:
                                 font=font_small)
         bounds_entry.pack(side='left', padx=4)
         bounds_entry.bind('<Return>', self._on_bounds_change)
+
+    def _on_eval_change(self):
+        self.app.evaluator_mode = self.eval_var.get()
+        if self.app.viz_Z is not None:
+            self.app._refresh_viz()
 
     def _on_projection_change(self):
         name = self.proj_var.get()

@@ -36,45 +36,67 @@ class ComplexLieProjection(Projection):
 
         return projected
 
-    def eval_grid(self, projected_expr, a, b, AA, BB):
-        """Evaluate on grid, return dict of numpy arrays."""
-        try:
-            f = lambdify((a, b), projected_expr, modules=['numpy'])
-        except Exception:
-            return None
+    def eval_grid(self, projected_expr, a, b, AA, BB, evaluator='numpy',
+                  traction_expr=None):
+        """Evaluate on grid, return dict of numpy arrays.
 
-        try:
-            with np.errstate(divide='ignore', invalid='ignore', over='ignore'):
-                Z = f(AA, BB)
-                if np.isscalar(Z) or (isinstance(Z, np.ndarray) and Z.ndim == 0):
-                    Z = np.full_like(AA, complex(Z), dtype=complex)
-                Z = np.asarray(Z, dtype=complex)
-        except Exception:
-            return None
+        evaluator: 'numpy' (fast, current), 'hybrid' (TractionValue per-pixel),
+                   'sympy' (exact, slow)
+        traction_expr: the pre-projection expression (needed for hybrid/sympy modes)
 
-        phase = np.angle(Z)
-        phase = (phase + 2 * np.pi) % (2 * np.pi)
+        For hybrid/sympy, returns a GridComputation for async execution.
+        For numpy, returns the result dict directly.
+        """
+        from evaluator import eval_grid_hybrid, eval_grid_sympy, GridComputation
 
-        mag = np.abs(Z)
-        log_mag = np.log(mag + 1e-15)
+        if evaluator in ('hybrid', 'sympy') and traction_expr is not None:
+            func = eval_grid_hybrid if evaluator == 'hybrid' else eval_grid_sympy
+            comp = GridComputation()
+            comp.start(func, traction_expr, a, b, AA, BB)
+            return comp  # caller must poll comp.is_done()
+        else:
+            # Fast numpy path (default) — synchronous
+            try:
+                f = lambdify((a, b), projected_expr, modules=['numpy'])
+            except Exception:
+                return None
+            try:
+                with np.errstate(divide='ignore', invalid='ignore', over='ignore'):
+                    Z = f(AA, BB)
+                    if np.isscalar(Z) or (isinstance(Z, np.ndarray) and Z.ndim == 0):
+                        Z = np.full_like(AA, complex(Z), dtype=complex)
+                    Z = np.asarray(Z, dtype=complex)
+            except Exception:
+                return None
 
-        invalid = ~np.isfinite(Z) | (mag < 1e-15)
-        phase[invalid] = np.nan
-        log_mag[invalid] = np.nan
+            return _z_to_metrics(Z)
 
-        brightness = 0.5 + np.arctan(log_mag) / np.pi
-        brightness = np.clip(brightness, 0.12, 0.95)
-        brightness[invalid] = 0.0
 
-        return {
-            'Z': Z,
-            'Re': Z.real,
-            'Im': Z.imag,
-            'mag': mag,
-            'log_mag': log_mag,
-            'phase': phase,
-            'brightness': brightness,
-        }
+def _z_to_metrics(Z):
+    """Convert a complex Z grid to the standard metrics dict."""
+    phase = np.angle(Z)
+    phase = (phase + 2 * np.pi) % (2 * np.pi)
+
+    mag = np.abs(Z)
+    log_mag = np.log(mag + 1e-15)
+
+    invalid = ~np.isfinite(Z) | (mag < 1e-15)
+    phase[invalid] = np.nan
+    log_mag[invalid] = np.nan
+
+    brightness = 0.5 + np.arctan(log_mag) / np.pi
+    brightness = np.clip(brightness, 0.12, 0.95)
+    brightness[invalid] = 0.0
+
+    return {
+        'Z': Z,
+        'Re': Z.real,
+        'Im': Z.imag,
+        'mag': mag,
+        'log_mag': log_mag,
+        'phase': phase,
+        'brightness': brightness,
+    }
 
 
 # Auto-register on import

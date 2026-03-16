@@ -86,7 +86,8 @@ class QSurfaceProjection(Projection):
         self._exprs = (total_phase, total_mag, S.One)
         return total_phase
 
-    def eval_grid(self, projected_expr, a, b, AA, BB):
+    def eval_grid(self, projected_expr, a, b, AA, BB, evaluator='numpy',
+                  traction_expr=None):
         """Evaluate on grid, return dict of numpy arrays."""
         q_phase_expr, q_mag_expr, scalar_expr = self._exprs
 
