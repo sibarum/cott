@@ -541,9 +541,20 @@ def _project_pow(expr):
     # In exponents, ω acts as W (the structure constant): ω = W in exponent space
     # Derived from: 0^(tω) = e^(-W·tω) = e^(iπt), so W·ω = -iπ = W², thus ω = W
     if not isinstance(base, (Zero, Omega)):
+        # If base is a product containing traction types (e.g. -ω, 3*0),
+        # distribute the power: (a*b)^n -> a^n * b^n, then project each.
+        if isinstance(base, Mul) and (base.has(Zero) or base.has(Omega)):
+            result = S.One
+            for factor in Mul.make_args(base):
+                result = result * _project(Pow(factor, exponent))
+            return result
         pb = _project(base)
         exp_projected = exponent.subs(Omega(), W_CONST) if exponent.has(Omega) else exponent
         pe = _project(exp_projected)
+        # Negative real bases: (-a)^n = a^n * e^(iπn)
+        # Numpy can't compute (-1.0)**0.5 as a float — needs complex form.
+        if isinstance(pb, Number) and pb.is_negative:
+            return Pow(-pb, pe) * sp_exp(I * pi * pe)
         return Pow(pb, pe)
 
     # Convert omega base to zero base: w^a = 0^(-a)

@@ -550,7 +550,10 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0, projection_name
         return None
 
     # Step 2: Grid evaluation
+    # Nudge exact-zero grid points by epsilon so that p/q ≈ p*ω (large)
+    # instead of NaN. In traction, 1/0 = ω — this approximates that.
     lin = np.linspace(-bounds, bounds, grid_res)
+    lin[np.abs(lin) < 1e-14] = 1e-14
     AA, BB = np.meshgrid(lin, lin[::-1])  # flip y so up = positive
 
     result = proj.eval_grid(projected, a, b, AA, BB)
@@ -1122,7 +1125,15 @@ class CalculatorApp:
         Additional lines at 1/2, 1/3, 2/3, 3/4 subdivisions.
         """
         bounds = self.viz_bounds
-        fractions = [0, 1/4, 1/3, 1/2, 2/3, 3/4]
+        fractions = []
+        if bounds < 25:
+            fractions.append(0)
+        if bounds < 16:
+            fractions.append(1/2)
+        if bounds < 8:
+            fractions.extend([1/4, 3/4])
+        if bounds < 2:
+            fractions.extend([1/3, 2/3])
         # Generate all grid values: integer + fraction offsets
         values = set()
         int_min = int(-bounds) - 1
