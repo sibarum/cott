@@ -8,10 +8,11 @@
     <link rel="stylesheet" href="../../lib/styles-v1.css">
     <script src="../../lib/traction-interpret.js"></script>
 
-    <title>Zero-Lift Chebyshev</title>
+    <title>The Dyadic Chebyshev Tower</title>
 
 </head>
 <body>
+
 
 <div class="section">
 
@@ -20,10 +21,24 @@
     </a>
 
     <div class="headings">
-        <h1>Zero-Lift Chebyshev</h1>
-        <h2>the symbolic phase engine</h2>
+        <h1>The Dyadic Chebyshev Tower</h1>
+        <h2>exact phase algebra from invertible zero</h2>
     </div>
 
+    <div class="section-title">
+        Table of Contents
+    </div>
+    <ol class="nested">
+        <li><a href="#section-1">Abstract</a></li>
+        <li><a href="#section-2">The Discovery</a></li>
+        <li><a href="#section-3">Half-Cycle Sums and Chebyshev Recurrence</a></li>
+        <li><a href="#section-4">The Minimal Polynomial</a></li>
+        <li><a href="#section-5">The Ring Q[s][u] / (u&sup2; &minus; su + 1)</a></li>
+        <li><a href="#section-6">The Level 2 Tower</a></li>
+        <li><a href="#section-7">The Dyadic Tower</a></li>
+        <li><a href="#section-8">Significance</a></li>
+        <li><a href="#section-9">Implementation</a></li>
+    </ol>
 
     <div class="copyonly">---</div>
     <div class="section-footer">
@@ -31,19 +46,39 @@
     </div>
 </div>
 
+
+<!-- ============================================================ -->
+<!-- 1. ABSTRACT -->
+<!-- ============================================================ -->
+
 <div class="section">
-    <div class="section-title">
+    <div class="section-title" id="section-1">
         1. Abstract
     </div>
 
     <p>
-        <a href="/cott/theory/traction">Traction algebra</a> is the result of applying
-        <a href="/cott/intro">Constructive Operational Type Theory</a> to ordinary algebra. By demanding totality
-        and reversibility in every operation, <a href="/cott/theory/reference">a rich structure emerges</a> in
-        base-0 exponentiation and logarithm. This article discusses one of the most striking emergent
-        structures as a result of following this methodology: the zero-lift Chebyshev polynomials.
+        This article presents the discovery that powers of <a href="/cott/theory/traction">traction zero</a> naturally produce
+        <strong>Chebyshev polynomial structure</strong> &mdash; a discrete, exact, purely algebraic representation
+        of complex phase that requires no analytic continuation, no power series, and no branch cuts.
     </p>
 
+    <p>
+        From the single generator <span class="dynamicexpr">u = 0^{1/2}</span> and its inverse
+        <span class="dynamicexpr">v = w^{1/2}</span>, a quadratic extension
+        emerges with minimal polynomial <span class="dynamicexpr">u^2 - s*u + 1 = 0</span>,
+        where <span class="dynamicexpr">s = u + v</span> is the Chebyshev parameter.
+        Every element of this ring has exact canonical form <span class="variable">a</span> + <span class="variable">b</span>&middot;<span class="variable">u</span>
+        with rational polynomial coefficients, and arithmetic is closed under the reduction rule
+        <span class="dynamicexpr">u^2 = s*u - 1</span>.
+    </p>
+
+    <p>
+        This structure extends naturally into a <strong>dyadic tower</strong> of quadratic extensions,
+        where each level adjoins a new square root &mdash;
+        <span class="dynamicexpr">0^{1/4}</span>, <span class="dynamicexpr">0^{1/8}</span>,
+        <span class="dynamicexpr">0^{1/16}</span>, and so on &mdash;
+        doubling the dimension at each step: 2, 4, 8, 16, &hellip;
+    </p>
 
     <div class="copyonly">---</div>
     <div class="section-footer">
@@ -51,28 +86,791 @@
 </div>
 
 
+<!-- ============================================================ -->
+<!-- 2. THE DISCOVERY -->
+<!-- ============================================================ -->
+
 <div class="section">
-    <div class="section-title">
-        2. Reciprocality
+    <div class="section-title" id="section-2">
+        2. The Discovery
     </div>
 
     <p>
-        We explore the exponential emergence of zero and its reciprocal &omega;.
+        In <a href="/cott/theory/traction">traction algebra</a>, zero is invertible:
     </p>
 
-    <div class="expression">
-        <span class="dynamicexpr">0^{-1}=w</span>
+    <div class="expression font-lg">
+        <span class="dynamicexpr">0^{-1} = w</span>
     </div>
 
-    <div class="expression">
-        <span class="dynamicexpr">0^n = w^{-n}</span>
-    </div>
+    <p>
+        and the basic power rules produce a coherent structure where
+        <span class="dynamicexpr">0*w = 1</span>,
+        <span class="dynamicexpr">0^w = -1</span>,
+        and <span class="dynamicexpr">i = 0^{w/2}</span>.
+        The question arises: what happens when we tabulate
+        <span class="dynamicexpr">0^n</span> for successive integer values of
+        <span class="variable">n</span>?
+    </p>
 
+    <p>
+        The answer is a phase rotation. Beginning from
+        <span class="dynamicexpr">0^0 = 1</span>
+        and proceeding through the positive integers:
+    </p>
 
+    <table class="fixed centered">
+        <tr>
+            <th><span class="variable">n</span></th>
+            <th><span class="dynamicexpr">0^n</span></th>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">-3</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">w^3</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">-2</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">w^2</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">-1</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">w</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">0</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">1</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">1</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">0</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">2</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">-1</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">3</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">-w</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">4</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">w^2</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">5</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">-w^3</span></div></td>
+        </tr>
+    </table>
+
+    <p>
+        The powers of zero <em>cycle through the classes with alternating signs</em>.
+        Negative powers yield pure &omega;-class elements; positive powers
+        rotate through 1, 0, &minus;1, &minus;&omega;, &omega;&sup2;, &minus;&omega;&sup3;, &hellip;
+        This is not imposed &mdash; it falls out of the traction power rules.
+    </p>
+
+    <p>
+        The structure is a <strong>phase rotation</strong>, entirely analogous to powers of
+        <span class="dynamicexpr">e^{i*pi}</span> on the unit circle &mdash;
+        except that it is <em>purely algebraic</em>.
+        There is no limit, no series, no epsilon-delta argument underneath.
+        The rotation is baked into the algebra itself.
+    </p>
 
     <div class="copyonly">---</div>
     <div class="section-footer">
     </div>
 </div>
+
+
+<!-- ============================================================ -->
+<!-- 3. HALF-CYCLE SUMS AND CHEBYSHEV RECURRENCE -->
+<!-- ============================================================ -->
+
+<div class="section">
+    <div class="section-title" id="section-3">
+        3. Half-Cycle Sums and Chebyshev Recurrence
+    </div>
+
+    <p>
+        To formalize this structure, we introduce the <strong>half-step generators</strong>:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">u = 0^{1/2}</span>
+    </div>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">v = w^{1/2} = 0^{-1/2}</span>
+    </div>
+
+    <p>
+        Since <span class="dynamicexpr">u*v = 0^{1/2} * 0^{-1/2} = 0^0 = 1</span>,
+        these generators are inverses of each other. We define the <strong>Chebyshev parameter</strong>:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">s = u + v</span>
+    </div>
+
+    <p>
+        and the <strong>half-cycle sum</strong> at index <span class="variable">n</span>:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">a_{n} = u^n + v^n</span>
+    </div>
+
+    <p>
+        where <span class="dynamicexpr">a_{n}</span> denotes
+        <span class="dynamicexpr">0^{n/2} + w^{n/2}</span>.
+        These sums satisfy a remarkable recurrence:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">a_{n} = s * a_{n-1} - a_{n-2}</span>
+    </div>
+
+    <p>
+        with initial values <span class="dynamicexpr">a_{0} = 2</span>
+        and <span class="dynamicexpr">a_{1} = s</span>.
+        This is the <strong>modified Chebyshev recurrence of the first kind</strong>,
+        producing exact polynomial identities in the parameter
+        <span class="dynamicexpr">s = u + v</span>:
+    </p>
+
+    <table class="fixed centered">
+        <tr>
+            <th><span class="variable">n</span></th>
+            <th><span class="variable">n</span>/2</th>
+            <th><span class="dynamicexpr">a_{n} = u^n + v^n</span></th>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">0</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">0</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">2</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">1</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">1/2</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">s</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">2</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">1</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">s^2 - 2</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">3</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">3/2</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">s^3 - 3*s</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">4</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">2</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">s^4 - 4*s^2 + 2</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">5</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">5/2</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">s^5 - 5*s^3 + 5*s</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">6</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">3</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">s^6 - 6*s^4 + 9*s^2 - 2</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">7</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">7/2</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">s^7 - 7*s^5 + 14*s^3 - 7*s</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">8</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">4</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">s^8 - 8*s^6 + 20*s^4 - 16*s^2 + 2</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">9</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">9/2</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">s^9 - 9*s^7 + 27*s^5 - 30*s^3 + 9*s</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">10</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">5</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">s^{10} - 10*s^8 + 35*s^6 - 50*s^4 + 25*s^2 - 2</span></div></td>
+        </tr>
+    </table>
+
+    <p>
+        These are exact symbolic identities &mdash; not approximations.
+        Each half-cycle sum is a polynomial in
+        <span class="dynamicexpr">s = u + v</span>
+        with integer coefficients. The polynomials are symmetric:
+        <span class="dynamicexpr">a_{-n} = a_{n}</span>.
+    </p>
+
+    <p>
+        The critical observation is that these polynomials <strong>refuse to collapse</strong>.
+        Despite the many opportunities for algebraic contradiction &mdash; zero being invertible,
+        negative powers, fractional exponents &mdash; the system remains self-consistent.
+        The Chebyshev recurrence holds exactly, and the half-cycle sums are always well-defined
+        polynomials in <span class="variable">s</span>.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 4. THE MINIMAL POLYNOMIAL -->
+<!-- ============================================================ -->
+
+<div class="section">
+    <div class="section-title" id="section-4">
+        4. The Minimal Polynomial
+    </div>
+
+    <p>
+        Since <span class="dynamicexpr">u + v = s</span> and <span class="dynamicexpr">u*v = 1</span>,
+        the generators <span class="variable">u</span> and <span class="variable">v</span> are the two roots of:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">x^2 - s*x + 1 = 0</span>
+    </div>
+
+    <p>
+        This is the <strong>minimal polynomial of <span class="variable">u</span></strong> over the polynomial ring
+        &Qopf;[<span class="variable">s</span>].
+        It is irreducible: the discriminant
+        <span class="dynamicexpr">s^2 - 4</span> is not a perfect square in
+        &Qopf;[<span class="variable">s</span>], so no further reduction is possible.
+    </p>
+
+    <p>
+        The immediate consequence is a <strong>reduction rule</strong>:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">u^2 = s*u - 1</span>
+    </div>
+
+    <p>
+        Any power of <span class="variable">u</span> can be reduced to at most linear degree in
+        <span class="variable">u</span> by repeated application of this rule.
+        This means every element of the extension has canonical form
+        <span class="variable">a</span> + <span class="variable">b</span>&middot;<span class="variable">u</span>,
+        where <span class="variable">a</span> and <span class="variable">b</span> are polynomials in
+        <span class="variable">s</span> with rational coefficients.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 5. THE RING -->
+<!-- ============================================================ -->
+
+<div class="section">
+    <div class="section-title" id="section-5">
+        5. The Ring &Qopf;[s][u] / (u&sup2; &minus; su + 1)
+    </div>
+
+    <div class="subsection-title" id="section-5_1">
+        5.1 Canonical Form and Arithmetic
+    </div>
+
+    <p>
+        Every element of the ring has the form
+        <span class="variable">a</span> + <span class="variable">b</span>&middot;<span class="variable">u</span>,
+        where <span class="variable">a</span>, <span class="variable">b</span> &isin;
+        &Qopf;[<span class="variable">s</span>].
+        Arithmetic is closed under the reduction <span class="dynamicexpr">u^2 = s*u - 1</span>:
+    </p>
+
+    <p><strong>Addition:</strong></p>
+    <div class="expression">
+        <span class="dynamicexpr">(a_{1} + b_{1}*u) + (a_{2} + b_{2}*u) = (a_{1} + a_{2}) + (b_{1} + b_{2})*u</span>
+    </div>
+
+    <p><strong>Multiplication:</strong></p>
+    <div class="expression">
+        <span class="dynamicexpr">(a_{1} + b_{1}*u) * (a_{2} + b_{2}*u) = (a_{1}*a_{2} - b_{1}*b_{2}) + (a_{1}*b_{2} + b_{1}*a_{2} + b_{1}*b_{2}*s)*u</span>
+    </div>
+
+    <p>
+        The multiplication formula arises from expanding the product and applying
+        <span class="dynamicexpr">u^2 = s*u - 1</span> to the
+        <span class="dynamicexpr">b_{1}*b_{2}*u^2</span> term:
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">b_{1}*b_{2}*u^2 = b_{1}*b_{2}*(s*u - 1) = -b_{1}*b_{2} + b_{1}*b_{2}*s*u</span>
+    </div>
+
+    <div class="subsection-title" id="section-5_2">
+        5.2 Conjugation
+    </div>
+
+    <p>
+        <strong>Conjugation</strong> replaces <span class="variable">u</span> with its inverse
+        <span class="dynamicexpr">v = s - u</span>:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">conj(a + b*u) = (a + b*s) - b*u</span>
+    </div>
+
+    <p>
+        This is an involution: <span class="dynamicexpr">conj(conj(x)) = x</span>.
+        It swaps the two roots of the minimal polynomial, exchanging the zero-class generator
+        <span class="variable">u</span> with the omega-class generator <span class="variable">v</span>.
+    </p>
+
+    <div class="subsection-title" id="section-5_3">
+        5.3 Norm
+    </div>
+
+    <p>
+        The <strong>norm</strong> of an element is the product with its conjugate. It always
+        lands in the base ring &Qopf;[<span class="variable">s</span>]:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">N(a + b*u) = a^2 + a*b*s + b^2</span>
+    </div>
+
+    <p>
+        A critical property: for all integer powers of the generator,
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">N(u^n) = 1</span>
+    </div>
+
+    <p>
+        Every power of <span class="variable">u</span> is a <strong>unit</strong> of norm 1.
+        This means inversion is always possible for powers of the generator:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">(a + b*u)^{-1} = conj(a + b*u) / N(a + b*u)</span>
+    </div>
+
+    <div class="subsection-title" id="section-5_4">
+        5.4 Connection to Traction
+    </div>
+
+    <p>
+        The bridge between traction algebra and the Chebyshev ring is direct:
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">0^n = u^{2*n}</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">w^n = v^{2*n} = u^{-2*n}</span>
+    </div>
+
+    <p>
+        Since <span class="dynamicexpr">u = 0^{1/2}</span>, traction zero is
+        <span class="dynamicexpr">0 = u^2 = s*u - 1</span>,
+        and traction omega is
+        <span class="dynamicexpr">w = v^2 = s^2 - s*u - 1</span>.
+        Every half-integer traction exponent maps to an integer power of
+        <span class="variable">u</span>,
+        and every integer power of <span class="variable">u</span> has exact canonical form in the ring.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 6. THE LEVEL 2 TOWER -->
+<!-- ============================================================ -->
+
+<div class="section">
+    <div class="section-title" id="section-6">
+        6. The Level 2 Tower
+    </div>
+
+    <p>
+        The construction generalizes naturally. Adjoining the <strong>quarter-power</strong>
+        <span class="dynamicexpr">w = 0^{1/4}</span>
+        (where <span class="dynamicexpr">w^2 = u</span>) gives a second level of extension.
+    </p>
+
+    <div class="subsection-title" id="section-6_1">
+        6.1 New Generators
+    </div>
+
+    <p>
+        At Level 2 we introduce:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">w = 0^{1/4}</span>
+    </div>
+
+    <p>
+        with the new Chebyshev parameter:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">t = w + w^{-1}</span>
+    </div>
+
+    <p>
+        The parameters are linked by the <strong>Chebyshev doubling formula</strong>:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">t^2 = s + 2</span>
+    </div>
+
+    <p>
+        This follows directly from
+        <span class="dynamicexpr">t^2 = (w + w^{-1})^2 = w^2 + 2 + w^{-2} = u + v + 2 = s + 2</span>.
+    </p>
+
+    <div class="subsection-title" id="section-6_2">
+        6.2 The Minimal Polynomial of w over &Qopf;[s]
+    </div>
+
+    <p>
+        Over the base ring &Qopf;[<span class="variable">s</span>],
+        the generator <span class="variable">w</span> satisfies a <strong>quartic</strong> minimal polynomial:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">w^4 - s*w^2 + 1 = 0</span>
+    </div>
+
+    <p>
+        This factors over the intermediate extension as:
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">(w^2 - t*w + 1) * (w^2 + t*w + 1) = 0</span>
+    </div>
+
+    <p>
+        where <span class="dynamicexpr">t^2 = s + 2</span>.
+        The four roots are <span class="variable">w</span>,
+        <span class="dynamicexpr">w^{-1}</span>,
+        <span class="dynamicexpr">-w</span>,
+        and <span class="dynamicexpr">-w^{-1}</span>.
+    </p>
+
+    <div class="subsection-title" id="section-6_3">
+        6.3 Four-Dimensional Canonical Form
+    </div>
+
+    <p>
+        Every element of the Level 2 ring has canonical form in four components over
+        &Qopf;[<span class="variable">s</span>]:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">a + b*t + c*w + d*t*w</span>
+    </div>
+
+    <p>
+        where <span class="variable">a</span>, <span class="variable">b</span>,
+        <span class="variable">c</span>, <span class="variable">d</span> &isin;
+        &Qopf;[<span class="variable">s</span>],
+        with reduction rules
+        <span class="dynamicexpr">t^2 = s + 2</span> and
+        <span class="dynamicexpr">w^2 = t*w - 1</span>.
+    </p>
+
+    <p>
+        The multiplication table for the basis {1, <span class="variable">t</span>,
+        <span class="variable">w</span>, <span class="variable">t</span><span class="variable">w</span>}:
+    </p>
+
+    <table class="fixed centered">
+        <tr>
+            <th>&times;</th>
+            <th>1</th>
+            <th><span class="variable">t</span></th>
+            <th><span class="variable">w</span></th>
+            <th><span class="variable">tw</span></th>
+        </tr>
+        <tr>
+            <th>1</th>
+            <td><div class="expression"><span class="dynamicexpr">1</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">t</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">w</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">t*w</span></div></td>
+        </tr>
+        <tr>
+            <th><span class="variable">t</span></th>
+            <td><div class="expression"><span class="dynamicexpr">t</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">s + 2</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">t*w</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">(s+2)*w</span></div></td>
+        </tr>
+        <tr>
+            <th><span class="variable">w</span></th>
+            <td><div class="expression"><span class="dynamicexpr">w</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">t*w</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">t*w - 1</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">(s+2)*w - t</span></div></td>
+        </tr>
+        <tr>
+            <th><span class="variable">tw</span></th>
+            <td><div class="expression"><span class="dynamicexpr">t*w</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">(s+2)*w</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">(s+2)*w - t</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">(s+2)*t*w - (s+2)</span></div></td>
+        </tr>
+    </table>
+
+    <div class="subsection-title" id="section-6_4">
+        6.4 Galois Structure
+    </div>
+
+    <p>
+        The extension &Qopf;[<span class="variable">s</span>] &rarr;
+        &Qopf;[<span class="variable">s</span>,
+        <span class="variable">t</span>,
+        <span class="variable">w</span>] has degree 4, with Galois group isomorphic to the
+        <strong>Klein four-group</strong> <em>V</em><sub>4</sub>.
+        The three non-trivial automorphisms are:
+    </p>
+
+    <ul>
+        <li><strong>&sigma;</strong> (w-conjugation): <span class="dynamicexpr">w =-> w^{-1} = t - w</span>, fixes <span class="variable">t</span></li>
+        <li><strong>&tau;</strong> (sign conjugation): <span class="dynamicexpr">w =-> -w</span>, <span class="dynamicexpr">t =-> -t</span></li>
+        <li><strong>&sigma;&tau;</strong>: <span class="dynamicexpr">w =-> -(t - w) = w - t</span></li>
+    </ul>
+
+    <p>
+        The <strong>full norm</strong>
+        <span class="dynamicexpr">N_{4}(x) = x * sigma(x) * tau(x) * sigma(tau(x))</span>
+        always lands in &Qopf;[<span class="variable">s</span>],
+        and <span class="dynamicexpr">N_{4}(w^n) = 1</span> for all integer
+        <span class="variable">n</span> &mdash;
+        every power of the generator remains a unit.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 7. THE DYADIC TOWER -->
+<!-- ============================================================ -->
+
+<div class="section">
+    <div class="section-title" id="section-7">
+        7. The Dyadic Tower
+    </div>
+
+    <p>
+        The pattern continues indefinitely. Each level adjoins a new square root of
+        the previous generator, producing a <strong>tower of quadratic extensions</strong>:
+    </p>
+
+    <table class="fixed centered">
+        <tr>
+            <th>Level</th>
+            <th>Generator</th>
+            <th>Dimension</th>
+            <th>Minimal Polynomial</th>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">0</span></div></td>
+            <td><div class="expression">&Qopf;[<span class="variable">s</span>]</div></td>
+            <td><div class="expression"><span class="dynamicexpr">1</span></div></td>
+            <td><div class="expression">&mdash;</div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">1</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">u = 0^{1/2}</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">2</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">u^2 - s*u + 1 = 0</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">2</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">w = 0^{1/4}</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">4</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">w^4 - s*w^2 + 1 = 0</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="dynamicexpr">3</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">0^{1/8}</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">8</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">x^8 - s*x^4 + 1 = 0</span></div></td>
+        </tr>
+        <tr>
+            <td><div class="expression"><span class="variable">k</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">0^{1/2^k}</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">2^k</span></div></td>
+            <td><div class="expression"><span class="dynamicexpr">x^{2^k} - s*x^{2^{k-1}} + 1 = 0</span></div></td>
+        </tr>
+    </table>
+
+    <p>
+        At each level, the Chebyshev doubling formula
+        <span class="dynamicexpr">t_{k}^2 = t_{k-1} + 2</span>
+        links the Chebyshev parameters, with
+        <span class="dynamicexpr">t_{0} = s</span>.
+        Every element at level <span class="variable">k</span> has exact canonical form as a
+        <span class="dynamicexpr">2^k</span>-component vector over
+        &Qopf;[<span class="variable">s</span>].
+    </p>
+
+    <p>
+        The tower is <strong>dyadic</strong> &mdash; each level doubles the dimension, and the generators
+        are successive square roots in the traction exponent: <span class="dynamicexpr">0^{1/2}</span>,
+        <span class="dynamicexpr">0^{1/4}</span>,
+        <span class="dynamicexpr">0^{1/8}</span>,
+        <span class="dynamicexpr">0^{1/16}</span>, &hellip;
+    </p>
+
+    <p>
+        In the limit, the tower resolves all dyadic (power-of-two denominator) traction exponents
+        with exact polynomial arithmetic &mdash; a <strong>non-archimedean algebraic number field</strong>
+        that captures the full phase structure of traction without ever invoking the complex numbers.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 8. SIGNIFICANCE -->
+<!-- ============================================================ -->
+
+<div class="section">
+    <div class="section-title" id="section-8">
+        8. Significance
+    </div>
+
+    <p>
+        The dyadic Chebyshev tower is notable for several reasons:
+    </p>
+
+    <p>
+        <strong>Phase without analysis.</strong>
+        In classical mathematics, the connection between exponentiation and rotation requires
+        the full machinery of real analysis: power series, convergence, Euler's formula as a
+        <em>theorem</em> about limits. Here, the rotation is an <em>algebraic</em> consequence of
+        the traction axioms. The Chebyshev recurrence produces exact trigonometric identities
+        without invoking continuity, limits, or the real numbers.
+    </p>
+
+    <p>
+        <strong>No branch cuts.</strong>
+        Extending classical complex analysis to fractional powers forces a choice of branch cuts &mdash;
+        an analytic, non-algebraic decision. In the Chebyshev ring, half-integer and quarter-integer
+        exponents extend the recurrence cleanly, with no ambiguity and no discontinuity.
+        The extension <span class="dynamicexpr">u = 0^{1/2}</span> simply adds a new generator
+        and a new polynomial relation.
+    </p>
+
+    <p>
+        <strong>Exact rational arithmetic.</strong>
+        Every element of the ring has coefficients in
+        &Qopf;[<span class="variable">s</span>] &mdash; polynomials with rational numbers.
+        No floating point, no rounding, no numerical instability. The algebraic structure is
+        computed exactly and symbolically. This makes the system suitable for computer algebra,
+        formal verification, and applications where exact arithmetic is essential.
+    </p>
+
+    <p>
+        <strong>Self-consistency from totality.</strong>
+        The Chebyshev structure was not designed or imposed. It emerged from a single
+        demand: that the algebra be <em>total</em> (every operation defined) and
+        <em>reversible</em> (every operation invertible). The fact that this demand produces
+        a well-known family of orthogonal polynomials &mdash; independently discovered by
+        Chebyshev in the 19th century for entirely different reasons &mdash; is striking evidence
+        that the traction axioms capture something fundamental about algebraic structure.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 9. IMPLEMENTATION -->
+<!-- ============================================================ -->
+
+<div class="section">
+    <div class="section-title" id="section-9">
+        9. Implementation
+    </div>
+
+    <p>
+        The algebraic structures described in this paper are implemented in the
+        <strong>COTT Solver</strong>, an open-source calculator and symbolic algebra system
+        for traction expressions.
+    </p>
+
+    <p>
+        The core engine is <code>chebyshev_ring.py</code>, a standalone Python module that implements:
+    </p>
+
+    <ul>
+        <li><strong>QsPoly</strong> &mdash; polynomials in &Qopf;[<span class="variable">s</span>]
+            with exact rational (<code>fractions.Fraction</code>) coefficients.</li>
+        <li><strong>Element</strong> &mdash; the Level 1 ring
+            &Qopf;[<span class="variable">s</span>][<span class="variable">u</span>] / (<span class="variable">u</span>&sup2; &minus; <span class="variable">su</span> + 1),
+            with full arithmetic, conjugation, norm, inversion, and exponentiation.</li>
+        <li><strong>TowerElement</strong> &mdash; the Level 2 tower with four &Qopf;[<span class="variable">s</span>]-components,
+            supporting the complete multiplication table, Galois conjugations (&sigma;, &tau;, &sigma;&tau;),
+            half-norm and full norm, and exact inversion.</li>
+    </ul>
+
+    <p>
+        The module has no dependencies beyond Python's standard library and is verified by
+        a comprehensive test suite covering construction, arithmetic, associativity, distributivity,
+        conjugation involutions, norm-1 identities, Chebyshev recurrence, traction conversion,
+        and numeric evaluation.
+    </p>
+
+    <p>
+        The COTT Calculator GUI provides interactive visualization of the Chebyshev structure:
+    </p>
+
+    <ul>
+        <li><strong>Phase Map tab</strong> &mdash; plots the phase orbit of
+            <span class="dynamicexpr">0^{n/2}</span> on the unit circle,
+            the half-cycle sum waveform, and an equivalence table, all parameterized by
+            &theta;.</li>
+        <li><strong>Explain tab</strong> &mdash; for any traction expression, shows the Chebyshev
+            polynomial decomposition, recurrence trace, and position on the unit circle.</li>
+    </ul>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        <p>
+            R. Netz, 2026. With algebraic implementation and formal analysis by Claude (Anthropic).
+        </p>
+        <p>
+            Published under the <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+        </p>
+    </div>
+</div>
+
+
 </body>
 </html>
