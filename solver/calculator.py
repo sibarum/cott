@@ -494,6 +494,200 @@ def _format_real(expr):
 
 
 # ============================================================
+# Chebyshev Decomposition
+# ============================================================
+
+def _extract_zero_exponent(expr):
+    """
+    If expr is a zero-power (or equivalent), return the exponent.
+    Returns None if not a simple zero-power.
+    """
+    if isinstance(expr, Zero):
+        return S.One
+    if isinstance(expr, Omega):
+        return S.NegativeOne
+    if expr is S.One or expr == Integer(1):
+        return S.Zero
+    if isinstance(expr, Pow):
+        if isinstance(expr.base, Zero):
+            return expr.exp
+        if isinstance(expr.base, Omega):
+            return -expr.exp
+    return None
+
+
+def _step_label(k, denom):
+    """Format recurrence step k with denominator denom as a fraction label.
+    E.g., k=3, denom=2 → 'a(3/2)'; k=4, denom=2 → 'a(2)'.
+    """
+    from math import gcd
+    g = gcd(k, denom)
+    num, den = k // g, denom // g
+    if den == 1:
+        return f'a({num})'
+    return f'a({num}/{den})'
+
+
+def _cheb_poly_str(n_steps, step_denom=2, var='s'):
+    """
+    Compute the modified Chebyshev polynomial via recurrence:
+    T_0=2, T_1=s, T_n = s*T_{n-1} - T_{n-2}.
+
+    n_steps: number of recurrence iterations.
+    step_denom: each step represents 1/step_denom of a full unit.
+        (step_denom=2 → half-integer steps, step_denom=16 → 1/16 steps, etc.)
+    Returns (formatted_string, trace_list).
+    """
+    from sympy import Symbol as Sym, expand
+    s = Sym(var)
+
+    if n_steps == 0:
+        return '2', [(_step_label(0, step_denom), '2')]
+    if n_steps == 1:
+        return str(s), [(_step_label(0, step_denom), '2'),
+                         (_step_label(1, step_denom), str(s))]
+
+    prev2 = Integer(2)
+    prev1 = s
+    trace = [(_step_label(0, step_denom), '2'),
+             (_step_label(1, step_denom), str(s))]
+
+    for k in range(2, n_steps + 1):
+        curr = expand(s * prev1 - prev2)
+        label = _step_label(k, step_denom)
+        poly_str = str(curr).replace('**', '^').replace('*', '\u00b7')
+        trace.append((label, poly_str))
+        prev2 = prev1
+        prev1 = curr
+
+    final_str = str(prev1).replace('**', '^').replace('*', '\u00b7')
+    return final_str, trace
+
+
+def chebyshev_decompose(expr):
+    """
+    Analyze a traction expression for Chebyshev structure.
+    Returns a dict describing the decomposition.
+    """
+    simplified = traction_simplify(expr)
+    traction_str = format_result(simplified)
+
+    # Try to get complex projection
+    try:
+        proj = project_complex(simplified)
+        complex_str = format_complex(simplified)
+        if not complex_str:
+            complex_str = str(proj)
+    except Exception:
+        complex_str = ''
+
+    # Check for free symbols (can't decompose symbolically)
+    if simplified.free_symbols:
+        return {
+            'traction_str': traction_str,
+            'has_decomp': False,
+            'note': 'Contains free variables \u2014 Chebyshev decomposition requires a concrete exponent',
+            'complex_str': complex_str,
+        }
+
+    # Extract zero-power exponent
+    exponent = _extract_zero_exponent(simplified)
+
+    # Handle Mul: scalar * zero-power
+    coeff = None
+    if exponent is None and isinstance(simplified, Mul):
+        scalar_parts = []
+        zero_exp = None
+        for arg in Mul.make_args(simplified):
+            e = _extract_zero_exponent(arg)
+            if e is not None and zero_exp is None:
+                zero_exp = e
+            else:
+                scalar_parts.append(arg)
+        if zero_exp is not None:
+            exponent = zero_exp
+            coeff = Mul(*scalar_parts) if scalar_parts else None
+
+    # Handle -1 = 0^2 in the integer cycle
+    if exponent is None and simplified == S.NegativeOne:
+        exponent = Integer(2)
+
+    if exponent is None:
+        # Scalar or complex expression — no Chebyshev decomposition
+        return {
+            'traction_str': traction_str,
+            'has_decomp': False,
+            'note': 'Not a zero-power expression',
+            'complex_str': complex_str,
+        }
+
+    # Check if exponent is numeric
+    try:
+        exp_val = Rational(exponent)
+    except (TypeError, ValueError):
+        return {
+            'traction_str': traction_str,
+            'has_decomp': False,
+            'note': f'Symbolic exponent 0^({format_result(exponent)}) \u2014 cannot compute Chebyshev polynomial',
+            'complex_str': complex_str,
+            'exponent': exponent,
+        }
+
+    # Format exponent string
+    exp_str = format_result(exp_val)
+
+    # Half-cycle label
+    if exp_val.q == 1:
+        half_label = str(int(exp_val))
+    else:
+        half_label = f'{exp_val.p}/{exp_val.q}'
+
+    # Equivalence: what does 0^n simplify to?
+    try:
+        equiv = traction_simplify(Pow(Zero(), exp_val))
+        equiv_str = format_result(equiv)
+        if coeff is not None:
+            equiv_str = f'{format_result(coeff)}\u00b7{equiv_str}'
+    except Exception:
+        equiv_str = '?'
+
+    # Chebyshev polynomial: for exponent p/q, we need 2*exponent to be an
+    # integer for the standard recurrence (u=0^(1/2), step_denom=2).
+    # If not, use a finer grid: u_d = 0^(1/(2q)), step_denom = 2q.
+    doubled = exp_val * 2
+    if doubled.q == 1:
+        # Standard half-integer case: 2*exponent is an integer
+        n_steps = abs(int(doubled))
+        step_denom = 2
+    else:
+        # Finer grid needed
+        p_num = abs(exp_val.p)
+        q_den = exp_val.q
+        n_steps = 2 * p_num
+        step_denom = 2 * q_den
+
+    cheb_str, trace = _cheb_poly_str(n_steps, step_denom=step_denom)
+
+    # Cap trace display
+    if len(trace) > 12:
+        trace = trace[:3] + [('...', '...')] + trace[-3:]
+
+    return {
+        'traction_str': traction_str,
+        'has_decomp': True,
+        'exponent': exp_val,
+        'exp_str': exp_str,
+        'half_label': half_label,
+        'equiv_str': equiv_str,
+        'cheb_str': cheb_str,
+        'trace': trace,
+        'complex_str': complex_str,
+        'coeff': coeff,
+        'step_denom': step_denom,
+    }
+
+
+# ============================================================
 # Phase Visualization
 # ============================================================
 
@@ -913,67 +1107,47 @@ class CalculatorApp:
         self._make_button(btn_row, '\u2699', self._open_settings, small=True).pack(side='left', padx=(8, 1))
 
 
-        # ===== Explain tab =====
+        # ===== Explain tab (Chebyshev Decomposition) =====
         explain_frame = tk.Frame(self._tab_container, bg=BG_BODY, bd=1, relief='solid')
         self._tab_frames['Explain'] = explain_frame
 
-        # Step display fields
-        self.explain_steps = {}
-        step_names = [
-            ('parse', '1. Parse'),
-            ('substitute', '2. Substitute x'),
-            ('simplify', '3. Traction Simplify'),
-            ('project', '4. Project'),
-            ('evaluate', '5. Evaluate'),
-        ]
+        # Horizontal split: scrollable text (left) + orbit plot (right)
+        explain_hframe = tk.Frame(explain_frame, bg=BG_BODY)
+        explain_hframe.pack(fill='both', expand=True, padx=6, pady=6)
 
-        steps_frame = tk.Frame(explain_frame, bg=BG_BODY)
-        steps_frame.pack(fill='both', expand=True, padx=10, pady=4)
+        # Left: scrollable text widget
+        text_frame = tk.Frame(explain_hframe, bg='#1a1a2e', bd=1, relief='sunken')
+        text_frame.pack(side='left', fill='both', expand=True, padx=(0, 4))
 
-        for key, label in step_names:
-            row = tk.Frame(steps_frame, bg=BG_BODY)
-            row.pack(fill='x', pady=2)
+        self.cheb_text = tk.Text(
+            text_frame, wrap='word', font=tkfont.Font(family='Consolas', size=11),
+            bg='#1a1a2e', fg='#eeeeee', insertbackground='#eeeeee',
+            selectbackground='#3a5a8a', selectforeground='#ffffff',
+            bd=0, highlightthickness=0, padx=12, pady=10,
+            state='disabled', cursor='arrow'
+        )
+        cheb_scrollbar = tk.Scrollbar(text_frame, command=self.cheb_text.yview)
+        self.cheb_text.configure(yscrollcommand=cheb_scrollbar.set)
+        cheb_scrollbar.pack(side='right', fill='y')
+        self.cheb_text.pack(side='left', fill='both', expand=True)
 
-            tk.Label(row, text=label, font=self.font_label, bg=BG_BODY, fg=FG_DIM,
-                     width=18, anchor='w').pack(side='left')
+        # Text tags for styling
+        self.cheb_text.tag_configure('header', font=tkfont.Font(family='Segoe UI', size=13, weight='bold'),
+                                      foreground='#ffdd33', spacing1=8, spacing3=2)
+        self.cheb_text.tag_configure('value', font=tkfont.Font(family='Consolas', size=12),
+                                      foreground='#ffffff', spacing1=2, spacing3=2)
+        self.cheb_text.tag_configure('dim', font=tkfont.Font(family='Consolas', size=10),
+                                      foreground='#8899aa', spacing1=2, spacing3=2)
+        self.cheb_text.tag_configure('expr', font=tkfont.Font(family='Consolas', size=14, weight='bold'),
+                                      foreground='#ffffff', spacing1=4, spacing3=6)
 
-            var = tk.StringVar()
-            entry = tk.Entry(
-                row, textvariable=var, font=tkfont.Font(family='Consolas', size=11),
-                bg=BG_DISPLAY, fg=FG_TEXT, bd=1, relief='sunken',
-                readonlybackground=BG_DISPLAY, state='readonly'
-            )
-            entry.pack(side='left', fill='x', expand=True, padx=(4, 0))
-            self.explain_steps[key] = var
+        # Right: orbit plot (matplotlib)
+        self.cheb_fig = Figure(figsize=(3.2, 4.2), dpi=96, facecolor=BG_BODY)
+        self.cheb_fig.subplots_adjust(left=0.12, right=0.95, top=0.92, bottom=0.08)
+        self.cheb_ax_orbit = self.cheb_fig.add_subplot(1, 1, 1)
 
-        # Options row: projection selector + p,q inputs
-        opts_frame = tk.Frame(explain_frame, bg=BG_BODY)
-        opts_frame.pack(fill='x', padx=10, pady=(8, 10))
-
-        tk.Label(opts_frame, text='Projection:', font=self.font_label,
-                 bg=BG_BODY, fg=FG_DIM).pack(side='left')
-
-        self.explain_proj_var = tk.StringVar(value=self.projection_names[0])
-        proj_menu = tk.OptionMenu(opts_frame, self.explain_proj_var, *self.projection_names)
-        proj_menu.configure(font=self.font_label, bg=BG_BTN, highlightthickness=0)
-        proj_menu.pack(side='left', padx=(4, 12))
-
-        tk.Label(opts_frame, text='p=', font=self.font_label,
-                 bg=BG_BODY, fg=FG_DIM).pack(side='left')
-        self.explain_p_var = tk.StringVar(value='1')
-        tk.Entry(opts_frame, textvariable=self.explain_p_var, width=6,
-                 font=self.font_label).pack(side='left', padx=(2, 8))
-
-        tk.Label(opts_frame, text='q=', font=self.font_label,
-                 bg=BG_BODY, fg=FG_DIM).pack(side='left')
-        self.explain_q_var = tk.StringVar(value='0')
-        tk.Entry(opts_frame, textvariable=self.explain_q_var, width=6,
-                 font=self.font_label).pack(side='left', padx=(2, 0))
-
-        tk.Button(opts_frame, text='Explain', font=self.font_btn_small,
-                  bd=1, padx=8, bg='#5a7d9a', fg='white',
-                  activebackground=BG_BTN_ACTIVE,
-                  command=self._run_explain).pack(side='right', padx=4)
+        self.cheb_canvas_widget = FigureCanvasTkAgg(self.cheb_fig, master=explain_hframe)
+        self.cheb_canvas_widget.get_tk_widget().pack(side='left', fill='y', padx=(4, 0))
 
         # ===== Phase Map tab =====
         phasemap_frame = tk.Frame(self._tab_container, bg=BG_BODY, bd=1, relief='solid')
@@ -1525,125 +1699,133 @@ class CalculatorApp:
         self.pm_fig.set_facecolor(BG_BODY)
         self.pm_canvas_widget.draw()
 
-    # ===== Explain Tab =====
+    # ===== Explain Tab (Chebyshev Decomposition) =====
 
     def _run_explain(self):
-        """Run the step-by-step explanation for the current expression."""
-        from sympy import Symbol as Sym
+        """Compute and display the Chebyshev decomposition of the current expression."""
+        tw = self.cheb_text
+        tw.configure(state='normal')
+        tw.delete('1.0', 'end')
 
         expr_text = self.entry_var.get().strip()
         if not expr_text:
-            for var in self.explain_steps.values():
-                var.set('')
+            tw.insert('end', 'Enter an expression', 'dim')
+            tw.configure(state='disabled')
+            self._draw_cheb_orbit(self.cheb_ax_orbit, None)
+            self.cheb_canvas_widget.draw()
             return
 
-        proj_name = self.explain_proj_var.get()
-        proj = registry.get('projection', proj_name)
-
-        try:
-            p_val = float(self.explain_p_var.get())
-        except ValueError:
-            p_val = 1.0
-        try:
-            q_val = float(self.explain_q_var.get())
-        except ValueError:
-            q_val = 0.0
-
-        p_sym = Sym('p')
-        q_sym = Sym('q')
-        x_sym = Sym('x')
-
-        # Step 1: Parse
         try:
             parsed = parse_and_eval(expr_text)
-            self.explain_steps['parse'].set(str(parsed))
         except Exception as e:
-            self.explain_steps['parse'].set(f'Error: {e}')
-            for key in ['substitute', 'simplify', 'project', 'evaluate']:
-                self.explain_steps[key].set('')
+            tw.insert('end', f'Parse error: {e}', 'value')
+            tw.configure(state='disabled')
+            self._draw_cheb_orbit(self.cheb_ax_orbit, None)
+            self.cheb_canvas_widget.draw()
             return
 
-        # Step 2: Substitute x → native_x(p, q), then p → p_val, q → q_val
-        try:
-            result = parsed
-            # First pass: substitute x with projection's native unit (using p, q symbols)
-            if result.has(x_sym) and proj:
-                native = proj.native_x(p_sym, q_sym)
-                result = result.subs(x_sym, native)
+        decomp = chebyshev_decompose(parsed)
+        self._render_cheb_text(decomp)
+        tw.configure(state='disabled')
+        self._draw_cheb_orbit(self.cheb_ax_orbit, decomp.get('exponent'))
+        self.cheb_canvas_widget.draw()
 
-            # Second pass: substitute p, q with numeric values
-            has_vars = result.has(p_sym) or result.has(q_sym)
-            if has_vars:
-                substituted = result.subs([(p_sym, p_val), (q_sym, q_val)])
-                self.explain_steps['substitute'].set(str(substituted))
-            else:
-                substituted = result
-                self.explain_steps['substitute'].set('(no variables to substitute)')
-        except Exception as e:
-            self.explain_steps['substitute'].set(f'Error: {e}')
-            substituted = parsed
+    def _render_cheb_text(self, decomp):
+        """Render the Chebyshev decomposition into the text widget."""
+        tw = self.cheb_text
 
-        # Step 3: Traction Simplify
-        try:
-            simplified = traction_simplify(substituted)
-            self.explain_steps['simplify'].set(str(simplified))
-        except Exception as e:
-            self.explain_steps['simplify'].set(f'Error: {e}')
-            simplified = substituted
+        traction_str = decomp['traction_str']
 
-        # Step 4: Project (using the selected projection)
-        try:
-            if proj:
-                proj_str = proj.format_projection(simplified)
-                if proj_str:
-                    self.explain_steps['project'].set(f'[{proj_name}] {proj_str}')
-                else:
-                    self.explain_steps['project'].set(f'[{proj_name}] (no projection available)')
+        if not decomp['has_decomp']:
+            tw.insert('end', traction_str + '\n', 'expr')
+            tw.insert('end', '\n')
+            tw.insert('end', decomp.get('note', '') + '\n', 'dim')
+            if decomp.get('complex_str'):
+                tw.insert('end', '\n')
+                tw.insert('end', 'Complex Projection\n', 'header')
+                tw.insert('end', decomp['complex_str'] + '\n', 'value')
+            return
 
-                # Also compute numeric projection for step 5
-                from sympy import symbols as syms
-                a, b = syms('a b', real=True)
-                projected = proj.project_expr(simplified, a, b)
-                if projected is None:
-                    projected = project_complex(simplified)
-            else:
-                projected = project_complex(simplified)
-                self.explain_steps['project'].set(str(projected))
-        except Exception as e:
-            self.explain_steps['project'].set(f'Error: {e}')
-            projected = simplified
+        # Expression with equivalence
+        equiv_str = decomp['equiv_str']
+        if equiv_str != traction_str:
+            tw.insert('end', f'{traction_str}  =  {equiv_str}\n', 'expr')
+        else:
+            tw.insert('end', traction_str + '\n', 'expr')
 
-        # Step 5: Evaluate (numeric result)
-        try:
-            import cmath
+        # Chebyshev Polynomial
+        hc_label = decomp['half_label']
+        tw.insert('end', '\n')
+        tw.insert('end', 'Chebyshev Polynomial\n', 'header')
 
-            # For q_surface: show phase and magnitude numerically
-            if hasattr(proj, '_recursive_decompose'):
-                phase_val, mag_val = proj._recursive_decompose(simplified)
-                # Project for numeric display
-                phase_num = complex(project_complex(phase_val).evalf()) if phase_val is not None else 0
-                mag_num = complex(project_complex(mag_val).evalf()) if mag_val is not None else 0
-                parts = []
-                if phase_num.imag == 0:
-                    parts.append(f'phase={phase_num.real:.6g}')
-                else:
-                    parts.append(f'phase={phase_num.real:.6g}+{phase_num.imag:.6g}i')
-                if isinstance(mag_val, Omega):
-                    parts.append('magnitude=ω (∞)')
-                elif mag_num.imag == 0:
-                    parts.append(f'magnitude={mag_num.real:.6g}')
-                else:
-                    parts.append(f'magnitude={mag_num.real:.6g}+{mag_num.imag:.6g}i')
-                self.explain_steps['evaluate'].set('  '.join(parts))
-            else:
-                # Standard complex evaluation
-                val = complex(projected.evalf())
-                mag = abs(val)
-                phase = cmath.phase(val)
-                self.explain_steps['evaluate'].set(
-                    f'{val.real:.6g} + {val.imag:.6g}i   |f|={mag:.6g}  arg={phase/3.14159:.4g}π')
-        except Exception as e:
-            self.explain_steps['evaluate'].set(f'Error: {e}')
+        step_denom = decomp.get('step_denom', 2)
+        if step_denom == 2:
+            gen_note = 's = u + v,  u = 0^(1/2),  v = \u03c9^(1/2)'
+        else:
+            d = step_denom
+            gen_note = f's = u + v,  u = 0^(1/{d}),  v = \u03c9^(1/{d})'
+        tw.insert('end', gen_note + '\n', 'dim')
+
+        cheb_str = decomp['cheb_str']
+        tw.insert('end', f'a({hc_label}) = {cheb_str}\n', 'value')
+
+        # Recurrence Trace
+        trace = decomp.get('trace', [])
+        if trace:
+            tw.insert('end', '\n')
+            tw.insert('end', 'Recurrence Trace\n', 'header')
+            tw.insert('end', 'a\u2099 = (u+v)\u00b7a\u2099\u208b\u2081 \u2212 a\u2099\u208b\u2082\n', 'dim')
+            for label, poly_str in trace:
+                tw.insert('end', f'  {label} = {poly_str}\n', 'value')
+
+        # Complex Projection
+        if decomp.get('complex_str'):
+            tw.insert('end', '\n')
+            tw.insert('end', 'Complex Projection\n', 'header')
+            tw.insert('end', decomp['complex_str'] + '\n', 'value')
+
+    def _draw_cheb_orbit(self, ax, exponent):
+        """Draw a unit circle orbit plot highlighting the given exponent."""
+        ax.clear()
+        ax.set_facecolor('#1a1a2e')
+        ax.set_aspect('equal')
+        ax.set_title('Phase Orbit', fontsize=13, color='#eeeeee')
+        ax.tick_params(colors='#aaaaaa', labelsize=9)
+
+        # Unit circle
+        circ_t = np.linspace(0, 2 * np.pi, 200)
+        ax.plot(np.cos(circ_t), np.sin(circ_t), color='#333344', linewidth=0.8)
+        ax.axhline(0, color='#333344', linewidth=0.5)
+        ax.axvline(0, color='#333344', linewidth=0.5)
+
+        # Plot integer powers as reference dots: 0^n for n = -6..6
+        theta_ref = np.pi / 4  # reference angle for visualization
+        for n in range(-6, 7):
+            angle = n * theta_ref
+            zx, zy = np.cos(angle), np.sin(angle)
+            ax.plot(zx, zy, 'o', color='#4488ff', markersize=2.5, alpha=0.4)
+
+        # Highlight the current expression's position
+        if exponent is not None:
+            try:
+                n_val = float(exponent)
+                angle = n_val * theta_ref
+                zx, zy = np.cos(angle), np.sin(angle)
+                ax.plot(zx, zy, 'o', color='#00ccff', markersize=10, zorder=5,
+                        markeredgecolor='white', markeredgewidth=1.5)
+                ax.annotate(f'$0^{{{exponent}}}$', (zx, zy),
+                            textcoords='offset points', xytext=(8, 8),
+                            fontsize=12, color='#00ccff')
+            except (TypeError, ValueError):
+                pass
+
+        # Origin marker (0^0 = 1)
+        ax.plot(1, 0, 'o', color='#ffffff', markersize=5, zorder=4)
+        ax.set_xlim(-1.5, 1.5)
+        ax.set_ylim(-1.5, 1.5)
+
+        ax.legend(['unit circle'], fontsize=9, loc='lower left',
+                   facecolor='#1a1a2e', edgecolor='#444444', labelcolor='#999999')
 
     def _on_viz_hover(self, event):
         """Draw gauge readouts for the hovered pixel."""
