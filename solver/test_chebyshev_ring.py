@@ -1,10 +1,11 @@
-"""Tests for the Chebyshev ring Q[s][u] / (u² - su + 1)."""
+"""Tests for the Chebyshev ring Q[s][u] / (u² - su + 1) and Level 2 tower."""
 
 import pytest
 import cmath
 import math
 from fractions import Fraction
-from chebyshev_ring import QsPoly, Element, U, V, ONE, ZERO, S
+from chebyshev_ring import (QsPoly, Element, U, V, ONE, ZERO, S,
+                             TowerElement, W, W_INV, T, T_ONE, T_ZERO)
 
 
 # ============================================================
@@ -501,3 +502,297 @@ class TestDisplay:
     def test_repr_a_plus_bu(self):
         e = Element(QsPoly([3]), QsPoly([2]))  # 3 + 2u
         assert 'u' in repr(e)
+
+
+# ============================================================
+# Level 2 Tower Tests — Construction
+# ============================================================
+
+class TestTowerConstruction:
+
+    def test_one(self):
+        assert T_ONE.a == QsPoly.one()
+        assert T_ONE.b.is_zero()
+        assert T_ONE.c.is_zero()
+        assert T_ONE.d.is_zero()
+
+    def test_zero(self):
+        assert T_ZERO.is_zero()
+
+    def test_w(self):
+        assert W.c == QsPoly.one()
+        assert W.a.is_zero() and W.b.is_zero() and W.d.is_zero()
+
+    def test_t(self):
+        assert T.b == QsPoly.one()
+        assert T.a.is_zero() and T.c.is_zero() and T.d.is_zero()
+
+    def test_w_inv(self):
+        """w⁻¹ = t - w."""
+        assert W_INV == TowerElement(0, QsPoly.one(), QsPoly.from_int(-1), 0)
+
+
+# ============================================================
+# Level 2 Tower Tests — Core Arithmetic
+# ============================================================
+
+class TestTowerArithmetic:
+
+    def test_w_squared(self):
+        """w² = tw - 1 (fundamental reduction rule)."""
+        w2 = W * W
+        assert w2.a == QsPoly.from_int(-1)
+        assert w2.b.is_zero()
+        assert w2.c.is_zero()
+        assert w2.d == QsPoly.one()
+
+    def test_t_squared(self):
+        """t² = s + 2."""
+        t2 = T * T
+        assert t2 == TowerElement(QsPoly((2, 1)))  # s + 2
+
+    def test_w_times_w_inv(self):
+        """w · w⁻¹ = 1."""
+        assert W * W_INV == T_ONE
+
+    def test_w_inv_times_w(self):
+        """w⁻¹ · w = 1 (commutativity)."""
+        assert W_INV * W == T_ONE
+
+    def test_u_as_w_squared(self):
+        """u = w² = -1 + tw. Lifting Level 1 u into Level 2."""
+        u_tower = TowerElement.from_element(U)
+        w2 = W * W
+        assert u_tower == w2
+
+    def test_v_as_w_neg2(self):
+        """v = w⁻² = (t-w)²."""
+        v_tower = TowerElement.from_element(V)
+        w_inv_sq = W_INV ** 2
+        assert v_tower == w_inv_sq
+
+    def test_u_times_v_in_tower(self):
+        """u·v = 1 in Level 2."""
+        u_t = TowerElement.from_element(U)
+        v_t = TowerElement.from_element(V)
+        assert u_t * v_t == T_ONE
+
+    def test_mul_scalar(self):
+        assert W * 3 == TowerElement(0, 0, QsPoly.from_int(3), 0)
+
+    def test_mul_associative(self):
+        assert (W * W) * T == W * (W * T)
+
+    def test_mul_distributive(self):
+        assert W * (T_ONE + W) == W + W * W
+
+    def test_w_fourth_is_traction_zero(self):
+        """w⁴ = 0^1 = u² (traction zero)."""
+        w4 = W ** 4
+        # u² = -1 + s·u. As a TowerElement via from_element:
+        u_sq = Element.u_power(2)
+        u_sq_tower = TowerElement.from_element(u_sq)
+        assert w4 == u_sq_tower
+
+
+# ============================================================
+# Level 2 Tower Tests — Conjugation and Norm
+# ============================================================
+
+class TestTowerConjNorm:
+
+    def test_sigma_w(self):
+        """σ(w) = w⁻¹ = t - w."""
+        assert W.sigma() == W_INV
+
+    def test_tau_w(self):
+        """τ(w) = -w."""
+        assert W.tau() == -W
+
+    def test_sigma_involution(self):
+        """σ(σ(x)) = x."""
+        x = TowerElement(QsPoly([1, 2]), QsPoly([3]), QsPoly([-1]), QsPoly([1]))
+        assert x.sigma().sigma() == x
+
+    def test_tau_involution(self):
+        """τ(τ(x)) = x."""
+        x = TowerElement(QsPoly([1]), QsPoly([2]), QsPoly([3]), QsPoly([4]))
+        assert x.tau().tau() == x
+
+    def test_half_norm_w(self):
+        """N₂(w) = w · σ(w) = w · w⁻¹ = 1."""
+        hn = W.half_norm()
+        assert hn == T_ONE
+
+    def test_full_norm_w(self):
+        """N₄(w) = 1."""
+        fn = W.full_norm()
+        assert fn == QsPoly.one()
+
+    def test_full_norm_w_power(self):
+        """N₄(w^n) = 1 for all n."""
+        for n in range(-4, 5):
+            fn = TowerElement.w_power(n).full_norm()
+            assert fn == QsPoly.one(), f"N₄(w^{n}) != 1"
+
+
+# ============================================================
+# Level 2 Tower Tests — Inversion and Powers
+# ============================================================
+
+class TestTowerInversion:
+
+    def test_inv_w(self):
+        """w⁻¹ = t - w."""
+        assert W.inv() == W_INV
+
+    def test_w_times_inv(self):
+        assert W * W.inv() == T_ONE
+
+    def test_inv_involution(self):
+        for n in range(-3, 4):
+            x = TowerElement.w_power(n)
+            assert x.inv().inv() == x, f"inv(inv(w^{n})) != w^{n}"
+
+    def test_power_inverse_identity(self):
+        """w^n · w^{-n} = 1."""
+        for n in range(-4, 5):
+            assert TowerElement.w_power(n) * TowerElement.w_power(-n) == T_ONE
+
+    def test_large_power(self):
+        """w^100 works."""
+        e = TowerElement.w_power(100)
+        assert e.full_norm() == QsPoly.one()
+
+
+# ============================================================
+# Level 2 Tower Tests — Traction Conversion
+# ============================================================
+
+class TestTowerTraction:
+
+    def test_traction_quarter(self):
+        """0^(1/4) = w."""
+        assert TowerElement.from_traction_exp(Fraction(1, 4)) == W
+
+    def test_traction_half(self):
+        """0^(1/2) = w² = u."""
+        e = TowerElement.from_traction_exp(Fraction(1, 2))
+        assert e == W ** 2
+
+    def test_traction_one(self):
+        """0^1 = w⁴."""
+        e = TowerElement.from_traction_exp(1)
+        assert e == W ** 4
+
+    def test_traction_neg_quarter(self):
+        """0^(-1/4) = w⁻¹ = t - w."""
+        assert TowerElement.from_traction_exp(Fraction(-1, 4)) == W_INV
+
+    def test_traction_non_quarter_raises(self):
+        """0^(1/3) requires w^(4/3), not an integer."""
+        with pytest.raises(ValueError):
+            TowerElement.from_traction_exp(Fraction(1, 3))
+
+
+# ============================================================
+# Level 2 Tower Tests — Chebyshev Structure
+# ============================================================
+
+class TestTowerChebyshev:
+
+    def test_quarter_cycle_sums_are_scalar(self):
+        """w^n + w^{-n} should be in Q[s,t] (no w or tw components)."""
+        for n in range(8):
+            total = TowerElement.w_power(n) + TowerElement.w_power(-n)
+            assert total.c.is_zero() and total.d.is_zero(), \
+                f"w^{n} + w^{{-{n}}} has nonzero w-component"
+
+    def test_w1_plus_w_inv_is_t(self):
+        """w + w⁻¹ = t."""
+        assert W + W_INV == T
+
+    def test_w2_plus_w_inv2_is_s(self):
+        """w² + w⁻² = s (the Level 1 parameter)."""
+        total = W**2 + W_INV**2
+        assert total.is_scalar()
+        assert total.a == QsPoly.s()
+
+    def test_t_squared_minus_2_is_s(self):
+        """t² - 2 = s (Chebyshev doubling)."""
+        result = T * T - 2
+        assert result.is_scalar()
+        assert result.a == QsPoly.s()
+
+    def test_minimal_polynomial(self):
+        """w⁴ - sw² + 1 = 0 (minimal polynomial of w over Q[s])."""
+        s_tower = TowerElement(QsPoly.s())
+        result = W**4 - s_tower * W**2 + T_ONE
+        assert result == T_ZERO
+
+
+# ============================================================
+# Level 2 Tower Tests — Evaluation
+# ============================================================
+
+class TestTowerEvaluation:
+
+    def test_eval_w(self):
+        """At θ: w = e^{iθ}."""
+        theta = math.pi / 5
+        val = W.eval_at(theta=theta)
+        expected = cmath.exp(1j * theta)
+        assert abs(val - expected) < 1e-12
+
+    def test_eval_t(self):
+        """t = 2cos(θ)."""
+        theta = math.pi / 7
+        val = T.eval_at(theta=theta)
+        assert abs(val - 2 * math.cos(theta)) < 1e-12
+
+    def test_eval_w_squared_is_u(self):
+        """w² evaluated = u = e^{2iθ}."""
+        theta = math.pi / 6
+        w2_val = (W**2).eval_at(theta=theta)
+        u_val = cmath.exp(2j * theta)
+        assert abs(w2_val - u_val) < 1e-12
+
+    def test_eval_product(self):
+        """(w + 1)(w - 1) evaluated matches numeric."""
+        theta = 0.8
+        w_num = cmath.exp(1j * theta)
+        expected = (w_num + 1) * (w_num - 1)
+        expr = (W + T_ONE) * (W - T_ONE)
+        val = expr.eval_at(theta=theta)
+        assert abs(val - expected) < 1e-12
+
+    def test_eval_quarter_sum_is_real(self):
+        """w^n + w^{-n} = 2cos(nθ) should be real."""
+        theta = math.pi / 5
+        for n in range(6):
+            val = (TowerElement.w_power(n) + TowerElement.w_power(-n)).eval_at(theta=theta)
+            assert abs(val.imag) < 1e-12
+            assert abs(val.real - 2 * math.cos(n * theta)) < 1e-12
+
+
+# ============================================================
+# Level 2 Tower Tests — Display
+# ============================================================
+
+class TestTowerDisplay:
+
+    def test_repr_zero(self):
+        assert repr(T_ZERO) == '0'
+
+    def test_repr_one(self):
+        assert repr(T_ONE) == '1'
+
+    def test_repr_w(self):
+        assert repr(W) == 'w'
+
+    def test_repr_t(self):
+        assert repr(T) == 't'
+
+    def test_repr_tw(self):
+        tw = TowerElement(0, 0, 0, QsPoly.one())
+        assert repr(tw) == 'tw'
