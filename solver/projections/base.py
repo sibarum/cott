@@ -28,6 +28,15 @@ class Projection:
     # Keys this projection provides in eval_grid output
     output_keys = ['Re', 'Im', 'mag', 'phase']
 
+    def format_projection(self, traction_expr):
+        """
+        Format a traction expression as it appears in this projection's domain.
+        Used for the ≈ display in the calculator.
+
+        Returns a string, or '' if no meaningful projection can be shown.
+        """
+        return ''
+
     def native_x(self, a, b):
         """
         Return the projection's native unit coordinate as a traction expression.

@@ -20,6 +20,17 @@ class ComplexLieProjection(Projection):
     description = 'Standard complex projection via Lie exponential (0^z = e^{-Wz})'
     output_keys = ['Re', 'Im', 'mag', 'phase']
 
+    def format_projection(self, traction_expr):
+        """Format as Lie exponential / Euler complex form."""
+        from calculator import format_complex, format_approx
+        result = format_complex(traction_expr)
+        if result:
+            return result
+        result = format_approx(traction_expr)
+        if result:
+            return result
+        return ''
+
     def native_x(self, a, b):
         """Complex Lie native unit: x = p + q*0^(w/2) (complex plane)."""
         return a + b * Pow(Zero(), Mul(Omega(), Rational(1, 2)))
@@ -36,40 +47,22 @@ class ComplexLieProjection(Projection):
 
         return projected
 
-    def eval_grid(self, projected_expr, a, b, AA, BB, evaluator='numpy',
-                  traction_expr=None):
-        """Evaluate on grid, return dict of numpy arrays.
+    def eval_grid(self, projected_expr, a, b, AA, BB, **kwargs):
+        """Evaluate on grid, return dict of numpy arrays."""
+        try:
+            f = lambdify((a, b), projected_expr, modules=['numpy'])
+        except Exception:
+            return None
+        try:
+            with np.errstate(divide='ignore', invalid='ignore', over='ignore'):
+                Z = f(AA, BB)
+                if np.isscalar(Z) or (isinstance(Z, np.ndarray) and Z.ndim == 0):
+                    Z = np.full_like(AA, complex(Z), dtype=complex)
+                Z = np.asarray(Z, dtype=complex)
+        except Exception:
+            return None
 
-        evaluator: 'numpy' (fast, current), 'hybrid' (TractionValue per-pixel),
-                   'sympy' (exact, slow)
-        traction_expr: the pre-projection expression (needed for hybrid/sympy modes)
-
-        For hybrid/sympy, returns a GridComputation for async execution.
-        For numpy, returns the result dict directly.
-        """
-        from evaluator import eval_grid_hybrid, eval_grid_sympy, GridComputation
-
-        if evaluator in ('hybrid', 'sympy') and traction_expr is not None:
-            func = eval_grid_hybrid if evaluator == 'hybrid' else eval_grid_sympy
-            comp = GridComputation()
-            comp.start(func, traction_expr, a, b, AA, BB)
-            return comp  # caller must poll comp.is_done()
-        else:
-            # Fast numpy path (default) — synchronous
-            try:
-                f = lambdify((a, b), projected_expr, modules=['numpy'])
-            except Exception:
-                return None
-            try:
-                with np.errstate(divide='ignore', invalid='ignore', over='ignore'):
-                    Z = f(AA, BB)
-                    if np.isscalar(Z) or (isinstance(Z, np.ndarray) and Z.ndim == 0):
-                        Z = np.full_like(AA, complex(Z), dtype=complex)
-                    Z = np.asarray(Z, dtype=complex)
-            except Exception:
-                return None
-
-            return _z_to_metrics(Z)
+        return _z_to_metrics(Z)
 
 
 def _z_to_metrics(Z):

@@ -16,6 +16,11 @@ from traction import Zero, Omega, Null, Log0, LogW, z, w, null, traction_simplif
 import registry
 import projections  # auto-discovers and registers projection plugins
 
+import matplotlib
+matplotlib.use('TkAgg')
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+
 
 # ============================================================
 # Expression Parser
@@ -509,7 +514,7 @@ PHASE_COLORS = np.array([
 
 
 def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
-                       projection_name='complex_lie', evaluator='numpy'):
+                       projection_name='complex_lie'):
     """
     Compute visualization data for a traction expression using a registered projection.
 
@@ -518,8 +523,6 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
         x    — projection's native unit coordinate. Defined by each projection:
                complex_lie: x = p + q*0^(w/2)
                q_surface:   x = 0^(w*p/q)
-
-    evaluator: 'numpy' (fast), 'hybrid' (TractionValue per-pixel), 'sympy' (exact, slow)
 
     Returns tuple (phase, brightness, Z, log_mag) or None on failure.
     """
@@ -567,16 +570,10 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
     AA, BB = np.meshgrid(lin, lin[::-1])  # flip y so up = positive
 
     eval_result = proj.eval_grid(projected, a, b, AA, BB,
-                                 evaluator=evaluator, traction_expr=traction_expr)
+                                 traction_expr=traction_expr)
     if eval_result is None:
         return None
 
-    # For async evaluators (hybrid/sympy), return the GridComputation object
-    from evaluator import GridComputation
-    if isinstance(eval_result, GridComputation):
-        return eval_result  # caller handles async polling
-
-    # Sync result (numpy): return the standard tuple
     return eval_result['phase'], eval_result['brightness'], eval_result['Z'], eval_result['log_mag']
 
 
@@ -772,8 +769,6 @@ class CalculatorApp:
         self.color_mode = 'phase'  # 'phase' or 'continuity'
         self.projection_names = registry.names('projection')
         self.projection_index = 0  # default to first registered (complex_lie)
-        self.evaluator_mode = 'numpy'  # 'numpy', 'hybrid', 'sympy'
-        self.approx_mode = '='  # '=' (exact traction) or '≈' (Euler approximation)
 
         self._build_ui()
         self._bind_keys()
@@ -799,12 +794,8 @@ class CalculatorApp:
         result_frame = tk.Frame(top_frame, bg=BG_RESULT, relief='sunken', bd=1)
         result_frame.pack(fill='x')
 
-        self.approx_btn = tk.Button(
-            result_frame, text='=', font=self.font_btn_small,
-            width=2, bd=1, relief='flat', bg=BG_RESULT, fg=FG_DIM,
-            activebackground=BG_RESULT, command=self._toggle_approx_mode
-        )
-        self.approx_btn.pack(side='left', padx=(4, 0))
+        tk.Label(result_frame, text='=', font=self.font_btn_small,
+                 bg=BG_RESULT, fg=FG_DIM, width=2).pack(side='left', padx=(4, 0))
 
         self.display_result_var = tk.StringVar()
         self.display_result = tk.Entry(
@@ -815,12 +806,34 @@ class CalculatorApp:
         )
         self.display_result.pack(side='left', fill='x', expand=True, padx=(0, 10), pady=4)
 
-        # Hidden stubs for removed display elements (code still references them)
-        self.display_approx = tk.Label(top_frame)
-        self.display_history = tk.Label(top_frame)
 
-        # Horizontal container: calculator + visualization
-        hframe = tk.Frame(border, bg=BG_FRAME)
+        # ===== Tab bar =====
+        tab_bar = tk.Frame(border, bg=BG_FRAME)
+        tab_bar.pack(fill='x', pady=(0, 2))
+
+        self._tab_frames = {}
+        self._tab_buttons = {}
+        self._active_tab = None
+
+        for tab_name in ['Plot', 'Explain', 'Phase Map']:
+            btn = tk.Button(
+                tab_bar, text=tab_name, font=self.font_label,
+                bd=0, padx=16, pady=3, bg=BG_FRAME, fg=FG_TEXT,
+                activebackground=BG_BODY,
+                command=lambda n=tab_name: self._select_tab(n)
+            )
+            btn.pack(side='left')
+            self._tab_buttons[tab_name] = btn
+
+        # Tab content container
+        self._tab_container = tk.Frame(border, bg=BG_FRAME)
+        self._tab_container.pack(fill='both', expand=True)
+
+        # ===== Plot tab =====
+        plot_frame = tk.Frame(self._tab_container, bg=BG_FRAME)
+        self._tab_frames['Plot'] = plot_frame
+
+        hframe = tk.Frame(plot_frame, bg=BG_FRAME)
         hframe.pack()
 
         # ===== Left: Calculator =====
@@ -899,11 +912,112 @@ class CalculatorApp:
         self._make_button(btn_row, '+', self._zoom_in, small=True).pack(side='left', padx=1)
         self._make_button(btn_row, '\u2699', self._open_settings, small=True).pack(side='left', padx=(8, 1))
 
-        # Hidden stub buttons for settings window _set_toggle references
-        self.tangent_btn = tk.Button(btn_row); self.tangent_btn._toggled = False; self.tangent_btn._is_toggle = True; self.tangent_btn._is_accent = False
-        self.normal_btn = tk.Button(btn_row); self.normal_btn._toggled = False; self.normal_btn._is_toggle = True; self.normal_btn._is_accent = False
-        self.color_btn = tk.Button(btn_row); self.color_btn._toggled = False; self.color_btn._is_toggle = True; self.color_btn._is_accent = False
-        self.proj_btn = tk.Button(btn_row); self.proj_btn._toggled = False; self.proj_btn._is_toggle = True; self.proj_btn._is_accent = False
+
+        # ===== Explain tab =====
+        explain_frame = tk.Frame(self._tab_container, bg=BG_BODY, bd=1, relief='solid')
+        self._tab_frames['Explain'] = explain_frame
+
+        # Step display fields
+        self.explain_steps = {}
+        step_names = [
+            ('parse', '1. Parse'),
+            ('substitute', '2. Substitute x'),
+            ('simplify', '3. Traction Simplify'),
+            ('project', '4. Project'),
+            ('evaluate', '5. Evaluate'),
+        ]
+
+        steps_frame = tk.Frame(explain_frame, bg=BG_BODY)
+        steps_frame.pack(fill='both', expand=True, padx=10, pady=4)
+
+        for key, label in step_names:
+            row = tk.Frame(steps_frame, bg=BG_BODY)
+            row.pack(fill='x', pady=2)
+
+            tk.Label(row, text=label, font=self.font_label, bg=BG_BODY, fg=FG_DIM,
+                     width=18, anchor='w').pack(side='left')
+
+            var = tk.StringVar()
+            entry = tk.Entry(
+                row, textvariable=var, font=tkfont.Font(family='Consolas', size=11),
+                bg=BG_DISPLAY, fg=FG_TEXT, bd=1, relief='sunken',
+                readonlybackground=BG_DISPLAY, state='readonly'
+            )
+            entry.pack(side='left', fill='x', expand=True, padx=(4, 0))
+            self.explain_steps[key] = var
+
+        # Options row: projection selector + p,q inputs
+        opts_frame = tk.Frame(explain_frame, bg=BG_BODY)
+        opts_frame.pack(fill='x', padx=10, pady=(8, 10))
+
+        tk.Label(opts_frame, text='Projection:', font=self.font_label,
+                 bg=BG_BODY, fg=FG_DIM).pack(side='left')
+
+        self.explain_proj_var = tk.StringVar(value=self.projection_names[0])
+        proj_menu = tk.OptionMenu(opts_frame, self.explain_proj_var, *self.projection_names)
+        proj_menu.configure(font=self.font_label, bg=BG_BTN, highlightthickness=0)
+        proj_menu.pack(side='left', padx=(4, 12))
+
+        tk.Label(opts_frame, text='p=', font=self.font_label,
+                 bg=BG_BODY, fg=FG_DIM).pack(side='left')
+        self.explain_p_var = tk.StringVar(value='1')
+        tk.Entry(opts_frame, textvariable=self.explain_p_var, width=6,
+                 font=self.font_label).pack(side='left', padx=(2, 8))
+
+        tk.Label(opts_frame, text='q=', font=self.font_label,
+                 bg=BG_BODY, fg=FG_DIM).pack(side='left')
+        self.explain_q_var = tk.StringVar(value='0')
+        tk.Entry(opts_frame, textvariable=self.explain_q_var, width=6,
+                 font=self.font_label).pack(side='left', padx=(2, 0))
+
+        tk.Button(opts_frame, text='Explain', font=self.font_btn_small,
+                  bd=1, padx=8, bg='#5a7d9a', fg='white',
+                  activebackground=BG_BTN_ACTIVE,
+                  command=self._run_explain).pack(side='right', padx=4)
+
+        # ===== Phase Map tab =====
+        phasemap_frame = tk.Frame(self._tab_container, bg=BG_BODY, bd=1, relief='solid')
+        self._tab_frames['Phase Map'] = phasemap_frame
+
+        # Controls row
+        pm_controls = tk.Frame(phasemap_frame, bg=BG_BODY)
+        pm_controls.pack(fill='x', padx=10, pady=(8, 4))
+
+        tk.Label(pm_controls, text='N:', font=self.font_label,
+                 bg=BG_BODY, fg=FG_DIM).pack(side='left')
+        self.pm_n_var = tk.StringVar(value='10')
+        tk.Entry(pm_controls, textvariable=self.pm_n_var, width=4,
+                 font=self.font_label).pack(side='left', padx=(2, 12))
+
+        tk.Label(pm_controls, text='\u03b8 / \u03c0:', font=self.font_label,
+                 bg=BG_BODY, fg=FG_DIM).pack(side='left')
+        self.pm_theta_var = tk.DoubleVar(value=0.25)
+        self.pm_theta_scale = tk.Scale(
+            pm_controls, variable=self.pm_theta_var, from_=0.01, to=0.99,
+            resolution=0.01, orient='horizontal', length=200,
+            bg=BG_BODY, fg=FG_TEXT, highlightthickness=0, troughcolor=BG_DISPLAY,
+            command=lambda _: self._update_phase_map()
+        )
+        self.pm_theta_scale.pack(side='left', padx=(2, 12))
+
+        tk.Button(pm_controls, text='Refresh', font=self.font_btn_small,
+                  bd=1, padx=8, bg='#5a7d9a', fg='white',
+                  activebackground=BG_BTN_ACTIVE,
+                  command=self._update_phase_map).pack(side='right', padx=4)
+
+        # Matplotlib figure
+        self.pm_fig = Figure(figsize=(8.5, 4.5), dpi=96, facecolor=BG_BODY)
+        self.pm_fig.subplots_adjust(left=0.07, right=0.97, top=0.92, bottom=0.12, wspace=0.32)
+
+        self.pm_ax_orbit = self.pm_fig.add_subplot(1, 3, 1)
+        self.pm_ax_amp = self.pm_fig.add_subplot(1, 3, 2)
+        self.pm_ax_table = self.pm_fig.add_subplot(1, 3, 3)
+
+        self.pm_canvas_widget = FigureCanvasTkAgg(self.pm_fig, master=phasemap_frame)
+        self.pm_canvas_widget.get_tk_widget().pack(fill='both', expand=True, padx=6, pady=(0, 8))
+
+        # Show Plot tab by default
+        self._select_tab('Plot')
 
     def _make_button(self, parent, label, command, accent=False, small=False, toggle=False):
         """Create a button. If toggle=True, uses chisel bevel style for toggle switches."""
@@ -979,18 +1093,8 @@ class CalculatorApp:
     def _clear_entry(self):
         self.entry_var.set('')
 
-    def _toggle_approx_mode(self):
-        """Toggle between = (exact traction) and ≈ (Euler approximation)."""
-        if self.approx_mode == '=':
-            self.approx_mode = '\u2248'
-        else:
-            self.approx_mode = '='
-        self.approx_btn.configure(text=self.approx_mode)
-        self._update_live_preview()
-        self.display_expr.focus_set()
-
     def _format_display_result(self, parsed):
-        """Format the result for display, applying x-substitution and approx mode."""
+        """Format the result for display, applying x-substitution."""
         from sympy import Symbol as Sym
         x_sym = Sym('x')
         p_sym = Sym('p')
@@ -1006,18 +1110,7 @@ class CalculatorApp:
                 result = result.subs(x_sym, native)
                 result = traction_simplify(result)
 
-        if self.approx_mode == '\u2248':
-            # Euler approximation: project to complex
-            euler = format_complex(result)
-            if euler:
-                return f'\u2248 {euler}'
-            # Fallback: decimal approximation
-            approx = format_approx(result)
-            if approx:
-                return f'\u2248 {approx}'
-            return f'= {format_result(result)}'
-        else:
-            return f'= {format_result(result)}'
+        return f'= {format_result(result)}'
 
     def _set_result_text(self, text, fg=None):
         """Set the result display text (Entry widget)."""
@@ -1032,8 +1125,6 @@ class CalculatorApp:
     def _clear_all(self):
         self.entry_var.set('')
         self.history = []
-        self.display_history.configure(text='')
-        self.display_approx.configure(text='')
         self._update_live_preview()
 
     def _evaluate(self):
@@ -1047,6 +1138,10 @@ class CalculatorApp:
 
             # Refresh the phase plot (keeps expression in entry)
             self._refresh_viz()
+
+            # Refresh explain tab if active
+            if self._active_tab == 'Explain':
+                self._run_explain()
 
         except (ParseError, Exception) as e:
             self._set_result_text(f'Error: {e}', fg='#aa3333')
@@ -1071,11 +1166,6 @@ class CalculatorApp:
 
     def _refresh_viz(self):
         """Compute and render the phase plot for the current expression."""
-        # Cancel any in-progress async computation
-        if hasattr(self, '_active_computation') and self._active_computation is not None:
-            self._active_computation.cancel()
-            self._active_computation = None
-
         expr_text = self.entry_var.get().strip()
         if not expr_text:
             self.viz_canvas.delete('all')
@@ -1085,49 +1175,16 @@ class CalculatorApp:
         try:
             proj_name = self.projection_names[self.projection_index]
             result = compute_phase_grid(expr_text, bounds=self.viz_bounds,
-                                       projection_name=proj_name, evaluator=self.evaluator_mode)
+                                       projection_name=proj_name)
             if result is None:
                 self.viz_canvas.delete('all')
                 self.display_expr.focus_set()
                 return
 
-            # Check if result is async (GridComputation)
-            from evaluator import GridComputation
-            if isinstance(result, GridComputation):
-                self._active_computation = result
-                self.viz_title_label.configure(text='Computing... 0%')
-                self._poll_computation()
-                return
-
-            # Sync result (numpy)
             self._apply_viz_result(result)
         except Exception:
             self.viz_canvas.delete('all')
         self.display_expr.focus_set()
-
-    def _poll_computation(self):
-        """Poll an async grid computation for completion."""
-        comp = self._active_computation
-        if comp is None:
-            return
-
-        if comp.is_done():
-            self._active_computation = None
-            if comp.error or comp.result is None:
-                self.viz_title_label.configure(text='Phase Plot')
-                self.viz_canvas.delete('all')
-                return
-            # Convert Z grid to metrics
-            from projections.complex_lie import _z_to_metrics
-            metrics = _z_to_metrics(comp.result)
-            self._apply_viz_result(
-                (metrics['phase'], metrics['brightness'], metrics['Z'], metrics['log_mag']))
-            return
-
-        # Still computing — update progress and poll again
-        pct = int(comp.progress * 100)
-        self.viz_title_label.configure(text=f'Computing... {pct}%')
-        self.root.after(100, self._poll_computation)
 
     def _apply_viz_result(self, result):
         """Apply a completed visualization result (phase, brightness, Z, log_mag)."""
@@ -1287,7 +1344,6 @@ class CalculatorApp:
     def _toggle_tangent(self):
         """Toggle tangent lines (gradient flow) on/off."""
         self.show_tangent = not self.show_tangent
-        self._set_toggle(self.tangent_btn, self.show_tangent)
         if self.viz_Z is not None:
             if self.show_tangent:
                 self._draw_flow_lines(normal=False, tag='tangent', color='#ffffff')
@@ -1298,7 +1354,6 @@ class CalculatorApp:
     def _toggle_normal(self):
         """Toggle normal lines (constant |f| contours) on/off."""
         self.show_normal = not self.show_normal
-        self._set_toggle(self.normal_btn, self.show_normal)
         if self.viz_Z is not None:
             if self.show_normal:
                 self._draw_flow_lines(normal=True, tag='normal', color='#aaaaaa')
@@ -1312,7 +1367,6 @@ class CalculatorApp:
             self.color_mode = 'continuity'
         else:
             self.color_mode = 'phase'
-        self._set_toggle(self.color_btn, self.color_mode == 'continuity')
         if self.viz_Z is not None:
             self._refresh_viz()
         self.display_expr.focus_set()
@@ -1322,7 +1376,6 @@ class CalculatorApp:
         self.projection_index = (self.projection_index + 1) % len(self.projection_names)
         name = self.projection_names[self.projection_index]
         label = name.replace('_', ' ')
-        self.proj_btn.configure(text='P')
         if hasattr(self, 'viz_title_label'):
             self.viz_title_label.configure(text=f'Phase Plot [{label}]')
         if self.viz_Z is not None:
@@ -1332,6 +1385,265 @@ class CalculatorApp:
     def _open_settings(self):
         """Open the settings window (single-instance)."""
         SettingsWindow(self)
+
+    # ===== Tab Navigation =====
+
+    def _select_tab(self, name):
+        """Switch between Plot and Explain tabs."""
+        if self._active_tab == name:
+            return
+        # Hide current
+        if self._active_tab and self._active_tab in self._tab_frames:
+            self._tab_frames[self._active_tab].pack_forget()
+            self._tab_buttons[self._active_tab].configure(bg=BG_FRAME)
+        # Show new
+        self._tab_frames[name].pack(fill='both', expand=True)
+        self._tab_buttons[name].configure(bg=BG_BODY)
+        self._active_tab = name
+        # Auto-run explain when switching to the Explain tab
+        if name == 'Explain':
+            self._run_explain()
+        elif name == 'Phase Map':
+            self._update_phase_map()
+
+    # ===== Phase Map Tab =====
+
+    def _update_phase_map(self):
+        """Compute and render the Chebyshev phase map visualization."""
+        try:
+            N = int(self.pm_n_var.get())
+        except ValueError:
+            N = 10
+        N = max(1, min(N, 50))
+
+        theta = self.pm_theta_var.get() * np.pi  # θ in radians
+        t = 2 * np.cos(theta)  # u + v = 2cos(θ)
+
+        # u, v are complex conjugates on the unit circle: e^{±iθ}
+        u_val = np.exp(1j * theta)
+        v_val = np.exp(-1j * theta)
+
+        # Compute half-integer indices from -N to N
+        half_indices = np.arange(-2 * N, 2 * N + 1)  # n values; index = n/2
+        x_vals = half_indices / 2.0  # n/2 values
+
+        # u^n = e^{inθ}  (0^{n/2})
+        zero_powers = np.array([u_val ** n for n in half_indices])
+        # v^n = e^{-inθ}  (w^{n/2})
+        omega_powers = np.array([v_val ** n for n in half_indices])
+        # a_{n/2} = u^n + v^n = 2cos(nθ)
+        a_sums = zero_powers + omega_powers  # real-valued (imaginary parts cancel)
+
+        # --- Subplot 1: Phase Orbit (complex plane) ---
+        ax1 = self.pm_ax_orbit
+        ax1.clear()
+        ax1.set_facecolor('#1a1a2e')
+        ax1.set_title('Phase Orbit', fontsize=10, color='#cccccc')
+        ax1.set_xlabel('Re', fontsize=8, color='#999999')
+        ax1.set_ylabel('Im', fontsize=8, color='#999999')
+        ax1.tick_params(colors='#888888', labelsize=7)
+        ax1.set_aspect('equal')
+
+        # Unit circle reference
+        circ_t = np.linspace(0, 2 * np.pi, 200)
+        ax1.plot(np.cos(circ_t), np.sin(circ_t), color='#333344', linewidth=0.8, zorder=0)
+        ax1.axhline(0, color='#333344', linewidth=0.5)
+        ax1.axvline(0, color='#333344', linewidth=0.5)
+
+        # Plot 0^{n/2} orbit in blue
+        ax1.plot(zero_powers.real, zero_powers.imag, 'o-',
+                 color='#4488ff', markersize=3, linewidth=0.8, alpha=0.7, label='$0^{n/2}$')
+        # Plot w^{n/2} orbit in red
+        ax1.plot(omega_powers.real, omega_powers.imag, 'o-',
+                 color='#ff4444', markersize=3, linewidth=0.8, alpha=0.7, label='$\\omega^{n/2}$')
+
+        # Highlight n=0 (both = 1)
+        ax1.plot(1, 0, 'o', color='#ffffff', markersize=6, zorder=5)
+
+        ax1.legend(fontsize=7, loc='upper left', facecolor='#1a1a2e',
+                   edgecolor='#444444', labelcolor='#cccccc')
+
+        # --- Subplot 2: Amplitude Plot ---
+        ax2 = self.pm_ax_amp
+        ax2.clear()
+        ax2.set_facecolor('#1a1a2e')
+        ax2.set_title('Half-Cycle Sums  $a_{n/2}$', fontsize=10, color='#cccccc')
+        ax2.set_xlabel('n / 2', fontsize=8, color='#999999')
+        ax2.set_ylabel('Value', fontsize=8, color='#999999')
+        ax2.tick_params(colors='#888888', labelsize=7)
+
+        # Re(0^{n/2}) and Re(w^{n/2})
+        ax2.plot(x_vals, zero_powers.real, '-', color='#4488ff', linewidth=0.8,
+                 alpha=0.5, label='Re($0^{n/2}$)')
+        ax2.plot(x_vals, omega_powers.real, '-', color='#ff4444', linewidth=0.8,
+                 alpha=0.5, label='Re($\\omega^{n/2}$)')
+        # Sum a_{n/2} = 2cos(nθ)
+        ax2.plot(x_vals, a_sums.real, 'o-', color='#ffffff', markersize=3,
+                 linewidth=1.2, label='$a_{n/2}$', zorder=3)
+        ax2.axhline(0, color='#333344', linewidth=0.5)
+
+        # Highlight symmetry: mark integer vs half-integer
+        int_mask = (half_indices % 2 == 0)
+        ax2.plot(x_vals[int_mask], a_sums.real[int_mask], 's',
+                 color='#ffcc00', markersize=4, zorder=4, label='Integer n/2')
+
+        ax2.legend(fontsize=6, loc='upper right', facecolor='#1a1a2e',
+                   edgecolor='#444444', labelcolor='#cccccc')
+
+        # --- Subplot 3: Equivalence Table ---
+        ax3 = self.pm_ax_table
+        ax3.clear()
+        ax3.set_facecolor('#1a1a2e')
+        ax3.set_title('Equivalences', fontsize=10, color='#cccccc')
+        ax3.axis('off')
+
+        # Build table data for integer powers
+        table_n = list(range(-5, 9))
+        rows = []
+        for n in table_n:
+            half = n / 2.0
+            val = 2 * np.cos(n * theta)
+            label = f'{half:+.1f}' if half != int(half) else f'{int(half):+d}'
+            rows.append([label, f'{val:+.3f}'])
+
+        table = ax3.table(
+            cellText=rows,
+            colLabels=['n/2', '$a_{n/2}$'],
+            cellLoc='center',
+            loc='center',
+        )
+        table.auto_set_font_size(False)
+        table.set_fontsize(7)
+        for key, cell in table.get_celld().items():
+            cell.set_facecolor('#1a1a2e')
+            cell.set_edgecolor('#444466')
+            cell.set_text_props(color='#cccccc')
+            if key[0] == 0:  # header row
+                cell.set_facecolor('#2a2a4e')
+                cell.set_text_props(color='#ffcc00', fontweight='bold')
+
+        self.pm_fig.set_facecolor(BG_BODY)
+        self.pm_canvas_widget.draw()
+
+    # ===== Explain Tab =====
+
+    def _run_explain(self):
+        """Run the step-by-step explanation for the current expression."""
+        from sympy import Symbol as Sym
+
+        expr_text = self.entry_var.get().strip()
+        if not expr_text:
+            for var in self.explain_steps.values():
+                var.set('')
+            return
+
+        proj_name = self.explain_proj_var.get()
+        proj = registry.get('projection', proj_name)
+
+        try:
+            p_val = float(self.explain_p_var.get())
+        except ValueError:
+            p_val = 1.0
+        try:
+            q_val = float(self.explain_q_var.get())
+        except ValueError:
+            q_val = 0.0
+
+        p_sym = Sym('p')
+        q_sym = Sym('q')
+        x_sym = Sym('x')
+
+        # Step 1: Parse
+        try:
+            parsed = parse_and_eval(expr_text)
+            self.explain_steps['parse'].set(str(parsed))
+        except Exception as e:
+            self.explain_steps['parse'].set(f'Error: {e}')
+            for key in ['substitute', 'simplify', 'project', 'evaluate']:
+                self.explain_steps[key].set('')
+            return
+
+        # Step 2: Substitute x → native_x(p, q), then p → p_val, q → q_val
+        try:
+            result = parsed
+            # First pass: substitute x with projection's native unit (using p, q symbols)
+            if result.has(x_sym) and proj:
+                native = proj.native_x(p_sym, q_sym)
+                result = result.subs(x_sym, native)
+
+            # Second pass: substitute p, q with numeric values
+            has_vars = result.has(p_sym) or result.has(q_sym)
+            if has_vars:
+                substituted = result.subs([(p_sym, p_val), (q_sym, q_val)])
+                self.explain_steps['substitute'].set(str(substituted))
+            else:
+                substituted = result
+                self.explain_steps['substitute'].set('(no variables to substitute)')
+        except Exception as e:
+            self.explain_steps['substitute'].set(f'Error: {e}')
+            substituted = parsed
+
+        # Step 3: Traction Simplify
+        try:
+            simplified = traction_simplify(substituted)
+            self.explain_steps['simplify'].set(str(simplified))
+        except Exception as e:
+            self.explain_steps['simplify'].set(f'Error: {e}')
+            simplified = substituted
+
+        # Step 4: Project (using the selected projection)
+        try:
+            if proj:
+                proj_str = proj.format_projection(simplified)
+                if proj_str:
+                    self.explain_steps['project'].set(f'[{proj_name}] {proj_str}')
+                else:
+                    self.explain_steps['project'].set(f'[{proj_name}] (no projection available)')
+
+                # Also compute numeric projection for step 5
+                from sympy import symbols as syms
+                a, b = syms('a b', real=True)
+                projected = proj.project_expr(simplified, a, b)
+                if projected is None:
+                    projected = project_complex(simplified)
+            else:
+                projected = project_complex(simplified)
+                self.explain_steps['project'].set(str(projected))
+        except Exception as e:
+            self.explain_steps['project'].set(f'Error: {e}')
+            projected = simplified
+
+        # Step 5: Evaluate (numeric result)
+        try:
+            import cmath
+
+            # For q_surface: show phase and magnitude numerically
+            if hasattr(proj, '_recursive_decompose'):
+                phase_val, mag_val = proj._recursive_decompose(simplified)
+                # Project for numeric display
+                phase_num = complex(project_complex(phase_val).evalf()) if phase_val is not None else 0
+                mag_num = complex(project_complex(mag_val).evalf()) if mag_val is not None else 0
+                parts = []
+                if phase_num.imag == 0:
+                    parts.append(f'phase={phase_num.real:.6g}')
+                else:
+                    parts.append(f'phase={phase_num.real:.6g}+{phase_num.imag:.6g}i')
+                if isinstance(mag_val, Omega):
+                    parts.append('magnitude=ω (∞)')
+                elif mag_num.imag == 0:
+                    parts.append(f'magnitude={mag_num.real:.6g}')
+                else:
+                    parts.append(f'magnitude={mag_num.real:.6g}+{mag_num.imag:.6g}i')
+                self.explain_steps['evaluate'].set('  '.join(parts))
+            else:
+                # Standard complex evaluation
+                val = complex(projected.evalf())
+                mag = abs(val)
+                phase = cmath.phase(val)
+                self.explain_steps['evaluate'].set(
+                    f'{val.real:.6g} + {val.imag:.6g}i   |f|={mag:.6g}  arg={phase/3.14159:.4g}π')
+        except Exception as e:
+            self.explain_steps['evaluate'].set(f'Error: {e}')
 
     def _on_viz_hover(self, event):
         """Draw gauge readouts for the hovered pixel."""
@@ -1674,25 +1986,6 @@ class SettingsWindow:
             tk.Label(proj_frame, text=f'  {desc}', font=font_small,
                      bg=BG_BODY, fg=FG_DIM).pack(anchor='w', padx=(20, 0))
 
-        # Section: Evaluator
-        tk.Label(parent, text='Evaluator', font=font, bg=BG_BODY, fg=FG_TEXT,
-                 anchor='w').pack(fill='x', pady=(0, 4))
-
-        eval_frame = tk.Frame(parent, bg=BG_BODY)
-        eval_frame.pack(fill='x', pady=(0, 12))
-
-        self.eval_var = tk.StringVar(value=self.app.evaluator_mode)
-        for mode, desc in [('numpy', 'Fast (numpy) — may have branch cuts at singularities'),
-                           ('hybrid', 'Hybrid (TractionValue) — correct zero/omega classes'),
-                           ('sympy', 'Exact (SymPy) — full traction simplify per pixel (slow!)')]:
-            rb = tk.Radiobutton(
-                eval_frame, text=desc, font=font_small,
-                variable=self.eval_var, value=mode,
-                bg=BG_BODY, activebackground=BG_BODY,
-                command=self._on_eval_change
-            )
-            rb.pack(anchor='w')
-
         # Section: Color Mode
         tk.Label(parent, text='Color Mode', font=font, bg=BG_BODY, fg=FG_TEXT,
                  anchor='w').pack(fill='x', pady=(0, 4))
@@ -1746,11 +2039,6 @@ class SettingsWindow:
         bounds_entry.pack(side='left', padx=4)
         bounds_entry.bind('<Return>', self._on_bounds_change)
 
-    def _on_eval_change(self):
-        self.app.evaluator_mode = self.eval_var.get()
-        if self.app.viz_Z is not None:
-            self.app._refresh_viz()
-
     def _on_projection_change(self):
         name = self.proj_var.get()
         idx = self.app.projection_names.index(name) if name in self.app.projection_names else 0
@@ -1762,13 +2050,11 @@ class SettingsWindow:
 
     def _on_color_change(self):
         self.app.color_mode = self.color_var.get()
-        self.app._set_toggle(self.app.color_btn, self.app.color_mode == 'continuity')
         if self.app.viz_Z is not None:
             self.app._refresh_viz()
 
     def _on_tangent_change(self):
         self.app.show_tangent = self.tangent_var.get()
-        self.app._set_toggle(self.app.tangent_btn, self.app.show_tangent)
         if self.app.viz_Z is not None:
             if self.app.show_tangent:
                 self.app._draw_flow_lines(normal=False, tag='tangent', color='#ffffff')
@@ -1777,7 +2063,6 @@ class SettingsWindow:
 
     def _on_normal_change(self):
         self.app.show_normal = self.normal_var.get()
-        self.app._set_toggle(self.app.normal_btn, self.app.show_normal)
         if self.app.viz_Z is not None:
             if self.app.show_normal:
                 self.app._draw_flow_lines(normal=True, tag='normal', color='#aaaaaa')
