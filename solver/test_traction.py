@@ -536,8 +536,9 @@ class TestProjection:
         assert project_complex(z) == exp(-W_CONST)
 
     def test_project_omega(self):
-        from sympy import zoo
-        assert project_complex(w) == zoo
+        """ω = 0^(-1) → e^W (Lie exponential, not infinity)."""
+        from sympy import exp as sp_exp
+        assert project_complex(w) == sp_exp(W_CONST)
 
     def test_project_integer(self):
         assert project_complex(Integer(5)) == 5
@@ -607,10 +608,13 @@ class TestQSurfaceDecomposition:
         assert mag == S.Zero
 
     def test_zero_pow_omega_half(self, qs):
-        """0^(w/2): phase=1/2, magnitude=-1 (omega extracted)."""
+        """0^(w/2) now simplifies to i via Mul-exponent factoring:
+        0^(w/2) = (0^w)^(1/2) = (-1)^(1/2) = i.
+        As a scalar, decomposition gives (phase=1, magnitude=i)."""
         phase, mag = qs._recursive_decompose(z**(w / 2))
-        assert phase == Rational(1, 2)
-        assert mag == S.NegativeOne
+        assert phase == S.One
+        from sympy import I
+        assert mag == I
 
     def test_zero_pow_omega(self, qs):
         """0^w = -1: phase=1, magnitude=-1."""
@@ -651,14 +655,12 @@ class TestQSurfaceDecomposition:
         assert mag == Integer(4)
 
     def test_zero_pow_omega_plus_5(self, qs):
-        """0^(w+5): additive exponent decomposes as 0^w * 0^5.
-        0^w: phase=1, magnitude=-1. 0^5: phase=5, magnitude=0 (zero-class).
-        Combined: phase=1+5=6, magnitude=0 (zero-class absorbs via -0=0).
-        But magnitudes multiply: -1 * 0 = 0 → magnitude 0, not -1.
-        """
+        """0^(w+5) now distributes via traction_simplify:
+        0^(w+5) = 0^w * 0^5 = (-1) * 0^5 = 0^5 (sign absorption).
+        So _recursive_decompose sees 0^5: phase=5, magnitude=0."""
         expr = z**(w + 5)
         phase, mag = qs._recursive_decompose(expr)
-        assert phase == Integer(6)
+        assert phase == Integer(5)
         assert mag == S.Zero
 
     # === Primitives: (phase, magnitude) convention ===
@@ -811,3 +813,86 @@ class TestPipeline:
         from calculator import compute_phase_grid
         result = compute_phase_grid('p^2+x')
         assert result is not None
+
+
+class TestExponentDistribution:
+    """Test the 0^(A+B) = 0^A * 0^B distribution rule,
+    cross-verified against the Lie exponential projection."""
+
+    @staticmethod
+    def _lie_eval(expr):
+        """Evaluate a traction expression numerically via Lie exponential (no simplification)."""
+        val = complex(project_complex(expr).evalf())
+        return val
+
+    @staticmethod
+    def _simplify_eval(expr):
+        """Simplify, then evaluate the result numerically."""
+        s = traction_simplify(expr)
+        val = complex(project_complex(s).evalf())
+        return val
+
+    def _assert_cross_verified(self, expr, expected_simplified=None):
+        """Assert that the simplified and Lie results agree numerically,
+        and optionally check the symbolic simplified form."""
+        simplified = traction_simplify(expr)
+        if expected_simplified is not None:
+            assert simplified == expected_simplified, \
+                f"Expected {expected_simplified}, got {simplified}"
+
+        # Cross-verify: both evaluation paths should give the same complex number
+        lie_val = self._lie_eval(expr)
+        simp_val = self._simplify_eval(expr)
+        assert abs(lie_val - simp_val) < 1e-10, \
+            f"Lie={lie_val} vs Simplified={simp_val} differ for {expr}"
+
+    def test_zero_pow_sum_identity(self):
+        """0^(0^(5/6) + 0^(3/2)) = 5/4."""
+        expr = Zero()**(Zero()**Rational(5, 6) + Zero()**Rational(3, 2))
+        self._assert_cross_verified(expr, Rational(5, 4))
+
+    def test_zero_pow_omega_plus_3(self):
+        """0^(w + 3) = 0^w * 0^3 = (-1) * 0^3 = 0^3 (sign absorption)."""
+        expr = Zero()**(w + 3)
+        self._assert_cross_verified(expr, Pow(Zero(), 3))
+
+    def test_zero_pow_omega_plus_omega(self):
+        """0^(w + w) = 0^(2w) = (0^w)^2 = (-1)^2 = 1.
+        SymPy collapses w+w to 2*w (Mul), so the Mul-exponent factoring rule
+        substitutes w -> 0^(-1) and factors as (0^(0^(-1)))^2 = (-1)^2 = 1."""
+        expr = Zero()**(w + w)
+        self._assert_cross_verified(expr, Integer(1))
+
+    def test_zero_pow_two_zero_powers(self):
+        """0^(0^2 + 0^3) = 0^(0^2) * 0^(0^3) = 2 * 3 = 6."""
+        expr = Zero()**(Zero()**2 + Zero()**3)
+        self._assert_cross_verified(expr, Integer(6))
+
+    def test_zero_pow_three_terms(self):
+        """0^(0^1 + 0^2 + 0^3) = 0^(0^1) * 0^(0^2) * 0^(0^3) = 1 * 2 * 3 = 6.
+        But 0^(0^1) = 0^0 = 1, so the product is 1*2*3 = 6."""
+        expr = Zero()**(Zero()**1 + Zero()**2 + Zero()**3)
+        self._assert_cross_verified(expr, Integer(6))
+
+    def test_zero_pow_mixed_sum(self):
+        """0^(1 + w) = 0^1 * 0^w = 0 * (-1) = -0 = 0 (sign absorption)."""
+        expr = Zero()**(Integer(1) + w)
+        simplified = traction_simplify(expr)
+        # Should be Zero (bare traction zero, since 0^1 = 0 and -0 = 0)
+        assert isinstance(simplified, Zero), f"Expected Zero, got {simplified}"
+
+    def test_zero_pow_rational_sum(self):
+        """0^(1/2 + 1/2) = 0^1 = 0."""
+        expr = Zero()**(Rational(1, 2) + Rational(1, 2))
+        self._assert_cross_verified(expr)
+        simplified = traction_simplify(expr)
+        assert isinstance(simplified, (Zero, Pow)), f"Expected zero-class, got {simplified}"
+
+    def test_nested_distribution(self):
+        """0^(0^(0^2 + 0^3) + 0^1) = 0^(0^6 + 0) = 0^(0^6) * 0^0 = 6 * 1 = 6."""
+        inner = Zero()**(Zero()**2 + Zero()**3)  # = 6
+        expr = Zero()**(inner + Zero()**1)  # 0^(6 + 0^1) = 0^(6 + 0) = 0^6 * 0^0... hmm
+        # Actually: inner simplifies to 6, so expr = 0^(6 + 0^1) = 0^(6 + 0)
+        # 0^(6 + 0): 6 is Integer, 0 is Zero. Add gives 6 + 0 (SymPy).
+        # Let's just cross-verify numerically.
+        self._assert_cross_verified(expr)

@@ -166,8 +166,8 @@ class Parser:
         if self.match('null'):
             return null
 
-        # Number (integer or rational p/q)
-        if ch.isdigit():
+        # Number (integer, rational p/q, or decimal)
+        if ch.isdigit() or (ch == '.' and self.pos + 1 < len(self.text) and self.text[self.pos + 1].isdigit()):
             return self.number()
 
         raise ParseError(f"Unexpected character '{ch}' at position {self.pos}")
@@ -183,8 +183,28 @@ class Parser:
 
     def number(self):
         start = self.pos
+
+        # Leading dot: .5 = 0.5
+        if self.peek() == '.':
+            self.consume('.')
+            while self.pos < len(self.text) and self.text[self.pos].isdigit():
+                self.pos += 1
+            full_str = '0.' + self.text[start + 1:self.pos]
+            from fractions import Fraction
+            return Rational(Fraction(full_str).limit_denominator(10**12))
+
         while self.pos < len(self.text) and self.text[self.pos].isdigit():
             self.pos += 1
+
+        # Check for decimal: n.mmm
+        if self.peek() == '.' and self.pos < len(self.text) - 1 and self.text[self.pos + 1].isdigit():
+            self.consume('.')
+            while self.pos < len(self.text) and self.text[self.pos].isdigit():
+                self.pos += 1
+            full_str = self.text[start:self.pos]
+            from fractions import Fraction
+            return Rational(Fraction(full_str).limit_denominator(10**12))
+
         n = int(self.text[start:self.pos])
 
         # Check for rational: n/m where m is immediately after /
@@ -516,6 +536,176 @@ def _extract_zero_exponent(expr):
     return None
 
 
+def _collect_exponent_denoms(expr):
+    """Collect all exponent denominators from zero/omega powers in an expression."""
+    denoms = set()
+    expr = traction_simplify(expr)
+
+    if isinstance(expr, (Zero, Omega)):
+        denoms.add(1)
+    elif isinstance(expr, Pow):
+        if isinstance(expr.base, (Zero, Omega)) and isinstance(expr.exp, Rational):
+            denoms.add(int(expr.exp.q))
+        elif isinstance(expr.base, (Zero, Omega)) and isinstance(expr.exp, Integer):
+            denoms.add(1)
+        # Recurse into non-traction powers
+        if not isinstance(expr.base, (Zero, Omega)):
+            denoms.update(_collect_exponent_denoms(expr.base))
+    elif isinstance(expr, (Add, Mul)):
+        for arg in expr.args:
+            denoms.update(_collect_exponent_denoms(arg))
+
+    return denoms
+
+
+def _expr_to_ring(expr):
+    """
+    Convert a traction expression to a chebyshev_ring.Element with an
+    adaptive generator. Returns (element, base_denom) or (None, None).
+
+    The generator g = 0^(1/(2d)) where d = LCD of all exponent denominators.
+    Then 0^(p/q) = g^(2d·p/q), which is always an integer power of g.
+
+    The ring is always Q[s][g]/(g²-sg+1) with s = g + g⁻¹.
+    """
+    from chebyshev_ring import Element
+    from fractions import Fraction as Frac
+    from math import lcm
+
+    expr = traction_simplify(expr)
+
+    # Find the LCD of all exponent denominators
+    denoms = _collect_exponent_denoms(expr)
+    if not denoms:
+        denoms = {1}
+    base_denom = 1
+    for d in denoms:
+        base_denom = lcm(base_denom, d)
+
+    # Generator g = 0^(1/scale), where scale = LCD of denominators.
+    # Minimum scale of 2 so the generator is at least 0^(1/2) (not bare 0).
+    # Then 0^(p/q) = g^(scale·p/q), always an integer.
+    base_denom = max(base_denom, 2)
+    scale = base_denom
+
+    el = _convert_with_scale(expr, scale)
+    if el is not None:
+        return el, base_denom
+    return None, None
+
+
+def _convert_with_scale(expr, scale):
+    """Convert a traction expression to Element using the given scale factor.
+    0^(p/q) maps to u^(scale * p/q), which must be an integer."""
+    from chebyshev_ring import Element
+    from fractions import Fraction as Frac
+
+    expr = traction_simplify(expr)
+
+    # Scalar atoms
+    if isinstance(expr, Integer):
+        return Element.from_int(int(expr))
+    if isinstance(expr, Rational):
+        return Element.from_fraction(Frac(expr.p, expr.q))
+    if isinstance(expr, Null):
+        return Element.zero_el()
+
+    # Zero-powers: 0^(p/q) → u^(scale * p/q)
+    if isinstance(expr, Zero):
+        return Element.u_power(scale)
+    if isinstance(expr, Omega):
+        return Element.u_power(-scale)
+    if isinstance(expr, Pow) and isinstance(expr.base, (Zero, Omega)):
+        exp = expr.exp
+        try:
+            r = Frac(int(exp.p), int(exp.q)) if isinstance(exp, Rational) else Frac(int(exp))
+        except (TypeError, ValueError, AttributeError):
+            return None
+        if isinstance(expr.base, Omega):
+            r = -r
+        power = r * scale
+        if power.denominator != 1:
+            return None
+        return Element.u_power(int(power))
+
+    # Sums
+    if isinstance(expr, Add):
+        result = None
+        for term in Add.make_args(expr):
+            t = _convert_with_scale(term, scale)
+            if t is None:
+                return None
+            result = t if result is None else result + t
+        return result
+
+    # Products
+    if isinstance(expr, Mul):
+        result = None
+        for factor in Mul.make_args(expr):
+            f = _convert_with_scale(factor, scale)
+            if f is None:
+                return None
+            result = f if result is None else result * f
+        return result
+
+    # Powers with integer exponent
+    if isinstance(expr, Pow):
+        base_el = _convert_with_scale(expr.base, scale)
+        if base_el is not None and isinstance(expr.exp, Integer):
+            return base_el ** int(expr.exp)
+
+    return None
+
+
+def _decompose_ring_element(ring_el, base_denom, traction_str, complex_str, simplified):
+    """Build a decomposition result dict from a chebyshev_ring Element."""
+    ring_str = repr(ring_el)
+
+    # Try to find the exponent for the orbit plot (if it's a simple zero-power)
+    exponent = None
+    exp_zero = _extract_zero_exponent(simplified)
+    if exp_zero is not None:
+        try:
+            exponent = Rational(exp_zero)
+        except (TypeError, ValueError):
+            pass
+
+    conj = ring_el.conj()
+    conj_str = repr(conj)
+    norm = ring_el.norm()
+    norm_str = repr(norm)
+
+    # Generator description based on base_denom
+    if base_denom == 1:
+        gen_note = 'g = 0,  s = g + g\u207b\u00b9'
+    elif base_denom == 2:
+        gen_note = 'g = 0^(1/2),  s = g + g\u207b\u00b9'
+    else:
+        gen_note = f'g = 0^(1/{base_denom}),  s = g + g\u207b\u00b9'
+    ring_label = f'Q[s][g] / (g\u00b2 \u2212 sg + 1)'
+
+    components = [
+        ('a', repr(ring_el.a)),
+        ('b', repr(ring_el.b)),
+    ]
+
+    return {
+        'traction_str': traction_str,
+        'has_decomp': True,
+        'ring_form': True,
+        'ring_str': ring_str,
+        'ring_label': ring_label,
+        'gen_note': gen_note,
+        'components': components,
+        'norm_str': norm_str,
+        'conj_str': conj_str,
+        'is_unit': ring_el.can_invert(),
+        'complex_str': complex_str,
+        'exponent': exponent,
+        'base_denom': base_denom,
+    }
+
+
 def _step_label(k, denom):
     """Format recurrence step k with denominator denom as a fraction label.
     E.g., k=3, denom=2 → 'a(3/2)'; k=4, denom=2 → 'a(2)'.
@@ -590,7 +780,12 @@ def chebyshev_decompose(expr):
             'complex_str': complex_str,
         }
 
-    # Extract zero-power exponent
+    # --- Primary path: try to convert to a Chebyshev ring Element ---
+    ring_el, base_denom = _expr_to_ring(simplified)
+    if ring_el is not None:
+        return _decompose_ring_element(ring_el, base_denom, traction_str, complex_str, simplified)
+
+    # --- Fallback: single zero-power analysis ---
     exponent = _extract_zero_exponent(simplified)
 
     # Handle Mul: scalar * zero-power
@@ -613,7 +808,6 @@ def chebyshev_decompose(expr):
         exponent = Integer(2)
 
     if exponent is None:
-        # Scalar or complex expression — no Chebyshev decomposition
         return {
             'traction_str': traction_str,
             'has_decomp': False,
@@ -1009,7 +1203,7 @@ class CalculatorApp:
         self._tab_buttons = {}
         self._active_tab = None
 
-        for tab_name in ['Plot', 'Explain', 'Phase Map']:
+        for tab_name in ['Plot', 'Explain', 'Phase Map', 'Tower']:
             btn = tk.Button(
                 tab_bar, text=tab_name, font=self.font_label,
                 bd=0, padx=16, pady=3, bg=BG_FRAME, fg=FG_TEXT,
@@ -1189,6 +1383,65 @@ class CalculatorApp:
 
         self.pm_canvas_widget = FigureCanvasTkAgg(self.pm_fig, master=phasemap_frame)
         self.pm_canvas_widget.get_tk_widget().pack(fill='both', expand=True, padx=6, pady=(0, 8))
+
+        # ===== Tower tab (Level 2 interactive visualization) =====
+        tower_frame = tk.Frame(self._tab_container, bg=BG_BODY, bd=1, relief='solid')
+        self._tab_frames['Tower'] = tower_frame
+
+        tower_hframe = tk.Frame(tower_frame, bg=BG_BODY)
+        tower_hframe.pack(fill='both', expand=True, padx=6, pady=6)
+
+        # Left: sphere canvas
+        SPHERE_SIZE = 340
+        self.tower_canvas = tk.Canvas(
+            tower_hframe, width=SPHERE_SIZE, height=SPHERE_SIZE,
+            bg='#1a1a2e', highlightthickness=0
+        )
+        self.tower_canvas.pack(side='left', padx=(0, 6))
+
+        # Right: controls + readout
+        tower_right = tk.Frame(tower_hframe, bg=BG_BODY)
+        tower_right.pack(side='left', fill='both', expand=True)
+
+        # θ_w slider (outer rotation — w level)
+        tk.Label(tower_right, text='\u03b8w / \u03c0  (w = 0^{1/4})', font=self.font_label,
+                 bg=BG_BODY, fg=FG_DIM).pack(anchor='w', padx=4, pady=(8, 0))
+        self.tower_tw_var = tk.DoubleVar(value=0.25)
+        tk.Scale(
+            tower_right, variable=self.tower_tw_var, from_=0.0, to=2.0,
+            resolution=0.01, orient='horizontal', length=250,
+            bg=BG_BODY, fg=FG_TEXT, highlightthickness=0, troughcolor=BG_DISPLAY,
+            command=lambda _: self._update_tower()
+        ).pack(anchor='w', padx=4)
+
+        # θ_u slider (inner rotation — u level)
+        tk.Label(tower_right, text='\u03b8u / \u03c0  (u = 0^{1/2})', font=self.font_label,
+                 bg=BG_BODY, fg=FG_DIM).pack(anchor='w', padx=4, pady=(8, 0))
+        self.tower_tu_var = tk.DoubleVar(value=0.25)
+        tk.Scale(
+            tower_right, variable=self.tower_tu_var, from_=0.0, to=2.0,
+            resolution=0.01, orient='horizontal', length=250,
+            bg=BG_BODY, fg=FG_TEXT, highlightthickness=0, troughcolor=BG_DISPLAY,
+            command=lambda _: self._update_tower()
+        ).pack(anchor='w', padx=4)
+
+        # Readout text
+        self.tower_text = tk.Text(
+            tower_right, wrap='word', font=tkfont.Font(family='Consolas', size=11),
+            bg='#1a1a2e', fg='#eeeeee', insertbackground='#eeeeee',
+            selectbackground='#3a5a8a', selectforeground='#ffffff',
+            bd=1, relief='sunken', highlightthickness=0, padx=10, pady=8,
+            state='disabled', cursor='arrow', height=12
+        )
+        self.tower_text.pack(fill='both', expand=True, padx=4, pady=(8, 0))
+        self.tower_text.tag_configure('header', font=tkfont.Font(family='Segoe UI', size=12, weight='bold'),
+                                       foreground='#ffdd33', spacing1=4, spacing3=2)
+        self.tower_text.tag_configure('value', font=tkfont.Font(family='Consolas', size=11),
+                                       foreground='#ffffff', spacing1=1, spacing3=1)
+        self.tower_text.tag_configure('dim', font=tkfont.Font(family='Consolas', size=10),
+                                       foreground='#8899aa', spacing1=1, spacing3=1)
+
+        self._tower_sphere_size = SPHERE_SIZE
 
         # Show Plot tab by default
         self._select_tab('Plot')
@@ -1579,6 +1832,187 @@ class CalculatorApp:
             self._run_explain()
         elif name == 'Phase Map':
             self._update_phase_map()
+        elif name == 'Tower':
+            self._update_tower()
+
+    # ===== Tower Tab =====
+
+    def _update_tower(self):
+        """Update the Tower tab sphere visualization and readout."""
+        theta_w = self.tower_tw_var.get() * np.pi
+        theta_u = self.tower_tu_var.get() * np.pi
+
+        # Sphere position from two independent angles
+        sx = np.cos(theta_w)
+        sy = np.sin(theta_w) * np.cos(theta_u)
+        sz = np.sin(theta_w) * np.sin(theta_u)
+
+        self._draw_tower_sphere(sx, sy, sz)
+
+        # Compute 4 tower components (a, b, c, d) from the sphere point.
+        # We want a + bt + cw + dtw to represent this orientation.
+        # Use the sphere coords as a 4D unit vector projected to 3D:
+        #   a = cos(θ_w/2) * cos(θ_u/2)
+        #   b = cos(θ_w/2) * sin(θ_u/2)
+        #   c = sin(θ_w/2) * cos(θ_u/2)
+        #   d = sin(θ_w/2) * sin(θ_u/2)
+        # This ensures a² + b² + c² + d² = 1 (unit 4-sphere).
+        a = np.cos(theta_w / 2) * np.cos(theta_u / 2)
+        b = np.cos(theta_w / 2) * np.sin(theta_u / 2)
+        c = np.sin(theta_w / 2) * np.cos(theta_u / 2)
+        d = np.sin(theta_w / 2) * np.sin(theta_u / 2)
+
+        # Convert to traction expression:
+        # a + bt + cw + dtw
+        # = (a+d) + (b+c)*0^(1/4) + b*0^(-1/4) + d*0^(1/2)
+        const = a + d
+        coeff_quarter = b + c      # coefficient of 0^(1/4)
+        coeff_neg_quarter = b       # coefficient of 0^(-1/4)
+        coeff_half = d              # coefficient of 0^(1/2)
+
+        # Build display string for the traction expression
+        traction_parts = []
+        if abs(const) > 1e-10:
+            traction_parts.append(f'{const:.4f}')
+        if abs(coeff_quarter) > 1e-10:
+            traction_parts.append(f'{coeff_quarter:+.4f}\u00b70^(1/4)')
+        if abs(coeff_neg_quarter) > 1e-10:
+            traction_parts.append(f'{coeff_neg_quarter:+.4f}\u00b70^(-1/4)')
+        if abs(coeff_half) > 1e-10:
+            traction_parts.append(f'{coeff_half:+.4f}\u00b70^(1/2)')
+        if not traction_parts:
+            traction_parts.append('0')
+
+        traction_expr = ' '.join(traction_parts)
+        # Clean up leading +
+        if traction_expr.startswith('+'):
+            traction_expr = traction_expr[1:]
+
+        # Update readout
+        tw = self.tower_text
+        tw.configure(state='normal')
+        tw.delete('1.0', 'end')
+
+        tw.insert('end', 'Traction Expression\n', 'header')
+        tw.insert('end', f'  {traction_expr}\n', 'value')
+
+        tw.insert('end', '\n')
+        tw.insert('end', 'Tower Components  a + bt + cw + dtw\n', 'header')
+        tw.insert('end', f'  a = {a:+.6f}\n', 'value')
+        tw.insert('end', f'  b = {b:+.6f}\n', 'value')
+        tw.insert('end', f'  c = {c:+.6f}\n', 'value')
+        tw.insert('end', f'  d = {d:+.6f}\n', 'value')
+
+        tw.insert('end', '\n')
+        tw.insert('end', 'Basis Expansion\n', 'header')
+        tw.insert('end', '  t  = 0^(1/4) + 0^(-1/4)\n', 'dim')
+        tw.insert('end', '  w  = 0^(1/4)\n', 'dim')
+        tw.insert('end', '  tw = 0^(1/2) + 1\n', 'dim')
+
+        tw.insert('end', '\n')
+        tw.insert('end', 'Angles\n', 'header')
+        tw.insert('end', f'  \u03b8w = {theta_w / np.pi:.4f}\u03c0  ({np.degrees(theta_w):.1f}\u00b0)\n', 'value')
+        tw.insert('end', f'  \u03b8u = {theta_u / np.pi:.4f}\u03c0  ({np.degrees(theta_u):.1f}\u00b0)\n', 'value')
+
+        tw.insert('end', '\n')
+        tw.insert('end', 'Sphere\n', 'header')
+        tw.insert('end', f'  x = {sx:+.4f}   y = {sy:+.4f}   z = {sz:+.4f}\n', 'value')
+
+        tw.configure(state='disabled')
+
+    def _draw_tower_sphere(self, dot_x, dot_y, dot_z):
+        """Draw a sphere with a dot at (x, y, z) on it.
+        Orthographic projection: screen_x = y, screen_y = -x (so x-axis goes into screen).
+        Dot size scales with depth, opacity drops when behind."""
+        canvas = self.tower_canvas
+        canvas.delete('all')
+        S = self._tower_sphere_size
+        cx, cy = S / 2, S / 2
+        R = S * 0.4  # sphere radius in pixels
+
+        # Draw wireframe sphere
+        wire_color = '#333355'
+
+        # Equator (xz plane, projected as horizontal ellipse)
+        pts = []
+        for i in range(101):
+            a = 2 * np.pi * i / 100
+            px = cx + R * np.cos(a)
+            py = cy + R * np.sin(a) * 0.3  # foreshortened
+            pts.extend([px, py])
+        canvas.create_line(*pts, fill=wire_color, width=1, smooth=True)
+
+        # Front meridian (xy plane)
+        pts = []
+        for i in range(101):
+            a = 2 * np.pi * i / 100
+            px = cx + R * np.cos(a) * 0.3
+            py = cy + R * np.sin(a)
+            pts.extend([px, py])
+        canvas.create_line(*pts, fill=wire_color, width=1, smooth=True)
+
+        # Side meridian (yz plane — the "visible" great circle)
+        pts = []
+        for i in range(101):
+            a = 2 * np.pi * i / 100
+            px = cx + R * np.cos(a)
+            py = cy + R * np.sin(a)
+            pts.extend([px, py])
+        canvas.create_line(*pts, fill=wire_color, width=1, smooth=True)
+
+        # Axis lines through center
+        canvas.create_line(cx - R * 1.15, cy, cx + R * 1.15, cy, fill='#222244', width=1)
+        canvas.create_line(cx, cy - R * 1.15, cx, cy + R * 1.15, fill='#222244', width=1)
+
+        # Axis labels
+        label_font = tkfont.Font(family='Consolas', size=9)
+        canvas.create_text(cx + R * 1.2, cy + 2, text='y', fill='#555577', font=label_font, anchor='w')
+        canvas.create_text(cx + 2, cy - R * 1.2, text='x', fill='#555577', font=label_font, anchor='s')
+        canvas.create_text(cx - 12, cy + R * 0.35, text='z', fill='#555577', font=label_font, anchor='e')
+
+        # Project dot: screen coords from (x, y, z)
+        # Orthographic: screen_x = y, screen_y = -x, depth = z
+        screen_x = cx + dot_y * R
+        screen_y = cy - dot_x * R
+
+        # Depth-based size: larger when z > 0 (front), smaller when z < 0 (back)
+        # Range: z in [-1, 1] → dot_radius in [4, 16]
+        min_r, max_r = 4, 16
+        dot_r = min_r + (max_r - min_r) * (dot_z + 1) / 2
+
+        # Depth-based color: bright when front, dim when behind
+        if dot_z >= 0:
+            # Front face: full brightness
+            r_c, g_c, b_c = 0, 200, 255
+            alpha = 1.0
+        else:
+            # Back face: 50% opacity (blend with background #1a1a2e)
+            alpha = 0.5
+            r_c = int(0 * alpha + 0x1a * (1 - alpha))
+            g_c = int(200 * alpha + 0x1a * (1 - alpha))
+            b_c = int(255 * alpha + 0x2e * (1 - alpha))
+
+        dot_color = f'#{r_c:02x}{g_c:02x}{b_c:02x}'
+
+        # Draw a faint line from center to dot (projected)
+        canvas.create_line(cx, cy, screen_x, screen_y, fill='#333355', width=1, dash=(3, 3))
+
+        # Draw the dot
+        canvas.create_oval(
+            screen_x - dot_r, screen_y - dot_r,
+            screen_x + dot_r, screen_y + dot_r,
+            fill=dot_color, outline='#ffffff' if dot_z >= 0 else '#555577',
+            width=2 if dot_z >= 0 else 1
+        )
+
+        # Draw a small "shadow" dot on the equator plane for depth reference
+        shadow_x = cx + dot_y * R
+        shadow_y = cy - dot_x * R * 0.3  # projected onto equator
+        canvas.create_oval(
+            shadow_x - 2, shadow_y - 2,
+            shadow_x + 2, shadow_y + 2,
+            fill='#333355', outline=''
+        )
 
     # ===== Phase Map Tab =====
 
@@ -1746,7 +2180,38 @@ class CalculatorApp:
                 tw.insert('end', decomp['complex_str'] + '\n', 'value')
             return
 
-        # Expression with equivalence
+        # --- Ring form (general expressions: sums, products, etc.) ---
+        if decomp.get('ring_form'):
+            tw.insert('end', traction_str + '\n', 'expr')
+
+            tw.insert('end', '\n')
+            tw.insert('end', 'Ring Decomposition\n', 'header')
+            tw.insert('end', f'{decomp["ring_label"]}\n', 'dim')
+            tw.insert('end', f'{decomp["gen_note"]}\n', 'dim')
+
+            tw.insert('end', '\n')
+            tw.insert('end', f'  {decomp["ring_str"]}\n', 'value')
+            tw.insert('end', '\n')
+            for name, val in decomp['components']:
+                tw.insert('end', f'  {name} = {val}\n', 'value')
+
+            tw.insert('end', '\n')
+            tw.insert('end', 'Conjugate\n', 'header')
+            tw.insert('end', f'  {decomp["conj_str"]}\n', 'value')
+
+            tw.insert('end', '\n')
+            tw.insert('end', 'Norm\n', 'header')
+            tw.insert('end', f'  N = {decomp["norm_str"]}\n', 'value')
+            if decomp['is_unit']:
+                tw.insert('end', '  (unit \u2014 invertible)\n', 'dim')
+
+            if decomp.get('complex_str'):
+                tw.insert('end', '\n')
+                tw.insert('end', 'Complex Projection\n', 'header')
+                tw.insert('end', decomp['complex_str'] + '\n', 'value')
+            return
+
+        # --- Single zero-power form (legacy path) ---
         equiv_str = decomp['equiv_str']
         if equiv_str != traction_str:
             tw.insert('end', f'{traction_str}  =  {equiv_str}\n', 'expr')
