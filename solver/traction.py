@@ -40,7 +40,7 @@ W_CONST = sp_sqrt(-I * pi)
 # Chebyshev evaluation angle: 0^z = e^(i*THETA*z) after omega -> pi/THETA
 # At this angle, 0^omega = e^(i*pi) = -1 (always), and all 0^n lie on the unit circle.
 # Default: pi/4 (matches Phase Map slider default)
-CHEB_THETA = pi / 4
+CHEB_THETA = pi * 2
 
 # In exponents, omega acts as pi/THETA (so that 0^omega = e^(i*THETA*pi/THETA) = e^(i*pi) = -1)
 OMEGA_EXP_VAL = pi / CHEB_THETA

@@ -2763,117 +2763,159 @@ class CalculatorApp:
             for label, poly_str in trace:
                 tw.insert('end', f'  {label} = {poly_str}\n', 'value')
 
+    @staticmethod
+    def _traction_plane_coords(decomp):
+        """Extract (x, y) coordinates for the traction plane.
+        x = scalar multiplier, y = traction power level.
+        0^n → y = -n (zero-powers go down), ω^n → y = +n (omega-powers go up).
+        Scalars → y = 0. Mixed → try ring (a, b) or fallback."""
+        if decomp is None:
+            return None, None
+
+        simplified_str = decomp.get('traction_str', '')
+        band = decomp.get('band', '')
+
+        # Try to extract from the traction expression structure
+        # Re-parse from display string (replace · with * for parser compatibility)
+        try:
+            clean_str = simplified_str.replace('\u00b7', '*') if simplified_str else ''
+            parsed = parse_and_eval(clean_str) if clean_str else None
+        except Exception:
+            parsed = None
+
+        if parsed is not None:
+            parsed_s = traction_simplify(parsed)
+
+            # Pure scalar: y=0, x=value
+            if isinstance(parsed_s, (Integer, Rational)):
+                return float(parsed_s), 0.0
+
+            # Bare Zero: 0^1 → x=0, y=-1
+            if isinstance(parsed_s, Zero):
+                return 0.0, -1.0
+
+            # Bare Omega: ω^1 = 0^(-1) → x=0, y=1
+            if isinstance(parsed_s, Omega):
+                return 0.0, 1.0
+
+            # Zero power: 0^n → x=0, y=-n
+            # Also handles omega exponents: 0^(ω·t) → y=t (omega-direction)
+            if isinstance(parsed_s, Pow) and isinstance(parsed_s.base, Zero):
+                exp = parsed_s.exp
+                if isinstance(exp, (Integer, Rational)):
+                    return 0.0, -float(exp)
+                # Omega-containing exponent: 0^(ω·t) → t omega-steps
+                omega_info = _extract_omega_rational(exp)
+                if omega_info is not None:
+                    coeff, _ = omega_info
+                    return 0.0, float(coeff)
+
+            # Omega power: ω^n → x=0, y=n
+            if isinstance(parsed_s, Pow) and isinstance(parsed_s.base, Omega):
+                exp = parsed_s.exp
+                if isinstance(exp, (Integer, Rational)):
+                    return 0.0, float(exp)
+                omega_info = _extract_omega_rational(exp)
+                if omega_info is not None:
+                    coeff, _ = omega_info
+                    return 0.0, -float(coeff)
+
+            # Mul: coeff * 0^n or coeff * ω^n
+            if isinstance(parsed_s, Mul):
+                from sympy import Mul as SMul
+                coeff = 1.0
+                power_y = None
+                for arg in SMul.make_args(parsed_s):
+                    if isinstance(arg, (Integer, Rational)):
+                        coeff *= float(arg)
+                    elif isinstance(arg, Zero):
+                        power_y = -1.0
+                    elif isinstance(arg, Omega):
+                        power_y = 1.0
+                    elif isinstance(arg, Pow) and isinstance(arg.base, Zero):
+                        if isinstance(arg.exp, (Integer, Rational)):
+                            power_y = -float(arg.exp)
+                    elif isinstance(arg, Pow) and isinstance(arg.base, Omega):
+                        if isinstance(arg.exp, (Integer, Rational)):
+                            power_y = float(arg.exp)
+                if power_y is not None:
+                    return coeff, power_y
+
+        # Omega-band ring elements with numeric (a, b)
+        if band == 'omega':
+            components = decomp.get('components', [])
+            if len(components) >= 2:
+                try:
+                    a_val = float(components[0][1])
+                    b_val = float(components[1][1])
+                    return a_val, b_val
+                except (ValueError, TypeError):
+                    pass
+
+        return None, None
+
     def _draw_cheb_orbit(self, ax, decomp):
-        """Draw the traction coordinate plane.
-        X-axis: scalar (-1 to 1), center = 0
-        Y-axis: traction class (0 to ω), center = 1
-        Origin: 0(1) = 1(0), where zero-class meets unity."""
+        """Draw the complex plane (Sheet 0 / omega-band).
+        Re = horizontal, Im = vertical.
+        Cardinal points: 1 (right), i=0^(ω/2) (top), -1=0^ω (left), -i (bottom).
+        Rational-band elements live on other sheets — shown as 'different sheet'."""
         ax.clear()
         ax.set_facecolor('#1a1a2e')
         ax.set_aspect('equal')
-        ax.set_title('Traction Plane', fontsize=13, color='#eeeeee')
-        # Grid lines
-        ax.axhline(0, color='#444455', linewidth=0.5)
-        ax.axvline(0, color='#444455', linewidth=0.5)
-        for i in range(-3, 4):
-            if i != 0:
-                ax.axhline(i, color='#222233', linewidth=0.3)
-                ax.axvline(i, color='#222233', linewidth=0.3)
+        ax.tick_params(colors='#888899', labelsize=8)
 
-        # Unit circle reference
+        # Grid and unit circle
+        ax.axhline(0, color='#333344', linewidth=0.5)
+        ax.axvline(0, color='#333344', linewidth=0.5)
         circ_t = np.linspace(0, 2 * np.pi, 200)
         ax.plot(np.cos(circ_t), np.sin(circ_t), color='#333344', linewidth=0.8)
 
-        # X-axis: scalar integers
-        x_ticks = list(range(-3, 4))
-        ax.set_xticks(x_ticks)
-        ax.set_xticklabels([str(v) for v in x_ticks], fontsize=8, color='#888899')
-
-        # Y-axis: traction powers (0³, 0², 0, 1, ω, ω², ω³)
-        _sup = {2: '\u00b2', 3: '\u00b3', 4: '\u2074', 5: '\u2075', 6: '\u2076'}
-        y_ticks = list(range(-3, 4))
-        y_labels = []
-        for v in y_ticks:
-            if v == 0:
-                y_labels.append('1')
-            elif v == 1:
-                y_labels.append('\u03c9')
-            elif v == -1:
-                y_labels.append('0')
-            elif v > 1:
-                y_labels.append(f'\u03c9{_sup.get(v, "^" + str(v))}')
-            else:
-                y_labels.append(f'0{_sup.get(-v, "^" + str(-v))}')
-        ax.set_yticks(y_ticks)
-        ax.set_yticklabels(y_labels, fontsize=9, color='#888899')
-        ax.tick_params(colors='#666677', labelsize=8)
-
-        # Reference points for key traction elements
+        # Cardinal reference points
         refs = [
-            (0, 0, None, '#ffffff'),         # center
-            (0, 1, '\u03c9', '#ff4444'),         # ω
-            (0, -1, '0', '#4488ff'),        # 0
-            (-1, 0, '-1', '#ff8888'),        # -1
-            (1, 0, '1', '#ffaaff'),        # 1
+            (1, 0, '1', '#ffffff'),
+            (-1, 0, '-1', '#ff8888'),
+            (0, 1, 'i', '#88ff88'),
+            (0, -1, '-i', '#88ff88'),
         ]
-        for rx, ry, label, rcolor in refs:
-            ax.plot(rx, ry, 'o', color=rcolor, markersize=5, zorder=4, alpha=0.6)
-            ax.annotate(label, (rx, ry),
-                        textcoords='offset points', xytext=(rx*15-4, ry*15-4),
-                        fontsize=10, color=rcolor)
+        for rx, ry, rlabel, rcolor in refs:
+            ax.plot(rx, ry, 'o', color=rcolor, markersize=4, zorder=4, alpha=0.5)
+            ox = 8 if rx >= 0 else -18
+            oy = 6 if ry >= 0 else -12
+            ax.annotate(rlabel, (rx, ry), textcoords='offset points',
+                        xytext=(ox, oy), fontsize=9, color=rcolor, alpha=0.7)
+
+        # Title reflects which sheet we're on
+        band = decomp.get('band', '') if decomp else ''
+        if band == 'omega':
+            ax.set_title('Sheet 0 (\u03c9-band)', fontsize=11, color='#eeeeee')
+        else:
+            ax.set_title('Complex Plane', fontsize=11, color='#eeeeee')
 
         if decomp is None:
-            ax.set_xlim(-1.6, 1.6)
-            ax.set_ylim(-1.6, 1.6)
+            ax.set_xlim(-1.5, 1.5)
+            ax.set_ylim(-1.5, 1.5)
             return
 
-        # Plot the expression's ring coordinates (a, b)
-        # For ring element a + b·g: x = a (scalar), y = b (generator direction)
-        components = decomp.get('components', [])
         traction_str = decomp.get('traction_str', '')
-        plotted = False
+        val = decomp.get('complex_val')
 
-        if len(components) >= 2:
-            try:
-                a_str = components[0][1]
-                b_str = components[1][1]
-                # Try to evaluate as numbers (works for omega band with rational s)
-                a_val = float(a_str) if a_str.replace('-', '').replace('/', '').replace('.', '').isdigit() or a_str in ('0', '1', '-1', '-2') else None
-                b_val = float(b_str) if b_str.replace('-', '').replace('/', '').replace('.', '').isdigit() or b_str in ('0', '1', '-1', '-2') else None
-
-                if a_val is not None and b_val is not None:
-                    ax.plot(a_val, b_val, 'o', color='#00ccff', markersize=10, zorder=5,
-                            markeredgecolor='white', markeredgewidth=1.5)
-                    label = traction_str if len(traction_str) < 20 else traction_str[:17] + '...'
-                    ax.annotate(label, (a_val, b_val),
-                                textcoords='offset points', xytext=(8, 8),
-                                fontsize=10, color='#00ccff')
-                    plotted = True
-
-                    margin = max(abs(a_val), abs(b_val)) * 1.3
-                    lim = max(1.6, margin)
-                    ax.set_xlim(-lim, lim)
-                    ax.set_ylim(-lim, lim)
-            except (ValueError, TypeError):
-                pass
-
-        # Fallback: use complex_val if ring coordinates aren't numeric
-        if not plotted:
-            val = decomp.get('complex_val')
-            if val is not None and np.isfinite(val):
-                ax.plot(val.real, val.imag, 'o', color='#00ccff', markersize=10, zorder=5,
-                        markeredgecolor='white', markeredgewidth=1.5)
-                label = traction_str if len(traction_str) < 20 else traction_str[:17] + '...'
-                ax.annotate(label, (val.real, val.imag),
-                            textcoords='offset points', xytext=(8, 8),
-                            fontsize=10, color='#00ccff')
-                margin = max(abs(val.real), abs(val.imag)) * 1.3
-                lim = max(1.6, margin)
-                ax.set_xlim(-lim, lim)
-                ax.set_ylim(-lim, lim)
-            else:
-                ax.set_xlim(-1.6, 1.6)
-                ax.set_ylim(-1.6, 1.6)
+        if val is not None and np.isfinite(val):
+            ax.plot(val.real, val.imag, 'o', color='#00ccff', markersize=10, zorder=5,
+                    markeredgecolor='white', markeredgewidth=1.5)
+            label = traction_str if len(traction_str) < 20 else traction_str[:17] + '...'
+            ax.annotate(label, (val.real, val.imag),
+                        textcoords='offset points', xytext=(8, 8),
+                        fontsize=10, color='#00ccff')
+            margin = max(abs(val.real), abs(val.imag), 1.0) * 1.3
+            lim = max(1.5, margin)
+            ax.set_xlim(-lim, lim)
+            ax.set_ylim(-lim, lim)
+        else:
+            ax.set_xlim(-1.5, 1.5)
+            ax.set_ylim(-1.5, 1.5)
+            if band == 'rational':
+                ax.text(0, 0, 'different\nsheet', fontsize=11, color='#555566',
+                        ha='center', va='center', style='italic')
 
     def _on_viz_hover(self, event):
         """Draw gauge readouts for the hovered pixel."""
