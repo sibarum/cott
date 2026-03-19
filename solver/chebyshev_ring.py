@@ -29,6 +29,78 @@ from fractions import Fraction
 
 
 # ============================================================
+# GeneratorSpec — Pluggable base element specification
+# ============================================================
+
+class GeneratorSpec:
+    """
+    Specifies a base element for Chebyshev ring construction.
+
+    A base element B has:
+        - A name (for display)
+        - An identity table: B^0, B^1, B^(-1), B^B
+        - A sign convention: how B-exponents map to ring generator powers
+          (0-base: 0^n → g^(+2n), ω-base: ω^n → g^(-2n) since ω = 0^(-1))
+
+    The ring is always Q[s][g]/(g²-sg+1), s = g + g⁻¹.
+    Only the interpretation of g and the exponent mapping change.
+    """
+    __slots__ = ['name', 'symbol', 'exponent_sign', 'omega_band']
+
+    def __init__(self, name, symbol, exponent_sign=1, omega_band=False):
+        """
+        Args:
+            name: Human-readable name ('zero', 'omega')
+            symbol: Display symbol ('0', 'ω')
+            exponent_sign: +1 for 0-base (0^n → g^{+scale·n}),
+                          -1 for ω-base (ω^n → g^{-scale·n})
+            omega_band: If True, this is an omega-channel generator
+                       (exponents contain ω, θ-independent)
+        """
+        self.name = name
+        self.symbol = symbol
+        self.exponent_sign = exponent_sign
+        self.omega_band = omega_band
+
+    def format_generator(self, scale):
+        """Format the generator expression for display.
+        scale is the denominator, so g = B^(1/scale) or g = B^(ω/scale)."""
+        if self.omega_band:
+            if scale == 1:
+                return f'{self.symbol}^\u03c9'
+            elif scale == 2:
+                return f'{self.symbol}^(\u03c9/2)'
+            else:
+                return f'{self.symbol}^(\u03c9/{scale})'
+        else:
+            if scale == 1:
+                return self.symbol
+            elif scale == 2:
+                return f'{self.symbol}^(1/2)'
+            else:
+                return f'{self.symbol}^(1/{scale})'
+
+    def format_s(self, scale):
+        """Format the s parameter for display."""
+        g = self.format_generator(scale)
+        g_inv = self.format_generator(scale).replace('^(', '^(-').replace('^\u03c9', '^(-\u03c9)') \
+            if '^(' in self.format_generator(scale) or '^\u03c9' == self.format_generator(scale)[-2:] \
+            else f'{self.symbol}^(-1/{scale})'
+        # Simpler: just show g + g⁻¹
+        return f's = g + g\u207b\u00b9'
+
+    def __repr__(self):
+        return f'GeneratorSpec({self.name!r}, {self.symbol!r}, sign={self.exponent_sign})'
+
+
+# Predefined generator specs
+ZERO_SPEC = GeneratorSpec('zero', '0', exponent_sign=+1, omega_band=False)
+OMEGA_SPEC = GeneratorSpec('omega', '\u03c9', exponent_sign=-1, omega_band=False)
+ZERO_OMEGA_SPEC = GeneratorSpec('zero-omega', '0', exponent_sign=+1, omega_band=True)
+OMEGA_OMEGA_SPEC = GeneratorSpec('omega-omega', '\u03c9', exponent_sign=-1, omega_band=True)
+
+
+# ============================================================
 # QsPoly — Polynomials in Q[s]
 # ============================================================
 

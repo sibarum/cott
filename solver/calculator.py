@@ -216,8 +216,9 @@ class Parser:
             while self.pos < len(self.text) and self.text[self.pos].isdigit():
                 self.pos += 1
             d = int(self.text[dstart:self.pos])
-            if d == 0:
-                # n/0 should be handled as division, not a rational
+            if d == 0 or n == 0:
+                # n/0 → division by zero (handled as operator, not rational)
+                # 0/d → traction zero divided by d (not Rational(0,d) which collapses to numeric 0)
                 self.pos = saved
                 return _to_traction(n)
             return Rational(n, d)
@@ -563,22 +564,35 @@ def _expr_to_ring(expr):
     Convert a traction expression to a chebyshev_ring.Element with an
     adaptive generator. Returns (element, info_dict) or (None, None).
 
+    Auto-detects the natural base (zero or omega) and band (rational or omega).
     Priority:
-    1. Omega band (primary): g = 0^(ω/n), s = 2cos(π/n)
-       θ-independent, universal structure. Ring is a cyclotomic field.
-    2. Rational band (secondary): g = 0^(1/n), s is formal
-    3. Multi-band: both generators needed.
+    1. Omega band: g = B^(ω/n), θ-independent universal structure
+    2. Rational band: g = B^(1/n), θ-dependent
+    3. Multi-band: both generators needed
     """
-    from chebyshev_ring import Element
+    from chebyshev_ring import Element, ZERO_SPEC, OMEGA_SPEC, ZERO_OMEGA_SPEC, OMEGA_OMEGA_SPEC
     from fractions import Fraction as Frac
     from math import lcm
 
     expr = traction_simplify(expr)
 
-    # Classify exponents into omega and rational bands
+    # Classify exponents into omega and rational bands, and detect base
     rational_denoms = set()
     omega_denoms = set()
-    _classify_exponents(expr, rational_denoms, omega_denoms)
+    bases_seen = set()  # 'zero', 'omega'
+    _classify_exponents_full(expr, rational_denoms, omega_denoms, bases_seen)
+
+    # Determine the natural base spec
+    if bases_seen == {'omega'}:
+        rat_spec = OMEGA_SPEC
+        omega_spec = OMEGA_OMEGA_SPEC
+    elif bases_seen == {'zero'}:
+        rat_spec = ZERO_SPEC
+        omega_spec = ZERO_OMEGA_SPEC
+    else:
+        # Mixed bases or scalars — default to zero
+        rat_spec = ZERO_SPEC
+        omega_spec = ZERO_OMEGA_SPEC
 
     # --- Priority 1: Pure omega exponents → omega-band ring ---
     if omega_denoms and not rational_denoms:
@@ -587,10 +601,10 @@ def _expr_to_ring(expr):
             omega_lcd = lcm(omega_lcd, d)
         el = _convert_omega_band(expr, omega_lcd)
         if el is not None:
-            return el, {'band': 'omega', 'omega_lcd': omega_lcd}
+            return el, {'band': 'omega', 'omega_lcd': omega_lcd, 'spec': omega_spec}
 
     # --- Priority 2: Pure rational exponents → rational-band ring ---
-    if rational_denoms:
+    if rational_denoms or not omega_denoms:
         denoms = _collect_exponent_denoms(expr)
         if not denoms:
             denoms = {1}
@@ -601,14 +615,47 @@ def _expr_to_ring(expr):
 
         el = _convert_with_scale(expr, base_denom)
         if el is not None:
-            return el, {'band': 'rational', 'base_denom': base_denom}
+            return el, {'band': 'rational', 'base_denom': base_denom, 'spec': rat_spec}
 
     # --- Priority 3: Mixed → multi-band ---
     mb_result = _try_multiband(expr)
     if mb_result is not None:
         el, rat_scale, omega_scale = mb_result
-        return (el, rat_scale, omega_scale), {'band': 'multi'}
+        return (el, rat_scale, omega_scale), {'band': 'multi', 'rat_spec': rat_spec, 'omega_spec': omega_spec}
     return None, None
+
+
+def _classify_exponents_full(expr, rational_denoms, omega_denoms, bases_seen):
+    """Classify exponent denominators and detect which bases appear."""
+    from fractions import Fraction as Frac
+    expr = traction_simplify(expr)
+
+    if isinstance(expr, (Integer, Rational, Null)):
+        return
+    if isinstance(expr, Zero):
+        rational_denoms.add(1)
+        bases_seen.add('zero')
+        return
+    if isinstance(expr, Omega):
+        rational_denoms.add(1)
+        bases_seen.add('omega')
+        return
+    if isinstance(expr, Pow) and isinstance(expr.base, (Zero, Omega)):
+        base_name = 'zero' if isinstance(expr.base, Zero) else 'omega'
+        bases_seen.add(base_name)
+        exp = expr.exp
+        omega_info = _extract_omega_rational(exp)
+        if omega_info is not None:
+            coeff, _ = omega_info
+            omega_denoms.add(coeff.denominator)
+        elif isinstance(exp, (Integer, Rational)):
+            rational_denoms.add(int(exp.q) if isinstance(exp, Rational) else 1)
+        return
+    if isinstance(expr, (Add, Mul)):
+        for arg in expr.args:
+            _classify_exponents_full(arg, rational_denoms, omega_denoms, bases_seen)
+    if isinstance(expr, Pow) and isinstance(expr.exp, Integer):
+        _classify_exponents_full(expr.base, rational_denoms, omega_denoms, bases_seen)
 
 
 def _convert_omega_band(expr, omega_lcd):
@@ -934,23 +981,23 @@ def _decompose_ring_element(ring_el, ring_info, traction_str, complex_str, simpl
     band = ring_info.get('band', 'rational')
     base_denom = ring_info.get('base_denom')
     omega_lcd = ring_info.get('omega_lcd')
+    spec = ring_info.get('spec')
+
+    ring_label = f'Q[s][g] / (g\u00b2 \u2212 sg + 1)'
 
     if band == 'omega':
-        # Omega-band: g = 0^(ω/n), s = 0^(ω/n) + 0^(-ω/n) (exact traction)
         n = omega_lcd
-        if n == 1:
-            gen_note = 'g = 0^\u03c9,  s = g + g\u207b\u00b9'
-        elif n == 2:
-            gen_note = 'g = 0^(\u03c9/2),  s = 0,  g\u00b2 = -1'
-        else:
-            gen_note = f'g = 0^(\u03c9/{n}),  s = 0^(\u03c9/{n}) + 0^(-\u03c9/{n})'
-        ring_label = f'Q[s][g] / (g\u00b2 \u2212 sg + 1)'
+        sym = spec.symbol if spec else '0'
+        g_str = spec.format_generator(n) if spec else f'0^(\u03c9/{n})'
 
-        # For n=2 (s=0) and n=3 (s=1), coefficients evaluate to rationals.
-        # For larger n, keep polynomial form in s.
+        # s is exact traction: g + g⁻¹
         s_rational = {1: Frac(-2), 2: Frac(0), 3: Frac(1)}.get(n)
+        if n == 2:
+            gen_note = f'g = {g_str},  s = 0,  g\u00b2 = -1'
+        else:
+            gen_note = f'g = {g_str},  s = g + g\u207b\u00b9'
+
         if s_rational is not None:
-            # s is rational — evaluate polynomials to get exact rational coordinates
             a_val = ring_el.a.eval_at(float(s_rational))
             b_val = ring_el.b.eval_at(float(s_rational))
             a_frac = Frac(a_val.real).limit_denominator(10000) if abs(a_val.imag) < 1e-12 else None
@@ -960,18 +1007,14 @@ def _decompose_ring_element(ring_el, ring_info, traction_str, complex_str, simpl
                 ('b', str(b_frac) if b_frac is not None else repr(ring_el.b)),
             ]
         else:
-            # s is algebraic — keep polynomial form
             components = [
                 ('a', repr(ring_el.a)),
                 ('b', repr(ring_el.b)),
             ]
     else:
-        # Rational-band: g = 0^(1/n), s is formal
-        if base_denom == 2:
-            gen_note = 'g = 0^(1/2),  s = g + g\u207b\u00b9'
-        else:
-            gen_note = f'g = 0^(1/{base_denom}),  s = g + g\u207b\u00b9'
-        ring_label = f'Q[s][g] / (g\u00b2 \u2212 sg + 1)'
+        sym = spec.symbol if spec else '0'
+        g_str = spec.format_generator(base_denom) if spec else f'0^(1/{base_denom})'
+        gen_note = f'g = {g_str},  s = g + g\u207b\u00b9'
         components = [
             ('a', repr(ring_el.a)),
             ('b', repr(ring_el.b)),
@@ -2721,59 +2764,116 @@ class CalculatorApp:
                 tw.insert('end', f'  {label} = {poly_str}\n', 'value')
 
     def _draw_cheb_orbit(self, ax, decomp):
-        """Draw a complex plane plot highlighting the expression's value."""
+        """Draw the traction coordinate plane.
+        X-axis: scalar (-1 to 1), center = 0
+        Y-axis: traction class (0 to ω), center = 1
+        Origin: 0(1) = 1(0), where zero-class meets unity."""
         ax.clear()
         ax.set_facecolor('#1a1a2e')
         ax.set_aspect('equal')
-        ax.set_title('Complex Plane', fontsize=13, color='#eeeeee')
-        ax.tick_params(colors='#aaaaaa', labelsize=9)
+        ax.set_title('Traction Plane', fontsize=13, color='#eeeeee')
+        # Grid lines
+        ax.axhline(0, color='#444455', linewidth=0.5)
+        ax.axvline(0, color='#444455', linewidth=0.5)
+        for i in range(-3, 4):
+            if i != 0:
+                ax.axhline(i, color='#222233', linewidth=0.3)
+                ax.axvline(i, color='#222233', linewidth=0.3)
 
-        # Unit circle
+        # Unit circle reference
         circ_t = np.linspace(0, 2 * np.pi, 200)
         ax.plot(np.cos(circ_t), np.sin(circ_t), color='#333344', linewidth=0.8)
-        ax.axhline(0, color='#333344', linewidth=0.5)
-        ax.axvline(0, color='#333344', linewidth=0.5)
 
-        # Plot integer zero-powers as reference dots: 0^n for n = -6..6
-        theta_ref = np.pi / 4
-        for n in range(-6, 7):
-            angle = n * theta_ref
-            zx, zy = np.cos(angle), np.sin(angle)
-            ax.plot(zx, zy, 'o', color='#4488ff', markersize=2.5, alpha=0.4)
+        # X-axis: scalar integers
+        x_ticks = list(range(-3, 4))
+        ax.set_xticks(x_ticks)
+        ax.set_xticklabels([str(v) for v in x_ticks], fontsize=8, color='#888899')
+
+        # Y-axis: traction powers (0³, 0², 0, 1, ω, ω², ω³)
+        _sup = {2: '\u00b2', 3: '\u00b3', 4: '\u2074', 5: '\u2075', 6: '\u2076'}
+        y_ticks = list(range(-3, 4))
+        y_labels = []
+        for v in y_ticks:
+            if v == 0:
+                y_labels.append('1')
+            elif v == 1:
+                y_labels.append('\u03c9')
+            elif v == -1:
+                y_labels.append('0')
+            elif v > 1:
+                y_labels.append(f'\u03c9{_sup.get(v, "^" + str(v))}')
+            else:
+                y_labels.append(f'0{_sup.get(-v, "^" + str(-v))}')
+        ax.set_yticks(y_ticks)
+        ax.set_yticklabels(y_labels, fontsize=9, color='#888899')
+        ax.tick_params(colors='#666677', labelsize=8)
+
+        # Reference points for key traction elements
+        refs = [
+            (0, 0, None, '#ffffff'),         # center
+            (0, 1, '\u03c9', '#ff4444'),         # ω
+            (0, -1, '0', '#4488ff'),        # 0
+            (-1, 0, '-1', '#ff8888'),        # -1
+            (1, 0, '1', '#ffaaff'),        # 1
+        ]
+        for rx, ry, label, rcolor in refs:
+            ax.plot(rx, ry, 'o', color=rcolor, markersize=5, zorder=4, alpha=0.6)
+            ax.annotate(label, (rx, ry),
+                        textcoords='offset points', xytext=(rx*15-4, ry*15-4),
+                        fontsize=10, color=rcolor)
 
         if decomp is None:
-            ax.plot(1, 0, 'o', color='#ffffff', markersize=5, zorder=4)
-            ax.set_xlim(-1.5, 1.5)
-            ax.set_ylim(-1.5, 1.5)
+            ax.set_xlim(-1.6, 1.6)
+            ax.set_ylim(-1.6, 1.6)
             return
 
-        # Get the complex value for plotting
-        val = decomp.get('complex_val')
+        # Plot the expression's ring coordinates (a, b)
+        # For ring element a + b·g: x = a (scalar), y = b (generator direction)
+        components = decomp.get('components', [])
         traction_str = decomp.get('traction_str', '')
+        plotted = False
 
-        # Plot the value
-        if val is not None and np.isfinite(val):
-            zx, zy = val.real, val.imag
-            ax.plot(zx, zy, 'o', color='#00ccff', markersize=10, zorder=5,
-                    markeredgecolor='white', markeredgewidth=1.5)
+        if len(components) >= 2:
+            try:
+                a_str = components[0][1]
+                b_str = components[1][1]
+                # Try to evaluate as numbers (works for omega band with rational s)
+                a_val = float(a_str) if a_str.replace('-', '').replace('/', '').replace('.', '').isdigit() or a_str in ('0', '1', '-1', '-2') else None
+                b_val = float(b_str) if b_str.replace('-', '').replace('/', '').replace('.', '').isdigit() or b_str in ('0', '1', '-1', '-2') else None
 
-            # Label
-            label = traction_str if len(traction_str) < 20 else traction_str[:17] + '...'
-            ax.annotate(label, (zx, zy),
-                        textcoords='offset points', xytext=(8, 8),
-                        fontsize=10, color='#00ccff')
+                if a_val is not None and b_val is not None:
+                    ax.plot(a_val, b_val, 'o', color='#00ccff', markersize=10, zorder=5,
+                            markeredgecolor='white', markeredgewidth=1.5)
+                    label = traction_str if len(traction_str) < 20 else traction_str[:17] + '...'
+                    ax.annotate(label, (a_val, b_val),
+                                textcoords='offset points', xytext=(8, 8),
+                                fontsize=10, color='#00ccff')
+                    plotted = True
 
-            # Expand view if the value is outside the unit circle
-            margin = max(abs(zx), abs(zy)) * 1.3
-            lim = max(1.5, margin)
-            ax.set_xlim(-lim, lim)
-            ax.set_ylim(-lim, lim)
-        else:
-            ax.set_xlim(-1.5, 1.5)
-            ax.set_ylim(-1.5, 1.5)
+                    margin = max(abs(a_val), abs(b_val)) * 1.3
+                    lim = max(1.6, margin)
+                    ax.set_xlim(-lim, lim)
+                    ax.set_ylim(-lim, lim)
+            except (ValueError, TypeError):
+                pass
 
-        # Origin marker (0^0 = 1)
-        ax.plot(1, 0, 'o', color='#ffffff', markersize=5, zorder=4)
+        # Fallback: use complex_val if ring coordinates aren't numeric
+        if not plotted:
+            val = decomp.get('complex_val')
+            if val is not None and np.isfinite(val):
+                ax.plot(val.real, val.imag, 'o', color='#00ccff', markersize=10, zorder=5,
+                        markeredgecolor='white', markeredgewidth=1.5)
+                label = traction_str if len(traction_str) < 20 else traction_str[:17] + '...'
+                ax.annotate(label, (val.real, val.imag),
+                            textcoords='offset points', xytext=(8, 8),
+                            fontsize=10, color='#00ccff')
+                margin = max(abs(val.real), abs(val.imag)) * 1.3
+                lim = max(1.6, margin)
+                ax.set_xlim(-lim, lim)
+                ax.set_ylim(-lim, lim)
+            else:
+                ax.set_xlim(-1.6, 1.6)
+                ax.set_ylim(-1.6, 1.6)
 
     def _on_viz_hover(self, event):
         """Draw gauge readouts for the hovered pixel."""
