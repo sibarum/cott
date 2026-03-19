@@ -20,7 +20,7 @@ For bare scalars (not in 0^(...) form):
 
 import numpy as np
 from sympy import Symbol, Rational, Pow, Mul, symbols, lambdify, S, Integer, Number, Add
-from traction import Zero, Omega, Null, traction_simplify, project_complex, W_CONST, _project
+from traction import Zero, Omega, Null, traction_simplify, project_complex, OMEGA_EXP_VAL, _project
 from projections.base import Projection
 
 
@@ -284,7 +284,7 @@ def _project_for_eval(expr):
     """Project a traction expression for numeric evaluation (ω → W, etc.)."""
     if expr is None:
         return S.Zero
-    expr_w = expr.subs(Omega(), W_CONST) if hasattr(expr, 'has') and expr.has(Omega) else expr
+    expr_w = expr.subs(Omega(), OMEGA_EXP_VAL) if hasattr(expr, 'has') and expr.has(Omega) else expr
     return _project(expr_w)
 
 

@@ -19,9 +19,11 @@ from sympy import (
     S, I, pi, symbols, lambdify
 )
 
-# Precompute W as a complex number
-from traction import W_CONST, Zero, Omega, Null, Log0, LogW
-_W = complex(W_CONST.evalf())
+# Precompute Chebyshev evaluation constants
+from traction import W_CONST, CHEB_THETA, OMEGA_EXP_VAL, Zero, Omega, Null, Log0, LogW
+import math as _math
+_THETA = _math.pi / 4  # Chebyshev angle (matches CHEB_THETA default)
+_OMEGA_VAL = _math.pi / _THETA  # omega -> pi/theta in exponents
 
 
 class TractionExponent:
@@ -38,8 +40,8 @@ class TractionExponent:
         self.omega = complex(omega)
 
     def project(self):
-        """Project to complex: real + omega * W."""
-        return self.real + self.omega * _W
+        """Project to complex via Chebyshev: e^(i*THETA*(real + omega*pi/THETA))."""
+        return self.real + self.omega * _OMEGA_VAL
 
     def __add__(self, other):
         if isinstance(other, TractionExponent):
@@ -140,16 +142,15 @@ class TV:
         if self.kind == TV.SCALAR:
             return self.val
         elif self.kind == TV.ZERO_POWER:
-            # 0^(a + bω) → e^{-Wa + iπb}
+            # 0^(a + bω) → e^(i*THETA*(a + b*pi/THETA)) = e^(i*THETA*a + i*pi*b)
             exp = self.exponent
-            return cmath.exp(-_W * exp.real + 1j * cmath.pi * exp.omega)
+            total_exp = complex(exp.real) + complex(exp.omega) * _OMEGA_VAL
+            return cmath.exp(1j * _THETA * total_exp)
         elif self.kind == TV.OMEGA_VAL:
-            # coeff*ω → coeff * C(ω). C(ω) = zoo, so this is infinity.
-            # For rendering, return a large number with the right phase.
+            # coeff*ω → coeff * e^(-i*THETA) (Chebyshev projection of ω)
             if abs(self.omega_coeff) < 1e-300:
                 return 0.0
-            phase = cmath.phase(self.omega_coeff)
-            return 1e15 * cmath.exp(1j * phase)
+            return self.omega_coeff * cmath.exp(-1j * _THETA)
         return self.val
 
     def __repr__(self):
@@ -378,7 +379,7 @@ def traction_eval(expr, env):
             proj = inner.project()
             if abs(proj) < 1e-300:
                 return TV.scalar(complex('nan'))
-            return TV.scalar(-cmath.log(proj) / _W)
+            return TV.scalar(cmath.log(proj) / (1j * _THETA))
         except (ValueError, ZeroDivisionError):
             return TV.scalar(complex('nan'))
 
@@ -389,7 +390,7 @@ def traction_eval(expr, env):
             proj = inner.project()
             if abs(proj) < 1e-300:
                 return TV.scalar(complex('nan'))
-            return TV.scalar(cmath.log(proj) / _W)
+            return TV.scalar(-cmath.log(proj) / (1j * _THETA))
         except (ValueError, ZeroDivisionError):
             return TV.scalar(complex('nan'))
 

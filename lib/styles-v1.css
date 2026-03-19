@@ -42,7 +42,6 @@ td {
     border: 1px solid #999;
 }
 table .expression {
-    text-align: center;
     margin: 1em 0.1em;
 }
 
@@ -234,7 +233,7 @@ span.variable, span.symbol, span.number, sup, sub, .fraction {
     margin: 0 0.1em;
     font-size: 0.75em;
 }
-sup .fraction {
+sup .fraction, .sqrt .fraction {
     display: inline;
     margin: 0;
 }
@@ -242,6 +241,7 @@ p .fraction {
     margin: 0 0.2em;
     font-size: 0.8em;
 }
+
 .numerator {
     display: inline;
     vertical-align: middle;
@@ -260,7 +260,7 @@ p .fraction {
     color: rgba(1,1,1,0%);
     white-space: nowrap;
 }
-sup .h-divider {
+sup .h-divider, .sqrt .h-divider {
     height: auto;
     border: none;
     color: inherit;

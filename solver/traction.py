@@ -34,8 +34,16 @@ from sympy import (
 )
 
 # Structure constant for 0^z = e^(-W*z), where W^2 = -i*pi
-# Connects traction algebra to Lie group exponential
+# Connects traction algebra to Lie group exponential (legacy)
 W_CONST = sp_sqrt(-I * pi)
+
+# Chebyshev evaluation angle: 0^z = e^(i*THETA*z) after omega -> pi/THETA
+# At this angle, 0^omega = e^(i*pi) = -1 (always), and all 0^n lie on the unit circle.
+# Default: pi/4 (matches Phase Map slider default)
+CHEB_THETA = pi / 4
+
+# In exponents, omega acts as pi/THETA (so that 0^omega = e^(i*THETA*pi/THETA) = e^(i*pi) = -1)
+OMEGA_EXP_VAL = pi / CHEB_THETA
 
 
 # ============================================================
@@ -493,19 +501,13 @@ def resolve_log(expr):
 
 def project_complex(expr):
     """
-    Project a traction expression to the complex numbers.
+    Project a traction expression to the complex numbers via Chebyshev evaluation.
 
-    The core mapping: 0^(t*w) -> e^(i*pi*t), derived from 0^w = -1 = e^(i*pi).
+    The core mapping: 0^z -> e^(i*THETA*z), where THETA is the Chebyshev angle.
+    In exponents, omega -> pi/THETA so that 0^omega = e^(i*pi) = -1 always.
 
-    This handles:
-        Integers/rationals   ->  themselves
-        0^(t*w)              ->  e^(i*pi*t)
-        a * 0^(t*w)          ->  a * e^(i*pi*t)
-        Products/sums        ->  distributed
-        Symbols              ->  left as-is
-
-    Integer zero-powers (0^n for n > 0) have no known general mapping
-    to C yet, so they are left unevaluated.
+    All zero-powers of real exponents land on the unit circle.
+    The imaginary axis (from 0^(omega/2) = i) controls magnitude.
 
     Returns a SymPy complex expression.
     """
@@ -519,31 +521,29 @@ def _project(expr):
     if isinstance(expr, (Integer, Rational)):
         return expr
     if isinstance(expr, Zero):
-        # 0 = 0^1, so C(0) = e^(-W) via the Lie formula.
-        # Using S.Zero here would make 0*f(x) project to 0 (blank plots).
-        return sp_exp(-W_CONST)
+        # 0 = 0^1 → e^(i*THETA)
+        return sp_exp(I * CHEB_THETA)
     if isinstance(expr, Omega):
-        # ω = 0^(-1) → e^{-W·(-1)} = e^W
-        return sp_exp(W_CONST)
+        # ω = 0^(-1) → e^(-i*THETA)
+        return sp_exp(-I * CHEB_THETA)
     if isinstance(expr, Null):
         return S.Zero
     if isinstance(expr, Symbol):
         return expr
 
-    # Logarithms: log_0(y) = -ln(y)/W, log_w(y) = ln(y)/W
-    # Derived from 0^z = e^(-W*z) -> z = -ln(0^z)/W -> log_0(y) = -ln(y)/W
-    # Substitute ω → W in the argument (same principle as exponents)
+    # Logarithms: 0^z = e^(i*THETA*z) → z = ln(y)/(i*THETA) → log_0(y) = -i*ln(y)/THETA
+    # log_w(y) = i*ln(y)/THETA  (since log_w = -log_0)
     if isinstance(expr, Log0):
         arg = expr.args[0]
-        arg = arg.subs(Omega(), W_CONST) if arg.has(Omega) else arg
+        arg = arg.subs(Omega(), OMEGA_EXP_VAL) if arg.has(Omega) else arg
         proj_arg = _project(arg)
-        return -sp_log(proj_arg) / W_CONST
+        return sp_log(proj_arg) / (I * CHEB_THETA)
 
     if isinstance(expr, LogW):
         arg = expr.args[0]
-        arg = arg.subs(Omega(), W_CONST) if arg.has(Omega) else arg
+        arg = arg.subs(Omega(), OMEGA_EXP_VAL) if arg.has(Omega) else arg
         proj_arg = _project(arg)
-        return sp_log(proj_arg) / W_CONST
+        return -sp_log(proj_arg) / (I * CHEB_THETA)
 
     # Powers
     if isinstance(expr, Pow):
@@ -567,26 +567,21 @@ def _project(expr):
 
 
 def _project_pow(expr):
-    """Project a Pow expression to C."""
+    """Project a Pow expression to C using Chebyshev evaluation."""
     base = expr.base
     exponent = expr.exp
 
     # Non-traction base: project base and exponent separately
-    # In exponents, ω acts as W (the structure constant): ω = W in exponent space
-    # Derived from: 0^(tω) = e^(-W·tω) = e^(iπt), so W·ω = -iπ = W², thus ω = W
     if not isinstance(base, (Zero, Omega)):
-        # If base is a product containing traction types (e.g. -ω, 3*0),
-        # distribute the power: (a*b)^n -> a^n * b^n, then project each.
         if isinstance(base, Mul) and (base.has(Zero) or base.has(Omega)):
             result = S.One
             for factor in Mul.make_args(base):
                 result = result * _project(Pow(factor, exponent))
             return result
         pb = _project(base)
-        exp_projected = exponent.subs(Omega(), W_CONST) if exponent.has(Omega) else exponent
+        exp_projected = exponent.subs(Omega(), OMEGA_EXP_VAL) if exponent.has(Omega) else exponent
         pe = _project(exp_projected)
         # Negative real bases: (-a)^n = a^n * e^(iπn)
-        # Numpy can't compute (-1.0)**0.5 as a float — needs complex form.
         if isinstance(pb, Number) and pb.is_negative:
             return Pow(-pb, pe) * sp_exp(I * pi * pe)
         return Pow(pb, pe)
@@ -604,11 +599,11 @@ def _project_pow(expr):
     if isinstance(exponent, Omega):
         return S.NegativeOne
 
-    # General case: 0^z = e^(-W*z)
-    # Substitute ω → W in the exponent (in exponents, ω acts as W),
-    # then project any remaining traction types (e.g. 0^(ω/2) → i).
-    exp_with_w = exponent.subs(Omega(), W_CONST) if exponent.has(Omega) else exponent
-    proj_exp = _project(exp_with_w)
-    return sp_exp(-W_CONST * proj_exp)
+    # Chebyshev projection: 0^z = e^(i*THETA*z)
+    # In exponents, ω → π/THETA so that 0^ω = e^(i*π) = -1.
+    # All real exponents give unit-circle values.
+    exp_sub = exponent.subs(Omega(), OMEGA_EXP_VAL) if exponent.has(Omega) else exponent
+    proj_exp = _project(exp_sub)
+    return sp_exp(I * CHEB_THETA * proj_exp)
 
 

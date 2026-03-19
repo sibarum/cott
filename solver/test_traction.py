@@ -530,15 +530,17 @@ class TestResolve:
 # ============================================================
 
 class TestProjection:
+    """Tests for the Chebyshev projection: 0^z → e^(i*THETA*z)."""
 
     def test_project_zero(self):
-        """C(0) = C(0^1) = e^(-W) via Lie formula, not numeric 0."""
-        assert project_complex(z) == exp(-W_CONST)
+        """C(0) = C(0^1) = e^(i*THETA) — on the unit circle."""
+        from traction import CHEB_THETA
+        assert project_complex(z) == exp(I * CHEB_THETA)
 
     def test_project_omega(self):
-        """ω = 0^(-1) → e^W (Lie exponential, not infinity)."""
-        from sympy import exp as sp_exp
-        assert project_complex(w) == sp_exp(W_CONST)
+        """ω = 0^(-1) → e^(-i*THETA)."""
+        from traction import CHEB_THETA
+        assert project_complex(w) == exp(-I * CHEB_THETA)
 
     def test_project_integer(self):
         assert project_complex(Integer(5)) == 5
@@ -551,7 +553,7 @@ class TestProjection:
         assert project_complex(z**w) == S.NegativeOne
 
     def test_project_dyadic_imaginary(self):
-        """0^(w/2) projects to i."""
+        """0^(w/2) projects to i (theta-independent)."""
         result = project_complex(z**(w / 2))
         assert result == I
 
@@ -560,13 +562,15 @@ class TestProjection:
         result = project_complex(w**(w / 2))
         assert result == -I
 
-    def test_project_lie_exponential(self):
-        """0^2 projects to e^(-2W) via the Lie formula."""
-        # Note: 0^1 evaluates eagerly to Zero(), which projects to 0.
-        # Use 0^2 which stays as Pow(Zero(), 2).
+    def test_project_unit_circle(self):
+        """0^n for rational n stays on the unit circle (Chebyshev property)."""
+        from traction import CHEB_THETA
         result = project_complex(z**2)
-        expected = exp(-2 * W_CONST)
+        expected = exp(I * 2 * CHEB_THETA)
         assert result == expected
+        # Verify magnitude = 1 numerically
+        val = complex(result.evalf())
+        assert abs(abs(val) - 1) < 1e-10
 
     def test_project_symbol_passthrough(self):
         """Symbols pass through projection unchanged."""
@@ -579,10 +583,12 @@ class TestProjection:
         result = project_complex(3 * z**(w / 2))
         assert result == 3 * I
 
-    def test_w_const_squared(self):
-        """W^2 = -i*pi (structure constant identity)."""
-        from sympy import simplify
-        assert simplify(W_CONST**2 + I * pi) == 0
+    def test_project_all_real_exponents_unit_circle(self):
+        """Every 0^(p/q) with real rational exponent has |C(·)| = 1."""
+        for n, d in [(1, 1), (1, 2), (1, 3), (2, 3), (5, 7), (3, 1), (-2, 1)]:
+            result = project_complex(z**Rational(n, d))
+            val = complex(result.evalf())
+            assert abs(abs(val) - 1) < 1e-10, f"|C(0^({n}/{d}))| = {abs(val)}, expected 1"
 
 
 # ============================================================

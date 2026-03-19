@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<html xmlns="http://www.w3.org/1999/html" lang="en">
+<head>
+    <script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../../lib/styles-v1.css">
+    <script src="../../../lib/traction-interpret.js"></script>
+
+    <title>Chebyshev Simplification Database</title>
+
+</head>
+<body>
+
+
+<div class="section">
+
+    <a href="/cott">
+        <div class="icon-back"></div>
+    </a>
+
+    <div class="headings">
+        <h1>Chebyshev Recurrence Database</h1>
+        <h2>"It's so discrete, it's continuous!"</h2>
+    </div>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        Published under the <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license
+
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-1">
+        1. Abstract
+    </div>
+
+    <p>
+        We have shown how
+        <a href="/cott/theory/chebyshev">Chebyshev polynomials emerge from totalized base-zero exponentiation.</a>
+        In this article we discuss the software architecture of solving any-dimensional, any-basis,
+        discrete transformations on traction tensors. The information-conservative traction tensor is
+        surjective to <span class="symbol">&complexes;</span>. This technique uses algebraic rules, logarithmic decomposition,
+        and canonical forms for caching known equivalences.
+    </p>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-1">
+        2. Architecture
+    </div>
+
+    <p>
+        Traction tensors are defined as polynomials of traction terms.
+    </p>
+
+    <p>
+        The dyadic-basis tensor is derived from <span class="dynamicexpr">sqrt(-1)</span>.
+    </p>
+
+    <div class="expression font-xl">
+        <span class="dynamicexpr">sqrt(-1)</span>
+        <span class="symbol">=</span>
+        <span class="dynamicexpr">0^{w/2}</span>
+    </div>
+
+    <div class="expression font-xl">
+        <span class="dynamicexpr">C(0^{w/2}) => i</span>
+    </div>
+
+    <p>
+        Non-dyadic basis tensors are chosen for primality.
+        Given <span class="variable">p</span> is some prime positive integer:
+    </p>
+
+    <div class="expression font-xl">
+        <span class="dynamicexpr">C(0^{w*p}) => e^(i*pi*p)</span>
+    </div>
+
+    <p>
+        Exact basis mappings are saved in an in-memory database whenever they are encountered
+        for the first time.
+    </p>
+
+    <table class="centered">
+        <tr>
+            <th>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">0^{w*u}</span>
+                </div>
+            </th>
+            <th>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">C(0^{w*u})</span>
+                </div>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">0^{w/2}</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">i</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">0^{w/3}</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">{1/2}+sqrt(3)*i/2</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">0^{w/5}</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">{1+sqrt(5)}/4+i*{sqrt((5-sqrt(5))/8)}</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Simplified Chebyshev recurrences are likewise cached.
+    </p>
+
+    <p>
+        Decomposition metadata would be included alongside computed values, for ease of indexing.
+        For example:
+    </p>
+
+    <table>
+        <tr>
+            <th>
+
+                Basis
+            </th>
+            <th>
+                Expression
+            </th>
+            <th>
+                Decomposition
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression">
+                    <div class="dynamicexpr">g = 0^{ω/2}</div>
+                    <div class="dynamicexpr">s = 0</div>
+                    <div class="dynamicexpr">g^2 = -1</div>
+                </div>
+            </td>
+            <td class="centered">
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">0^{w*3/2}</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">-s + (-1 + s^2)*g</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression">
+                    <div class="dynamicexpr">g = 0^(ω/3)</div>
+                    <div class="dynamicexpr">s = 1</div>
+                </div>
+            </td>
+            <td class="centered">
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">0^{w*5/3}</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">2*s - s^3 + (1 - 3*s^2 + s^4)*g</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="expression">
+                    <div class="dynamicexpr">g = 0^{ω/7}</div>
+                    <div class="dynamicexpr">s = 0^{ω/7} + 0^{-ω/7}</div>
+                </div>
+            </td>
+            <td class="centered">
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">0^{w*2/7}</span>
+                </div>
+            </td>
+            <td>
+                <div class="expression font-lg">
+                    <span class="dynamicexpr">-1 + (s)*g</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-1">
+
+    </div>
+
+    <div class="expression font-lg">
+        <span class="symbol">=</span>
+        <span class="dynamicexpr"></span>
+    </div>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-1">
+
+    </div>
+
+    <div class="expression font-lg">
+        <span class="symbol">=</span>
+        <span class="dynamicexpr"></span>
+    </div>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<script>
+</script>
+</body>
+</html>

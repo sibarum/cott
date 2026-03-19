@@ -561,12 +561,13 @@ def _collect_exponent_denoms(expr):
 def _expr_to_ring(expr):
     """
     Convert a traction expression to a chebyshev_ring.Element with an
-    adaptive generator. Returns (element, base_denom) or (None, None).
+    adaptive generator. Returns (element, info_dict) or (None, None).
 
-    The generator g = 0^(1/(2d)) where d = LCD of all exponent denominators.
-    Then 0^(p/q) = g^(2d·p/q), which is always an integer power of g.
-
-    The ring is always Q[s][g]/(g²-sg+1) with s = g + g⁻¹.
+    Priority:
+    1. Omega band (primary): g = 0^(ω/n), s = 2cos(π/n)
+       θ-independent, universal structure. Ring is a cyclotomic field.
+    2. Rational band (secondary): g = 0^(1/n), s is formal
+    3. Multi-band: both generators needed.
     """
     from chebyshev_ring import Element
     from fractions import Fraction as Frac
@@ -574,30 +575,99 @@ def _expr_to_ring(expr):
 
     expr = traction_simplify(expr)
 
-    # Find the LCD of all exponent denominators
-    denoms = _collect_exponent_denoms(expr)
-    if not denoms:
-        denoms = {1}
-    base_denom = 1
-    for d in denoms:
-        base_denom = lcm(base_denom, d)
+    # Classify exponents into omega and rational bands
+    rational_denoms = set()
+    omega_denoms = set()
+    _classify_exponents(expr, rational_denoms, omega_denoms)
 
-    # Generator g = 0^(1/scale), where scale = LCD of denominators.
-    # Minimum scale of 2 so the generator is at least 0^(1/2) (not bare 0).
-    # Then 0^(p/q) = g^(scale·p/q), always an integer.
-    base_denom = max(base_denom, 2)
-    scale = base_denom
+    # --- Priority 1: Pure omega exponents → omega-band ring ---
+    if omega_denoms and not rational_denoms:
+        omega_lcd = 1
+        for d in omega_denoms:
+            omega_lcd = lcm(omega_lcd, d)
+        el = _convert_omega_band(expr, omega_lcd)
+        if el is not None:
+            return el, {'band': 'omega', 'omega_lcd': omega_lcd}
 
-    el = _convert_with_scale(expr, scale)
-    if el is not None:
-        return el, base_denom
+    # --- Priority 2: Pure rational exponents → rational-band ring ---
+    if rational_denoms:
+        denoms = _collect_exponent_denoms(expr)
+        if not denoms:
+            denoms = {1}
+        base_denom = 1
+        for d in denoms:
+            base_denom = lcm(base_denom, d)
+        base_denom = max(base_denom, 2)
 
-    # Single-band failed — try multi-band for omega-containing exponents
+        el = _convert_with_scale(expr, base_denom)
+        if el is not None:
+            return el, {'band': 'rational', 'base_denom': base_denom}
+
+    # --- Priority 3: Mixed → multi-band ---
     mb_result = _try_multiband(expr)
     if mb_result is not None:
         el, rat_scale, omega_scale = mb_result
-        return (el, rat_scale, omega_scale), None  # base_denom=None signals multi-band
+        return (el, rat_scale, omega_scale), {'band': 'multi'}
     return None, None
+
+
+def _convert_omega_band(expr, omega_lcd):
+    """Convert an expression with omega exponents to Element.
+    g = 0^(ω/omega_lcd), scale = omega_lcd.
+    0^(ω·p/q) → g^(omega_lcd·p/q)."""
+    from chebyshev_ring import Element
+    from fractions import Fraction as Frac
+
+    expr = traction_simplify(expr)
+
+    # Scalar atoms
+    if isinstance(expr, Integer):
+        return Element.from_int(int(expr))
+    if isinstance(expr, Rational):
+        return Element.from_fraction(Frac(expr.p, expr.q))
+    if isinstance(expr, Null):
+        return Element.zero_el()
+
+    # Zero-powers with omega exponents
+    if isinstance(expr, Pow) and isinstance(expr.base, (Zero, Omega)):
+        exp = expr.exp
+        sign = -1 if isinstance(expr.base, Omega) else 1
+        omega_info = _extract_omega_rational(exp)
+        if omega_info is not None:
+            coeff, _ = omega_info
+            power = coeff * omega_lcd * sign
+            if power.denominator != 1:
+                return None
+            return Element.u_power(int(power))
+        return None
+
+    # Sums
+    if isinstance(expr, Add):
+        result = None
+        for term in Add.make_args(expr):
+            t = _convert_omega_band(term, omega_lcd)
+            if t is None:
+                return None
+            result = t if result is None else result + t
+        return result
+
+    # Products
+    if isinstance(expr, Mul):
+        result = None
+        for factor in Mul.make_args(expr):
+            f = _convert_omega_band(factor, omega_lcd)
+            if f is None:
+                return None
+            result = f if result is None else result * f
+        return result
+
+    # Powers with integer exponent
+    if isinstance(expr, Pow) and isinstance(expr.exp, Integer):
+        base_el = _convert_omega_band(expr.base, omega_lcd)
+        if base_el is not None:
+            return base_el ** int(expr.exp)
+
+    return None
 
 
 def _has_omega_exponent(expr):
@@ -837,17 +907,17 @@ def _convert_with_scale(expr, scale):
     return None
 
 
-def _decompose_ring_element(ring_el, base_denom, traction_str, complex_str, simplified):
+def _decompose_ring_element(ring_el, ring_info, traction_str, complex_str, simplified):
     """Build a decomposition result dict from a chebyshev_ring Element."""
+    import re
+    import math
+    from fractions import Fraction as Frac
 
     def _relabel(s):
-        """Replace 'u' with 'g' in ring repr strings for consistent display."""
-        import re
         return re.sub(r'\bu\b', 'g', s)
 
     ring_str = _relabel(repr(ring_el))
 
-    # Try to find the exponent for the orbit plot (if it's a simple zero-power)
     exponent = None
     exp_zero = _extract_zero_exponent(simplified)
     if exp_zero is not None:
@@ -861,19 +931,51 @@ def _decompose_ring_element(ring_el, base_denom, traction_str, complex_str, simp
     norm = ring_el.norm()
     norm_str = repr(norm)
 
-    # Generator description based on base_denom
-    if base_denom == 1:
-        gen_note = 'g = 0,  s = g + g\u207b\u00b9'
-    elif base_denom == 2:
-        gen_note = 'g = 0^(1/2),  s = g + g\u207b\u00b9'
-    else:
-        gen_note = f'g = 0^(1/{base_denom}),  s = g + g\u207b\u00b9'
-    ring_label = f'Q[s][g] / (g\u00b2 \u2212 sg + 1)'
+    band = ring_info.get('band', 'rational')
+    base_denom = ring_info.get('base_denom')
+    omega_lcd = ring_info.get('omega_lcd')
 
-    components = [
-        ('a', repr(ring_el.a)),
-        ('b', repr(ring_el.b)),
-    ]
+    if band == 'omega':
+        # Omega-band: g = 0^(ω/n), s = 0^(ω/n) + 0^(-ω/n) (exact traction)
+        n = omega_lcd
+        if n == 1:
+            gen_note = 'g = 0^\u03c9,  s = g + g\u207b\u00b9'
+        elif n == 2:
+            gen_note = 'g = 0^(\u03c9/2),  s = 0,  g\u00b2 = -1'
+        else:
+            gen_note = f'g = 0^(\u03c9/{n}),  s = 0^(\u03c9/{n}) + 0^(-\u03c9/{n})'
+        ring_label = f'Q[s][g] / (g\u00b2 \u2212 sg + 1)'
+
+        # For n=2 (s=0) and n=3 (s=1), coefficients evaluate to rationals.
+        # For larger n, keep polynomial form in s.
+        s_rational = {1: Frac(-2), 2: Frac(0), 3: Frac(1)}.get(n)
+        if s_rational is not None:
+            # s is rational — evaluate polynomials to get exact rational coordinates
+            a_val = ring_el.a.eval_at(float(s_rational))
+            b_val = ring_el.b.eval_at(float(s_rational))
+            a_frac = Frac(a_val.real).limit_denominator(10000) if abs(a_val.imag) < 1e-12 else None
+            b_frac = Frac(b_val.real).limit_denominator(10000) if abs(b_val.imag) < 1e-12 else None
+            components = [
+                ('a', str(a_frac) if a_frac is not None else repr(ring_el.a)),
+                ('b', str(b_frac) if b_frac is not None else repr(ring_el.b)),
+            ]
+        else:
+            # s is algebraic — keep polynomial form
+            components = [
+                ('a', repr(ring_el.a)),
+                ('b', repr(ring_el.b)),
+            ]
+    else:
+        # Rational-band: g = 0^(1/n), s is formal
+        if base_denom == 2:
+            gen_note = 'g = 0^(1/2),  s = g + g\u207b\u00b9'
+        else:
+            gen_note = f'g = 0^(1/{base_denom}),  s = g + g\u207b\u00b9'
+        ring_label = f'Q[s][g] / (g\u00b2 \u2212 sg + 1)'
+        components = [
+            ('a', repr(ring_el.a)),
+            ('b', repr(ring_el.b)),
+        ]
 
     return {
         'traction_str': traction_str,
@@ -888,7 +990,11 @@ def _decompose_ring_element(ring_el, base_denom, traction_str, complex_str, simp
         'is_unit': ring_el.can_invert(),
         'complex_str': complex_str,
         'exponent': exponent,
-        'base_denom': base_denom,
+        'base_denom': base_denom if band == 'rational' else None,
+        'band': band,
+        'omega_lcd': omega_lcd,
+        '_ring_el': ring_el,
+        '_ring_info': ring_info,
     }
 
 
@@ -940,6 +1046,64 @@ def _decompose_multiband(ring_el, rat_scale, omega_scale, traction_str, complex_
         'exponent': exponent,
         'base_denom': None,
     }
+
+
+def _eval_ring_exact(decomp):
+    """
+    Compute the exact symbolic value of a ring element by substituting
+    the traction expressions for g and s, then simplifying.
+
+    Uses Horner's method with traction_simplify at each step to keep
+    intermediate expressions manageable.
+
+    Returns a formatted string of the exact traction value.
+    """
+    from chebyshev_ring import Element, QsPoly
+    from sympy import Rational as SRat, Pow
+
+    ring_el = decomp.get('_ring_el')
+    ring_info = decomp.get('_ring_info', {})
+    band = ring_info.get('band', decomp.get('band', 'rational'))
+
+    if ring_el is None:
+        return 'Ring element not available'
+
+    if band == 'omega':
+        omega_lcd = ring_info.get('omega_lcd', 2)
+        # g = 0^(ω/n), g⁻¹ = 0^(-ω/n), s = g + g⁻¹
+        g_expr = Pow(Zero(), Mul(Omega(), SRat(1, omega_lcd)))
+        g_inv = Pow(Zero(), Mul(Omega(), SRat(-1, omega_lcd)))
+        s_expr = traction_simplify(g_expr + g_inv)
+    elif band == 'rational':
+        base_denom = ring_info.get('base_denom', decomp.get('base_denom', 2))
+        g_expr = Pow(Zero(), SRat(1, base_denom))
+        g_inv = Pow(Zero(), SRat(-1, base_denom))
+        s_expr = traction_simplify(g_expr + g_inv)
+    else:
+        return 'Multi-band exact evaluation not yet implemented'
+
+    def eval_poly_horner(poly, x):
+        """Evaluate QsPoly at traction expression x using Horner's method.
+        Expands and simplifies at each step to keep expressions small."""
+        from sympy import expand
+        coeffs = poly.coeffs
+        if not coeffs:
+            return Integer(0)
+        result = SRat(coeffs[-1])
+        for i in range(len(coeffs) - 2, -1, -1):
+            result = traction_simplify(expand(result * x) + SRat(coeffs[i]))
+        return result
+
+    a_val = eval_poly_horner(ring_el.a, s_expr)
+    b_val = eval_poly_horner(ring_el.b, s_expr)
+
+    if ring_el.b.is_zero():
+        exact = a_val
+    else:
+        from sympy import expand
+        exact = traction_simplify(expand(a_val + expand(b_val * g_expr)))
+
+    return format_result(exact)
 
 
 def _step_label(k, denom):
@@ -1019,14 +1183,14 @@ def chebyshev_decompose(expr):
         }
 
     # --- Primary path: try to convert to a Chebyshev ring Element ---
-    ring_result, base_denom = _expr_to_ring(simplified)
+    ring_result, ring_info = _expr_to_ring(simplified)
     if ring_result is not None:
         if isinstance(ring_result, tuple):
             # Multi-band: (element, rat_scale, omega_scale)
             el, rat_scale, omega_scale = ring_result
             return _decompose_multiband(el, rat_scale, omega_scale, traction_str, complex_str, simplified)
         else:
-            return _decompose_ring_element(ring_result, base_denom, traction_str, complex_str, simplified)
+            return _decompose_ring_element(ring_result, ring_info, traction_str, complex_str, simplified)
 
     # --- Fallback: single zero-power analysis ---
     exponent = _extract_zero_exponent(simplified)
@@ -2424,6 +2588,68 @@ class CalculatorApp:
         self._draw_cheb_orbit(self.cheb_ax_orbit, decomp)
         self.cheb_canvas_widget.draw()
 
+        # Start exact symbolic evaluation in background thread
+        if decomp.get('ring_form'):
+            self._start_exact_eval(decomp)
+
+    def _start_exact_eval(self, decomp):
+        """Launch background thread to compute exact symbolic value from ring element."""
+        import threading
+
+        # Cancel any previous computation
+        if hasattr(self, '_exact_eval_cancel'):
+            self._exact_eval_cancel.set()
+
+        cancel = threading.Event()
+        self._exact_eval_cancel = cancel
+
+        # Show "computing..." in the text widget
+        tw = self.cheb_text
+        tw.configure(state='normal')
+        tw.insert('end', '\n')
+        tw.insert('end', 'Exact Value\n', 'header')
+        tw.insert('end', '  computing...\n', 'dim')
+        self._exact_eval_insert_pos = tw.index('end - 2 lines linestart')
+        tw.configure(state='disabled')
+
+        def compute():
+            try:
+                result = _eval_ring_exact(decomp)
+                if cancel.is_set():
+                    return
+                # Schedule UI update on the main thread
+                self.root.after(0, lambda: self._finish_exact_eval(result, cancel))
+            except Exception as e:
+                if cancel.is_set():
+                    return
+                self.root.after(0, lambda: self._finish_exact_eval(f'Error: {e}', cancel))
+
+        t = threading.Thread(target=compute, daemon=True)
+        t.start()
+
+    def _finish_exact_eval(self, result, cancel):
+        """Update the Explain tab with the exact evaluation result."""
+        if cancel.is_set():
+            return
+
+        tw = self.cheb_text
+        tw.configure(state='normal')
+
+        # Find and replace the "computing..." line
+        try:
+            pos = self._exact_eval_insert_pos
+            # Delete from that position to end
+            tw.delete(pos, 'end')
+            tw.insert('end', 'Exact Value\n', 'header')
+            if isinstance(result, str) and result.startswith('Error'):
+                tw.insert('end', f'  {result}\n', 'dim')
+            else:
+                tw.insert('end', f'  {result}\n', 'value')
+        except Exception:
+            pass
+
+        tw.configure(state='disabled')
+
     def _render_cheb_text(self, decomp):
         """Render the Chebyshev decomposition into the text widget."""
         tw = self.cheb_text
@@ -2434,10 +2660,6 @@ class CalculatorApp:
             tw.insert('end', traction_str + '\n', 'expr')
             tw.insert('end', '\n')
             tw.insert('end', decomp.get('note', '') + '\n', 'dim')
-            if decomp.get('complex_str'):
-                tw.insert('end', '\n')
-                tw.insert('end', 'Complex Projection\n', 'header')
-                tw.insert('end', decomp['complex_str'] + '\n', 'value')
             return
 
         # --- Ring form (general expressions: sums, products, etc.) ---
@@ -2464,11 +2686,6 @@ class CalculatorApp:
             tw.insert('end', f'  N = {decomp["norm_str"]}\n', 'value')
             if decomp['is_unit']:
                 tw.insert('end', '  (unit \u2014 invertible)\n', 'dim')
-
-            if decomp.get('complex_str'):
-                tw.insert('end', '\n')
-                tw.insert('end', 'Complex Projection\n', 'header')
-                tw.insert('end', decomp['complex_str'] + '\n', 'value')
             return
 
         # --- Single zero-power form (legacy path) ---
@@ -2502,12 +2719,6 @@ class CalculatorApp:
             tw.insert('end', 'a\u2099 = (u+v)\u00b7a\u2099\u208b\u2081 \u2212 a\u2099\u208b\u2082\n', 'dim')
             for label, poly_str in trace:
                 tw.insert('end', f'  {label} = {poly_str}\n', 'value')
-
-        # Complex Projection
-        if decomp.get('complex_str'):
-            tw.insert('end', '\n')
-            tw.insert('end', 'Complex Projection\n', 'header')
-            tw.insert('end', decomp['complex_str'] + '\n', 'value')
 
     def _draw_cheb_orbit(self, ax, decomp):
         """Draw a complex plane plot highlighting the expression's value."""
