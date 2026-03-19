@@ -812,6 +812,450 @@ class TowerElement:
 
 
 # ============================================================
+# BiPoly — Bivariate Polynomials in Q[s₁, s₂]
+# ============================================================
+
+class BiPoly:
+    """
+    A bivariate polynomial in s₁ and s₂ with rational coefficients.
+    Stored as a tuple of QsPoly: coeffs[j] is the coefficient of s₂^j,
+    where each coefficient is a QsPoly in s₁.
+    """
+    __slots__ = ['coeffs']
+
+    def __init__(self, coeffs):
+        if isinstance(coeffs, BiPoly):
+            self.coeffs = coeffs.coeffs
+            return
+        if isinstance(coeffs, (int, Fraction)):
+            self.coeffs = (QsPoly(coeffs),)
+            return
+        if isinstance(coeffs, QsPoly):
+            self.coeffs = (coeffs,)
+            return
+        raw = tuple(c if isinstance(c, QsPoly) else QsPoly(c) for c in coeffs)
+        while len(raw) > 1 and raw[-1].is_zero():
+            raw = raw[:-1]
+        self.coeffs = raw
+
+    @staticmethod
+    def zero():
+        return BiPoly(0)
+
+    @staticmethod
+    def one():
+        return BiPoly(1)
+
+    @staticmethod
+    def s1():
+        """The indeterminate s₁."""
+        return BiPoly(QsPoly.s())
+
+    @staticmethod
+    def s2():
+        """The indeterminate s₂."""
+        return BiPoly((QsPoly.zero(), QsPoly.one()))
+
+    @staticmethod
+    def from_fraction(f):
+        return BiPoly(QsPoly.from_fraction(f))
+
+    def is_zero(self):
+        return all(c.is_zero() for c in self.coeffs)
+
+    def is_constant(self):
+        if len(self.coeffs) > 1:
+            for c in self.coeffs[1:]:
+                if not c.is_zero():
+                    return False
+        return self.coeffs[0].is_constant()
+
+    def constant_value(self):
+        return self.coeffs[0].constant_value()
+
+    def __add__(self, other):
+        if isinstance(other, (int, Fraction)):
+            other = BiPoly(other)
+        if isinstance(other, QsPoly):
+            other = BiPoly(other)
+        a, b = self.coeffs, other.coeffs
+        n = max(len(a), len(b))
+        result = []
+        for j in range(n):
+            ca = a[j] if j < len(a) else QsPoly.zero()
+            cb = b[j] if j < len(b) else QsPoly.zero()
+            result.append(ca + cb)
+        return BiPoly(result)
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        if isinstance(other, (int, Fraction)):
+            other = BiPoly(other)
+        if isinstance(other, QsPoly):
+            other = BiPoly(other)
+        a, b = self.coeffs, other.coeffs
+        n = max(len(a), len(b))
+        result = []
+        for j in range(n):
+            ca = a[j] if j < len(a) else QsPoly.zero()
+            cb = b[j] if j < len(b) else QsPoly.zero()
+            result.append(ca - cb)
+        return BiPoly(result)
+
+    def __neg__(self):
+        return BiPoly(tuple(-c for c in self.coeffs))
+
+    def __mul__(self, other):
+        if isinstance(other, (int, Fraction)):
+            c = Fraction(other)
+            return BiPoly(tuple(coeff * c for coeff in self.coeffs))
+        if isinstance(other, QsPoly):
+            return BiPoly(tuple(coeff * other for coeff in self.coeffs))
+        if isinstance(other, BiPoly):
+            if self.is_zero() or other.is_zero():
+                return BiPoly.zero()
+            a, b = self.coeffs, other.coeffs
+            n = len(a) + len(b) - 1
+            result = [QsPoly.zero()] * n
+            for i, ca in enumerate(a):
+                if ca.is_zero():
+                    continue
+                for j, cb in enumerate(b):
+                    result[i + j] = result[i + j] + ca * cb
+            return BiPoly(result)
+        return NotImplemented
+
+    def __rmul__(self, other):
+        if isinstance(other, (int, Fraction)):
+            return self.__mul__(other)
+        if isinstance(other, QsPoly):
+            return self.__mul__(other)
+        return NotImplemented
+
+    def eval_at(self, s1_val, s2_val):
+        """Evaluate at numeric values of s₁ and s₂."""
+        s2_val = complex(s2_val)
+        result = complex(0)
+        s2_pow = complex(1)
+        for c in self.coeffs:
+            result += c.eval_at(s1_val) * s2_pow
+            s2_pow *= s2_val
+        return result
+
+    def __eq__(self, other):
+        if isinstance(other, (int, Fraction)):
+            other = BiPoly(other)
+        if isinstance(other, QsPoly):
+            other = BiPoly(other)
+        if not isinstance(other, BiPoly):
+            return NotImplemented
+        # Normalize and compare
+        a = self.coeffs
+        b = other.coeffs
+        n = max(len(a), len(b))
+        for j in range(n):
+            ca = a[j] if j < len(a) else QsPoly.zero()
+            cb = b[j] if j < len(b) else QsPoly.zero()
+            if ca != cb:
+                return False
+        return True
+
+    def __hash__(self):
+        return hash(tuple(c.coeffs for c in self.coeffs))
+
+    def __repr__(self):
+        if self.is_zero():
+            return '0'
+        terms = []
+        for j, coeff in enumerate(self.coeffs):
+            if coeff.is_zero():
+                continue
+            c_str = repr(coeff)
+            if j == 0:
+                terms.append(c_str)
+            elif j == 1:
+                if coeff == QsPoly.one():
+                    terms.append('s\u2082')
+                elif coeff == QsPoly.from_int(-1):
+                    terms.append('-s\u2082')
+                elif coeff.is_constant():
+                    terms.append(f'{c_str}\u00b7s\u2082')
+                else:
+                    terms.append(f'({c_str})\u00b7s\u2082')
+            else:
+                if coeff == QsPoly.one():
+                    terms.append(f's\u2082^{j}')
+                elif coeff == QsPoly.from_int(-1):
+                    terms.append(f'-s\u2082^{j}')
+                elif coeff.is_constant():
+                    terms.append(f'{c_str}\u00b7s\u2082^{j}')
+                else:
+                    terms.append(f'({c_str})\u00b7s\u2082^{j}')
+        if not terms:
+            return '0'
+        result = terms[0]
+        for t in terms[1:]:
+            if t.startswith('-'):
+                result += f' - {t[1:]}'
+            else:
+                result += f' + {t}'
+        # Rename 's' to 's₁' for clarity in bivariate context
+        import re
+        result = re.sub(r'\bs\b', 's\u2081', result)
+        return result
+
+
+# ============================================================
+# MultiBandElement — Q[s₁,s₂][g₁,g₂] / (g₁²=s₁g₁-1, g₂²=s₂g₂-1)
+# ============================================================
+
+class MultiBandElement:
+    """
+    An element of a two-generator Chebyshev ring with independent bands.
+
+    Generators:
+        g₁ — first band (e.g., 0^(1/2) for rational exponents)
+        g₂ — second band (e.g., 0^(ω/7) for omega-scaled exponents)
+
+    Reduction rules:
+        g₁² = s₁·g₁ - 1    where s₁ = g₁ + g₁⁻¹
+        g₂² = s₂·g₂ - 1    where s₂ = g₂ + g₂⁻¹
+
+    Canonical form: a + b·g₁ + c·g₂ + d·g₁g₂
+    where a, b, c, d ∈ Q[s₁, s₂] (BiPoly instances).
+    """
+    __slots__ = ['a', 'b', 'c', 'd']
+
+    def __init__(self, a, b=None, c=None, d=None):
+        self.a = a if isinstance(a, BiPoly) else BiPoly(a)
+        self.b = b if isinstance(b, BiPoly) else BiPoly(b or 0)
+        self.c = c if isinstance(c, BiPoly) else BiPoly(c or 0)
+        self.d = d if isinstance(d, BiPoly) else BiPoly(d or 0)
+
+    # --- Constructors ---
+
+    @staticmethod
+    def one():
+        z = BiPoly.zero()
+        return MultiBandElement(BiPoly.one(), z, z, z)
+
+    @staticmethod
+    def zero_el():
+        z = BiPoly.zero()
+        return MultiBandElement(z, z, z, z)
+
+    @staticmethod
+    def g1():
+        """First-band generator."""
+        z = BiPoly.zero()
+        return MultiBandElement(z, BiPoly.one(), z, z)
+
+    @staticmethod
+    def g2():
+        """Second-band generator."""
+        z = BiPoly.zero()
+        return MultiBandElement(z, z, BiPoly.one(), z)
+
+    @staticmethod
+    def g1_inv():
+        """g₁⁻¹ = s₁ - g₁."""
+        z = BiPoly.zero()
+        return MultiBandElement(BiPoly.s1(), BiPoly(-1), z, z)
+
+    @staticmethod
+    def g2_inv():
+        """g₂⁻¹ = s₂ - g₂."""
+        z = BiPoly.zero()
+        return MultiBandElement(BiPoly.s2(), z, BiPoly(-1), z)
+
+    @staticmethod
+    def from_int(n):
+        z = BiPoly.zero()
+        return MultiBandElement(BiPoly(n), z, z, z)
+
+    # --- Arithmetic ---
+
+    def __add__(self, other):
+        if isinstance(other, (int, Fraction)):
+            other = MultiBandElement.from_int(other) if isinstance(other, int) else MultiBandElement(BiPoly.from_fraction(other))
+        return MultiBandElement(self.a + other.a, self.b + other.b,
+                                self.c + other.c, self.d + other.d)
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        if isinstance(other, (int, Fraction)):
+            other = MultiBandElement.from_int(other) if isinstance(other, int) else MultiBandElement(BiPoly.from_fraction(other))
+        return MultiBandElement(self.a - other.a, self.b - other.b,
+                                self.c - other.c, self.d - other.d)
+
+    def __neg__(self):
+        return MultiBandElement(-self.a, -self.b, -self.c, -self.d)
+
+    def __mul__(self, other):
+        if isinstance(other, (int, Fraction)):
+            c = Fraction(other)
+            return MultiBandElement(self.a * c, self.b * c, self.c * c, self.d * c)
+        if not isinstance(other, MultiBandElement):
+            return NotImplemented
+
+        a1, b1, c1, d1 = self.a, self.b, self.c, self.d
+        a2, b2, c2, d2 = other.a, other.b, other.c, other.d
+
+        _s1 = BiPoly.s1()
+        _s2 = BiPoly.s2()
+
+        new_a = a1*a2 - b1*b2 - c1*c2 + d1*d2
+        new_b = a1*b2 + b1*a2 + _s1*(b1*b2 - d1*d2) - c1*d2 - d1*c2
+        new_c = a1*c2 + c1*a2 - b1*d2 - d1*b2 + _s2*(c1*c2 - d1*d2)
+        new_d = a1*d2 + d1*a2 + b1*c2 + c1*b2 + _s1*(b1*d2 + d1*b2) + _s2*(c1*d2 + d1*c2) + _s1*_s2*d1*d2
+
+        return MultiBandElement(new_a, new_b, new_c, new_d)
+
+    def __rmul__(self, other):
+        if isinstance(other, (int, Fraction)):
+            c = Fraction(other)
+            return MultiBandElement(self.a * c, self.b * c, self.c * c, self.d * c)
+        return NotImplemented
+
+    # --- Conjugations ---
+
+    def sigma1(self):
+        """σ₁: g₁ → g₁⁻¹ = s₁ - g₁, fixes g₂."""
+        _s1 = BiPoly.s1()
+        return MultiBandElement(
+            self.a + _s1 * self.b,
+            -self.b,
+            self.c + _s1 * self.d,
+            -self.d
+        )
+
+    def sigma2(self):
+        """σ₂: g₂ → g₂⁻¹ = s₂ - g₂, fixes g₁."""
+        _s2 = BiPoly.s2()
+        return MultiBandElement(
+            self.a + _s2 * self.c,
+            self.b + _s2 * self.d,
+            -self.c,
+            -self.d
+        )
+
+    # --- Norm ---
+
+    def norm(self):
+        """Full norm: N(x) = x · σ₁(x) · σ₂(x) · σ₁σ₂(x).
+        Always in Q[s₁, s₂]."""
+        # Stage 1: x * σ₁(x) — eliminates g₁
+        half = self * self.sigma1()
+        # Stage 2: half * σ₂(half) — eliminates g₂
+        full = half * half.sigma2()
+        return full.a  # should be purely scalar (BiPoly)
+
+    def can_invert(self):
+        n = self.norm()
+        return n.is_constant() and not n.is_zero()
+
+    def inv(self):
+        n = self.norm()
+        if n.is_zero():
+            raise ZeroDivisionError("Cannot invert the zero element")
+        if not n.is_constant():
+            raise ValueError(f"Element is not a unit: norm = {n}")
+        c_inv = Fraction(1) / n.constant_value()
+        num = self.sigma1() * self.sigma2() * self.sigma1().sigma2()
+        return MultiBandElement(num.a * c_inv, num.b * c_inv,
+                                num.c * c_inv, num.d * c_inv)
+
+    def __pow__(self, n):
+        if not isinstance(n, int):
+            raise TypeError(f"Exponent must be an integer, got {type(n)}")
+        if n == 0:
+            return MultiBandElement.one()
+        if n < 0:
+            return self.inv() ** (-n)
+        result = MultiBandElement.one()
+        base = self
+        while n > 0:
+            if n & 1:
+                result = result * base
+            base = base * base
+            n >>= 1
+        return result
+
+    # --- Queries ---
+
+    def is_zero(self):
+        return self.a.is_zero() and self.b.is_zero() and self.c.is_zero() and self.d.is_zero()
+
+    def __eq__(self, other):
+        if isinstance(other, (int, Fraction)):
+            other = MultiBandElement.from_int(other) if isinstance(other, int) else MultiBandElement(BiPoly.from_fraction(other))
+        if not isinstance(other, MultiBandElement):
+            return NotImplemented
+        return self.a == other.a and self.b == other.b and self.c == other.c and self.d == other.d
+
+    # --- Evaluation ---
+
+    def eval_at(self, s1_val=None, s2_val=None, theta1=None, theta2=None):
+        """Evaluate numerically given the two Chebyshev parameters or angles."""
+        import cmath, math
+        if theta1 is not None:
+            s1_num = 2 * math.cos(theta1)
+            g1_num = cmath.exp(1j * theta1)
+        elif s1_val is not None:
+            s1_num = complex(s1_val)
+            g1_num = (s1_num + cmath.sqrt(s1_num**2 - 4)) / 2
+        else:
+            raise ValueError("Provide s1_val or theta1")
+
+        if theta2 is not None:
+            s2_num = 2 * math.cos(theta2)
+            g2_num = cmath.exp(1j * theta2)
+        elif s2_val is not None:
+            s2_num = complex(s2_val)
+            g2_num = (s2_num + cmath.sqrt(s2_num**2 - 4)) / 2
+        else:
+            raise ValueError("Provide s2_val or theta2")
+
+        a = self.a.eval_at(s1_num, s2_num)
+        b = self.b.eval_at(s1_num, s2_num)
+        c = self.c.eval_at(s1_num, s2_num)
+        d = self.d.eval_at(s1_num, s2_num)
+        return a + b * g1_num + c * g2_num + d * g1_num * g2_num
+
+    # --- Display ---
+
+    def __repr__(self):
+        parts = []
+        for coeff, basis_name in [(self.a, ''), (self.b, 'g\u2081'), (self.c, 'g\u2082'), (self.d, 'g\u2081g\u2082')]:
+            if coeff.is_zero():
+                continue
+            c_str = repr(coeff)
+            if not basis_name:
+                parts.append(c_str)
+            elif coeff == BiPoly.one():
+                parts.append(basis_name)
+            elif coeff == BiPoly(-1):
+                parts.append(f'-{basis_name}')
+            elif coeff.is_constant():
+                parts.append(f'{c_str}\u00b7{basis_name}')
+            else:
+                parts.append(f'({c_str})\u00b7{basis_name}')
+        if not parts:
+            return '0'
+        result = parts[0]
+        for p in parts[1:]:
+            if p.startswith('-'):
+                result += f' - {p[1:]}'
+            else:
+                result += f' + {p}'
+        return result
+
+
+# ============================================================
 # Module-level convenience
 # ============================================================
 
@@ -826,3 +1270,8 @@ W_INV = TowerElement.w_inv()
 T = TowerElement.t()
 T_ONE = TowerElement.one()
 T_ZERO = TowerElement.zero_el()
+
+G1 = MultiBandElement.g1()
+G2 = MultiBandElement.g2()
+MB_ONE = MultiBandElement.one()
+MB_ZERO = MultiBandElement.zero_el()

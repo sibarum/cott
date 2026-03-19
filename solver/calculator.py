@@ -591,7 +591,187 @@ def _expr_to_ring(expr):
     el = _convert_with_scale(expr, scale)
     if el is not None:
         return el, base_denom
+
+    # Single-band failed — try multi-band for omega-containing exponents
+    mb_result = _try_multiband(expr)
+    if mb_result is not None:
+        el, rat_scale, omega_scale = mb_result
+        return (el, rat_scale, omega_scale), None  # base_denom=None signals multi-band
     return None, None
+
+
+def _has_omega_exponent(expr):
+    """Check if an expression contains zero-powers with omega in the exponent."""
+    if isinstance(expr, Pow) and isinstance(expr.base, (Zero, Omega)):
+        return expr.exp.has(Omega) if hasattr(expr.exp, 'has') else False
+    if isinstance(expr, (Add, Mul)):
+        return any(_has_omega_exponent(arg) for arg in expr.args)
+    return False
+
+
+def _extract_omega_rational(exp):
+    """Extract (rational_coeff, omega_power) from an exponent like ω/7 or ω²·3/4.
+    Returns (coeff, omega_exp) such that the exponent = coeff * ω^omega_exp,
+    or None if it doesn't have this form. For simple ω*c, returns (c, 1)."""
+    from fractions import Fraction as Frac
+
+    # ω * rational: Mul(Rational, Omega)
+    if isinstance(exp, Mul):
+        rational_parts = []
+        omega_count = 0
+        for f in Mul.make_args(exp):
+            if isinstance(f, (Integer, Rational)):
+                rational_parts.append(f)
+            elif isinstance(f, Omega):
+                omega_count += 1
+            elif isinstance(f, Pow) and isinstance(f.base, Omega) and isinstance(f.exp, Integer):
+                omega_count += int(f.exp)
+            else:
+                return None
+        if omega_count > 0 and rational_parts:
+            coeff = Mul(*rational_parts)
+            try:
+                return Frac(int(coeff.p), int(coeff.q)) if isinstance(coeff, Rational) else Frac(int(coeff)), omega_count
+            except (TypeError, ValueError, AttributeError):
+                return None
+    # Bare omega
+    if isinstance(exp, Omega):
+        return Frac(1), 1
+    return None
+
+
+def _try_multiband(expr):
+    """Try to convert an expression to MultiBandElement.
+    Band 1 (g₁): rational exponents. Band 2 (g₂): omega-containing exponents."""
+    from chebyshev_ring import MultiBandElement
+    from fractions import Fraction as Frac
+    from math import lcm
+
+    expr = traction_simplify(expr)
+
+    # Collect LCD for each band
+    rational_denoms = set()
+    omega_denoms = set()
+    _classify_exponents(expr, rational_denoms, omega_denoms)
+
+    if not omega_denoms:
+        return None  # no omega exponents, single-band suffices
+
+    # Compute scales for each band
+    rat_lcd = 1
+    for d in rational_denoms:
+        rat_lcd = lcm(rat_lcd, d)
+    rat_lcd = max(rat_lcd, 2)
+
+    omega_lcd = 1
+    for d in omega_denoms:
+        omega_lcd = lcm(omega_lcd, d)
+
+    el = _convert_multiband(expr, rat_lcd, omega_lcd)
+    if el is None:
+        return None
+    return (el, rat_lcd, omega_lcd)
+
+
+def _classify_exponents(expr, rational_denoms, omega_denoms):
+    """Classify exponent denominators into rational and omega-containing bands."""
+    from fractions import Fraction as Frac
+    expr = traction_simplify(expr)
+
+    if isinstance(expr, (Integer, Rational, Null)):
+        return
+    if isinstance(expr, (Zero, Omega)):
+        rational_denoms.add(1)
+        return
+    if isinstance(expr, Pow) and isinstance(expr.base, (Zero, Omega)):
+        exp = expr.exp
+        omega_info = _extract_omega_rational(exp)
+        if omega_info is not None:
+            coeff, _ = omega_info
+            omega_denoms.add(coeff.denominator)
+        elif isinstance(exp, (Integer, Rational)):
+            rational_denoms.add(int(exp.q) if isinstance(exp, Rational) else 1)
+        return
+    if isinstance(expr, (Add, Mul)):
+        for arg in expr.args:
+            _classify_exponents(arg, rational_denoms, omega_denoms)
+    if isinstance(expr, Pow) and isinstance(expr.exp, Integer):
+        _classify_exponents(expr.base, rational_denoms, omega_denoms)
+
+
+def _convert_multiband(expr, rat_scale, omega_scale):
+    """Convert a traction expression to MultiBandElement.
+    g₁ handles rational exponents (scale=rat_scale), g₂ handles omega exponents (scale=omega_scale)."""
+    from chebyshev_ring import MultiBandElement
+    from fractions import Fraction as Frac
+
+    expr = traction_simplify(expr)
+
+    # Scalar atoms
+    if isinstance(expr, Integer):
+        return MultiBandElement.from_int(int(expr))
+    if isinstance(expr, Rational):
+        return MultiBandElement.from_int(0) + MultiBandElement.from_int(int(expr.p)) * Frac(1, int(expr.q))
+    if isinstance(expr, Null):
+        return MultiBandElement.zero_el()
+
+    # Zero/Omega atoms → band 1
+    if isinstance(expr, Zero):
+        return MultiBandElement.g1() ** rat_scale
+    if isinstance(expr, Omega):
+        return MultiBandElement.g1_inv() ** rat_scale
+
+    # Zero-powers
+    if isinstance(expr, Pow) and isinstance(expr.base, (Zero, Omega)):
+        exp = expr.exp
+        sign = -1 if isinstance(expr.base, Omega) else 1
+
+        # Check for omega-containing exponent → band 2
+        omega_info = _extract_omega_rational(exp)
+        if omega_info is not None:
+            coeff, _ = omega_info
+            power = coeff * omega_scale * sign
+            if power.denominator != 1:
+                return None
+            return MultiBandElement.g2() ** int(power)
+
+        # Rational exponent → band 1
+        try:
+            r = Frac(int(exp.p), int(exp.q)) if isinstance(exp, Rational) else Frac(int(exp))
+        except (TypeError, ValueError, AttributeError):
+            return None
+        power = r * rat_scale * sign
+        if power.denominator != 1:
+            return None
+        return MultiBandElement.g1() ** int(power)
+
+    # Sums
+    if isinstance(expr, Add):
+        result = None
+        for term in Add.make_args(expr):
+            t = _convert_multiband(term, rat_scale, omega_scale)
+            if t is None:
+                return None
+            result = t if result is None else result + t
+        return result
+
+    # Products
+    if isinstance(expr, Mul):
+        result = None
+        for factor in Mul.make_args(expr):
+            f = _convert_multiband(factor, rat_scale, omega_scale)
+            if f is None:
+                return None
+            result = f if result is None else result * f
+        return result
+
+    # Powers with integer exponent
+    if isinstance(expr, Pow) and isinstance(expr.exp, Integer):
+        base_el = _convert_multiband(expr.base, rat_scale, omega_scale)
+        if base_el is not None:
+            return base_el ** int(expr.exp)
+
+    return None
 
 
 def _convert_with_scale(expr, scale):
@@ -659,7 +839,13 @@ def _convert_with_scale(expr, scale):
 
 def _decompose_ring_element(ring_el, base_denom, traction_str, complex_str, simplified):
     """Build a decomposition result dict from a chebyshev_ring Element."""
-    ring_str = repr(ring_el)
+
+    def _relabel(s):
+        """Replace 'u' with 'g' in ring repr strings for consistent display."""
+        import re
+        return re.sub(r'\bu\b', 'g', s)
+
+    ring_str = _relabel(repr(ring_el))
 
     # Try to find the exponent for the orbit plot (if it's a simple zero-power)
     exponent = None
@@ -671,7 +857,7 @@ def _decompose_ring_element(ring_el, base_denom, traction_str, complex_str, simp
             pass
 
     conj = ring_el.conj()
-    conj_str = repr(conj)
+    conj_str = _relabel(repr(conj))
     norm = ring_el.norm()
     norm_str = repr(norm)
 
@@ -703,6 +889,56 @@ def _decompose_ring_element(ring_el, base_denom, traction_str, complex_str, simp
         'complex_str': complex_str,
         'exponent': exponent,
         'base_denom': base_denom,
+    }
+
+
+def _decompose_multiband(ring_el, rat_scale, omega_scale, traction_str, complex_str, simplified):
+    """Build decomposition dict for a MultiBandElement."""
+    ring_str = repr(ring_el)
+
+    exponent = None
+    exp_zero = _extract_zero_exponent(simplified)
+    if exp_zero is not None:
+        try:
+            exponent = Rational(exp_zero)
+        except (TypeError, ValueError):
+            pass
+
+    norm = ring_el.norm()
+    norm_str = repr(norm)
+    conj_str = f'\u03c3\u2081: {repr(ring_el.sigma1())}\n  \u03c3\u2082: {repr(ring_el.sigma2())}'
+
+    if rat_scale == 2:
+        g1_str = '0^(1/2)'
+    else:
+        g1_str = f'0^(1/{rat_scale})'
+
+    if omega_scale == 1:
+        g2_str = '0^\u03c9'
+    else:
+        g2_str = f'0^(\u03c9/{omega_scale})'
+
+    components = [
+        ('a', repr(ring_el.a)),
+        ('b', repr(ring_el.b)),
+        ('c', repr(ring_el.c)),
+        ('d', repr(ring_el.d)),
+    ]
+
+    return {
+        'traction_str': traction_str,
+        'has_decomp': True,
+        'ring_form': True,
+        'ring_str': ring_str,
+        'ring_label': 'Q[s\u2081,s\u2082][g\u2081,g\u2082] / (g\u2081\u00b2=s\u2081g\u2081\u22121, g\u2082\u00b2=s\u2082g\u2082\u22121)',
+        'gen_note': f'g\u2081 = {g1_str},  g\u2082 = {g2_str},  s\u2081 = g\u2081+g\u2081\u207b\u00b9,  s\u2082 = g\u2082+g\u2082\u207b\u00b9',
+        'components': components,
+        'norm_str': norm_str,
+        'conj_str': conj_str,
+        'is_unit': ring_el.can_invert(),
+        'complex_str': complex_str,
+        'exponent': exponent,
+        'base_denom': None,
     }
 
 
@@ -762,12 +998,14 @@ def chebyshev_decompose(expr):
     simplified = traction_simplify(expr)
     traction_str = format_result(simplified)
 
-    # Try to get complex projection
+    # Try to get complex projection (both string and numeric)
+    complex_val = None
     try:
         proj = project_complex(simplified)
         complex_str = format_complex(simplified)
         if not complex_str:
             complex_str = str(proj)
+        complex_val = complex(proj.evalf())
     except Exception:
         complex_str = ''
 
@@ -781,9 +1019,14 @@ def chebyshev_decompose(expr):
         }
 
     # --- Primary path: try to convert to a Chebyshev ring Element ---
-    ring_el, base_denom = _expr_to_ring(simplified)
-    if ring_el is not None:
-        return _decompose_ring_element(ring_el, base_denom, traction_str, complex_str, simplified)
+    ring_result, base_denom = _expr_to_ring(simplified)
+    if ring_result is not None:
+        if isinstance(ring_result, tuple):
+            # Multi-band: (element, rat_scale, omega_scale)
+            el, rat_scale, omega_scale = ring_result
+            return _decompose_multiband(el, rat_scale, omega_scale, traction_str, complex_str, simplified)
+        else:
+            return _decompose_ring_element(ring_result, base_denom, traction_str, complex_str, simplified)
 
     # --- Fallback: single zero-power analysis ---
     exponent = _extract_zero_exponent(simplified)
@@ -967,8 +1210,12 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
 
 def phase_to_rgb(phase_grid, brightness=None):
     """Map a 2D phase grid to an RGB array with smooth quadrant interpolation."""
-    t = phase_grid / (2 * np.pi)  # normalize to [0, 1)
-    segment = t * 4               # [0, 4)
+    # Sanitize: replace NaN/inf with 0 before any casts, track for later
+    invalid = ~np.isfinite(phase_grid)
+    phase_clean = np.where(invalid, 0.0, phase_grid)
+
+    t = phase_clean / (2 * np.pi)  # normalize to [0, 1)
+    segment = t * 4                 # [0, 4)
     idx = segment.astype(int) % 4
     frac = (segment - segment.astype(int))[..., np.newaxis]
 
@@ -978,13 +1225,12 @@ def phase_to_rgb(phase_grid, brightness=None):
 
     # Modulate by brightness
     if brightness is not None:
-        rgb = rgb * brightness[..., np.newaxis]
+        rgb = rgb * np.where(invalid, 0.0, brightness)[..., np.newaxis]
 
     rgb = np.clip(rgb, 0, 255).astype(np.uint8)
 
-    # NaN -> dark gray
-    nan_mask = np.isnan(phase_grid)
-    rgb[nan_mask] = [40, 40, 40]
+    # Invalid pixels (overflow/underflow) -> solid black
+    rgb[invalid] = [0, 0, 0]
 
     return rgb
 
@@ -1130,6 +1376,9 @@ FG_DIM = '#555555'
 FG_RESULT = '#1a1a2e'
 BORDER_COLOR = '#888888'
 
+# Tab Names
+TOWER = 'Orient 3D'
+
 
 class CalculatorApp:
 
@@ -1203,7 +1452,7 @@ class CalculatorApp:
         self._tab_buttons = {}
         self._active_tab = None
 
-        for tab_name in ['Plot', 'Explain', 'Phase Map', 'Tower']:
+        for tab_name in ['Plot', 'Explain', 'Phase Map', TOWER]:
             btn = tk.Button(
                 tab_bar, text=tab_name, font=self.font_label,
                 bd=0, padx=16, pady=3, bg=BG_FRAME, fg=FG_TEXT,
@@ -1336,7 +1585,7 @@ class CalculatorApp:
                                       foreground='#ffffff', spacing1=4, spacing3=6)
 
         # Right: orbit plot (matplotlib)
-        self.cheb_fig = Figure(figsize=(3.2, 4.2), dpi=96, facecolor=BG_BODY)
+        self.cheb_fig = Figure(figsize=(3.2, 4.2), dpi=96, facecolor=FG_RESULT)
         self.cheb_fig.subplots_adjust(left=0.12, right=0.95, top=0.92, bottom=0.08)
         self.cheb_ax_orbit = self.cheb_fig.add_subplot(1, 1, 1)
 
@@ -1386,7 +1635,7 @@ class CalculatorApp:
 
         # ===== Tower tab (Level 2 interactive visualization) =====
         tower_frame = tk.Frame(self._tab_container, bg=BG_BODY, bd=1, relief='solid')
-        self._tab_frames['Tower'] = tower_frame
+        self._tab_frames[TOWER] = tower_frame
 
         tower_hframe = tk.Frame(tower_frame, bg=BG_BODY)
         tower_hframe.pack(fill='both', expand=True, padx=6, pady=6)
@@ -1604,8 +1853,9 @@ class CalculatorApp:
             result = compute_phase_grid(expr_text, bounds=self.viz_bounds,
                                        projection_name=proj_name)
             if result is None:
-                self.viz_canvas.delete('all')
-                self.display_expr.focus_set()
+                # Expression has no plottable variables — show Explain tab instead
+                if self._active_tab == 'Plot':
+                    self._select_tab('Explain')
                 return
 
             self._apply_viz_result(result)
@@ -1642,6 +1892,8 @@ class CalculatorApp:
             img.put(f'{{{row}}}', to=(0, y))
 
         # Zoom up to canvas size and display
+        # Keep reference to base image — tkinter GCs it otherwise, causing missing pixels
+        self._viz_image_base = img
         self.viz_image = img.zoom(zoom, zoom)
         self.viz_canvas.delete('all')
         self.viz_canvas.create_image(AXIS_MARGIN, AXIS_MARGIN, anchor='nw', image=self.viz_image)
@@ -1832,7 +2084,7 @@ class CalculatorApp:
             self._run_explain()
         elif name == 'Phase Map':
             self._update_phase_map()
-        elif name == 'Tower':
+        elif name == TOWER:
             self._update_tower()
 
     # ===== Tower Tab =====
@@ -2145,23 +2397,31 @@ class CalculatorApp:
         if not expr_text:
             tw.insert('end', 'Enter an expression', 'dim')
             tw.configure(state='disabled')
-            self._draw_cheb_orbit(self.cheb_ax_orbit, None)
+            self._draw_cheb_orbit(self.cheb_ax_orbit, decomp=None)
             self.cheb_canvas_widget.draw()
             return
+
 
         try:
             parsed = parse_and_eval(expr_text)
         except Exception as e:
             tw.insert('end', f'Parse error: {e}', 'value')
             tw.configure(state='disabled')
-            self._draw_cheb_orbit(self.cheb_ax_orbit, None)
+            self._draw_cheb_orbit(self.cheb_ax_orbit, decomp=None)
             self.cheb_canvas_widget.draw()
             return
 
         decomp = chebyshev_decompose(parsed)
+        # Ensure complex_val is available for the orbit plot
+        if 'complex_val' not in decomp:
+            try:
+                proj = project_complex(traction_simplify(parsed))
+                decomp['complex_val'] = complex(proj.evalf())
+            except Exception:
+                decomp['complex_val'] = None
         self._render_cheb_text(decomp)
         tw.configure(state='disabled')
-        self._draw_cheb_orbit(self.cheb_ax_orbit, decomp.get('exponent'))
+        self._draw_cheb_orbit(self.cheb_ax_orbit, decomp)
         self.cheb_canvas_widget.draw()
 
     def _render_cheb_text(self, decomp):
@@ -2249,12 +2509,12 @@ class CalculatorApp:
             tw.insert('end', 'Complex Projection\n', 'header')
             tw.insert('end', decomp['complex_str'] + '\n', 'value')
 
-    def _draw_cheb_orbit(self, ax, exponent):
-        """Draw a unit circle orbit plot highlighting the given exponent."""
+    def _draw_cheb_orbit(self, ax, decomp):
+        """Draw a complex plane plot highlighting the expression's value."""
         ax.clear()
         ax.set_facecolor('#1a1a2e')
         ax.set_aspect('equal')
-        ax.set_title('Phase Orbit', fontsize=13, color='#eeeeee')
+        ax.set_title('Complex Plane', fontsize=13, color='#eeeeee')
         ax.tick_params(colors='#aaaaaa', labelsize=9)
 
         # Unit circle
@@ -2263,34 +2523,46 @@ class CalculatorApp:
         ax.axhline(0, color='#333344', linewidth=0.5)
         ax.axvline(0, color='#333344', linewidth=0.5)
 
-        # Plot integer powers as reference dots: 0^n for n = -6..6
-        theta_ref = np.pi / 4  # reference angle for visualization
+        # Plot integer zero-powers as reference dots: 0^n for n = -6..6
+        theta_ref = np.pi / 4
         for n in range(-6, 7):
             angle = n * theta_ref
             zx, zy = np.cos(angle), np.sin(angle)
             ax.plot(zx, zy, 'o', color='#4488ff', markersize=2.5, alpha=0.4)
 
-        # Highlight the current expression's position
-        if exponent is not None:
-            try:
-                n_val = float(exponent)
-                angle = n_val * theta_ref
-                zx, zy = np.cos(angle), np.sin(angle)
-                ax.plot(zx, zy, 'o', color='#00ccff', markersize=10, zorder=5,
-                        markeredgecolor='white', markeredgewidth=1.5)
-                ax.annotate(f'$0^{{{exponent}}}$', (zx, zy),
-                            textcoords='offset points', xytext=(8, 8),
-                            fontsize=12, color='#00ccff')
-            except (TypeError, ValueError):
-                pass
+        if decomp is None:
+            ax.plot(1, 0, 'o', color='#ffffff', markersize=5, zorder=4)
+            ax.set_xlim(-1.5, 1.5)
+            ax.set_ylim(-1.5, 1.5)
+            return
+
+        # Get the complex value for plotting
+        val = decomp.get('complex_val')
+        traction_str = decomp.get('traction_str', '')
+
+        # Plot the value
+        if val is not None and np.isfinite(val):
+            zx, zy = val.real, val.imag
+            ax.plot(zx, zy, 'o', color='#00ccff', markersize=10, zorder=5,
+                    markeredgecolor='white', markeredgewidth=1.5)
+
+            # Label
+            label = traction_str if len(traction_str) < 20 else traction_str[:17] + '...'
+            ax.annotate(label, (zx, zy),
+                        textcoords='offset points', xytext=(8, 8),
+                        fontsize=10, color='#00ccff')
+
+            # Expand view if the value is outside the unit circle
+            margin = max(abs(zx), abs(zy)) * 1.3
+            lim = max(1.5, margin)
+            ax.set_xlim(-lim, lim)
+            ax.set_ylim(-lim, lim)
+        else:
+            ax.set_xlim(-1.5, 1.5)
+            ax.set_ylim(-1.5, 1.5)
 
         # Origin marker (0^0 = 1)
         ax.plot(1, 0, 'o', color='#ffffff', markersize=5, zorder=4)
-        ax.set_xlim(-1.5, 1.5)
-        ax.set_ylim(-1.5, 1.5)
-
-        ax.legend(['unit circle'], fontsize=9, loc='lower left',
-                   facecolor='#1a1a2e', edgecolor='#444444', labelcolor='#999999')
 
     def _on_viz_hover(self, event):
         """Draw gauge readouts for the hovered pixel."""
@@ -2317,7 +2589,10 @@ class CalculatorApp:
 
         z = self.viz_Z[row, col]
         if not np.isfinite(z):
-            self._clear_gauges()
+            self._draw_overflow_gauge(p_val, q_val, z)
+            return
+        if z == 0:
+            self._draw_overflow_gauge(p_val, q_val, complex(0))
             return
 
         self._draw_gauges(z.real, z.imag, abs(z), np.angle(z), p_val, q_val)
@@ -2327,6 +2602,34 @@ class CalculatorApp:
 
     def _clear_gauges(self):
         self.gauge_canvas.delete('all')
+
+    def _draw_overflow_gauge(self, p_val, q_val, z):
+        """Draw an overflow/underflow indicator with p,q coordinates."""
+        gc = self.gauge_canvas
+        gc.delete('all')
+
+        label_font = tkfont.Font(family='Consolas', size=10)
+        coord_font = tkfont.Font(family='Consolas', size=8)
+
+        if np.isinf(z):
+            msg = 'overflow!'
+            color = '#ff4444'
+        elif z == 0:
+            msg = 'underflow'
+            color = '#888888'
+        elif np.isnan(z):
+            msg = 'undefined'
+            color = '#ff8844'
+        else:
+            msg = 'invalid'
+            color = '#888888'
+
+        gc.create_text(CANVAS_TOTAL // 2 - 40, 36, text=msg, font=label_font,
+                        fill=color, anchor='center')
+        gc.create_text(CANVAS_TOTAL // 2 + 40, 28, text=f'p={p_val:+.3g}', font=coord_font,
+                        fill='#bbbbbb', anchor='w')
+        gc.create_text(CANVAS_TOTAL // 2 + 40, 44, text=f'q={q_val:+.3g}', font=coord_font,
+                        fill='#bbbbbb', anchor='w')
 
     def _draw_gauges(self, re, im, mag, phase, p_val=0, q_val=0):
         """Draw 3 scale boxes (Re, Im, |f|), 1 phase compass, and p/q coordinates."""

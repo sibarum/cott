@@ -54,8 +54,12 @@ class ComplexLieProjection(Projection):
         except Exception:
             return None
         try:
+            # Use complex arrays so negative bases handle fractional powers correctly
+            # (e.g. (-1.0)**0.5 is NaN in real numpy, but (-1.0+0j)**0.5 = 1j)
+            AA_c = AA.astype(complex)
+            BB_c = BB.astype(complex)
             with np.errstate(divide='ignore', invalid='ignore', over='ignore'):
-                Z = f(AA, BB)
+                Z = f(AA_c, BB_c)
                 if np.isscalar(Z) or (isinstance(Z, np.ndarray) and Z.ndim == 0):
                     Z = np.full_like(AA, complex(Z), dtype=complex)
                 Z = np.asarray(Z, dtype=complex)
@@ -71,14 +75,17 @@ def _z_to_metrics(Z):
     phase = (phase + 2 * np.pi) % (2 * np.pi)
 
     mag = np.abs(Z)
-    log_mag = np.log(mag + 1e-15)
+    # Clamp magnitude floor to avoid log(0), but don't discard small values
+    log_mag = np.log(np.maximum(mag, 1e-300))
 
-    invalid = ~np.isfinite(Z) | (mag < 1e-15)
+    # Only truly invalid: non-finite Z or exactly zero
+    invalid = ~np.isfinite(Z) | (Z == 0)
     phase[invalid] = np.nan
     log_mag[invalid] = np.nan
 
     brightness = 0.5 + np.arctan(log_mag) / np.pi
     brightness = np.clip(brightness, 0.12, 0.95)
+    # Invalid pixels get zero brightness (renders as black, not gray)
     brightness[invalid] = 0.0
 
     return {

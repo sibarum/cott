@@ -608,13 +608,11 @@ class TestQSurfaceDecomposition:
         assert mag == S.Zero
 
     def test_zero_pow_omega_half(self, qs):
-        """0^(w/2) now simplifies to i via Mul-exponent factoring:
-        0^(w/2) = (0^w)^(1/2) = (-1)^(1/2) = i.
-        As a scalar, decomposition gives (phase=1, magnitude=i)."""
+        """0^(w/2) stays as a zero-power (factoring rule preserves traction).
+        Decomposition sees Pow(Zero, w/2): phase=1/2, magnitude=-1."""
         phase, mag = qs._recursive_decompose(z**(w / 2))
-        assert phase == S.One
-        from sympy import I
-        assert mag == I
+        assert phase == Rational(1, 2)
+        assert mag == S.NegativeOne
 
     def test_zero_pow_omega(self, qs):
         """0^w = -1: phase=1, magnitude=-1."""

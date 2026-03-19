@@ -260,11 +260,14 @@ def traction_simplify(expr):
             combined_exp = traction_simplify(Mul(base.exp, exp))
             return traction_simplify(Pow(base.base, combined_exp))
         # Exponent distribution: 0^(A+B) -> 0^A * 0^B
-        # This enables identities like 0^(0^n) = n to fire on each term.
+        # Only fire when at least one term simplifies beyond a bare zero-power,
+        # otherwise _simplify_mul will recombine and we get an infinite loop.
         if isinstance(base, Zero) and isinstance(exp, Add):
             terms = Add.make_args(exp)
-            product = Mul(*[Pow(Zero(), t) for t in terms])
-            return traction_simplify(product)
+            parts = [traction_simplify(Pow(Zero(), t)) for t in terms]
+            # Check if distribution made progress: at least one part is no longer 0^(...)
+            if any(not (isinstance(p, Pow) and isinstance(p.base, Zero)) for p in parts):
+                return traction_simplify(Mul(*parts))
         # Exponent factoring: 0^(c * A) -> (0^A)^c when A contains traction types
         # Substitute ω -> 0^(-1) first so that e.g. 0^(2ω) becomes 0^(2·0^(-1)),
         # then factor as (0^(0^(-1)))^2 = (-1)^2 = 1.
@@ -283,8 +286,12 @@ def traction_simplify(expr):
                 inner = Mul(*traction_parts) if len(traction_parts) > 1 else traction_parts[0]
                 inner_result = traction_simplify(Pow(Zero(), inner))
                 if not (isinstance(inner_result, Pow) and isinstance(inner_result.base, Zero)):
-                    # The identity fired — inner_result is a scalar, raise to scalar power
-                    return traction_simplify(Pow(inner_result, scalar))
+                    # The identity fired — inner_result is a scalar, raise to scalar power.
+                    # Only apply if the final result stays in traction (Integer, Rational, etc.)
+                    # to avoid escaping to classical arithmetic (e.g. (-1)^(1/7)).
+                    final = traction_simplify(Pow(inner_result, scalar))
+                    if isinstance(final, (Integer, Rational, Zero, Omega, Null)):
+                        return final
         return Pow(base, exp)
 
     if isinstance(expr, Mul):

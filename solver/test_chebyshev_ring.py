@@ -1,11 +1,12 @@
-"""Tests for the Chebyshev ring Q[s][u] / (u² - su + 1) and Level 2 tower."""
+"""Tests for the Chebyshev ring Q[s][u] / (u² - su + 1), Level 2 tower, and multi-band ring."""
 
 import pytest
 import cmath
 import math
 from fractions import Fraction
 from chebyshev_ring import (QsPoly, Element, U, V, ONE, ZERO, S,
-                             TowerElement, W, W_INV, T, T_ONE, T_ZERO)
+                             TowerElement, W, W_INV, T, T_ONE, T_ZERO,
+                             BiPoly, MultiBandElement, G1, G2, MB_ONE, MB_ZERO)
 
 
 # ============================================================
@@ -796,3 +797,239 @@ class TestTowerDisplay:
     def test_repr_tw(self):
         tw = TowerElement(0, 0, 0, QsPoly.one())
         assert repr(tw) == 'tw'
+
+
+# ============================================================
+# BiPoly Tests
+# ============================================================
+
+class TestBiPoly:
+
+    def test_zero(self):
+        assert BiPoly.zero().is_zero()
+
+    def test_one(self):
+        assert not BiPoly.one().is_zero()
+        assert BiPoly.one().is_constant()
+
+    def test_s1(self):
+        s1 = BiPoly.s1()
+        assert not s1.is_zero()
+        assert not s1.is_constant()
+
+    def test_s2(self):
+        s2 = BiPoly.s2()
+        assert not s2.is_zero()
+        assert not s2.is_constant()
+
+    def test_add(self):
+        assert BiPoly.s1() + BiPoly.s2() == BiPoly((QsPoly.s(), QsPoly.one()))
+
+    def test_mul_s1_s2(self):
+        """s₁ · s₂ should give a bivariate monomial."""
+        result = BiPoly.s1() * BiPoly.s2()
+        # s₁·s₂: coeffs[1] = QsPoly.s() (the s₁ coefficient of the s₂¹ term)
+        assert result == BiPoly((QsPoly.zero(), QsPoly.s()))
+
+    def test_eval(self):
+        # s₁ + 2·s₂ at s₁=3, s₂=5 → 3 + 10 = 13
+        p = BiPoly.s1() + BiPoly.s2() * 2
+        assert abs(p.eval_at(3.0, 5.0) - 13.0) < 1e-12
+
+
+# ============================================================
+# MultiBandElement Tests — Core
+# ============================================================
+
+class TestMultiBandCore:
+
+    def test_one(self):
+        assert MB_ONE.a == BiPoly.one()
+        assert MB_ONE.b.is_zero()
+
+    def test_zero(self):
+        assert MB_ZERO.is_zero()
+
+    def test_g1_squared(self):
+        """g₁² = s₁·g₁ - 1."""
+        result = G1 * G1
+        assert result.a == BiPoly(-1)
+        assert result.b == BiPoly.s1()
+        assert result.c.is_zero()
+        assert result.d.is_zero()
+
+    def test_g2_squared(self):
+        """g₂² = s₂·g₂ - 1."""
+        result = G2 * G2
+        assert result.a == BiPoly(-1)
+        assert result.c == BiPoly.s2()
+        assert result.b.is_zero()
+        assert result.d.is_zero()
+
+    def test_g1_times_g2(self):
+        """g₁·g₂ = g₁g₂ (basis element)."""
+        result = G1 * G2
+        assert result.a.is_zero()
+        assert result.b.is_zero()
+        assert result.c.is_zero()
+        assert result.d == BiPoly.one()
+
+    def test_g1_times_g1_inv(self):
+        """g₁ · g₁⁻¹ = 1."""
+        assert G1 * MultiBandElement.g1_inv() == MB_ONE
+
+    def test_g2_times_g2_inv(self):
+        """g₂ · g₂⁻¹ = 1."""
+        assert G2 * MultiBandElement.g2_inv() == MB_ONE
+
+    def test_g1g2_times_g1g2_inv(self):
+        """(g₁g₂) · (g₁g₂)⁻¹ = 1."""
+        g1g2 = G1 * G2
+        g1g2_inv = MultiBandElement.g1_inv() * MultiBandElement.g2_inv()
+        assert g1g2 * g1g2_inv == MB_ONE
+
+    def test_mul_associative(self):
+        assert (G1 * G2) * G1 == G1 * (G2 * G1)
+
+    def test_mul_commutative(self):
+        assert G1 * G2 == G2 * G1
+
+    def test_distributive(self):
+        assert G1 * (MB_ONE + G2) == G1 + G1 * G2
+
+
+# ============================================================
+# MultiBandElement Tests — Conjugation and Norm
+# ============================================================
+
+class TestMultiBandConjNorm:
+
+    def test_sigma1_g1(self):
+        """σ₁(g₁) = s₁ - g₁ = g₁⁻¹."""
+        assert G1.sigma1() == MultiBandElement.g1_inv()
+
+    def test_sigma2_g2(self):
+        """σ₂(g₂) = s₂ - g₂ = g₂⁻¹."""
+        assert G2.sigma2() == MultiBandElement.g2_inv()
+
+    def test_sigma1_fixes_g2(self):
+        """σ₁ fixes g₂."""
+        assert G2.sigma1() == G2
+
+    def test_sigma2_fixes_g1(self):
+        """σ₂ fixes g₁."""
+        assert G1.sigma2() == G1
+
+    def test_sigma1_involution(self):
+        x = MultiBandElement(BiPoly(1), BiPoly(2), BiPoly(3), BiPoly(4))
+        assert x.sigma1().sigma1() == x
+
+    def test_sigma2_involution(self):
+        x = MultiBandElement(BiPoly(1), BiPoly(2), BiPoly(3), BiPoly(4))
+        assert x.sigma2().sigma2() == x
+
+    def test_norm_g1(self):
+        """N(g₁) = 1."""
+        assert G1.norm() == BiPoly.one()
+
+    def test_norm_g2(self):
+        """N(g₂) = 1."""
+        assert G2.norm() == BiPoly.one()
+
+    def test_norm_g1g2(self):
+        """N(g₁g₂) = 1."""
+        assert (G1 * G2).norm() == BiPoly.one()
+
+    def test_norm_powers(self):
+        """N(g₁^n · g₂^m) = 1."""
+        for n in range(-2, 3):
+            for m in range(-2, 3):
+                el = (G1 ** n) * (G2 ** m)
+                assert el.norm() == BiPoly.one(), f"N(g1^{n} * g2^{m}) != 1"
+
+
+# ============================================================
+# MultiBandElement Tests — Inversion and Powers
+# ============================================================
+
+class TestMultiBandInversion:
+
+    def test_inv_g1(self):
+        assert G1.inv() == MultiBandElement.g1_inv()
+
+    def test_inv_g2(self):
+        assert G2.inv() == MultiBandElement.g2_inv()
+
+    def test_inv_g1g2(self):
+        g1g2 = G1 * G2
+        assert g1g2 * g1g2.inv() == MB_ONE
+
+    def test_power_inverse_identity(self):
+        for n in range(-2, 3):
+            el = G1 ** n
+            assert el * el.inv() == MB_ONE, f"g1^{n} * inv(g1^{n}) != 1"
+
+    def test_can_invert(self):
+        assert G1.can_invert()
+        assert G2.can_invert()
+        assert (G1 * G2).can_invert()
+
+
+# ============================================================
+# MultiBandElement Tests — Evaluation
+# ============================================================
+
+class TestMultiBandEval:
+
+    def test_eval_g1(self):
+        """g₁ at θ₁ = e^{iθ₁}."""
+        theta1 = math.pi / 5
+        theta2 = math.pi / 7
+        val = G1.eval_at(theta1=theta1, theta2=theta2)
+        assert abs(val - cmath.exp(1j * theta1)) < 1e-12
+
+    def test_eval_g2(self):
+        """g₂ at θ₂ = e^{iθ₂}."""
+        theta1 = math.pi / 5
+        theta2 = math.pi / 7
+        val = G2.eval_at(theta1=theta1, theta2=theta2)
+        assert abs(val - cmath.exp(1j * theta2)) < 1e-12
+
+    def test_eval_product(self):
+        """(g₁ + 1)(g₂ + 1) at specific angles."""
+        theta1 = 0.3
+        theta2 = 0.8
+        g1_num = cmath.exp(1j * theta1)
+        g2_num = cmath.exp(1j * theta2)
+        expected = (g1_num + 1) * (g2_num + 1)
+        expr = (G1 + MB_ONE) * (G2 + MB_ONE)
+        val = expr.eval_at(theta1=theta1, theta2=theta2)
+        assert abs(val - expected) < 1e-12
+
+    def test_eval_sum_real(self):
+        """g₁^n + g₁^{-n} should be real (2cos(nθ₁))."""
+        theta1 = math.pi / 4
+        theta2 = math.pi / 3
+        for n in range(4):
+            total = G1**n + MultiBandElement.g1_inv()**n
+            val = total.eval_at(theta1=theta1, theta2=theta2)
+            assert abs(val.imag) < 1e-12
+
+
+# ============================================================
+# MultiBandElement Tests — Display
+# ============================================================
+
+class TestMultiBandDisplay:
+
+    def test_repr_one(self):
+        assert repr(MB_ONE) == '1'
+
+    def test_repr_zero(self):
+        assert repr(MB_ZERO) == '0'
+
+    def test_repr_g1(self):
+        assert repr(G1) == 'g\u2081'
+
+    def test_repr_g2(self):
+        assert repr(G2) == 'g\u2082'
