@@ -2729,6 +2729,63 @@ class CalculatorApp:
             tw.insert('end', f'  N = {decomp["norm_str"]}\n', 'value')
             if decomp['is_unit']:
                 tw.insert('end', '  (unit \u2014 invertible)\n', 'dim')
+
+            # Wedge products — computed purely from ring coordinates, no projection
+            ring_el = decomp.get('_ring_el')
+            if ring_el is not None:
+                from chebyshev_ring import Element, QsPoly
+                from fractions import Fraction as Frac
+                import math as _math
+
+                tw.insert('end', '\n')
+                tw.insert('end', 'Wedge Products\n', 'header')
+                tw.insert('end', '  P \u2227 Q = a\u2081b\u2082 \u2212 b\u2081a\u2082  (in Q[s])\n', 'dim')
+
+                p_a, p_b = ring_el.a, ring_el.b
+                p_norm = ring_el.norm()
+
+                # Reference A: i = 0^(ω/2) → in the ring this is g (a=0, b=1)
+                ref_a = Element(QsPoly.zero(), QsPoly.one())
+                ref_a_label = 'i'
+                wedge_a = p_a * ref_a.b - p_b * ref_a.a  # a₁·1 - b₁·0 = a₁
+                ref_a_norm = ref_a.norm()
+
+                ring_info = decomp.get('_ring_info', {})
+                gen_label = decomp.get('gen_note', 'g').split(',')[0].replace('g = ', '').strip()
+
+                def _fmt_poly(poly):
+                    """Format a QsPoly: if constant, show the number; otherwise show polynomial."""
+                    if poly.is_constant():
+                        v = poly.constant_value()
+                        return str(v) if v.denominator != 1 else str(v.numerator)
+                    return repr(poly)
+
+                def _try_sin(wedge_poly, norm_p, norm_q):
+                    """Compute sin(θ) if all inputs are constant polynomials."""
+                    if wedge_poly.is_constant() and norm_p.is_constant() and norm_q.is_constant():
+                        w = float(wedge_poly.constant_value())
+                        np_ = float(norm_p.constant_value())
+                        nq = float(norm_q.constant_value())
+                        if np_ > 0 and nq > 0:
+                            sin_val = w / _math.sqrt(np_ * nq)
+                            return sin_val
+                    return None
+
+                # Reference A: g = generator (a=0, b=1)
+                tw.insert('end', f'\n  P \u2227 {gen_label}:\n', 'value')
+                tw.insert('end', f'    wedge = {_fmt_poly(wedge_a)}\n', 'value')
+                tw.insert('end', f'    N(P) = {_fmt_poly(p_norm)},  N({gen_label}) = {_fmt_poly(ref_a_norm)}\n', 'dim')
+
+                sin_a = _try_sin(wedge_a, p_norm, ref_a_norm)
+                if sin_a is not None:
+                    tw.insert('end', f'    sin(\u03b8) = {Frac(sin_a).limit_denominator(1000)}', 'value')
+                    if abs(sin_a) <= 1:
+                        tw.insert('end', f'  \u2192  \u03b8 = {_math.degrees(_math.asin(sin_a)):.2f}\u00b0\n', 'dim')
+                    else:
+                        tw.insert('end', '\n')
+                elif not wedge_a.is_constant():
+                    tw.insert('end', f'    sin(\u03b8) = {_fmt_poly(wedge_a)} / \u221a({_fmt_poly(p_norm)}\u00b7{_fmt_poly(ref_a_norm)})\n', 'value')
+
             return
 
         # --- Single zero-power form (legacy path) ---

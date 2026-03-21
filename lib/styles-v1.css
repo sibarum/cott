@@ -233,7 +233,7 @@ span.variable, span.symbol, span.number, sup, sub, .fraction {
     margin: 0 0.1em;
     font-size: 0.75em;
 }
-sup .fraction, .sqrt .fraction {
+sup .fraction, .sqrt .fraction, .nostack .fraction {
     display: inline;
     margin: 0;
 }
@@ -260,7 +260,7 @@ p .fraction {
     color: rgba(1,1,1,0%);
     white-space: nowrap;
 }
-sup .h-divider, .sqrt .h-divider {
+sup .h-divider, .sqrt .h-divider, .nostack .h-divider {
     height: auto;
     border: none;
     color: inherit;
