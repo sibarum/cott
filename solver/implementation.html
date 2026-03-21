@@ -81,7 +81,7 @@
                 <span class="dynamicexpr">1*0^{1}=0</span>
             </td>
             <td>
-                <span class="dynamicexpr">[0,1]</span>
+                <span class="dynamicexpr">[1,1]</span>
             </td>
         </tr>
         <tr>
@@ -89,7 +89,7 @@
                 <span class="dynamicexpr">1*0^{-1}=w</span>
             </td>
             <td>
-                <span class="dynamicexpr">[0,-1]</span>
+                <span class="dynamicexpr">[1,-1]</span>
             </td>
         </tr>
     </table>
@@ -137,9 +137,26 @@
     </div>
 
     <p>
-        The coefficient behaves additively.
-        The phase behaves exponentially over multiplication, logarithmically over addition.
+        To define the operational rules, we must first define a few helper functions.
+        These functions enable our operations to handle edge cases involving zero-rollover.
     </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">b = 0 =-> r(b) = 1</span>
+    </div>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">b = 0 =-> v(b) = 1</span>
+    </div>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">b != 0 =-> r(b) = b</span>
+    </div>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">b != 0 =-> v(b) = 0</span>
+    </div>
+
 
     <table class="centered">
         <tr>
@@ -159,7 +176,7 @@
                 <span class="dynamicexpr">[a_{1},a_{2}]*[b_{1},b_{2}]</span>
             </td>
             <td>
-                <span class="dynamicexpr">[a_{1}*b_{1},a_{2}+b_{2}]</span>
+                <span class="dynamicexpr">[r(a_{1})*r(b_{1}),a_{2}+b_{2}+v(a_{1})+v(b_{1})]</span>
             </td>
         </tr>
         <tr>
@@ -167,7 +184,7 @@
                 <span class="dynamicexpr">[a_{1},a_{2}]^[b_{1},b_{2}]</span>
             </td>
             <td>
-                <span class="dynamicexpr">[b_{2}*a_{1}^b_{1}, b_{2}+a_{2}*b_{1}]</span>
+                <span class="dynamicexpr">[r(b_{2})*a_{1}^b_{1}, b_{2}+a_{2}*b_{1}]</span>
             </td>
         </tr>
         <tr>
@@ -175,7 +192,7 @@
                 <span class="dynamicexpr">-[a_{1},a_{2}]</span>
             </td>
             <td>
-                <span class="dynamicexpr nostack">[-a_{1},1/a_{2}]</span>
+                <span class="dynamicexpr nostack">[-a_{1},1/r(a_{2})-v(a_{2})]</span>
             </td>
         </tr>
         <tr>
@@ -183,7 +200,7 @@
                 <span class="dynamicexpr nostack">1/[a_{1},a_{2}]</span>
             </td>
             <td>
-                <span class="dynamicexpr nostack">[1/a_{1},-a_{2}]</span>
+                <span class="dynamicexpr nostack">[1/r(a_{1}),-a_{2}-v(a_{1})]</span>
             </td>
         </tr>
         <tr>
@@ -204,7 +221,20 @@
                 </span>
             </td>
         </tr>
+        <tr>
+            <td>
+                <span class="dynamicexpr nostack">[[a_{1},a_{2}],[b_{1},b_{2}]]</span>
+            </td>
+            <td>
+                <span class="dynamicexpr nostack">[a_{1}*r(b_{2}), a_{2}+b_{1}+v(b_{2})]</span>
+            </td>
+        </tr>
     </table>
+
+    <p>
+        So, the coefficient behaves additively, and
+        the phase behaves exponentially over multiplication but logarithmically over addition.
+    </p>
 
     <p>
         From these operation rules, subtraction and division may be derived.
@@ -220,7 +250,11 @@
     </p>
 
     <div class="expression font-lg">
-        <span class="dynamicexpr">0/1=[0,1]</span>
+        <span class="dynamicexpr">0/0=1</span>
+    </div>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">0/1=[1,1]</span>
     </div>
 
     <div class="expression font-lg">
@@ -228,7 +262,7 @@
     </div>
 
     <div class="expression font-lg">
-        <span class="dynamicexpr">0^x=[0,x]</span>
+        <span class="dynamicexpr">0^x=[1,x]</span>
     </div>
 
     <div class="expression font-lg">
@@ -236,7 +270,7 @@
     </div>
 
     <div class="expression font-lg">
-        <span class="dynamicexpr">1/0=[0,-1]</span>
+        <span class="dynamicexpr">1/0=[1,-1]</span>
     </div>
 
     <div class="expression font-lg">
