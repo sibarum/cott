@@ -525,4 +525,12 @@ ol.nested > li > ol.nested > li::before {
     .icon-back {
         display: none;
     }
+
+    div.code, div.code span, div.code div, div.code::after {
+        background: none;
+        border: none;
+        color: black;
+        box-shadow: none;
+        text-shadow: none;
+    }
 }
