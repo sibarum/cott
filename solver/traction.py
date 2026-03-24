@@ -234,6 +234,192 @@ class LogW(Function):
 
 
 # ============================================================
+# Graded Algebra — Z-action
+# ============================================================
+
+class GradedElement(Expr):
+    """
+    Z_n(value) — an element at grade n in the operation hierarchy.
+
+    The Z-action shifts arithmetic operations between grades:
+        Z_n(a) + Z_n(b) = Z_{n-1}(a*b)      addition  → multiplication
+        Z_n(a) * Z_n(b) = Z_{n+1}(a+b)      multiply  → addition
+        Z_n(a) - Z_n(b) = Z_{n-1}(a/b)      subtract  → division
+        Z_n(a) / Z_n(b) = Z_{n+1}(a-b)      division  → subtraction
+
+    Exponentiation with scalars:
+        b ^ Z_n(a)       = Z_{n-1}(a*b)
+        Z_n(a) ^ b       = Z_{n+1}(a*b)
+
+    Inversion rules:
+        Z_n(1/a)         = -Z_{n-1}(a)       reciprocal → negation (down)
+        Z_n(-a)          = 1/Z_{n+1}(a)      negation   → reciprocal (up)
+
+    Fixed points:
+        Z_n(1)  = Z_{n±1}(0)
+        Z_n(0)  = Z_{n±1}(1)
+        Z_n(-1) = Z_{n±1}(w)
+        Z_n(w)  = Z_{n±1}(-1)
+
+    Composition:
+        Z_n(Z_{n+1}(x)) = Z_n(Z_{n-1}(x)) = x
+
+    Z_0 is the identity: Z_0(x) = x.
+    """
+    is_commutative = True
+    _op_priority = 16.0  # higher than Zero/Omega so our methods dispatch first
+
+    def __new__(cls, grade, value):
+        grade = sympify(grade)
+        value = sympify(value)
+
+        # Z_0(x) = x  (identity grade)
+        if grade == S.Zero:
+            return value
+
+        # Fixed-point normalization: canonicalize toward lowest grade.
+        # Z_n(0) = Z_{n-1}(1), so shift down:
+        if (isinstance(value, Integer) and value == S.Zero) or isinstance(value, Zero):
+            return GradedElement.__new__(cls, grade - 1, S.One)
+        # Z_n(w) = Z_{n-1}(-1), so shift down:
+        if isinstance(value, Omega):
+            return GradedElement.__new__(cls, grade - 1, S.NegativeOne)
+        # Z_n(-1) = Z_{n-1}(w) = Z_{n-2}(-1) = ... → collapses to grade 0 or 1.
+        # -1 and w alternate: shift down by 2 each cycle until grade ≤ 1.
+        if isinstance(value, Integer) and value == S.NegativeOne:
+            g = int(grade)
+            if g >= 2:
+                # Even grade → Z_0(-1) = -1; odd grade → Z_1(-1)
+                final_grade = g % 2
+                if final_grade == 0:
+                    return S.NegativeOne
+                return Expr.__new__(cls, S.One, S.NegativeOne)
+
+        # Composition collapse: Z_n(Z_{n+1}(x)) = x, Z_n(Z_{n-1}(x)) = x
+        if isinstance(value, GradedElement):
+            inner_grade = value.args[0]
+            inner_value = value.args[1]
+            diff = grade - inner_grade
+            if diff == S.One or diff == S.NegativeOne:
+                return inner_value
+
+        return Expr.__new__(cls, grade, value)
+
+    @property
+    def grade(self):
+        return self.args[0]
+
+    @property
+    def value(self):
+        return self.args[1]
+
+    def _sympystr(self, printer):
+        return f'Z_{printer.doprint(self.grade)}({printer.doprint(self.value)})'
+
+    def _latex(self, printer):
+        return r'Z_{' + printer.doprint(self.grade) + r'}\left(' + printer.doprint(self.value) + r'\right)'
+
+    def __repr__(self):
+        return f'Z_{self.grade}({self.value})'
+
+    def __str__(self):
+        return f'Z_{self.grade}({self.value})'
+
+    # --- Arithmetic: same-grade operations shift the grade ---
+
+    def __add__(self, other):
+        other = sympify(other)
+        if isinstance(other, GradedElement) and other.grade == self.grade:
+            # Z_n(a) + Z_n(b) = Z_{n-1}(a*b)
+            return GradedElement(self.grade - 1, self.value * other.value)
+        return Expr.__add__(self, other)
+
+    def __radd__(self, other):
+        other = sympify(other)
+        if isinstance(other, GradedElement) and other.grade == self.grade:
+            return GradedElement(self.grade - 1, other.value * self.value)
+        return Expr.__radd__(self, other)
+
+    def __sub__(self, other):
+        other = sympify(other)
+        if isinstance(other, GradedElement) and other.grade == self.grade:
+            # Z_n(a) - Z_n(b) = Z_{n-1}(a/b)
+            return GradedElement(self.grade - 1, self.value / other.value)
+        return Expr.__sub__(self, other)
+
+    def __rsub__(self, other):
+        other = sympify(other)
+        if isinstance(other, GradedElement) and other.grade == self.grade:
+            return GradedElement(self.grade - 1, other.value / self.value)
+        return Expr.__rsub__(self, other)
+
+    def __mul__(self, other):
+        other = sympify(other)
+        if isinstance(other, GradedElement) and other.grade == self.grade:
+            # Z_n(a) * Z_n(b) = Z_{n+1}(a+b)
+            return GradedElement(self.grade + 1, self.value + other.value)
+        return Expr.__mul__(self, other)
+
+    def __rmul__(self, other):
+        other = sympify(other)
+        if isinstance(other, GradedElement) and other.grade == self.grade:
+            return GradedElement(self.grade + 1, other.value + self.value)
+        return Expr.__rmul__(self, other)
+
+    def __truediv__(self, other):
+        other = sympify(other)
+        if isinstance(other, GradedElement) and other.grade == self.grade:
+            # Z_n(a) / Z_n(b) = Z_{n+1}(a-b)
+            return GradedElement(self.grade + 1, self.value - other.value)
+        return Expr.__truediv__(self, other)
+
+    def __rtruediv__(self, other):
+        other = sympify(other)
+        if isinstance(other, GradedElement) and other.grade == self.grade:
+            return GradedElement(self.grade + 1, other.value - self.value)
+        return Expr.__rtruediv__(self, other)
+
+    def __pow__(self, exp):
+        exp = sympify(exp)
+        # Z_n(a) ^ b = Z_{n+1}(a*b)
+        if not isinstance(exp, GradedElement):
+            return GradedElement(self.grade + 1, self.value * exp)
+        return Expr.__pow__(self, exp)
+
+    def __rpow__(self, base):
+        base = sympify(base)
+        # b ^ Z_n(a) = Z_{n-1}(a*b)
+        if not isinstance(base, GradedElement):
+            return GradedElement(self.grade - 1, self.value * base)
+        return Expr.__rpow__(self, base)
+
+    def __neg__(self):
+        # Z_n(-a) = 1/Z_{n+1}(a)  →  -Z_n(a) means we negate the value
+        # -Z_n(a) = Z_n(-a) = 1/Z_{n+1}(a)
+        return Pow(GradedElement(self.grade + 1, self.value), S.NegativeOne)
+
+    def _eval_power(self, exp):
+        """Handle Pow(Z_n(a), b) when SymPy constructs it."""
+        if not isinstance(exp, GradedElement):
+            # Z_n(a) ^ b = Z_{n+1}(a*b)
+            return GradedElement(self.grade + 1, self.value * exp)
+        return None
+
+    def inverse(self):
+        """Z_n(1/a) = -Z_{n-1}(a), so 1/Z_n(a) needs the inverse rule."""
+        # From Z_n(-a) = 1/Z_{n+1}(a), substitute a→-a:
+        # Z_n(a) = 1/Z_{n+1}(-a), so 1/Z_n(a) = Z_{n+1}(-a)
+        # Alternatively from Z_n(1/a) = -Z_{n-1}(a):
+        # if self = Z_n(a), then Z_{n+1}(-a) inverts it
+        return GradedElement(self.grade + 1, -self.value)
+
+
+def Z(n, value):
+    """Shorthand constructor: Z(n, x) = Z_n(x)."""
+    return GradedElement(n, value)
+
+
+# ============================================================
 # Singleton Aliases
 # ============================================================
 

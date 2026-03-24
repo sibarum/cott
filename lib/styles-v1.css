@@ -312,6 +312,104 @@ sup .h-divider, .sqrt .h-divider, .nostack .h-divider {
     background-color: black;
 }
 
+/* code highlighting */
+
+span.code {
+    font-family: "Ubuntu Sans Mono", monospace;
+    padding-top: .2em;
+}
+
+.code-title .rfloat {
+    font-family: "Ubuntu Sans Mono", monospace;
+    float:right;
+}
+
+div.code {
+    background-color: #272526;
+    color: #9fbd8d;
+    border: 0.5em solid #948c3c;
+    border-top: 0;
+    padding: 0.5em;
+    font-size: 1em;
+    font-family: "Ubuntu Sans Mono", monospace;
+    white-space: pre;
+    margin-bottom: 1em;
+}
+
+.code-title {
+    background-color: #948c3c;
+    color: white;
+    font-size: 1.2em;
+    padding: 0.2em 0.5em;
+    margin-top: 1em;
+}
+
+.code .variable {
+
+}
+
+/* SPN syntax highlighting — IBM 3278 phosphor terminal */
+
+div.code {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Scanline overlay for CRT feel */
+div.code::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 0, 0, 0.08) 2px,
+        rgba(0, 0, 0, 0.08) 4px
+    );
+    pointer-events: none;
+}
+
+.spn-keyword {
+    color: #66cc66;
+    font-weight: bold;
+    text-shadow: 0 0 6px rgba(102, 204, 102, 0.5);
+}
+
+.spn-ident {
+    color: #b0d8a0;
+}
+
+.spn-number {
+    color: #d4c872;
+    text-shadow: 0 0 4px rgba(212, 200, 114, 0.3);
+}
+
+.spn-op {
+    color: #78a878;
+}
+
+.spn-assign {
+    color: #88cc88;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(136, 204, 136, 0.4);
+}
+
+.spn-punct {
+    color: #5a8a5a;
+}
+
+.spn-not {
+    color: #cc4444;
+}
+
+.spn-error {
+    color: #cc4444;
+    background: rgba(204, 68, 68, 0.1);
+    padding: 0 0.3em;
+    text-shadow: 0 0 4px rgba(204, 68, 68, 0.4);
+}
+
 /* Bullets */
 
 ol.nested {

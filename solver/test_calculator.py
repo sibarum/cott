@@ -55,6 +55,19 @@ tests = [
     ('w/w', '1'),
     # Complex expressions with poles
     ('(1-(1/x)^2)^(1/x)', '(1-1\u00b7x^-2)^x^-1'),
+    # Solve: single solution
+    ('solve(x+3)', 'x = -3'),
+    ('solve(2*q-6, q)', 'q = 3'),
+    # Solve: multiple solutions
+    ('solve(x^2-4)', 'x \u2208 {-2, 2}'),
+    ('solve(x^3-x)', 'x \u2208 {-1, 0, 1}'),
+    # Solve: no solution
+    ('solve(x^2+1)', 'x \u2208 {-1\u00b7I, I}'),
+    # Equation syntax
+    ('x^2 = 4', 'x \u2208 {-2, 2}'),
+    ('x + 3 = 0', 'x = -3'),
+    ('2*p = 10', 'p = 5'),
+    ('q = q^2', 'q \u2208 {0, 1}'),
 ]
 
 passed = 0

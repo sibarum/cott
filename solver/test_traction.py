@@ -6,7 +6,8 @@ from sympy import S, Pow, Rational, Symbol, Integer, Add, Mul, I, pi, exp
 from traction import (
     Zero, Omega, Null, Log0, LogW, z, w, null,
     traction_simplify, log0, logw, zpow, wpow,
-    resolve, resolve_log, project_complex, W_CONST
+    resolve, resolve_log, project_complex, W_CONST,
+    GradedElement, Z
 )
 
 
@@ -900,3 +901,185 @@ class TestExponentDistribution:
         # 0^(6 + 0): 6 is Integer, 0 is Zero. Add gives 6 + 0 (SymPy).
         # Let's just cross-verify numerically.
         self._assert_cross_verified(expr)
+
+
+# ============================================================
+# Graded Algebra — Z-action
+# ============================================================
+
+class TestGradedIdentity:
+    """Z_0(x) = x for all x."""
+
+    def test_z0_integer(self):
+        assert Z(0, 5) == Integer(5)
+
+    def test_z0_symbol(self):
+        x = Symbol('x')
+        assert Z(0, x) == x
+
+    def test_z0_zero(self):
+        assert Z(0, z) is z
+
+    def test_z0_omega(self):
+        assert Z(0, w) is w
+
+
+class TestGradedArithmetic:
+    """Same-grade operations shift the grade."""
+
+    def test_add_becomes_mul(self):
+        # Z_1(a) + Z_1(b) = Z_0(a*b) = a*b
+        a, b = Integer(3), Integer(5)
+        result = Z(1, a) + Z(1, b)
+        assert result == a * b, f"Expected {a*b}, got {result}"
+
+    def test_mul_becomes_add(self):
+        # Z_1(a) * Z_1(b) = Z_2(a+b)
+        a, b = Integer(3), Integer(5)
+        result = Z(1, a) * Z(1, b)
+        assert isinstance(result, GradedElement)
+        assert result.grade == Integer(2)
+        assert result.value == a + b
+
+    def test_sub_becomes_div(self):
+        # Z_1(a) - Z_1(b) = Z_0(a/b) = a/b
+        a, b = Integer(6), Integer(3)
+        result = Z(1, a) - Z(1, b)
+        assert result == a / b, f"Expected {a/b}, got {result}"
+
+    def test_div_becomes_sub(self):
+        # Z_1(a) / Z_1(b) = Z_2(a-b)
+        a, b = Integer(8), Integer(3)
+        result = Z(1, a) / Z(1, b)
+        assert isinstance(result, GradedElement)
+        assert result.grade == Integer(2)
+        assert result.value == a - b
+
+    def test_higher_grade_add(self):
+        # Z_3(a) + Z_3(b) = Z_2(a*b)
+        a, b = Integer(2), Integer(7)
+        result = Z(3, a) + Z(3, b)
+        assert isinstance(result, GradedElement)
+        assert result.grade == Integer(2)
+        assert result.value == a * b
+
+    def test_negative_grade(self):
+        # Z_{-1}(a) + Z_{-1}(b) = Z_{-2}(a*b)
+        a, b = Integer(4), Integer(5)
+        result = Z(-1, a) + Z(-1, b)
+        assert isinstance(result, GradedElement)
+        assert result.grade == Integer(-2)
+        assert result.value == a * b
+
+    def test_chain_add_then_add(self):
+        # (Z_2(a) + Z_2(b)) + (Z_2(c) + Z_2(d))
+        # = Z_1(a*b) + Z_1(c*d) = Z_0(a*b*c*d) = a*b*c*d
+        a, b, c, d = Integer(2), Integer(3), Integer(5), Integer(7)
+        left = Z(2, a) + Z(2, b)    # Z_1(6)
+        right = Z(2, c) + Z(2, d)   # Z_1(35)
+        result = left + right         # Z_0(6*35) = 210
+        assert result == Integer(210), f"Expected 210, got {result}"
+
+
+class TestGradedExponentiation:
+    """Exponentiation with scalars shifts grade."""
+
+    def test_pow_scalar(self):
+        # Z_1(a) ^ b = Z_2(a*b)
+        result = Z(1, Integer(3)) ** Integer(4)
+        assert isinstance(result, GradedElement)
+        assert result.grade == Integer(2)
+        assert result.value == Integer(12)
+
+    def test_rpow_scalar(self):
+        # b ^ Z_1(a) = Z_0(a*b) = a*b
+        result = Integer(5) ** Z(1, Integer(3))
+        assert result == Integer(15), f"Expected 15, got {result}"
+
+
+class TestGradedFixedPoints:
+    """Fixed-point values across grades."""
+
+    def test_fixed_1_and_0(self):
+        # Z_2(1) and Z_3(0) should be equal
+        z2_1 = Z(2, Integer(1))
+        z3_0 = Z(3, Integer(0))
+        assert z2_1 == z3_0, f"Z_2(1)={z2_1} should equal Z_3(0)={z3_0}"
+
+    def test_fixed_neg1_and_omega(self):
+        # Z_n(-1) = Z_{n+1}(w)
+        z1_neg1 = Z(1, S.NegativeOne)
+        z2_w = Z(2, w)
+        assert z1_neg1 == z2_w, f"Z_1(-1)={z1_neg1} should equal Z_2(w)={z2_w}"
+
+    def test_fixed_omega_and_neg1(self):
+        # Z_n(w) = Z_{n+1}(-1)
+        z1_w = Z(1, w)
+        z2_neg1 = Z(2, S.NegativeOne)
+        assert z1_w == z2_neg1, f"Z_1(w)={z1_w} should equal Z_2(-1)={z2_neg1}"
+
+
+class TestGradedComposition:
+    """Composition of adjacent grades collapses to identity."""
+
+    def test_compose_up(self):
+        # Z_1(Z_2(x)) = x
+        x = Symbol('x')
+        inner = Z(2, x)
+        result = Z(1, inner)
+        assert result == x, f"Z_1(Z_2(x)) should be x, got {result}"
+
+    def test_compose_down(self):
+        # Z_2(Z_1(x)) = x
+        x = Symbol('x')
+        inner = Z(1, x)
+        result = Z(2, inner)
+        assert result == x, f"Z_2(Z_1(x)) should be x, got {result}"
+
+    def test_compose_non_adjacent_stays(self):
+        # Z_1(Z_3(x)) should NOT collapse (gap of 2)
+        x = Symbol('x')
+        inner = Z(3, x)
+        result = Z(1, inner)
+        assert isinstance(result, GradedElement), \
+            f"Z_1(Z_3(x)) should remain graded, got {result}"
+
+    def test_compose_with_concrete(self):
+        # Z_3(Z_4(7)) = 7
+        result = Z(3, Z(4, Integer(7)))
+        assert result == Integer(7)
+
+
+class TestGradedInversion:
+    """Negation and reciprocal shift grade."""
+
+    def test_negation(self):
+        # -Z_1(5): __neg__ produces 1/Z_2(5), then _eval_power fires:
+        # Pow(Z_2(5), -1) = Z_3(5*(-1)) = Z_3(-5)
+        elem = Z(1, Integer(5))
+        result = -elem
+        assert isinstance(result, GradedElement)
+        assert result.grade == Integer(3)
+        assert result.value == Integer(-5)
+
+    def test_inverse_method(self):
+        # inverse of Z_n(a) = Z_{n+1}(-a)
+        elem = Z(1, Integer(5))
+        inv = elem.inverse()
+        assert isinstance(inv, GradedElement)
+        assert inv.grade == Integer(2)
+        assert inv.value == Integer(-5)
+
+
+class TestGradedDisplay:
+    """String representation."""
+
+    def test_str(self):
+        elem = Z(2, Integer(3))
+        assert 'Z_2' in str(elem)
+        assert '3' in str(elem)
+
+    def test_repr(self):
+        elem = Z(1, Symbol('x'))
+        assert 'Z_1' in repr(elem)
+        assert 'x' in repr(elem)

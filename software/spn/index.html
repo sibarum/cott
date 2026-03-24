@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<html xmlns="http://www.w3.org/1999/html" lang="en">
+<head>
+    <script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&family=Ubuntu+Sans+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../lib/styles-v1.css">
+    <script src="../../lib/spn-interpret.js"></script>
+
+    <title>Symbols+Numbers</title>
+
+</head>
+<body>
+
+
+<div class="section">
+
+    <a href="/cott">
+        <div class="icon-back"></div>
+    </a>
+
+    <div class="headings">
+        <h1>Symbols+Numbers</h1>
+        <h2>a dual programming paradigm</h2>
+    </div>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        Published under the <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-1">
+        1. Motivation
+    </div>
+
+    <p>
+        In the world of software engineering, it's quite common for business logic, application logic,
+        technical boilerplate, logging, and other cross-cutting concerns to be woven together within
+        a unified source code. At a large scale, developers begin struggle delivering error-free code,
+        adding new features in a timely manner, or troubleshooting complex problems.
+        Worst yet, it can be a costly problem to fix, and a systems overhaul is likely to cause significant
+        instability in the software, and a rewrite could set back a development team decades.
+        Thus, "tech debt" tends to accumulate with no bounds.
+    </p>
+
+    <p>
+        Many programming languages have attempted to address semantic decoupling, with varying results.
+        Languages like Haskell and OCaml have gained some popularity for their unconventional yet
+        powerful compiler features. A major obstacle is transparency, and in more ways than one.
+        In terms of language transparency, functional languages have an unusually steep learning
+        curve for newcomers, primarily due to counter-intuitive design patterns and theory-heavy documentation.
+        In terms of runtime transparency, performance issues in a functional language with a
+        sophisticated compiler are notoriously difficult to troubleshoot effectively.
+    </p>
+
+    <p>
+        <strong>Symbols+Numbers</strong> ("Symbols Plus Numbers", SPN) attempts to resolve the issues of
+        modern functional programming, without compromising runtime semantics or obscuring implementation.
+        This is accomplished not by deferring all runtime semantics to the compiler like Haskell,
+        but rather by fully decoupling runtime semantics from application logic.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-2">
+        2. Monadic Decoupling
+    </div>
+
+    <p>
+        <strong>Monadic decoupling</strong><em> lifts a computation into a context where auxiliary
+            behaviors (like caching) can be introduced, modified, or removed independently of the core logic,
+            possibly at runtime."</em>
+    </p>
+
+    <p>
+        You'll find dozens of posts online of developers struggling to understand what a monad even is,
+        let alone how to use them effectively. SPN sees this as a marketing failure - the feature has not
+        been implemented in a way conducive to widespread understanding or adoption. The solution is to
+        make monads a central focus of the language - a necessary component that must be defined for
+        any logic to be evaluated. Then, a standard library offering a variety of common utility monads would be
+        immediately available, justifying its existence and discouraging "re-inventing the wheel".
+    </p>
+
+    <p>
+        Some of these monads include:
+    </p>
+
+    <ul>
+        <li>
+            Memoization and Caching
+        </li>
+        <li>
+            Dependency Injection
+        </li>
+        <li>
+            Authentication and Authorization
+        </li>
+        <li>
+            Performance Metrics
+        </li>
+        <li>
+            Logging
+        </li>
+        <li>
+            Predictive Specialization
+        </li>
+        <li>
+            Looping/Recursion Strategy
+        </li>
+        <li>
+            Retry Logic
+        </li>
+        <li>
+            Configurable Numeric Precision
+        </li>
+        <li>
+            User-Defined Monads
+        </li>
+        <li>etc</li>
+    </ul>
+
+    <p>
+        These monads would essentially be plug-and-play, giving the developer complete control over
+        runtime semantics without getting encumbered with boilerplate and cross-cutting concerns.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-3">
+        3. Classes
+    </div>
+
+    <p>
+        <em>Constrain the language, not the developer.</em>
+    </p>
+
+    <p>
+        The first step in writing any application is planning. This is the primary motivation behind
+        test-driven development (TDD) and behavior-driven development (BDD), both frameworks intended to
+        improve software quality by encouraging architectural planning before application logic is written.
+
+    </p>
+
+    <p>
+        <strong>Symbols</strong> is the symbolic language of SPN - it defines <em>what</em> an SPN application
+        or script is intended to do, but not <em>how</em>.
+    </p>
+
+    <p>
+        Some developers prefer mapping out a data structure first. Others prefer outlining a process or workflow,
+        then refine the data model as development progresses. SPN enables developers to start in either place.
+    </p>
+
+    <div class="subsection-title" id="section-3_1">
+        3.1 Type Declarations
+    </div>
+
+    <p>
+        SPN enables the construction of custom algebraic types. Operations on these types are checked
+        at compile time to ensure they match the declared domain. These types may declare additional
+        non-numeric values, but must be accompanied by rules to satisfy the closure.
+    </p>
+
+    <p>
+        In the following example, a custom <strong>algebraic type</strong> PositiveIntegerOmega is defined.
+        This type would gracefully handle division by zero with a distinguished element Omega,
+        which reverts back to 1 when multiplied by zero. Underscore is used as an operational
+        wildcard for convenience.
+    </p>
+
+    <div class="code-title">Algebraic Type <span class="rfloat">Symbols</span></div>
+<div class="code">numeric N, constraint N>=0, constraint N%1;
+value Omega;
+
+class(algebraic) PositiveIntegerOmega {
+    union of (N, Omega);
+    rule N/0 = Omega;
+    rule Omega_? = Omega;
+    rule 0 * Omega = 1;
+}
+</div>
+
+    <p>
+        <strong>Object types</strong> are structured collections of relational data. They may be declared in a generic way
+        (shown below) without specifying behavior, numeric precision, or mutability. SPN can use the same
+        type across multiple contexts.
+    </p>
+
+<div class="code-title">Object Type <span class="rfloat">Symbols</span></div>
+<div class="code">class(object) ElectricalState {
+    property(numeric) voltage;
+    property(numeric) resistance;
+    property(PositiveIntegerOmega) current;
+}
+</div>
+
+    <p>
+        <strong>Text types</strong> operate as text with constraints and/or metadata.
+        Text types automatically behave as regular text - or strings - and may overlay existing
+        text at runtime, without impacting any other text-related features. This can be useful
+        for writing parsers, formatters, or even byte streams.
+    </p>
+
+    <div class="code-title">Text Type <span class="rfloat">Symbols</span></div>
+    <div class="code">
+numeric Hundreds,
+        constraint Hundreds>=0,
+        constraint Hundreds%100;
+
+numeric ColorChannel,
+        constraint 0>=ColorChannel<256;
+
+class(algebraic) Color {
+    product of (ColorChannel, ColorChannel, ColorChannel);
+}
+
+class(text) FormattedText {
+    property(Hundreds) bold;
+    property(boolean) italics;
+    property(Color) fontColor;
+}
+    </div>
+
+    <p>
+        A <strong>stream type</strong> is a stateful class that produces values. Streams are the backbone of
+        iterators, useful for controlling program flow without defining specific procedures.
+    </p>
+
+    <div class="code-title">Stream Type <span class="rfloat">Symbols</span></div>
+    <div class="code">class(stream) FibonacciStream {
+        property(numeric, numeric) previous;
+        next(numeric);
+        rule next = previous.0 + previous.1;
+    }
+    </div>
+
+
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-4">
+        4. Pattern Matching
+    </div>
+
+    <p>
+        Logic is primarily controlled by pattern matching.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<script>
+</script>
+</body>
+</html>

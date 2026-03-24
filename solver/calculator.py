@@ -10,9 +10,10 @@ Usage:
 import tkinter as tk
 from tkinter import font as tkfont
 import numpy as np
-from sympy import S, Integer, Rational, Pow, Mul, Add, Symbol
+from sympy import S, Integer, Rational, Pow, Mul, Add, Symbol, I
 from sympy import symbols, lambdify
-from traction import Zero, Omega, Null, Log0, LogW, z, w, null, traction_simplify, log0, logw, project_complex
+from sympy import solve as sp_solve, expand as sp_expand, factor as sp_factor
+from traction import Zero, Omega, Null, Log0, LogW, z, w, null, traction_simplify, log0, logw, project_complex, GradedElement, Z
 import registry
 import projections  # auto-discovers and registers projection plugins
 
@@ -40,7 +41,8 @@ class Parser:
         mult     = power (('*' | '/') power)*
         power    = unary ('^' power)?
         unary    = '-' unary | primary
-        primary  = '(' expr ')' | funccall | number | 'w' | 'x' | 'omega'
+        primary  = '(' expr ')' | graded | funccall | number | 'w' | 'x' | 'omega'
+        graded   = 'Z_' int '(' expr ')' | 'Z' '(' expr ',' expr ')'
         funccall = ('log0' | 'logw') '(' expr ')'
     """
 
@@ -134,13 +136,26 @@ class Parser:
         if self.match('omega'):
             return w
 
-        # Function calls: log0(...), logw(...)
+        # Graded elements: Z_n(expr) or Z(n, expr)
+        if ch in ('Z', 'z'):
+            if self.match('Z_') or self.match('z_'):
+                return self._parse_graded()
+            if self.match('Z(') or self.match('z('):
+                return self._parse_graded_func()
+
+        # Function calls: log0(...), logw(...), solve(...), expand(...), factor(...)
         if self.match('log0'):
             return self._parse_func_call(log0, 'log0')
         if self.match('log\u03c9'):
             return self._parse_func_call(logw, 'log\u03c9')
         if self.match('logw'):
             return self._parse_func_call(logw, 'logw')
+        if self.match('solve'):
+            return self._parse_solve()
+        if self.match('expand'):
+            return self._parse_func_call(sp_expand, 'expand')
+        if self.match('factor'):
+            return self._parse_func_call(sp_factor, 'factor')
 
         # 'w' (must check after 'logw')
         if ch == 'w':
@@ -172,6 +187,39 @@ class Parser:
 
         raise ParseError(f"Unexpected character '{ch}' at position {self.pos}")
 
+    def _parse_graded(self):
+        """Parse Z_n(expr) where n is an integer (possibly negative)."""
+        # We already consumed 'Z_', now read the grade
+        neg = False
+        if self.peek() == '-':
+            neg = True
+            self.consume()
+        if self.peek() is None or not self.peek().isdigit():
+            raise ParseError(f"Expected digit after 'Z_' at position {self.pos}")
+        start = self.pos
+        while self.pos < len(self.text) and self.text[self.pos].isdigit():
+            self.pos += 1
+        grade = int(self.text[start:self.pos])
+        if neg:
+            grade = -grade
+        if self.peek() != '(':
+            raise ParseError(f"Expected '(' after Z_{grade} at position {self.pos}")
+        self.consume('(')
+        arg = self.expr()
+        self.consume(')')
+        return Z(grade, arg)
+
+    def _parse_graded_func(self):
+        """Parse Z(n, expr) — already consumed 'Z('."""
+        # Read grade expression (first argument)
+        grade_expr = self.expr()
+        if self.peek() != ',':
+            raise ParseError(f"Expected ',' in Z(n, expr) at position {self.pos}")
+        self.consume(',')
+        arg = self.expr()
+        self.consume(')')
+        return Z(grade_expr, arg)
+
     def _parse_func_call(self, func, name):
         """Parse func(expr) and return the result."""
         if self.peek() != '(':
@@ -180,6 +228,21 @@ class Parser:
         arg = self.expr()
         self.consume(')')
         return func(arg)
+
+    def _parse_solve(self):
+        """Parse solve(expr) or solve(expr, var) and return a SolutionSet."""
+        if self.peek() != '(':
+            raise ParseError(f"Expected '(' after solve at position {self.pos}")
+        self.consume('(')
+        expr = self.expr()
+        var = None
+        if self.peek() == ',':
+            self.consume(',')
+            var = self.expr()
+            if not isinstance(var, Symbol):
+                raise ParseError("Second argument to solve must be a variable")
+        self.consume(')')
+        return _do_solve(expr, var)
 
     def number(self):
         start = self.pos
@@ -233,13 +296,84 @@ def _to_traction(n):
     return Integer(n)
 
 
+class SolutionSet:
+    """Wrapper for a list of solutions returned by solve()."""
+    def __init__(self, solutions, variable):
+        self.solutions = solutions
+        self.variable = variable
+
+    def has(self, sym):
+        """SymPy-compatible: check if any solution references sym."""
+        return any(hasattr(s, 'has') and s.has(sym) for s in self.solutions)
+
+
+def _guess_variable(expr):
+    """Pick the solve variable from an expression's free symbols."""
+    free = expr.free_symbols
+    if not free:
+        raise ParseError("Nothing to solve: expression has no variables")
+    # Prefer x, then p, then q, then alphabetically first
+    for name in ('x', 'p', 'q'):
+        sym = Symbol(name)
+        if sym in free:
+            return sym
+    return sorted(free, key=str)[0]
+
+
+def _standardize_for_solve(expr):
+    """Replace traction Zero/Omega with standard numeric values for solving."""
+    if isinstance(expr, Zero):
+        return S.Zero
+    if isinstance(expr, Omega):
+        return S.ComplexInfinity
+    if hasattr(expr, 'args') and expr.args:
+        new_args = [_standardize_for_solve(a) for a in expr.args]
+        return expr.func(*new_args)
+    return expr
+
+
+def _do_solve(expr, var=None):
+    """Solve expr = 0 for var, returning a SolutionSet."""
+    expr = _standardize_for_solve(expr)
+    if var is None:
+        var = _guess_variable(expr)
+    solutions = sp_solve(expr, var)
+    return SolutionSet(solutions, var)
+
+
 def parse_and_eval(text):
-    """Parse a traction expression string and return the simplified result."""
+    """Parse a traction expression string and return the simplified result.
+
+    Supports equation syntax: 'lhs = rhs' is solved as 'lhs - rhs = 0'.
+    """
     text = text.strip()
     if not text:
         return None
+
+    # Equation syntax: split on '=' (but not inside function calls)
+    if '=' in text and not text.startswith('solve'):
+        # Find top-level '=' (not inside parentheses)
+        depth = 0
+        eq_pos = None
+        for i, ch in enumerate(text):
+            if ch == '(':
+                depth += 1
+            elif ch == ')':
+                depth -= 1
+            elif ch == '=' and depth == 0:
+                eq_pos = i
+                break
+        if eq_pos is not None:
+            lhs_text = text[:eq_pos].strip()
+            rhs_text = text[eq_pos + 1:].strip()
+            lhs = Parser(lhs_text).parse()
+            rhs = Parser(rhs_text).parse()
+            return _do_solve(lhs - rhs)
+
     parser = Parser(text)
     result = parser.parse()
+    if isinstance(result, SolutionSet):
+        return result
     return traction_simplify(result)
 
 
@@ -251,12 +385,24 @@ def format_result(expr):
     """Format a traction expression for display."""
     if expr is None:
         return ''
+    if isinstance(expr, SolutionSet):
+        if not expr.solutions:
+            return 'no solution'
+        parts = [format_result(s) for s in expr.solutions]
+        var = str(expr.variable)
+        if len(parts) == 1:
+            return f'{var} = {parts[0]}'
+        return f'{var} \u2208 {{{", ".join(parts)}}}'
     if isinstance(expr, Zero):
         return '0'
     if isinstance(expr, Omega):
         return '\u03c9'
     if isinstance(expr, Null):
         return '\u2205'  # empty set symbol
+    if isinstance(expr, GradedElement):
+        grade = format_result(expr.grade)
+        value = format_result(expr.value)
+        return f'Z_{grade}({value})'
     if isinstance(expr, Symbol):
         return str(expr)
     if isinstance(expr, Log0):
@@ -312,9 +458,10 @@ def format_approx(expr):
     """
     Format a decimal approximation of an expression.
     Returns '' if the approximation adds no information (e.g. pure integers).
+    Returns '' for SolutionSet (no single numeric approximation).
     Recursively approximates numeric sub-parts within traction expressions.
     """
-    if expr is None:
+    if expr is None or isinstance(expr, SolutionSet):
         return ''
 
     has_approx, text = _approx_inner(expr)
@@ -1398,6 +1545,10 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
     traction_expr = parsed.subs(subs)
     traction_expr = traction_simplify(traction_expr)
 
+    # Graded element path: any expression containing Z_n → plot as (r, p) in r + p*w
+    if traction_expr.has(GradedElement):
+        return _compute_graded_grid(traction_expr, a, b, grid_res, bounds)
+
     # Step 1: Symbolic projection
     projected = proj.project_expr(traction_expr, a, b)
     if projected is None:
@@ -1413,6 +1564,134 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
         return None
 
     return eval_result['phase'], eval_result['brightness'], eval_result['Z'], eval_result['log_mag']
+
+
+def _degrade(expr):
+    """
+    Recursively strip graded wrappers from an expression.
+
+    Replaces every GradedElement(n, value) with just value,
+    then maps omega -> i so that r + p*w becomes r + p*j.
+    """
+    from traction import Omega
+
+    if isinstance(expr, GradedElement):
+        return _degrade(expr.value)
+    if expr.args:
+        new_args = [_degrade(a) for a in expr.args]
+        try:
+            rebuilt = expr.func(*new_args)
+        except Exception:
+            rebuilt = expr
+        return rebuilt.subs(Omega(), I)
+    return expr.subs(Omega(), I)
+
+
+def _split_omega(expr):
+    """
+    Decompose a traction expression into (r, p) where expr = r + p*w.
+
+    Returns (r_part, w_part) as SymPy expressions.
+    For expressions that don't cleanly decompose, returns (expr, S.Zero).
+    """
+    from traction import Omega
+
+    if isinstance(expr, Omega):
+        return S.Zero, S.One
+
+    if isinstance(expr, Add):
+        r_terms = []
+        w_terms = []
+        for arg in expr.args:
+            if isinstance(arg, Omega):
+                w_terms.append(S.One)
+            elif isinstance(arg, Mul):
+                # Check if any factor is Omega
+                omega_count = 0
+                other_factors = []
+                for f in Mul.make_args(arg):
+                    if isinstance(f, Omega):
+                        omega_count += 1
+                    else:
+                        other_factors.append(f)
+                if omega_count == 1:
+                    w_terms.append(Mul(*other_factors) if other_factors else S.One)
+                elif omega_count == 0:
+                    r_terms.append(arg)
+                else:
+                    # Multiple omegas — treat as r part (w^2 etc.)
+                    r_terms.append(arg)
+            else:
+                r_terms.append(arg)
+        r = Add(*r_terms) if r_terms else S.Zero
+        w = Add(*w_terms) if w_terms else S.Zero
+        return r, w
+
+    if isinstance(expr, Mul):
+        omega_count = 0
+        other_factors = []
+        for f in Mul.make_args(expr):
+            if isinstance(f, Omega):
+                omega_count += 1
+            else:
+                other_factors.append(f)
+        if omega_count == 1:
+            return S.Zero, Mul(*other_factors) if other_factors else S.One
+        # No omega or multiple omegas
+        return expr, S.Zero
+
+    # Anything else: pure real part
+    return expr, S.Zero
+
+
+def _compute_graded_grid(graded_expr, a, b, grid_res, bounds):
+    """
+    Compute visualization for an expression containing GradedElements.
+
+    Strips graded wrappers and maps omega -> i in all values,
+    so r + p*w becomes r + p*j. Axes: horizontal = r, vertical = p (omega coeff).
+
+    Returns (phase, brightness, Z, log_mag) or None.
+    """
+    # Recursively unwrap all graded elements and project omega -> i
+    projected = _degrade(graded_expr)
+    try:
+        projected = projected.expand()
+    except Exception:
+        pass
+
+    try:
+        f = lambdify((a, b), projected, modules=['numpy'])
+    except Exception:
+        return None
+
+    lin = np.linspace(-bounds, bounds, grid_res)
+    AA, BB = np.meshgrid(lin, lin[::-1])
+
+    try:
+        AA_c = AA.astype(complex)
+        BB_c = BB.astype(complex)
+        with np.errstate(divide='ignore', invalid='ignore', over='ignore'):
+            Z = f(AA_c, BB_c)
+            if np.isscalar(Z) or (isinstance(Z, np.ndarray) and Z.ndim == 0):
+                Z = np.full_like(AA, complex(Z), dtype=complex)
+            Z = np.asarray(Z, dtype=complex)
+    except Exception:
+        return None
+
+    # Standard metrics from complex grid
+    phase = np.angle(Z)
+    phase = (phase + 2 * np.pi) % (2 * np.pi)
+    mag = np.abs(Z)
+    log_mag = np.log(np.maximum(mag, 1e-300))
+    invalid = ~np.isfinite(Z) | (Z == 0)
+    phase[invalid] = np.nan
+    log_mag[invalid] = np.nan
+    brightness = 0.5 + np.arctan(log_mag) / np.pi
+    brightness = np.clip(brightness, 0.12, 0.95)
+    brightness[invalid] = 0.0
+
+    return phase, brightness, Z, log_mag
 
 
 def phase_to_rgb(phase_grid, brightness=None):
@@ -1607,6 +1886,7 @@ class CalculatorApp:
         self.viz_image = None
         self.viz_Z = None  # complex grid for hover readout
         self.viz_log_mag = None  # log magnitude grid for gradient lines
+        self._viz_graded = False  # True when plotting a GradedElement
         self.show_tangent = False
         self.show_normal = False
         self.show_diamond = False
@@ -1978,6 +2258,10 @@ class CalculatorApp:
 
     def _format_display_result(self, parsed):
         """Format the result for display, applying x-substitution."""
+        # SolutionSet results: display directly, no x-substitution
+        if isinstance(parsed, SolutionSet):
+            return format_result(parsed)
+
         from sympy import Symbol as Sym
         x_sym = Sym('x')
         p_sym = Sym('p')
@@ -2065,20 +2349,34 @@ class CalculatorApp:
                     self._select_tab('Explain')
                 return
 
-            self._apply_viz_result(result)
+            # Detect graded expression for title label and hover mode
+            graded_label = None
+            parsed = parse_and_eval(expr_text)
+            if parsed is not None and parsed.has(GradedElement):
+                graded_label = 'Z-action : r + p\u00b7\u03c9'
+                self._viz_graded = True
+            elif isinstance(parsed, GradedElement):
+                graded_label = f'Z_{parsed.grade} : r + p\u00b7\u03c9'
+                self._viz_graded = True
+            else:
+                self._viz_graded = False
+            self._apply_viz_result(result, graded_label=graded_label)
         except Exception:
             self.viz_canvas.delete('all')
         self.display_expr.focus_set()
 
-    def _apply_viz_result(self, result):
+    def _apply_viz_result(self, result, graded_label=None):
         """Apply a completed visualization result (phase, brightness, Z, log_mag)."""
         phase, brightness, Z, log_mag = result
         self.viz_Z = Z
         self.viz_log_mag = log_mag
 
-        proj_name = self.projection_names[self.projection_index]
-        label = proj_name.replace('_', ' ')
-        self.viz_title_label.configure(text=f'Phase Plot [{label}]')
+        if graded_label:
+            self.viz_title_label.configure(text=f'Phase Plot [{graded_label}]')
+        else:
+            proj_name = self.projection_names[self.projection_index]
+            label = proj_name.replace('_', ' ')
+            self.viz_title_label.configure(text=f'Phase Plot [{label}]')
 
         if self.color_mode == 'continuity':
             rgb = continuity_to_rgb(phase, log_mag)
@@ -2618,6 +2916,14 @@ class CalculatorApp:
             self.cheb_canvas_widget.draw()
             return
 
+        # Z-action path: rich diagnostic for any expression containing GradedElement
+        if isinstance(parsed, GradedElement) or (hasattr(parsed, 'has') and parsed.has(GradedElement)):
+            self._render_graded_explain(parsed)
+            tw.configure(state='disabled')
+            self._draw_cheb_orbit(self.cheb_ax_orbit, decomp=None)
+            self.cheb_canvas_widget.draw()
+            return
+
         decomp = chebyshev_decompose(parsed)
         # Ensure complex_val is available for the orbit plot
         if 'complex_val' not in decomp:
@@ -2692,6 +2998,137 @@ class CalculatorApp:
             pass
 
         tw.configure(state='disabled')
+
+    def _render_graded_explain(self, parsed):
+        """Render Z-action diagnostic information into the Explain text widget."""
+        from traction import Omega, Zero, traction_simplify
+        from sympy import Add, Mul, Pow as SPow, I as symI, Symbol, Number, Rational
+
+        tw = self.cheb_text
+        traction_str = format_result(parsed)
+
+        tw.insert('end', 'Z-Action Expression\n', 'header')
+        tw.insert('end', f'  {traction_str}\n', 'expr')
+        tw.insert('end', '\n')
+
+        # Collect all GradedElement nodes in the expression tree
+        graded_nodes = []
+        def _collect_graded(e):
+            if isinstance(e, GradedElement):
+                graded_nodes.append(e)
+            if hasattr(e, 'args'):
+                for a in e.args:
+                    _collect_graded(a)
+        _collect_graded(parsed)
+
+        # --- Structure summary ---
+        tw.insert('end', 'Structure\n', 'header')
+        if isinstance(parsed, GradedElement):
+            tw.insert('end', f'  Top-level: Z_{format_result(parsed.grade)}(value)\n', 'value')
+            tw.insert('end', f'  Grade:     {format_result(parsed.grade)}\n', 'value')
+            tw.insert('end', f'  Value:     {format_result(parsed.value)}\n', 'value')
+        else:
+            tw.insert('end', f'  Top-level: {type(parsed).__name__} containing {len(graded_nodes)} graded node(s)\n', 'value')
+            for i, g in enumerate(graded_nodes):
+                tw.insert('end', f'  [{i+1}] Z_{format_result(g.grade)}({format_result(g.value)})\n', 'value')
+        tw.insert('end', '\n')
+
+        # --- Free symbols ---
+        free = parsed.free_symbols
+        if free:
+            tw.insert('end', 'Free Variables\n', 'header')
+            tw.insert('end', f'  {", ".join(str(s) for s in sorted(free, key=str))}\n', 'value')
+            tw.insert('end', '\n')
+
+        # --- Operation rules applied ---
+        tw.insert('end', 'Z-Action Rules\n', 'header')
+        tw.insert('end', '  Z_n(a) + Z_n(b) = Z_{n\u22121}(a\u00b7b)\n', 'dim')
+        tw.insert('end', '  Z_n(a) \u00b7 Z_n(b) = Z_{n+1}(a+b)\n', 'dim')
+        tw.insert('end', '  Z_n(a) \u2212 Z_n(b) = Z_{n\u22121}(a/b)\n', 'dim')
+        tw.insert('end', '  Z_n(a) / Z_n(b) = Z_{n+1}(a\u2212b)\n', 'dim')
+        tw.insert('end', '  Z_n(a) ^ b       = Z_{n+1}(a\u00b7b)\n', 'dim')
+        tw.insert('end', '  b ^ Z_n(a)       = Z_{n\u22121}(a\u00b7b)\n', 'dim')
+        tw.insert('end', '\n')
+
+        # --- Omega decomposition: value = r + p*w ---
+        tw.insert('end', 'Omega Decomposition\n', 'header')
+        tw.insert('end', '  value = r + p\u00b7\u03c9\n', 'dim')
+
+        # Extract the value to decompose (top-level or degrade the whole thing)
+        if isinstance(parsed, GradedElement):
+            val = parsed.value
+        else:
+            val = _degrade(parsed)
+
+        # Try to separate into real part and omega coefficient
+        r_part, w_part = _split_omega(val)
+        tw.insert('end', f'  r = {format_result(r_part)}\n', 'value')
+        tw.insert('end', f'  p = {format_result(w_part)}\n', 'value')
+
+        # Try numeric evaluation if no free symbols
+        if not val.free_symbols:
+            try:
+                val_with_i = val.subs(Omega(), symI)
+                z_complex = complex(val_with_i.evalf())
+                tw.insert('end', f'\n  Numeric (r + p\u00b7\u03c9):\n', 'dim')
+                tw.insert('end', f'    r = {z_complex.real:+.6f}\n', 'value')
+                tw.insert('end', f'    p = {z_complex.imag:+.6f}\n', 'value')
+                tw.insert('end', f'    |value| = {abs(z_complex):.6f}\n', 'value')
+                if z_complex != 0:
+                    import math
+                    angle = math.atan2(z_complex.imag, z_complex.real)
+                    tw.insert('end', f'    arg = {angle/math.pi:.4f}\u03c0  ({math.degrees(angle):.1f}\u00b0)\n', 'value')
+            except Exception as e:
+                tw.insert('end', f'  Numeric eval error: {e}\n', 'dim')
+        tw.insert('end', '\n')
+
+        # --- Fixed-point check ---
+        tw.insert('end', 'Fixed Points\n', 'header')
+        tw.insert('end', '  Z_n(0)  = Z_{n\u22121}(1)       Z_n(1) = Z_{n\u22121}(0)\n', 'dim')
+        tw.insert('end', '  Z_n(\u03c9) = Z_{n\u22121}(\u22121)     Z_n(\u22121) = Z_{n\u22121}(\u03c9)\n', 'dim')
+
+        if isinstance(parsed, GradedElement) and not parsed.value.free_symbols:
+            val = parsed.value
+            grade = parsed.grade
+            if val == Integer(0) or isinstance(val, Zero):
+                tw.insert('end', f'  \u2714 Value is 0: Z_{format_result(grade)}(0) = Z_{format_result(grade - 1)}(1)\n', 'value')
+            elif val == Integer(1):
+                tw.insert('end', f'  \u2714 Value is 1: Z_{format_result(grade)}(1) = Z_{format_result(grade - 1)}(0)\n', 'value')
+            elif val == S.NegativeOne:
+                tw.insert('end', f'  \u2714 Value is \u22121: Z_{format_result(grade)}(\u22121) = Z_{format_result(grade - 1)}(\u03c9)\n', 'value')
+            elif isinstance(val, Omega):
+                tw.insert('end', f'  \u2714 Value is \u03c9: Z_{format_result(grade)}(\u03c9) = Z_{format_result(grade - 1)}(\u22121)\n', 'value')
+            else:
+                tw.insert('end', f'  Value is not a fixed point\n', 'dim')
+        tw.insert('end', '\n')
+
+        # --- Composition check ---
+        tw.insert('end', 'Composition\n', 'header')
+        tw.insert('end', '  Z_n(Z_{n\u00b11}(x)) = x\n', 'dim')
+        if isinstance(parsed, GradedElement) and isinstance(parsed.value, GradedElement):
+            inner = parsed.value
+            diff = parsed.grade - inner.grade
+            if diff == Integer(1) or diff == Integer(-1):
+                tw.insert('end', f'  \u2714 Adjacent grades ({format_result(parsed.grade)}, {format_result(inner.grade)}): collapses to x = {format_result(inner.value)}\n', 'value')
+            else:
+                tw.insert('end', f'  \u2718 Non-adjacent grades ({format_result(parsed.grade)}, {format_result(inner.grade)}): gap = {format_result(diff)}, no collapse\n', 'value')
+        else:
+            tw.insert('end', '  (no nested graded composition)\n', 'dim')
+        tw.insert('end', '\n')
+
+        # --- Plot info ---
+        tw.insert('end', 'Plot Mapping\n', 'header')
+        tw.insert('end', '  \u03c9 \u2192 vertical axis (imaginary)\n', 'dim')
+        tw.insert('end', '  r \u2192 horizontal axis (real)\n', 'dim')
+        if free:
+            tw.insert('end', f'  Grid variables: {", ".join(str(s) for s in sorted(free, key=str))}\n', 'value')
+            # Show what the degrade function produces
+            degraded = _degrade(parsed)
+            tw.insert('end', f'  Degraded expr: {degraded}\n', 'value')
+            degraded_omega = degraded.subs(symI, Symbol('\u03c9'))
+            tw.insert('end', f'  As r + p\u00b7\u03c9: {degraded_omega}\n', 'value')
+        else:
+            tw.insert('end', '  (no free variables \u2014 constant expression, not plottable)\n', 'dim')
 
     def _render_cheb_text(self, decomp):
         """Render the Chebyshev decomposition into the text widget."""
@@ -3062,7 +3499,10 @@ class CalculatorApp:
         y_bot = y_top + bh
 
         # Draw the 3 scale boxes
-        labels = ['Re', 'Im', '|f|']
+        if getattr(self, '_viz_graded', False):
+            labels = ['r', '\u03c9', '|f|']
+        else:
+            labels = ['Re', 'Im', '|f|']
         values = [re, im, mag]
         for idx, (label, val) in enumerate(zip(labels, values)):
             bx = x_start + idx * (bw + gap)
