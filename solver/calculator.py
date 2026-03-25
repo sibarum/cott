@@ -1367,16 +1367,89 @@ def _complex_at_pi2(expr):
         return None
 
 
+def _chebyshev_relation(n):
+    """Compute T_n(s/2) as a polynomial in s (ascending Fraction coefficients).
+
+    Uses the Chebyshev recurrence T_{k+1}(x) = 2x·T_k(x) − T_{k-1}(x)
+    with x = s/2, giving T_{k+1}(s/2) = s·T_k(s/2) − T_{k-1}(s/2).
+
+    Returns list of Fraction coefficients [c0, c1, ..., cn].
+    """
+    from fractions import Fraction as Frac
+    if n == 0:
+        return [Frac(1)]
+    if n == 1:
+        return [Frac(0), Frac(1, 2)]
+    prev_prev = [Frac(1)]              # T_0(s/2) = 1
+    prev = [Frac(0), Frac(1, 2)]      # T_1(s/2) = s/2
+    for _ in range(2, n + 1):
+        # s · prev  (shift coefficients right by 1)
+        s_times = [Frac(0)] + prev[:]
+        # subtract prev_prev
+        length = max(len(s_times), len(prev_prev))
+        cur = []
+        for i in range(length):
+            a = s_times[i] if i < len(s_times) else Frac(0)
+            b = prev_prev[i] if i < len(prev_prev) else Frac(0)
+            cur.append(a - b)
+        prev_prev = prev
+        prev = cur
+    return prev
+
+
+def _poly_mod(p, m):
+    """Reduce polynomial p modulo m (both ascending-degree Fraction lists).
+
+    Returns the remainder of p / m with degree < deg(m).
+    """
+    from fractions import Fraction as Frac
+    p = list(p)
+    deg_m = len(m) - 1
+    lead_m = m[-1]
+    while len(p) > deg_m:
+        if p[-1] == Frac(0):
+            p.pop()
+            continue
+        factor = p[-1] / lead_m
+        offset = len(p) - len(m)
+        for i in range(len(m)):
+            p[i + offset] -= factor * m[i]
+        p.pop()
+    while len(p) > 1 and p[-1] == Frac(0):
+        p.pop()
+    return p
+
+
+def _eval_frac_poly_horner(coeffs, s_expr):
+    """Evaluate a polynomial (ascending-degree Fraction list) at a traction s_expr."""
+    from fractions import Fraction as Frac
+    from sympy import expand
+    # Strip trailing zeros
+    while len(coeffs) > 1 and coeffs[-1] == Frac(0):
+        coeffs = coeffs[:-1]
+    if not coeffs or all(c == Frac(0) for c in coeffs):
+        return Integer(0)
+    result = Rational(coeffs[-1].numerator, coeffs[-1].denominator)
+    for i in range(len(coeffs) - 2, -1, -1):
+        c = Rational(coeffs[i].numerator, coeffs[i].denominator)
+        result = traction_simplify(expand(result * s_expr) + c)
+    return result
+
+
 def _reduce_ring_form(decomp):
     """
-    Reduce the ring element using s² = 2 (the identity 0 + ω = null)
+    Reduce the ring element using the Chebyshev identity 0 + ω = ∅
     and substitute g = 0^(1/n) to get a simplified traction expression.
 
-    For base_denom = 2 (integer and half-integer exponents), s² = 2
-    makes u = 0^(1/2) a primitive 8th root of unity, collapsing any
-    polynomial in s to at most a constant + linear term.
+    The identity 0 + ω = ∅ implies T_n(s/2) = 0 where s = g + g⁻¹,
+    giving a polynomial relation on s. Reducing the ring polynomials
+    mod this relation and substituting back produces a simpler form.
 
-    Returns a formatted traction string, or None if not applicable.
+    For n=2: s² = 2, result has ≤ 4 terms (period-8 cycle).
+    For n=3: s² = 3, similar structure with 0^(k/3) terms.
+    For general n: T_n(s/2) = 0, result has ≤ 2n terms.
+
+    Returns (formatted_string, complex_value) or None if not applicable.
     """
     from fractions import Fraction as Frac
 
@@ -1385,72 +1458,33 @@ def _reduce_ring_form(decomp):
     band = ring_info.get('band', decomp.get('band', 'rational'))
     base_denom = ring_info.get('base_denom', decomp.get('base_denom', 2))
 
-    if ring_el is None or band != 'rational' or base_denom != 2:
+    if ring_el is None or band != 'rational':
         return None
 
-    # Reduce polynomial mod s² = 2:
-    # s^(2k)  → 2^k  (constant contribution)
-    # s^(2k+1) → 2^k · s  (linear contribution)
-    def reduce_mod_s2(poly):
-        const = Frac(0)
-        linear = Frac(0)
-        for i, c in enumerate(poly.coeffs):
-            k = i // 2
-            factor = Frac(2) ** k
-            if i % 2 == 0:
-                const += c * factor
-            else:
-                linear += c * factor
-        return const, linear
+    n = base_denom
 
-    a_const, a_linear = reduce_mod_s2(ring_el.a)
-    b_const, b_linear = reduce_mod_s2(ring_el.b)
+    # Compute the Chebyshev relation T_n(s/2) = 0
+    m_poly = _chebyshev_relation(n)
 
-    # After reduction, the ring form is:
-    #   (a_const + a_linear·s) + (b_const + b_linear·s)·g
-    #
-    # Substitute s = g + g⁻¹, g = 0^(1/2), g⁻¹ = ω^(1/2):
-    #   s·g = (0^(1/2) + ω^(1/2))·0^(1/2) = 0 + 1
-    #
-    # So the four atomic contributions are:
-    #   scalar:    a_const + b_linear  (from b_linear·s·g = b_linear·(0+1))
-    #   0 coeff:   b_linear           (from b_linear·s·g = b_linear·0 + b_linear)
-    #   0^(1/2):   a_linear + b_const
-    #   ω^(1/2):   a_linear
+    # Reduce a(s) and b(s) modulo the relation
+    a_red = _poly_mod(list(ring_el.a.coeffs), m_poly)
+    b_red = _poly_mod(list(ring_el.b.coeffs), m_poly)
 
-    terms = []
+    b_is_zero = all(c == Frac(0) for c in b_red)
 
-    scalar = a_const + b_linear
-    if scalar != 0:
-        if scalar.denominator == 1:
-            terms.append(Integer(int(scalar)))
-        else:
-            terms.append(Rational(scalar.numerator, scalar.denominator))
+    # Evaluate reduced polynomials at s = 0^(1/n) + ω^(1/n), g = 0^(1/n)
+    s_expr = traction_simplify(
+        Pow(Zero(), Rational(1, n)) + Pow(Omega(), Rational(1, n)))
+    g_expr = Pow(Zero(), Rational(1, n))
 
-    zero_coeff = b_linear
-    if zero_coeff != 0:
-        c = Rational(zero_coeff.numerator, zero_coeff.denominator)
-        terms.append(Mul(c, Zero()) if c != 1 else Zero())
+    a_val = _eval_frac_poly_horner(a_red, s_expr)
 
-    half_coeff = a_linear + b_const
-    if half_coeff != 0:
-        c = Rational(half_coeff.numerator, half_coeff.denominator)
-        base = Pow(Zero(), Rational(1, 2))
-        terms.append(Mul(c, base) if c != 1 else base)
-
-    omega_half_coeff = a_linear
-    if omega_half_coeff != 0:
-        c = Rational(omega_half_coeff.numerator, omega_half_coeff.denominator)
-        base = Pow(Omega(), Rational(1, 2))
-        terms.append(Mul(c, base) if c != 1 else base)
-
-    if not terms:
-        result_expr = Null()
+    if b_is_zero:
+        result_expr = a_val
     else:
-        result_expr = terms[0]
-        for t in terms[1:]:
-            result_expr = Add(result_expr, t)
-        result_expr = traction_simplify(result_expr)
+        from sympy import expand
+        b_val = _eval_frac_poly_horner(b_red, s_expr)
+        result_expr = traction_simplify(expand(a_val + expand(b_val * g_expr)))
 
     result_str = format_result(result_expr)
     result_complex = _complex_at_pi2(result_expr)
@@ -3387,16 +3421,17 @@ class CalculatorApp:
                 elif not wedge_a.is_constant():
                     tw.insert('end', f'    sin(\u03b8) = {_fmt_poly(wedge_a)} / \u221a({_fmt_poly(p_norm)}\u00b7{_fmt_poly(ref_a_norm)})\n', 'value')
 
-            # Reduced Form: substitute s² = 2 and simplify
+            # Reduced Form: reduce via 0 + ω = ∅ (Chebyshev identity)
             reduced_result = _reduce_ring_form(decomp)
             if reduced_result is not None:
                 reduced_str, reduced_cval = reduced_result
                 decomp['_reduced_str'] = reduced_str
                 decomp['_reduced_complex'] = reduced_cval
                 if reduced_str != traction_str:
+                    base_d = ring_info.get('base_denom', decomp.get('base_denom', 2))
                     tw.insert('end', '\n')
                     tw.insert('end', 'Reduced Form\n', 'header')
-                    tw.insert('end', '  0 + \u03c9 = \u2205,  s\u00b2 = 2\n', 'dim')
+                    tw.insert('end', f'  0 + \u03c9 = \u2205,  T\u2099(s/2) = 0  (n={base_d})\n', 'dim')
                     tw.insert('end', f'  {reduced_str}\n', 'value')
 
             return

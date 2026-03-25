@@ -47,8 +47,9 @@
 
     <p>
         The COTT Calculator is a Python/SymPy implementation of Traction Theory's algebra,
-        with a tkinter calculator GUI and phase-plot visualizer. It lives under <code>/solver</code>
-        and comprises roughly 2100 lines across six files.
+        with a tkinter calculator GUI, phase-plot visualizer, and Chebyshev ring decomposition engine.
+        It lives under <code>/solver</code>
+        and comprises roughly 4000 lines across eight files.
     </p>
 
     <p>
@@ -102,12 +103,17 @@
             <td>Q-norm surface projection for zero-power coordinates</td>
         </tr>
         <tr>
+            <td><code>chebyshev_ring.py</code></td>
+            <td>Exact arithmetic: <code>QsPoly</code>, <code>Element</code> (a + b&middot;u in &Qopf;[s][u]/(u&sup2;&minus;su+1)),
+                <code>TowerElement</code>, <code>MultiBandElement</code></td>
+        </tr>
+        <tr>
             <td><code>test_traction.py</code></td>
-            <td>106 pytest tests validating all identities</td>
+            <td>160 pytest tests validating all identities</td>
         </tr>
         <tr>
             <td><code>test_calculator.py</code></td>
-            <td>42 smoke tests for the parser/evaluator</td>
+            <td>173 tests for parser, evaluator, ring decomposition, and reduction</td>
         </tr>
         </tbody>
     </table>
@@ -195,8 +201,8 @@
             <td></td>
         </tr>
         <tr>
-            <td><span class="dynamicexpr">0^{-n} = w^n</span></td>
-            <td></td>
+            <td><span class="dynamicexpr">0^{-r} = w^r</span></td>
+            <td>Negative integer or rational exponent</td>
         </tr>
         <tr>
             <td><span class="dynamicexpr">0^w = -1</span></td>
@@ -245,11 +251,10 @@
         <span class="dynamicexpr">0^a * 0^b = 0^{a+b}</span>,
         <span class="dynamicexpr">0^a * w^b = 0^{a-b}</span>.
         After cancellation, the result is reconverted
-        (negative integer exponent &rarr; &omega;-base).
-        Additionally, definite zero-class elements absorb sign:
-        <span class="dynamicexpr">(-1)*0 = 0</span>
-        because negative zero cannot exist
-        (<span class="dynamicexpr">0-0=null</span>, not <span class="dynamicexpr">-0</span>).
+        (negative rational exponent &rarr; &omega;-base).
+        Signs are preserved:
+        <span class="dynamicexpr">-0</span> is a valid distinct expression
+        equal to &omega; in the reduced Chebyshev ring (see &sect;6.3).
     </p>
 
     <p>
@@ -797,19 +802,68 @@
     </p>
 
     <div class="subsection-title" id="section-6_3">
-        6.3 Negative Zero Cannot Exist
+        6.3 Negative Zero and the Chebyshev Reduction
     </div>
 
     <p>
-        Because the additive identity is <em>erasure</em>
-        (<span class="dynamicexpr">x - x = null</span>),
-        not <span class="dynamicexpr">x + 0 = x</span>,
-        the expression <span class="dynamicexpr">-0 = 0 - 0 = null</span>.
-        Negative zero is incoherent in this system.
-        The parser collapses <code>-0</code> &rarr; <code>0</code>,
-        and the simplifier absorbs sign from definite zero-class elements:
-        <span class="dynamicexpr">(-1)*0 = 0</span>,
-        <span class="dynamicexpr">(-2)*0 = 2*0</span>.
+        <span class="dynamicexpr">-0</span> is a valid, distinct expression &mdash;
+        the additive inverse of traction zero.
+        In the Chebyshev ring, the identity
+        <span class="dynamicexpr">0 + w = null</span> (additive inverse)
+        combined with <span class="dynamicexpr">0 * w = 1</span> (multiplicative inverse)
+        forces <strong>&omega; = &minus;0</strong>:
+        since 0&sup2; = &minus;1, we get &omega; = 0<sup>&minus;1</sup> = 0/0&sup2; = 0/(&minus;1) = &minus;0.
+    </p>
+
+    <p>
+        This single identity recovers the 8th roots of unity purely algebraically.
+        The Explain tab's <em>Reduced Form</em> section computes this by
+        reducing the ring polynomial modulo <em>T<sub>n</sub></em>(s/2) = 0
+        (the Chebyshev polynomial relation from 0 + &omega; = &empty;)
+        and substituting back:
+    </p>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>Expression</th>
+            <th>Reduced Form</th>
+            <th>Complex value (&theta; = &pi;/2)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><span class="dynamicexpr">0^0</span></td>
+            <td>1</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td><span class="dynamicexpr">0</span></td>
+            <td><span class="dynamicexpr">0</span></td>
+            <td><em>i</em></td>
+        </tr>
+        <tr>
+            <td><span class="dynamicexpr">0^2</span></td>
+            <td>&minus;1</td>
+            <td>&minus;1</td>
+        </tr>
+        <tr>
+            <td><span class="dynamicexpr">0^3</span></td>
+            <td>&minus;0</td>
+            <td>&minus;<em>i</em></td>
+        </tr>
+        <tr>
+            <td><span class="dynamicexpr">0^4</span></td>
+            <td>1</td>
+            <td>1</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>
+        The Traction Plane plot displays these values with cardinal points
+        1 (right), &minus;1 (left), 0 (top), &minus;0 (bottom),
+        confirming that traction zero acts as the imaginary unit <em>i</em>.
     </p>
 
     <div class="subsection-title" id="section-6_4">
