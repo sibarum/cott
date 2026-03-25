@@ -182,6 +182,7 @@
         wildcard for convenience.
     </p>
 
+    <div class="code-border">
     <div class="code-title">Algebraic Type <span class="rfloat">Symbols</span></div>
 <div class="code">numeric N, constraint N>=0, constraint N%1;
 value Omega;
@@ -193,6 +194,7 @@ class(algebraic) PositiveIntegerOmega {
     rule 0 * Omega = 1;
 }
 </div>
+    </div>
 
     <p>
         <strong>Object types</strong> are structured collections of relational data. They may be declared in a generic way
@@ -200,6 +202,7 @@ class(algebraic) PositiveIntegerOmega {
         type across multiple contexts.
     </p>
 
+    <div class="code-border">
 <div class="code-title">Object Type <span class="rfloat">Symbols</span></div>
 <div class="code">class(object) ElectricalState {
     property(numeric) voltage;
@@ -207,6 +210,7 @@ class(algebraic) PositiveIntegerOmega {
     property(PositiveIntegerOmega) current;
 }
 </div>
+    </div>
 
     <p>
         <strong>Text types</strong> operate as text with constraints and/or metadata.
@@ -215,6 +219,7 @@ class(algebraic) PositiveIntegerOmega {
         for writing parsers, formatters, or even byte streams.
     </p>
 
+    <div class="code-border">
     <div class="code-title">Text Type <span class="rfloat">Symbols</span></div>
     <div class="code">
 numeric Hundreds,
@@ -234,18 +239,21 @@ class(text) FormattedText {
     property(Color) fontColor;
 }
     </div>
+    </div>
 
     <p>
         A <strong>stream type</strong> is a stateful class that produces values. Streams are the backbone of
         iterators, useful for controlling program flow without defining specific procedures.
     </p>
 
+    <div class="code-border">
     <div class="code-title">Stream Type <span class="rfloat">Symbols</span></div>
     <div class="code">class(stream) FibonacciStream {
         property(numeric, numeric) previous;
         next(numeric);
         rule next = previous.0 + previous.1;
     }
+    </div>
     </div>
 
 

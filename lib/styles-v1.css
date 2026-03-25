@@ -333,7 +333,7 @@ div.code {
     font-size: 1em;
     font-family: "Ubuntu Sans Mono", monospace;
     white-space: pre;
-    margin-bottom: 1em;
+    margin: 0;
 }
 
 .code-title {
@@ -341,11 +341,13 @@ div.code {
     color: white;
     font-size: 1.2em;
     padding: 0.2em 0.5em;
-    margin-top: 1em;
+    margin: 0;
 }
 
-.code .variable {
-
+.code-border {
+    border: 0.1rem solid #373536;
+    padding:0;
+    margin: 1em 0;
 }
 
 /* SPN syntax highlighting — IBM 3278 phosphor terminal */

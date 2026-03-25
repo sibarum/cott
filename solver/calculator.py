@@ -424,8 +424,16 @@ def format_result(expr):
             exp = f'({exp})'
         return f'{base}^{exp}'
     if isinstance(expr, Mul):
+        args = list(expr.args)
+        # -1·X displays as -X
+        if args[0] == S.NegativeOne and len(args) >= 2:
+            rest = Mul(*args[1:]) if len(args) > 2 else args[1]
+            rest_str = format_result(rest)
+            if needs_parens(rest):
+                rest_str = f'({rest_str})'
+            return f'-{rest_str}'
         parts = []
-        for arg in expr.args:
+        for arg in args:
             s = format_result(arg)
             if isinstance(arg, Add):
                 s = f'({s})'
@@ -1294,6 +1302,160 @@ def _eval_ring_exact(decomp):
         exact = traction_simplify(expand(a_val + expand(b_val * g_expr)))
 
     return format_result(exact)
+
+
+def _complex_at_pi2(expr):
+    """Evaluate a traction expression numerically at θ = π/2.
+
+    Maps:  0 → i,  ω → −i,  0^z → e^{izπ/2}  (with ω → 2 in exponents).
+    Returns a Python complex, or None on failure.
+    """
+    import cmath
+
+    expr = traction_simplify(expr)
+
+    if isinstance(expr, (Integer, Rational)):
+        return complex(expr)
+    if isinstance(expr, Zero):
+        return 1j
+    if isinstance(expr, Omega):
+        return -1j
+    if isinstance(expr, Null):
+        return 0.0
+
+    if isinstance(expr, Pow):
+        base, exponent = expr.base, expr.exp
+        if isinstance(base, (Zero, Omega)):
+            sign = 1.0 if isinstance(base, Zero) else -1.0
+            try:
+                exp_num = complex(exponent.subs(Omega(), Integer(2)).evalf())
+            except Exception:
+                return None
+            return cmath.exp(1j * sign * cmath.pi / 2 * exp_num)
+        pb = _complex_at_pi2(base)
+        pe = _complex_at_pi2(exponent)
+        if pb is None or pe is None:
+            return None
+        if pb == 0:
+            return 0.0
+        try:
+            return pb ** pe
+        except Exception:
+            return None
+
+    if isinstance(expr, Mul):
+        result = complex(1)
+        for arg in Mul.make_args(expr):
+            v = _complex_at_pi2(arg)
+            if v is None:
+                return None
+            result *= v
+        return result
+
+    if isinstance(expr, Add):
+        result = complex(0)
+        for arg in Add.make_args(expr):
+            v = _complex_at_pi2(arg)
+            if v is None:
+                return None
+            result += v
+        return result
+
+    try:
+        return complex(expr.evalf())
+    except Exception:
+        return None
+
+
+def _reduce_ring_form(decomp):
+    """
+    Reduce the ring element using s² = 2 (the identity 0 + ω = null)
+    and substitute g = 0^(1/n) to get a simplified traction expression.
+
+    For base_denom = 2 (integer and half-integer exponents), s² = 2
+    makes u = 0^(1/2) a primitive 8th root of unity, collapsing any
+    polynomial in s to at most a constant + linear term.
+
+    Returns a formatted traction string, or None if not applicable.
+    """
+    from fractions import Fraction as Frac
+
+    ring_el = decomp.get('_ring_el')
+    ring_info = decomp.get('_ring_info', {})
+    band = ring_info.get('band', decomp.get('band', 'rational'))
+    base_denom = ring_info.get('base_denom', decomp.get('base_denom', 2))
+
+    if ring_el is None or band != 'rational' or base_denom != 2:
+        return None
+
+    # Reduce polynomial mod s² = 2:
+    # s^(2k)  → 2^k  (constant contribution)
+    # s^(2k+1) → 2^k · s  (linear contribution)
+    def reduce_mod_s2(poly):
+        const = Frac(0)
+        linear = Frac(0)
+        for i, c in enumerate(poly.coeffs):
+            k = i // 2
+            factor = Frac(2) ** k
+            if i % 2 == 0:
+                const += c * factor
+            else:
+                linear += c * factor
+        return const, linear
+
+    a_const, a_linear = reduce_mod_s2(ring_el.a)
+    b_const, b_linear = reduce_mod_s2(ring_el.b)
+
+    # After reduction, the ring form is:
+    #   (a_const + a_linear·s) + (b_const + b_linear·s)·g
+    #
+    # Substitute s = g + g⁻¹, g = 0^(1/2), g⁻¹ = ω^(1/2):
+    #   s·g = (0^(1/2) + ω^(1/2))·0^(1/2) = 0 + 1
+    #
+    # So the four atomic contributions are:
+    #   scalar:    a_const + b_linear  (from b_linear·s·g = b_linear·(0+1))
+    #   0 coeff:   b_linear           (from b_linear·s·g = b_linear·0 + b_linear)
+    #   0^(1/2):   a_linear + b_const
+    #   ω^(1/2):   a_linear
+
+    terms = []
+
+    scalar = a_const + b_linear
+    if scalar != 0:
+        if scalar.denominator == 1:
+            terms.append(Integer(int(scalar)))
+        else:
+            terms.append(Rational(scalar.numerator, scalar.denominator))
+
+    zero_coeff = b_linear
+    if zero_coeff != 0:
+        c = Rational(zero_coeff.numerator, zero_coeff.denominator)
+        terms.append(Mul(c, Zero()) if c != 1 else Zero())
+
+    half_coeff = a_linear + b_const
+    if half_coeff != 0:
+        c = Rational(half_coeff.numerator, half_coeff.denominator)
+        base = Pow(Zero(), Rational(1, 2))
+        terms.append(Mul(c, base) if c != 1 else base)
+
+    omega_half_coeff = a_linear
+    if omega_half_coeff != 0:
+        c = Rational(omega_half_coeff.numerator, omega_half_coeff.denominator)
+        base = Pow(Omega(), Rational(1, 2))
+        terms.append(Mul(c, base) if c != 1 else base)
+
+    if not terms:
+        result_expr = Null()
+    else:
+        result_expr = terms[0]
+        for t in terms[1:]:
+            result_expr = Add(result_expr, t)
+        result_expr = traction_simplify(result_expr)
+
+    result_str = format_result(result_expr)
+    result_complex = _complex_at_pi2(result_expr)
+
+    return result_str, result_complex
 
 
 def _step_label(k, denom):
@@ -2925,6 +3087,9 @@ class CalculatorApp:
             return
 
         decomp = chebyshev_decompose(parsed)
+        # Store parsed expression for θ=π/2 projection
+        decomp['_parsed'] = parsed
+        decomp['_pi2_val'] = _complex_at_pi2(parsed)
         # Ensure complex_val is available for the orbit plot
         if 'complex_val' not in decomp:
             try:
@@ -2958,7 +3123,7 @@ class CalculatorApp:
         tw.insert('end', '\n')
         tw.insert('end', 'Exact Value\n', 'header')
         tw.insert('end', '  computing...\n', 'dim')
-        self._exact_eval_insert_pos = tw.index('end - 2 lines linestart')
+        self._exact_eval_insert_pos = tw.index('end - 1 lines linestart')
         tw.configure(state='disabled')
 
         def compute():
@@ -2987,9 +3152,8 @@ class CalculatorApp:
         # Find and replace the "computing..." line
         try:
             pos = self._exact_eval_insert_pos
-            # Delete from that position to end
+            # Delete the "computing..." line (header is already in place)
             tw.delete(pos, 'end')
-            tw.insert('end', 'Exact Value\n', 'header')
             if isinstance(result, str) and result.startswith('Error'):
                 tw.insert('end', f'  {result}\n', 'dim')
             else:
@@ -3223,6 +3387,18 @@ class CalculatorApp:
                 elif not wedge_a.is_constant():
                     tw.insert('end', f'    sin(\u03b8) = {_fmt_poly(wedge_a)} / \u221a({_fmt_poly(p_norm)}\u00b7{_fmt_poly(ref_a_norm)})\n', 'value')
 
+            # Reduced Form: substitute s² = 2 and simplify
+            reduced_result = _reduce_ring_form(decomp)
+            if reduced_result is not None:
+                reduced_str, reduced_cval = reduced_result
+                decomp['_reduced_str'] = reduced_str
+                decomp['_reduced_complex'] = reduced_cval
+                if reduced_str != traction_str:
+                    tw.insert('end', '\n')
+                    tw.insert('end', 'Reduced Form\n', 'header')
+                    tw.insert('end', '  0 + \u03c9 = \u2205,  s\u00b2 = 2\n', 'dim')
+                    tw.insert('end', f'  {reduced_str}\n', 'value')
+
             return
 
         # --- Single zero-power form (legacy path) ---
@@ -3349,10 +3525,11 @@ class CalculatorApp:
         return None, None
 
     def _draw_cheb_orbit(self, ax, decomp):
-        """Draw the complex plane (Sheet 0 / omega-band).
-        Re = horizontal, Im = vertical.
-        Cardinal points: 1 (right), i=0^(ω/2) (top), -1=0^ω (left), -i (bottom).
-        Rational-band elements live on other sheets — shown as 'different sheet'."""
+        """Draw the traction plane at θ = π/2.
+
+        Axes: Re = horizontal, Im = vertical.
+        Cardinal points: 1 (right), 0 (top), -1 (left), -0 (bottom).
+        Plots both the exact value and reduced form on the unit circle."""
         ax.clear()
         ax.set_facecolor('#1a1a2e')
         ax.set_aspect('equal')
@@ -3364,12 +3541,12 @@ class CalculatorApp:
         circ_t = np.linspace(0, 2 * np.pi, 200)
         ax.plot(np.cos(circ_t), np.sin(circ_t), color='#333344', linewidth=0.8)
 
-        # Cardinal reference points
+        # Cardinal reference points: 1 (right), -1 (left), 0 (top), -0 (bottom)
         refs = [
             (1, 0, '1', '#ffffff'),
-            (-1, 0, '-1', '#ff8888'),
-            (0, 1, 'i', '#88ff88'),
-            (0, -1, '-i', '#88ff88'),
+            (-1, 0, '\u22121', '#ff8888'),
+            (0, 1, '0', '#88ff88'),
+            (0, -1, '\u22120', '#88ff88'),
         ]
         for rx, ry, rlabel, rcolor in refs:
             ax.plot(rx, ry, 'o', color=rcolor, markersize=4, zorder=4, alpha=0.5)
@@ -3378,12 +3555,7 @@ class CalculatorApp:
             ax.annotate(rlabel, (rx, ry), textcoords='offset points',
                         xytext=(ox, oy), fontsize=9, color=rcolor, alpha=0.7)
 
-        # Title reflects which sheet we're on
-        band = decomp.get('band', '') if decomp else ''
-        if band == 'omega':
-            ax.set_title('Sheet 0 (\u03c9-band)', fontsize=11, color='#eeeeee')
-        else:
-            ax.set_title('Complex Plane', fontsize=11, color='#eeeeee')
+        ax.set_title('Traction Plane  (\u03b8 = \u03c0/2)', fontsize=11, color='#eeeeee')
 
         if decomp is None:
             ax.set_xlim(-1.5, 1.5)
@@ -3391,25 +3563,40 @@ class CalculatorApp:
             return
 
         traction_str = decomp.get('traction_str', '')
-        val = decomp.get('complex_val')
+        max_r = 1.0  # track extent for axis limits
 
-        if val is not None and np.isfinite(val):
-            ax.plot(val.real, val.imag, 'o', color='#00ccff', markersize=10, zorder=5,
+        # --- Plot the exact value (original expression at θ = π/2) ---
+        exact_val = decomp.get('_pi2_val')
+        if exact_val is not None and np.isfinite(exact_val):
+            ax.plot(exact_val.real, exact_val.imag, 'o', color='#00ccff',
+                    markersize=10, zorder=5,
                     markeredgecolor='white', markeredgewidth=1.5)
-            label = traction_str if len(traction_str) < 20 else traction_str[:17] + '...'
-            ax.annotate(label, (val.real, val.imag),
+            label = traction_str if len(traction_str) < 20 else traction_str[:17] + '\u2026'
+            ax.annotate(label, (exact_val.real, exact_val.imag),
                         textcoords='offset points', xytext=(8, 8),
                         fontsize=10, color='#00ccff')
-            margin = max(abs(val.real), abs(val.imag), 1.0) * 1.3
-            lim = max(1.5, margin)
-            ax.set_xlim(-lim, lim)
-            ax.set_ylim(-lim, lim)
-        else:
-            ax.set_xlim(-1.5, 1.5)
-            ax.set_ylim(-1.5, 1.5)
-            if band == 'rational':
-                ax.text(0, 0, 'different\nsheet', fontsize=11, color='#555566',
-                        ha='center', va='center', style='italic')
+            max_r = max(max_r, abs(exact_val.real), abs(exact_val.imag))
+
+        # --- Plot the reduced form (if different label) ---
+        reduced_str = decomp.get('_reduced_str')
+        reduced_val = decomp.get('_reduced_complex')
+        if (reduced_str is not None and reduced_str != traction_str
+                and reduced_val is not None and np.isfinite(reduced_val)):
+            # Offset slightly if the two points coincide
+            dx, dy = 0, 0
+            if exact_val is not None and abs(reduced_val - exact_val) < 0.01:
+                dy = -0.08  # nudge the marker down a touch
+            ax.plot(reduced_val.real + dx, reduced_val.imag + dy, 's',
+                    color='#ffcc00', markersize=8, zorder=6,
+                    markeredgecolor='white', markeredgewidth=1.0)
+            ax.annotate(reduced_str, (reduced_val.real + dx, reduced_val.imag + dy),
+                        textcoords='offset points', xytext=(8, -14),
+                        fontsize=9, color='#ffcc00')
+            max_r = max(max_r, abs(reduced_val.real), abs(reduced_val.imag))
+
+        lim = max(1.5, max_r * 1.3)
+        ax.set_xlim(-lim, lim)
+        ax.set_ylim(-lim, lim)
 
     def _on_viz_hover(self, event):
         """Draw gauge readouts for the hovered pixel."""

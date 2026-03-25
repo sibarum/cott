@@ -86,7 +86,7 @@ class Zero(Expr):
             return S.One
         if exp == S.One:
             return Zero()
-        if isinstance(exp, Integer) and exp.is_negative:
+        if isinstance(exp, (Integer, Rational)) and exp.is_negative:
             return Pow(Omega(), -exp)
         if isinstance(exp, Omega):
             return S.NegativeOne
@@ -152,7 +152,7 @@ class Omega(Expr):
             return S.One
         if exp == S.One:
             return Omega()
-        if isinstance(exp, Integer) and exp.is_negative:
+        if isinstance(exp, (Integer, Rational)) and exp.is_negative:
             return Pow(Zero(), -exp)
         if isinstance(exp, Omega):
             return S.NegativeOne
@@ -538,19 +538,6 @@ def _simplify_mul(expr):
             zero_exp -= a.exp
         else:
             others.append(a)
-
-    # -0 = 0: zero-class elements absorb sign.
-    # Negative zero cannot exist — 0-0 = null (erasure), so -0 reverts to 0.
-    # Only applies when we KNOW the element is zero-class (bare Zero or
-    # positive integer power of Zero), not for symbolic exponents like 0^x
-    # which might be omega-class.
-    if has_definite_zero:
-        new_others = []
-        for a in others:
-            if isinstance(a, Number) and a.is_negative:
-                a = -a  # absorb sign: |-n| * 0 = n * 0
-            new_others.append(a)
-        others = new_others
 
     # Reconstruct: 0^zero_exp (triggers _eval_power for known cases)
     if zero_exp != S.Zero:

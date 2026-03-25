@@ -396,27 +396,26 @@ class TestUniversalPowerOfPower:
 
 class TestNegativeZero:
 
-    def test_neg_one_times_zero_absorbs(self):
-        """(-1)*0 = 0 — zero-class absorbs sign."""
+    def test_neg_one_times_zero_preserved(self):
+        """(-1)*0 = -0 — sign is preserved (no absorption)."""
         result = traction_simplify(S.NegativeOne * z)
-        assert isinstance(result, Zero)
+        assert result == Mul(S.NegativeOne, Zero())
 
-    def test_neg_times_zero_squared(self):
-        """(-1)*0^2 = 0^2 — sign absorbed by definite zero-class."""
+    def test_neg_times_zero_squared_preserved(self):
+        """(-1)*0^2 = -0^2 — sign is preserved."""
         result = traction_simplify(S.NegativeOne * z**2)
-        assert result == z**2
+        assert result == Mul(S.NegativeOne, z**2)
 
     def test_neg_times_zero_symbolic_preserved(self):
-        """(-1)*0^x stays as -0^x — can't absorb sign for symbolic exponent."""
+        """(-1)*0^x stays as -0^x."""
         x = Symbol('x')
         result = traction_simplify(Mul(S.NegativeOne, Pow(z, x)))
-        # Should NOT absorb sign since x might be negative (omega-class)
         assert result == Mul(S.NegativeOne, Pow(z, x))
 
-    def test_neg_two_times_zero(self):
-        """(-2)*0 = 2*0 — numeric sign absorbed."""
+    def test_neg_two_times_zero_preserved(self):
+        """(-2)*0 = -2*0 — sign is preserved."""
         result = traction_simplify(Integer(-2) * z)
-        assert result == 2 * z
+        assert result == Integer(-2) * z
 
 
 # ============================================================
@@ -660,13 +659,12 @@ class TestQSurfaceDecomposition:
         assert mag == Integer(4)
 
     def test_zero_pow_omega_plus_5(self, qs):
-        """0^(w+5) now distributes via traction_simplify:
-        0^(w+5) = 0^w * 0^5 = (-1) * 0^5 = 0^5 (sign absorption).
-        So _recursive_decompose sees 0^5: phase=5, magnitude=0."""
+        """0^(w+5) = 0^w * 0^5 = (-1) * 0^5 = -0^5.
+        Without sign absorption, -0^5 is a distinct expression.
+        Q-surface sees the Mul(-1, 0^5) as scalar-like."""
         expr = z**(w + 5)
         phase, mag = qs._recursive_decompose(expr)
-        assert phase == Integer(5)
-        assert mag == S.Zero
+        assert phase == S.One
 
     # === Primitives: (phase, magnitude) convention ===
 
@@ -857,9 +855,9 @@ class TestExponentDistribution:
         self._assert_cross_verified(expr, Rational(5, 4))
 
     def test_zero_pow_omega_plus_3(self):
-        """0^(w + 3) = 0^w * 0^3 = (-1) * 0^3 = 0^3 (sign absorption)."""
+        """0^(w + 3) = 0^w * 0^3 = (-1) * 0^3 = -0^3 (no sign absorption)."""
         expr = Zero()**(w + 3)
-        self._assert_cross_verified(expr, Pow(Zero(), 3))
+        self._assert_cross_verified(expr, Mul(S.NegativeOne, Pow(Zero(), 3)))
 
     def test_zero_pow_omega_plus_omega(self):
         """0^(w + w) = 0^(2w) = (0^w)^2 = (-1)^2 = 1.
@@ -880,11 +878,11 @@ class TestExponentDistribution:
         self._assert_cross_verified(expr, Integer(6))
 
     def test_zero_pow_mixed_sum(self):
-        """0^(1 + w) = 0^1 * 0^w = 0 * (-1) = -0 = 0 (sign absorption)."""
+        """0^(1 + w) = 0^1 * 0^w = 0 * (-1) = -0 (no sign absorption)."""
         expr = Zero()**(Integer(1) + w)
         simplified = traction_simplify(expr)
-        # Should be Zero (bare traction zero, since 0^1 = 0 and -0 = 0)
-        assert isinstance(simplified, Zero), f"Expected Zero, got {simplified}"
+        # -0 = Mul(-1, Zero())
+        assert simplified == Mul(S.NegativeOne, Zero()), f"Expected -0, got {simplified}"
 
     def test_zero_pow_rational_sum(self):
         """0^(1/2 + 1/2) = 0^1 = 0."""
