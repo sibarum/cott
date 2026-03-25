@@ -162,7 +162,8 @@ class Parser:
             self.consume()
             return w
 
-        # Variables: p (horizontal), q (vertical), x (projection native unit)
+        # Variables: p (horizontal), q (vertical), x (projection native unit),
+        # c (fractal pixel coordinate)
         if ch == 'p':
             self.consume()
             return Symbol('p')
@@ -172,6 +173,9 @@ class Parser:
         if ch == 'x':
             self.consume()
             return Symbol('x')
+        if ch == 'c':
+            self.consume()
+            return Symbol('c')
         # Legacy: y still works as alias for q
         if ch == 'y':
             self.consume()
@@ -1947,6 +1951,159 @@ def continuity_to_rgb(phase_grid, log_mag):
 
 
 # ============================================================
+# Fractal Computation
+# ============================================================
+
+def compute_fractal(iter_func, grid_res, bounds, escape=2.0, max_iter=100,
+                    cancel_event=None):
+    """Compute an escape-time fractal on a complex grid.
+
+    iter_func(x, c) -> next_x : vectorised numpy function for one iteration.
+    c is the pixel coordinate.  x starts at i (traction zero at θ=π/2).
+
+    Returns (counts, last_z, c_grid) where
+      counts[r,c] = iteration at which |x| > escape (0 means did not escape)
+      last_z[r,c] = value of x at escape (or at max_iter if it didn't)
+      c_grid[r,c] = the c value for that pixel.
+    """
+    lin = np.linspace(-bounds, bounds, grid_res)
+    AA, BB = np.meshgrid(lin, lin[::-1])
+    c_grid = AA + 1j * BB
+
+    # x starts at traction zero = i at θ=π/2
+    z = np.full_like(c_grid, 1j, dtype=complex)
+    counts = np.zeros(c_grid.shape, dtype=int)  # 0 = did not escape
+    last_z = np.zeros_like(c_grid, dtype=complex)
+    mask = np.ones(c_grid.shape, dtype=bool)     # still iterating
+
+    for n in range(1, max_iter + 1):
+        if cancel_event is not None and cancel_event.is_set():
+            return None
+        try:
+            z[mask] = iter_func(z[mask], c_grid[mask])
+        except Exception:
+            break
+        # Clamp to avoid overflow in subsequent iterations
+        bad = ~np.isfinite(z)
+        z[bad] = escape + 1
+        escaped = mask & (np.abs(z) > escape)
+        counts[escaped] = n
+        last_z[escaped] = z[escaped]
+        mask &= ~escaped
+        if not mask.any():
+            break
+
+    # For pixels that didn't escape, record last z
+    last_z[mask] = z[mask]
+    return counts, last_z, c_grid
+
+
+def fractal_to_rgb(counts, last_z, max_iter, escape=2.0):
+    """Colour an escape-time fractal.
+
+    Escaped pixels: smooth HSV colouring based on iteration count.
+    Interior pixels (didn't escape): black.
+    """
+    escaped = counts > 0
+    rgb = np.zeros(counts.shape + (3,), dtype=np.uint8)
+
+    if not escaped.any():
+        return rgb
+
+    # Smooth iteration count for anti-banding
+    abs_z = np.abs(last_z[escaped])
+    abs_z = np.maximum(abs_z, 1e-30)
+    smooth = counts[escaped] + 1 - np.log2(np.log2(abs_z + 1e-30))
+    smooth = np.maximum(smooth, 0)
+
+    # Map to hue cycle (repeats every ~32 iterations for visual variety)
+    t = smooth / 32.0
+    # HSV → RGB with S=0.85, V=1
+    hue = (t % 1.0) * 6.0
+    sector = hue.astype(int) % 6
+    frac = hue - sector
+
+    # Build RGB from HSV sector
+    v = np.ones_like(frac)
+    s = np.full_like(frac, 0.85)
+    p = v * (1 - s)
+    q = v * (1 - s * frac)
+    tt = v * (1 - s * (1 - frac))
+
+    r = np.where(sector == 0, v, np.where(sector == 1, q, np.where(
+        sector == 2, p, np.where(sector == 3, p, np.where(sector == 4, tt, v)))))
+    g = np.where(sector == 0, tt, np.where(sector == 1, v, np.where(
+        sector == 2, v, np.where(sector == 3, q, np.where(sector == 4, p, p)))))
+    b = np.where(sector == 0, p, np.where(sector == 1, p, np.where(
+        sector == 2, tt, np.where(sector == 3, v, np.where(sector == 4, v, q)))))
+
+    rgb[escaped, 0] = (r * 255).astype(np.uint8)
+    rgb[escaped, 1] = (g * 255).astype(np.uint8)
+    rgb[escaped, 2] = (b * 255).astype(np.uint8)
+
+    return rgb
+
+
+def _parse_fractal_args(text):
+    """Parse 'fractal(expr[, escape, maxRecursion])' from raw input text.
+
+    Returns (expr_str, escape, max_iter) or raises ValueError with help message.
+    """
+    text = text.strip()
+    if not text.startswith('fractal(') or not text.endswith(')'):
+        raise ValueError(
+            "Usage: fractal(expr[, escape, maxIter])\n"
+            "  expr:    iteration body\n"
+            "           c = pixel coordinate (or use p, q)\n"
+            "           x = accumulator, starts at 0 (traction)\n"
+            "           0 and \u03c9 project to i and \u2212i\n"
+            "  escape:  escape radius (default 2)\n"
+            "  maxIter: max iterations (default 100)\n\n"
+            "Examples:\n"
+            "  fractal(c + x^2)          — Mandelbrot (x\u2080 = 0 = i)\n"
+            "  fractal(c + x^2, 4, 200)  — higher escape & iterations\n"
+            "  fractal(p + q*0 + x^2)    — same, using p/q coordinates\n"
+            "  fractal(c*x - x^3 + c)    — custom formula")
+
+    inner = text[len('fractal('):-1].strip()
+    if not inner:
+        raise ValueError("fractal() requires an expression argument")
+
+    # Split on top-level commas (respecting parentheses)
+    parts = []
+    depth = 0
+    current = []
+    for ch in inner:
+        if ch == '(':
+            depth += 1
+        elif ch == ')':
+            depth -= 1
+        elif ch == ',' and depth == 0:
+            parts.append(''.join(current).strip())
+            current = []
+            continue
+        current.append(ch)
+    parts.append(''.join(current).strip())
+
+    expr_str = parts[0]
+    escape = 2.0
+    max_iter = 100
+
+    if len(parts) > 1:
+        try:
+            escape = float(parts[1])
+        except ValueError:
+            raise ValueError(f"Invalid escape radius: {parts[1]}")
+    if len(parts) > 2:
+        try:
+            max_iter = int(parts[2])
+        except ValueError:
+            raise ValueError(f"Invalid maxIter: {parts[2]}")
+
+    return expr_str, escape, max_iter
+
+
+# ============================================================
 # Gradient Streamlines
 # ============================================================
 
@@ -2494,6 +2651,15 @@ class CalculatorApp:
         expr_text = self.entry_var.get().strip()
         if not expr_text:
             return
+
+        # Fractal mode: fractal(expr[, escape, maxIter])
+        if expr_text.lower().startswith('fractal'):
+            try:
+                self._handle_fractal(expr_text)
+            except (ValueError, Exception) as e:
+                self._set_result_text(str(e), fg='#aa3333')
+            return
+
         try:
             result = parse_and_eval(expr_text)
             display_text = self._format_display_result(result)
@@ -2508,6 +2674,134 @@ class CalculatorApp:
 
         except (ParseError, Exception) as e:
             self._set_result_text(f'Error: {e}', fg='#aa3333')
+
+    # ===== Fractal Rendering =====
+
+    def _handle_fractal(self, text):
+        """Parse a fractal(...) command and launch background computation.
+
+        x starts at traction zero (= i at θ=π/2). The expression is projected
+        to complex via Zero→i, Omega→-i before compilation.
+        Supports both 'c' and 'p'/'q' for the pixel coordinate.
+        """
+        import threading
+        from sympy import Symbol, lambdify, I as symI
+
+        expr_str, escape, max_iter = _parse_fractal_args(text)
+
+        # Parse the inner expression
+        c_sym = Symbol('c')
+        x_sym = Symbol('x')
+        p_sym = Symbol('p')
+        q_sym = Symbol('q')
+        try:
+            parsed = Parser(expr_str).parse()
+        except Exception as e:
+            raise ValueError(f'Parse error in fractal expression: {e}')
+
+        # Support p/q as alternative to c: replace p + q·i → c
+        if parsed.has(p_sym) or parsed.has(q_sym):
+            parsed = parsed.subs(p_sym, (c_sym + c_sym.conjugate()) / 2)  # nah, just direct
+            # Simpler: p = Re(c), q = Im(c), so substitute p→Re(c), q→Im(c)
+            # But for lambdify it's easier: substitute at the numpy level
+            # Let's just replace p → c_real, q → c_imag via a wrapper
+            pass  # handled below in the wrapper
+
+        # Project traction types to θ=π/2: Zero→i, Omega→-i, Null→0
+        projected = parsed.subs(Zero(), symI).subs(Omega(), -symI).subs(Null(), 0)
+
+        # Determine which variables the expression uses
+        has_c = projected.has(c_sym)
+        has_pq = projected.has(p_sym) or projected.has(q_sym)
+
+        if has_pq:
+            # Replace p→Re(c), q→Im(c) by lambdifying with p,q then wrapping
+            from sympy import re as sym_re, im as sym_im
+            projected_pq = projected.subs(p_sym, sym_re(c_sym)).subs(q_sym, sym_im(c_sym))
+            try:
+                f_raw = lambdify((x_sym, c_sym), projected_pq, modules='numpy')
+            except Exception as e:
+                raise ValueError(f'Cannot compile fractal expression: {e}')
+        elif has_c:
+            try:
+                f_raw = lambdify((x_sym, c_sym), projected, modules='numpy')
+            except Exception as e:
+                raise ValueError(f'Cannot compile fractal expression: {e}')
+        else:
+            raise ValueError(
+                'Fractal expression must use c (pixel coordinate) '
+                'or p/q (real/imaginary parts)')
+
+        # Quick smoke test
+        try:
+            f_raw(np.array([1j]), np.array([0.1 + 0.1j]))
+        except Exception as e:
+            raise ValueError(f'Cannot evaluate fractal expression: {e}')
+
+        # Store raw text for re-render on zoom
+        self._fractal_raw_text = text
+
+        self._set_result_text(
+            f'fractal: {expr_str}  (esc={escape}, n={max_iter})', fg=FG_DIM)
+
+        # Switch to Plot tab
+        if self._active_tab != 'Plot':
+            self._select_tab('Plot')
+
+        # Cancel any previous fractal computation
+        if hasattr(self, '_fractal_cancel'):
+            self._fractal_cancel.set()
+
+        cancel = threading.Event()
+        self._fractal_cancel = cancel
+
+        # Store fractal metadata for hover (don't clear old data yet)
+        self._fractal_mode = True
+        self._fractal_escape = escape
+        self._fractal_max_iter = max_iter
+        self._fractal_expr_str = expr_str
+
+        self.viz_title_label.configure(
+            text=f'Fractal [{expr_str}]  computing\u2026')
+
+        def compute():
+            result = compute_fractal(
+                f_raw, GRID_RES, self.viz_bounds,
+                escape=escape, max_iter=max_iter,
+                cancel_event=cancel)
+            if cancel.is_set() or result is None:
+                return
+            self.root.after(0, lambda: self._finish_fractal(result, cancel))
+
+        t = threading.Thread(target=compute, daemon=True)
+        t.start()
+
+    def _finish_fractal(self, result, cancel):
+        """Display a completed fractal computation."""
+        if cancel.is_set():
+            return
+
+        counts, last_z, c_grid = result
+        self._fractal_counts = counts
+        self._fractal_last_z = last_z
+        self._fractal_c_grid = c_grid
+
+        # Store a dummy viz_Z so hover works (using last_z for coordinate mapping)
+        self.viz_Z = last_z
+        self.viz_log_mag = None
+
+        escape = self._fractal_escape
+        max_iter = self._fractal_max_iter
+        expr_str = self._fractal_expr_str
+
+        rgb = fractal_to_rgb(counts, last_z, max_iter, escape)
+        self._render_viz(rgb)
+
+        escaped_pct = np.count_nonzero(counts) / counts.size * 100
+        self.viz_title_label.configure(
+            text=f'Fractal [{expr_str}]  ({escaped_pct:.0f}% escaped)')
+        self._set_result_text(
+            f'fractal: {expr_str}  (esc={escape}, n={max_iter})', fg=FG_RESULT)
 
     def _on_entry_change(self):
         """Live preview: evaluate as you type."""
@@ -2529,6 +2823,7 @@ class CalculatorApp:
 
     def _refresh_viz(self):
         """Compute and render the phase plot for the current expression."""
+        self._fractal_mode = False  # Clear fractal mode for normal plots
         expr_text = self.entry_var.get().strip()
         if not expr_text:
             self.viz_canvas.delete('all')
@@ -3656,6 +3951,11 @@ class CalculatorApp:
         p_val = -bounds + (col / w) * 2 * bounds
         q_val = bounds - (row / h) * 2 * bounds
 
+        # Fractal mode: show iteration count and last z
+        if getattr(self, '_fractal_mode', False) and self._fractal_counts is not None:
+            self._draw_fractal_gauge(row, col, p_val, q_val)
+            return
+
         z = self.viz_Z[row, col]
         if not np.isfinite(z):
             self._draw_overflow_gauge(p_val, q_val, z)
@@ -3668,6 +3968,49 @@ class CalculatorApp:
 
     def _on_viz_leave(self, event):
         self._clear_gauges()
+
+    def _draw_fractal_gauge(self, row, col, p_val, q_val):
+        """Draw hover info for fractal mode: coordinates, iteration count, last value."""
+        gc = self.gauge_canvas
+        gc.delete('all')
+
+        counts = self._fractal_counts
+        last_z = self._fractal_last_z
+        max_iter = self._fractal_max_iter
+
+        n = int(counts[row, col])
+        zv = last_z[row, col]
+
+        label_font = tkfont.Font(family='Consolas', size=9)
+        small_font = tkfont.Font(family='Consolas', size=8)
+
+        y = 8
+        # Pixel coordinate (traction labels: imaginary axis = 0/-0)
+        q_sign = '+' if q_val >= 0 else '\u2212'
+        q_abs = abs(q_val)
+        gc.create_text(8, y, text=f'c = {p_val:+.4f} {q_sign} {q_abs:.4f}\u00b70',
+                        font=label_font, fill='#cccccc', anchor='nw')
+        y += 16
+
+        # Iteration count
+        if n == 0:
+            gc.create_text(8, y, text=f'iter: {max_iter} (bounded)',
+                            font=label_font, fill='#88ff88', anchor='nw')
+        else:
+            gc.create_text(8, y, text=f'iter: {n} (escaped)',
+                            font=label_font, fill='#ffaa44', anchor='nw')
+        y += 16
+
+        # Last z value
+        if np.isfinite(zv):
+            gc.create_text(8, y, text=f'last x = {zv.real:+.4f}{zv.imag:+.4f}i',
+                            font=small_font, fill='#999999', anchor='nw')
+            y += 14
+            gc.create_text(8, y, text=f'|x| = {abs(zv):.4f}',
+                            font=small_font, fill='#999999', anchor='nw')
+        else:
+            gc.create_text(8, y, text=f'last x = overflow',
+                            font=small_font, fill='#ff4444', anchor='nw')
 
     def _clear_gauges(self):
         self.gauge_canvas.delete('all')
@@ -3816,15 +4159,25 @@ class CalculatorApp:
 
     def _zoom_in(self):
         self.viz_bounds = max(0.25, self.viz_bounds / 2)
-        self._refresh_viz()
+        self._refresh_viz_or_fractal()
 
     def _zoom_out(self):
         self.viz_bounds = min(100, self.viz_bounds * 2)
-        self._refresh_viz()
+        self._refresh_viz_or_fractal()
 
     def _zoom_reset(self):
         self.viz_bounds = DEFAULT_BOUNDS
-        self._refresh_viz()
+        self._refresh_viz_or_fractal()
+
+    def _refresh_viz_or_fractal(self):
+        """Re-render: if in fractal mode re-launch the fractal, else normal plot."""
+        if getattr(self, '_fractal_mode', False) and hasattr(self, '_fractal_raw_text'):
+            try:
+                self._handle_fractal(self._fractal_raw_text)
+            except Exception:
+                self._refresh_viz()
+        else:
+            self._refresh_viz()
 
 
 def _nice_tick_step(bounds):
