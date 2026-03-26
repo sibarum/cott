@@ -1959,7 +1959,9 @@ def compute_fractal(iter_func, grid_res, bounds, escape=2.0, max_iter=100,
     """Compute an escape-time fractal on a complex grid.
 
     iter_func(x, c) -> next_x : vectorised numpy function for one iteration.
-    c is the pixel coordinate.  x starts at i (traction zero at θ=π/2).
+    c is the pixel coordinate.  x starts at traction zero (0), which
+    projects to e^{iπ/2} for the numeric computation.  The iteration
+    is algebraically identical to traction arithmetic at θ=π/2.
 
     Returns (counts, last_z, c_grid) where
       counts[r,c] = iteration at which |x| > escape (0 means did not escape)
@@ -1970,7 +1972,9 @@ def compute_fractal(iter_func, grid_res, bounds, escape=2.0, max_iter=100,
     AA, BB = np.meshgrid(lin, lin[::-1])
     c_grid = AA + 1j * BB
 
-    # x starts at traction zero = i at θ=π/2
+    # x starts at traction zero (0).  Under the θ=π/2 projection this
+    # is e^{iπ/2} = 1j.  Note: 0 ≠ i = 0^(ω/2) — they are distinct
+    # traction elements that share 0² = i² = −1.
     z = np.full_like(c_grid, 1j, dtype=complex)
     counts = np.zeros(c_grid.shape, dtype=int)  # 0 = did not escape
     last_z = np.zeros_like(c_grid, dtype=complex)
@@ -2055,12 +2059,13 @@ def _parse_fractal_args(text):
             "Usage: fractal(expr[, escape, maxIter])\n"
             "  expr:    iteration body\n"
             "           c = pixel coordinate (or use p, q)\n"
-            "           x = accumulator, starts at 0 (traction)\n"
-            "           0 and \u03c9 project to i and \u2212i\n"
+            "           x = accumulator, starts at traction 0\n"
+            "               (note: 0 \u2260 i. 0\u00b2 = i\u00b2 = \u22121,\n"
+            "                but i = 0^(\u03c9/2), a different element)\n"
             "  escape:  escape radius (default 2)\n"
             "  maxIter: max iterations (default 100)\n\n"
             "Examples:\n"
-            "  fractal(c + x^2)          — Mandelbrot (x\u2080 = 0 = i)\n"
+            "  fractal(c + x^2)          — traction Mandelbrot (x\u2080 = 0)\n"
             "  fractal(c + x^2, 4, 200)  — higher escape & iterations\n"
             "  fractal(p + q*0 + x^2)    — same, using p/q coordinates\n"
             "  fractal(c*x - x^3 + c)    — custom formula")
@@ -2292,7 +2297,7 @@ class CalculatorApp:
         self._tab_buttons = {}
         self._active_tab = None
 
-        for tab_name in ['Plot', 'Explain', 'Phase Map', TOWER]:
+        for tab_name in ['Plot', 'Explain', 'Phase Map', TOWER, 'Help']:
             btn = tk.Button(
                 tab_bar, text=tab_name, font=self.font_label,
                 bd=0, padx=16, pady=3, bg=BG_FRAME, fg=FG_TEXT,
@@ -2532,8 +2537,229 @@ class CalculatorApp:
 
         self._tower_sphere_size = SPHERE_SIZE
 
+        # ===== Help tab =====
+        self._build_help_tab()
+
         # Show Plot tab by default
         self._select_tab('Plot')
+
+    # ===== Help Tab =====
+
+    def _build_help_tab(self):
+        """Build the Help tab with interactive example buttons."""
+        HELP_BG = '#0d0d1a'  # dark background for readability
+
+        help_frame = tk.Frame(self._tab_container, bg=HELP_BG, bd=1, relief='solid')
+        self._tab_frames['Help'] = help_frame
+
+        # Scrollable area using Canvas + Frame with fixed minimum size
+        help_canvas = tk.Canvas(help_frame, bg=HELP_BG, highlightthickness=0, bd=0,
+                                width=760, height=520)
+        help_scrollbar = tk.Scrollbar(help_frame, orient='vertical', command=help_canvas.yview)
+        help_inner = tk.Frame(help_canvas, bg=HELP_BG)
+
+        help_inner.bind('<Configure>', lambda e: help_canvas.configure(scrollregion=help_canvas.bbox('all')))
+        self._help_window_id = help_canvas.create_window((0, 0), window=help_inner, anchor='nw')
+        help_canvas.configure(yscrollcommand=help_scrollbar.set)
+
+        # Keep inner frame as wide as the canvas
+        def _sync_inner_width(event):
+            help_canvas.itemconfigure(self._help_window_id, width=event.width)
+        help_canvas.bind('<Configure>', _sync_inner_width)
+
+        help_scrollbar.pack(side='right', fill='y')
+        help_canvas.pack(side='left', fill='both', expand=True)
+
+        # Enable mousewheel scrolling
+        def _on_mousewheel(event):
+            help_canvas.yview_scroll(int(-1 * (event.delta / 120)), 'units')
+        help_canvas.bind_all('<MouseWheel>', _on_mousewheel)
+        # Unbind when leaving Help tab to avoid conflicts
+        self._help_canvas = help_canvas
+        self._help_mousewheel_handler = _on_mousewheel
+
+        font_section = tkfont.Font(family='Segoe UI', size=13, weight='bold')
+        font_desc = tkfont.Font(family='Consolas', size=10)
+        font_example = tkfont.Font(family='Consolas', size=11, weight='bold')
+
+        def add_section(title, description, examples):
+            """Add a section with header, description, and example buttons."""
+            tk.Label(help_inner, text=title, font=font_section,
+                     bg=HELP_BG, fg='#ffdd33', anchor='w').pack(
+                fill='x', padx=16, pady=(14, 2))
+            if description:
+                tk.Label(help_inner, text=description, font=font_desc,
+                         bg=HELP_BG, fg='#aabbcc', anchor='w', justify='left',
+                         wraplength=700).pack(fill='x', padx=20, pady=(0, 6))
+            for expr, hint, tab in examples:
+                row = tk.Frame(help_inner, bg=HELP_BG)
+                row.pack(fill='x', padx=20, pady=2)
+                btn = tk.Button(
+                    row, text=expr, font=font_example,
+                    bg='#161630', fg='#88ccff', activebackground='#2a3a5a',
+                    activeforeground='#aaddff', bd=1, relief='solid',
+                    padx=10, pady=3, anchor='w', cursor='hand2',
+                    command=lambda e=expr, t=tab: self._run_example(e, t)
+                )
+                btn.pack(side='left')
+                btn.bind('<Enter>', lambda ev, b=btn: b.configure(bg='#2a3a5a'))
+                btn.bind('<Leave>', lambda ev, b=btn: b.configure(bg='#161630'))
+                if hint:
+                    tk.Label(row, text=hint, font=font_desc,
+                             bg=HELP_BG, fg='#8899bb', anchor='w').pack(
+                        side='left', padx=(10, 0))
+
+        # ---- Welcome ----
+        tk.Label(help_inner, text='Welcome to the COTT Calculator',
+                 font=tkfont.Font(family='Segoe UI', size=16, weight='bold'),
+                 bg=HELP_BG, fg='#ffffff').pack(padx=16, pady=(14, 2), anchor='w')
+        tk.Label(help_inner, font=font_desc, bg=HELP_BG, fg='#aabbcc',
+                 anchor='w', justify='left', wraplength=700,
+                 text='Click any example below to load it into the calculator and see the result. '
+                      'Each example switches to the relevant tab automatically.').pack(
+            fill='x', padx=20, pady=(0, 6))
+
+        # ---- Foundations ----
+        add_section('\u2460  Traction Foundations',
+                    'In traction algebra, 0 and \u03c9 are not ordinary numbers. '
+                    '0\u00b2 = \u22121, \u03c9\u00b2 = 0, and 0\u00b7\u03c9 = 1. '
+                    'These identities replace imaginary numbers with pure algebra.',
+                    [
+                        ('0^2',           '0 squared = \u22121',                  'Explain'),
+                        ('\u03c9^2',      '\u03c9 squared = 0',                   'Explain'),
+                        ('0 * \u03c9',    'zero times omega = 1',                 'Explain'),
+                        ('0^(1/2)',       'square root of traction zero',          'Explain'),
+                        ('0^(\u03c9/2)', 'the imaginary unit i, algebraically',   'Explain'),
+                        ('0^0',           'any base to its own zero = 1',         'Explain'),
+                    ])
+
+        # ---- Arithmetic ----
+        add_section('\u2461  Arithmetic & Algebra',
+                    'Standard operations work, but division by zero produces \u03c9-scaled '
+                    'results instead of errors. Subtraction to zero yields null (\u2205).',
+                    [
+                        ('3 / 0',                     'division by zero \u2192 3\u00b7\u03c9',      'Plot'),
+                        ('5 - 5',                     'self-cancellation \u2192 null',               'Plot'),
+                        ('solve(x^2 + 1)',            'x\u00b2 = \u22121 has traction solutions',   'Plot'),
+                        ('solve(x^2 - 4, x)',         'standard quadratic roots',                    'Plot'),
+                        ('expand((x + 1)^3)',         'polynomial expansion',                        'Plot'),
+                        ('factor(x^3 - x)',           'pulls out common factors',                    'Plot'),
+                    ])
+
+        # ---- Phase Visualization ----
+        add_section('\u2462  Phase Plots',
+                    'The plot tab colors the (p, q) plane by the phase and magnitude of the '
+                    'expression. Cyan/Magenta/Yellow/Teal mark the four quadrants.',
+                    [
+                        ('p + q*0^(\u03c9/2)',        'complex plane: p + qi',                       'Plot'),
+                        ('p^2 - q^2',                 'hyperbolic saddle',                           'Plot'),
+                        ('p^3 - 3*p*q^2',             'real part of (p+qi)\u00b3  \u2014 harmonic',  'Plot'),
+                        ('1 / (p + q*0^(\u03c9/2))',  'pole at the origin',                          'Plot'),
+                        ('(p + q*0^(\u03c9/2))^5',    'quintic: five-fold phase winding',            'Plot'),
+                    ])
+
+        # ---- Traction Exponentials ----
+        add_section('\u2463  Traction Exponentials',
+                    '0^z is the traction exponential \u2014 it maps algebra to geometry. '
+                    'Under complex-Lie projection, 0^z \u2192 e^{\u2212Wz} where W\u00b2 = \u2212i\u03c0.',
+                    [
+                        ('0^(p + q*0^(\u03c9/2))',    'traction plane wave e^{-W(p+qi)}',            'Plot'),
+                        ('0^p * \u03c9^q',            'mixed 0/\u03c9 exponential field',            'Plot'),
+                        ('0^(p*\u03c9)',              'de Broglie phase: momentum \u2192 wave',       'Plot'),
+                        ('log0(p + q*0^(\u03c9/2))',  'traction logarithm \u2014 inverse of 0^z',    'Plot'),
+                        ('log\u03c9(p + q*0^(\u03c9/2))', 'omega-base logarithm',                    'Plot'),
+                    ])
+
+        # ---- Physics & Relativity ----
+        add_section('\u2464  Physics & Relativity',
+                    'Traction algebra encodes relativistic and quantum structure natively. '
+                    'The null element arises from light-cone cancellation; 0^z encodes phase.',
+                    [
+                        ('p^2 - q^2',                         'Minkowski interval  s\u00b2 = t\u00b2 \u2212 x\u00b2',  'Plot'),
+                        ('(p + q)*(p - q)',                    'light-cone factorization',                                 'Plot'),
+                        ('0^(p + q) + 0^(p - q)',             'standing wave (superposition)',                             'Plot'),
+                        ('0^(p*q)',                            'interaction phase \u2014 p\u00b7q coupling',               'Plot'),
+                        ('(p + q*0^(\u03c9/2))^2 + 1',       'Dirac-like: z\u00b2 + 1 with traction twist',              'Plot'),
+                    ])
+
+        # ---- Graded Elements (Z-Action) ----
+        add_section('\u2465  Graded Elements  (Z-Action)',
+                    'Z_n(a) lives at grade n. Addition drops grade (Z_n + Z_n = Z_{n\u22121}), '
+                    'multiplication raises it. This inverts the usual algebra/geometry relationship.',
+                    [
+                        ('Z_2(3) + Z_2(5)',           'grade drops: Z_1(15)',                        'Explain'),
+                        ('Z_2(3) * Z_2(5)',           'grade rises: Z_3(8)',                         'Explain'),
+                        ('Z_1(7) - Z_1(2)',           'subtraction \u2192 Z_0(7/2)',                 'Explain'),
+                        ('Z_3(p + q)',                'graded field on the plane',                   'Plot'),
+                    ])
+
+        # ---- Chebyshev Ring ----
+        add_section('\u2466  Chebyshev Ring Structure',
+                    'The Explain tab decomposes expressions into the Chebyshev ring \u211a[s][g]/(g\u00b2 \u2212 sg + 1), '
+                    'where s\u00b2 = 2 recovers trigonometric identities purely algebraically.',
+                    [
+                        ('0^(1/3)',                   'third root \u2192 Chebyshev decomposition',    'Explain'),
+                        ('0^(1/4)',                   'fourth root \u2192 ring element w',            'Explain'),
+                        ('0^(2/3) + 0^(1/3)',         'sum of roots in the ring',                    'Explain'),
+                        ('0^(1/6)',                   'sixth root structure',                         'Explain'),
+                    ])
+
+        # ---- Fractals ----
+        add_section('\u2467  Fractals',
+                    'fractal(expr) iterates x \u2192 expr starting from traction zero, '
+                    'using each pixel as the parameter c (or p, q).',
+                    [
+                        ('fractal(x^2 + c)',              'Mandelbrot set',                          'Plot'),
+                        ('fractal(x^3 + c)',              'cubic Mandelbrot',                        'Plot'),
+                        ('fractal(x^2 + c, 4, 200)',     'higher iteration Mandelbrot',              'Plot'),
+                        ('fractal(x^2 * \u03c9 + c)',    'omega-twisted Mandelbrot',                 'Plot'),
+                        ('fractal(x^2 + x*\u03c9 + c)',  'traction-perturbed iteration',             'Plot'),
+                    ])
+
+        # ---- Signal Analysis ----
+        add_section('\u2468  Signal Analysis & Waves',
+                    'Traction exponentials act as Fourier-like basis functions. '
+                    'Superpositions and interference patterns emerge from the algebra.',
+                    [
+                        ('0^p + 0^(2*p)',                      'harmonic superposition (1st + 2nd)',   'Plot'),
+                        ('0^p * 0^q',                          'separable product: 0^{p+q}',          'Plot'),
+                        ('0^p + 0^(\u03c9*p)',                 'forward + conjugate wave',             'Plot'),
+                        ('(0^p - 0^(\u03c9*p)) / (0^(\u03c9/2) - 0^(1/2))',
+                                                               'sine-like envelope',                   'Plot'),
+                    ])
+
+        # ---- Orient 3D ----
+        add_section('\u2469  Tower Visualization',
+                    'The Orient 3D tab shows the four-component tower basis (a + bt + cw + dtw). '
+                    'Use the sliders to explore the sphere of orientations.',
+                    [
+                        ('0^(1/4)',                   'quarter-turn: fundamental tower element w',   TOWER),
+                        ('0^(1/2)',                   'half-turn: the traction square root',         TOWER),
+                        ('0^(3/4)',                   'three-quarter turn',                          TOWER),
+                    ])
+
+        # ---- Phase Map ----
+        add_section('\u246a  Phase Map Orbits',
+                    'The Phase Map tab traces discrete orbits of 0^{n/2} and \u03c9^{n/2} on the unit circle, '
+                    'showing how algebraic powers generate geometric rotations.',
+                    [
+                        ('0^(1/3)',                   'period-6 orbit of the third root',             'Phase Map'),
+                        ('0^(1/5)',                   'period-10 orbit \u2014 pentagonal symmetry',   'Phase Map'),
+                        ('\u03c9^(1/4)',              'omega quarter-root orbit',                     'Phase Map'),
+                    ])
+
+        # Bottom padding
+        tk.Frame(help_inner, bg=HELP_BG, height=20).pack()
+
+    def _run_example(self, expr, tab):
+        """Load an example expression, evaluate it, and switch to the target tab."""
+        # Unbind mousewheel from help canvas before switching
+        self._help_canvas.unbind_all('<MouseWheel>')
+        self.entry_var.set(expr)
+        self.display_expr.icursor('end')
+        self._evaluate()
+        self._select_tab(tab)
+        self.display_expr.focus_set()
 
     def _make_button(self, parent, label, command, accent=False, small=False, toggle=False):
         """Create a button. If toggle=True, uses chisel bevel style for toggle switches."""
@@ -2680,8 +2906,10 @@ class CalculatorApp:
     def _handle_fractal(self, text):
         """Parse a fractal(...) command and launch background computation.
 
-        x starts at traction zero (= i at θ=π/2). The expression is projected
-        to complex via Zero→i, Omega→-i before compilation.
+        x starts at traction zero (0).  Under the θ=π/2 projection used for
+        rasterisation, 0 projects to e^{iπ/2} — the same magnitude-1 point
+        as i = 0^(ω/2), but a distinct traction element.  The numeric
+        iteration is algebraically equivalent to traction arithmetic.
         Supports both 'c' and 'p'/'q' for the pixel coordinate.
         """
         import threading
@@ -2742,7 +2970,7 @@ class CalculatorApp:
         self._fractal_raw_text = text
 
         self._set_result_text(
-            f'fractal: {expr_str}  (esc={escape}, n={max_iter})', fg=FG_DIM)
+            f'fractal: {expr_str}  (x\u2080=0, esc={escape}, n={max_iter})', fg=FG_DIM)
 
         # Switch to Plot tab
         if self._active_tab != 'Plot':
@@ -2801,7 +3029,7 @@ class CalculatorApp:
         self.viz_title_label.configure(
             text=f'Fractal [{expr_str}]  ({escaped_pct:.0f}% escaped)')
         self._set_result_text(
-            f'fractal: {expr_str}  (esc={escape}, n={max_iter})', fg=FG_RESULT)
+            f'fractal: {expr_str}  (x\u2080=0, esc={escape}, n={max_iter})', fg=FG_RESULT)
 
     def _on_entry_change(self):
         """Live preview: evaluate as you type."""
@@ -3082,6 +3310,11 @@ class CalculatorApp:
             self._update_phase_map()
         elif name == TOWER:
             self._update_tower()
+        # Re-bind mousewheel for Help tab scrolling
+        if name == 'Help' and hasattr(self, '_help_mousewheel_handler'):
+            self._help_canvas.bind_all('<MouseWheel>', self._help_mousewheel_handler)
+        elif hasattr(self, '_help_canvas'):
+            self._help_canvas.unbind_all('<MouseWheel>')
 
     # ===== Tower Tab =====
 
@@ -4001,9 +4234,11 @@ class CalculatorApp:
                             font=label_font, fill='#ffaa44', anchor='nw')
         y += 16
 
-        # Last z value
+        # Last z value (traction form: a + b·0)
         if np.isfinite(zv):
-            gc.create_text(8, y, text=f'last x = {zv.real:+.4f}{zv.imag:+.4f}i',
+            zr, zi = zv.real, zv.imag
+            z_sign = '+' if zi >= 0 else '\u2212'
+            gc.create_text(8, y, text=f'last x = {zr:+.4f} {z_sign} {abs(zi):.4f}\u00b70',
                             font=small_font, fill='#999999', anchor='nw')
             y += 14
             gc.create_text(8, y, text=f'|x| = {abs(zv):.4f}',
