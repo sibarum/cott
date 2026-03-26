@@ -5180,8 +5180,8 @@ class FullScreenViewer:
     # ----------------------------------------------------------------
 
     _ZOOM_IMPULSE = 0.18       # log-scale impulse per scroll tick
-    _ZOOM_FRICTION = 0.82      # velocity multiplier per animation frame
-    _ZOOM_TICK_MS = 16         # ~60 fps animation
+    _ZOOM_FRICTION = 0.5      # velocity multiplier per animation frame
+    _ZOOM_TICK_MS = 60
     _ZOOM_STOP_THRESHOLD = 0.003  # velocity below this = stopped
 
     def _on_scroll_zoom(self, event):
