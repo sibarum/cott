@@ -63,6 +63,8 @@ class FullScreenViewer:
         self.win.configure(bg='#000000')
         self.win.attributes('-fullscreen', True)
         self.win.protocol('WM_DELETE_WINDOW', self._close)
+        self.win.lift()
+        self.win.focus_force()
 
         # Canvas fills entire window
         self.canvas = tk.Canvas(self.win, bg='#000000', highlightthickness=0,
