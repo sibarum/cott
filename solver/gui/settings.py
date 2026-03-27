@@ -5,6 +5,7 @@ Settings window with tabbed interface.
 import tkinter as tk
 from tkinter import font as tkfont
 
+import registry
 from gui.constants import *
 
 

@@ -1455,6 +1455,15 @@ class CalculatorApp:
             self.cheb_canvas_widget.draw()
             return
 
+        # SolutionSet: not decomposable, just display the result
+        if isinstance(parsed, SolutionSet):
+            tw.insert('end', f'  {format_result(parsed)}\n', 'expr')
+            tw.insert('end', '\n  Solution sets have no Chebyshev decomposition.\n', 'dim')
+            tw.configure(state='disabled')
+            self._draw_cheb_orbit(self.cheb_ax_orbit, decomp=None)
+            self.cheb_canvas_widget.draw()
+            return
+
         # Z-action path: rich diagnostic for any expression containing GradedElement
         if isinstance(parsed, GradedElement) or (hasattr(parsed, 'has') and parsed.has(GradedElement)):
             self._render_graded_explain(parsed)
