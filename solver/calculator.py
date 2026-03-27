@@ -20,7 +20,7 @@ import tkinter as tk
 
 # Re-export public API for backward compatibility
 from parser import Parser, ParseError, SolutionSet, parse_and_eval
-from formatting import format_result, format_approx, format_complex
+from formatting import format_result, format_approx, format_complex, format_numeric_approx
 from decomposition import chebyshev_decompose, _eval_ring_exact, _reduce_ring_form, _complex_at_pi2
 from visualization import (compute_phase_grid, phase_to_rgb, continuity_to_rgb,
                            CANVAS_SIZE, GRID_RES, AXIS_MARGIN, CANVAS_TOTAL, DEFAULT_BOUNDS, PHASE_COLORS)

@@ -294,3 +294,212 @@ def _format_real(expr):
         return f'{val:.6g}'
     except (TypeError, ValueError):
         return str(expr)
+
+
+def format_numeric_approx(expr):
+    """
+    Format a full numeric approximation of an expression for ≈ display mode.
+
+    - Pure numeric (no variables): compute the decimal value.
+      Traction types are projected to complex first.
+    - Expressions with variables: approximate all numeric sub-expressions
+      to decimals, but preserve variable symbols intact.
+    - SolutionSet: approximate each solution.
+    - Returns a string (never empty — always produces output).
+    """
+    if expr is None:
+        return ''
+    if isinstance(expr, SolutionSet):
+        if not expr.solutions:
+            return 'no solution'
+        parts = [format_numeric_approx(s) for s in expr.solutions]
+        var = str(expr.variable)
+        if len(parts) == 1:
+            return f'{var} \u2248 {parts[0]}'
+        return f'{var} \u2208 {{{", ".join(parts)}}}'
+
+    return _numeric_approx(expr)
+
+
+def _numeric_approx(expr):
+    """Recursive numeric approximation of a SymPy/traction expression."""
+    # Traction atoms: project to complex
+    if isinstance(expr, (Zero, Omega, Null)):
+        return _approx_traction_atom(expr)
+
+    # Plain numbers
+    if isinstance(expr, Integer):
+        return str(int(expr))
+    if isinstance(expr, Rational):
+        return f'{float(expr):.6g}'
+
+    # Symbols stay as-is
+    if isinstance(expr, Symbol):
+        return str(expr)
+
+    # Log types: project
+    if isinstance(expr, (Log0, LogW)):
+        return _approx_via_projection(expr)
+
+    # GradedElement
+    if isinstance(expr, GradedElement):
+        return f'Z_{_numeric_approx(expr.grade)}({_numeric_approx(expr.value)})'
+
+    # No free symbols → try to evaluate numerically
+    if not expr.free_symbols:
+        return _approx_constant(expr)
+
+    # Has free symbols → approximate sub-expressions structurally
+    if isinstance(expr, Pow):
+        return _approx_pow(expr)
+    if isinstance(expr, Mul):
+        return _approx_mul(expr)
+    if isinstance(expr, Add):
+        return _approx_add(expr)
+
+    # Fallback: try evalf
+    try:
+        val = complex(expr.evalf())
+        return _format_complex_number(val)
+    except Exception:
+        return str(expr)
+
+
+def _approx_traction_atom(expr):
+    """Approximate a traction atom (Zero, Omega, Null) via θ=π/2 evaluation."""
+    val = _traction_eval(expr)
+    if val is not None:
+        return _format_complex_number(val)
+    return format_result(expr)
+
+
+def _approx_via_projection(expr):
+    """Approximate an expression containing traction types."""
+    val = _traction_eval(expr)
+    if val is not None:
+        return _format_complex_number(val)
+    return format_result(expr)
+
+
+def _traction_eval(expr):
+    """Evaluate a traction expression numerically at θ=π/2.
+
+    Maps 0→i, ω→-i, consistent with 0²=i²=-1.
+    Returns a Python complex, or None on failure.
+    """
+    from decomposition import _complex_at_pi2
+    return _complex_at_pi2(expr)
+
+
+def _approx_constant(expr):
+    """Approximate a constant expression (no free symbols) to a number."""
+    # First try traction evaluation (handles 0^n, omega expressions, etc.)
+    has_traction = expr.has(Zero) or expr.has(Omega)
+    if has_traction:
+        val = _traction_eval(expr)
+        if val is not None:
+            return _format_complex_number(val)
+
+    # Standard SymPy numeric evaluation
+    try:
+        val = complex(expr.evalf())
+        return _format_complex_number(val)
+    except Exception:
+        return str(expr)
+
+
+def _approx_pow(expr):
+    """Approximate a Pow expression, keeping variables intact."""
+    base, exp = expr.base, expr.exp
+
+    # Traction zero/omega powers without free symbols → project
+    if isinstance(base, (Zero, Omega)) and not expr.free_symbols:
+        return _approx_constant(expr)
+
+    b_str = _numeric_approx(base)
+    e_str = _numeric_approx(exp)
+    if needs_parens(base):
+        b_str = f'({b_str})'
+    if needs_parens_exp(exp) or (isinstance(exp, Rational) and not isinstance(exp, Integer)):
+        e_str = f'({e_str})'
+    return f'{b_str}^{e_str}'
+
+
+def _approx_mul(expr):
+    """Approximate a Mul expression, keeping variables intact."""
+    args = list(expr.args)
+
+    # -1·X → -X
+    if args[0] == S.NegativeOne and len(args) >= 2:
+        rest = Mul(*args[1:]) if len(args) > 2 else args[1]
+        rest_str = _numeric_approx(rest)
+        if needs_parens(rest) or _needs_complex_parens(rest_str):
+            rest_str = f'({rest_str})'
+        return f'-{rest_str}'
+
+    parts = []
+    for arg in args:
+        s = _numeric_approx(arg)
+        if isinstance(arg, Add) or _needs_complex_parens(s):
+            s = f'({s})'
+        parts.append(s)
+    return '\u00b7'.join(parts)
+
+
+def _needs_complex_parens(s):
+    """Check if an approximated string contains a+bi form that needs parentheses."""
+    # If the string contains + or - after the first character, it's a complex
+    # number that needs parentheses when used in multiplication
+    if not s:
+        return False
+    inner = s[1:]  # skip possible leading minus
+    return '+' in inner or ('-' in inner and not inner.startswith('-'))
+
+
+def _approx_add(expr):
+    """Approximate an Add expression, keeping variables intact."""
+    parts = []
+    for i, arg in enumerate(expr.args):
+        s = _numeric_approx(arg)
+        if i > 0 and not s.startswith('-'):
+            s = '+' + s
+        parts.append(s)
+    return ''.join(parts)
+
+
+def _format_complex_number(val):
+    """Format a Python complex number concisely."""
+    re_part = val.real
+    im_part = val.imag
+
+    # Threshold for treating as zero
+    eps = 1e-12
+
+    if abs(im_part) < eps:
+        # Pure real
+        if abs(re_part - round(re_part)) < eps and abs(re_part) < 1e15:
+            return str(int(round(re_part)))
+        return f'{re_part:.6g}'
+
+    if abs(re_part) < eps:
+        # Pure imaginary
+        if abs(im_part - 1) < eps:
+            return 'i'
+        if abs(im_part + 1) < eps:
+            return '-i'
+        if abs(im_part - round(im_part)) < eps and abs(im_part) < 1e15:
+            return f'{int(round(im_part))}i'
+        return f'{im_part:.6g}i'
+
+    # a + bi form
+    re_str = f'{re_part:.6g}'
+    if abs(im_part - 1) < eps:
+        im_str = '+i'
+    elif abs(im_part + 1) < eps:
+        im_str = '-i'
+    elif im_part > 0:
+        im_str = f'+{im_part:.6g}i'
+    else:
+        im_str = f'{im_part:.6g}i'
+
+    return f'{re_str}{im_str}'

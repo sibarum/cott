@@ -20,7 +20,7 @@ from traction import Zero, Omega, Null, GradedElement, traction_simplify, projec
 import registry
 import projections  # auto-discovers and registers projection plugins
 from parser import Parser, ParseError, parse_and_eval, SolutionSet
-from formatting import format_result, format_approx, format_complex
+from formatting import format_result, format_approx, format_complex, format_numeric_approx
 from decomposition import chebyshev_decompose, _eval_ring_exact, _reduce_ring_form, _complex_at_pi2
 from visualization import (compute_phase_grid, phase_to_rgb, continuity_to_rgb,
                            CANVAS_SIZE, GRID_RES, AXIS_MARGIN, CANVAS_TOTAL, DEFAULT_BOUNDS, PHASE_COLORS)
@@ -60,6 +60,7 @@ class CalculatorApp:
         self.projection_names = registry.names('projection')
         self.projection_index = 0  # default to first registered (complex_lie)
         self._has_t = False  # True when current expression contains t
+        self._approx_mode = False  # True when displaying ≈ approximations
 
         self._build_ui()
         self._bind_keys()
@@ -85,8 +86,10 @@ class CalculatorApp:
         result_frame = tk.Frame(top_frame, bg=BG_RESULT, relief='sunken', bd=1)
         result_frame.pack(fill='x')
 
-        tk.Label(result_frame, text='=', font=self.font_btn_small,
-                 bg=BG_RESULT, fg=FG_DIM, width=2).pack(side='left', padx=(4, 0))
+        self._eq_label = tk.Label(result_frame, text='=', font=self.font_btn_small,
+                                   bg=BG_RESULT, fg=FG_DIM, width=2, cursor='hand2')
+        self._eq_label.pack(side='left', padx=(4, 0))
+        self._eq_label.bind('<Button-1>', lambda e: self._toggle_approx_mode())
 
         self.display_result_var = tk.StringVar()
         self.display_result = tk.Entry(
@@ -669,8 +672,12 @@ class CalculatorApp:
 
     def _format_display_result(self, parsed):
         """Format the result for display, applying x-substitution."""
+        prefix = '\u2248 ' if self._approx_mode else '= '
+
         # SolutionSet results: display directly, no x-substitution
         if isinstance(parsed, SolutionSet):
+            if self._approx_mode:
+                return format_numeric_approx(parsed)
             return format_result(parsed)
 
         from sympy import Symbol as Sym
@@ -681,14 +688,16 @@ class CalculatorApp:
         result = parsed
 
         # If expression contains x, substitute with the active projection's native_x
-        if result.has(x_sym):
+        if hasattr(result, 'has') and result.has(x_sym):
             proj = registry.get('projection', self.projection_names[self.projection_index])
             if proj is not None:
                 native = proj.native_x(p_sym, q_sym)
                 result = result.subs(x_sym, native)
                 result = traction_simplify(result)
 
-        return f'= {format_result(result)}'
+        if self._approx_mode:
+            return prefix + format_numeric_approx(result)
+        return prefix + format_result(result)
 
     def _set_result_text(self, text, fg=None):
         """Set the result display text (Entry widget)."""
@@ -699,6 +708,12 @@ class CalculatorApp:
         self.display_result.configure(state='readonly')
         # Scroll to end so the rightmost content is visible
         self.display_result.xview_moveto(1.0)
+
+    def _toggle_approx_mode(self):
+        """Toggle between exact (=) and approximate (≈) display modes."""
+        self._approx_mode = not self._approx_mode
+        self._eq_label.configure(text='\u2248' if self._approx_mode else '=')
+        self._update_live_preview()
 
     def _clear_all(self):
         self.entry_var.set('')

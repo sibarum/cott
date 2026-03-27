@@ -71,77 +71,8 @@
 
 <div class="section">
 
-    <div class="section-title" id="section-2">
-        2. Monadic Decoupling
-    </div>
-
-    <p>
-        <strong>Monadic decoupling</strong><em> lifts a computation into a context where auxiliary
-            behaviors (like caching) can be introduced, modified, or removed independently of the core logic,
-            possibly at runtime."</em>
-    </p>
-
-    <p>
-        You'll find dozens of posts online of developers struggling to understand what a monad even is,
-        let alone how to use them effectively. SPN sees this as a marketing failure - the feature has not
-        been implemented in a way conducive to widespread understanding or adoption. The solution is to
-        make monads a central focus of the language - a necessary component that must be defined for
-        any logic to be evaluated. Then, a standard library offering a variety of common utility monads would be
-        immediately available, justifying its existence and discouraging "re-inventing the wheel".
-    </p>
-
-    <p>
-        Some of these monads include:
-    </p>
-
-    <ul>
-        <li>
-            Memoization and Caching
-        </li>
-        <li>
-            Dependency Injection
-        </li>
-        <li>
-            Authentication and Authorization
-        </li>
-        <li>
-            Performance Metrics
-        </li>
-        <li>
-            Logging
-        </li>
-        <li>
-            Predictive Specialization
-        </li>
-        <li>
-            Looping/Recursion Strategy
-        </li>
-        <li>
-            Retry Logic
-        </li>
-        <li>
-            Configurable Numeric Precision
-        </li>
-        <li>
-            User-Defined Monads
-        </li>
-        <li>etc</li>
-    </ul>
-
-    <p>
-        These monads would essentially be plug-and-play, giving the developer complete control over
-        runtime semantics without getting encumbered with boilerplate and cross-cutting concerns.
-    </p>
-
-    <div class="copyonly">---</div>
-    <div class="section-footer">
-    </div>
-</div>
-
-<div class="section">
-
     <div class="section-title" id="section-3">
-        3. Classes
+        2. Classes
     </div>
 
     <p>
@@ -165,8 +96,8 @@
         then refine the data model as development progresses. SPN enables developers to start in either place.
     </p>
 
-    <div class="subsection-title" id="section-3_1">
-        3.1 Type Declarations
+    <div class="subsection-title" id="section-2_1">
+        2.1 Class Declarations
     </div>
 
     <p>
@@ -248,16 +179,14 @@ class(text) FormattedText {
 
     <div class="code-border">
     <div class="code-title">Stream Type <span class="rfloat">Symbols</span></div>
-    <div class="code">class(stream) FibonacciStream {
-        property(numeric, numeric) previous;
-        next(numeric);
-        rule next = previous.0 + previous.1;
-    }
+    <div class="code">
+class(stream) FibonacciStream {
+    property(numeric, numeric) previous;
+    next(numeric);
+    rule next = previous.0 + previous.1;
+}
     </div>
     </div>
-
-
-
 
     <div class="copyonly">---</div>
     <div class="section-footer">
@@ -267,11 +196,99 @@ class(text) FormattedText {
 <div class="section">
 
     <div class="section-title" id="section-4">
-        4. Pattern Matching
+        3. Pattern Matching
     </div>
 
     <p>
-        Logic is primarily controlled by pattern matching.
+        For this section, we'll be using the following data model as an example
+        to illustrate pattern matching.
+    </p>
+
+    <div class="code-border">
+        <div class="code-title">If Matching<span class="rfloat">Symbols</span></div>
+        <div class="code">
+            numeric Year constraint Year>=1900, constraint Year%1;
+            numeric Month constraint 0 < Month <= 12;
+            numeric
+            Day constraint 0 < Day <= 31;
+
+            class (algebraic) Date {
+                product of (Year, Month, Day);
+            }
+
+            class (object) Customer {
+                property(Date) birthday;
+            }
+        </div>
+    </div>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-2">
+        4. Monadic Decoupling
+    </div>
+
+    <p>
+        <strong>Monadic decoupling</strong><em> lifts a computation into a context where auxiliary
+        behaviors (like caching) can be introduced, modified, or removed independently of the core logic,
+        possibly at runtime."</em>
+    </p>
+
+    <p>
+        You'll find dozens of posts online of developers struggling to understand what a monad even is,
+        let alone how to use them effectively. SPN sees this as a marketing failure - the feature has not
+        been implemented in a way conducive to widespread understanding or adoption. The solution is to
+        make monads a central focus of the language - a necessary component that must be defined for
+        any logic to be evaluated. Then, a standard library offering a variety of common utility monads would be
+        immediately available, justifying its existence and discouraging "re-inventing the wheel".
+    </p>
+
+    <p>
+        Some of these monads include:
+    </p>
+
+    <ul>
+        <li>
+            Memoization and Caching
+        </li>
+        <li>
+            Dependency Injection
+        </li>
+        <li>
+            Authentication and Authorization
+        </li>
+        <li>
+            Performance Metrics
+        </li>
+        <li>
+            Logging
+        </li>
+        <li>
+            Predictive Specialization
+        </li>
+        <li>
+            Looping/Recursion Strategy
+        </li>
+        <li>
+            Retry Logic
+        </li>
+        <li>
+            Configurable Numeric Precision
+        </li>
+        <li>
+            User-Defined Monads
+        </li>
+        <li>etc</li>
+    </ul>
+
+    <p>
+        These monads would essentially be plug-and-play, giving the developer complete control over
+        runtime semantics without getting encumbered with boilerplate and cross-cutting concerns.
     </p>
 
     <div class="copyonly">---</div>
