@@ -59,6 +59,7 @@ class CalculatorApp:
         self.color_mode = 'phase'  # 'phase' or 'continuity'
         self.projection_names = registry.names('projection')
         self.projection_index = 0  # default to first registered (complex_lie)
+        self._has_t = False  # True when current expression contains t
 
         self._build_ui()
         self._bind_keys()
@@ -154,6 +155,7 @@ class CalculatorApp:
             [('4', '4'),        ('5', '5'),      ('6', '6'),      ('\u2013', '-'), ('p', 'p')],
             [('1', '1'),        ('2', '2'),      ('3', '3'),      ('+', '+'),      ('q', 'q')],
             [('0', '0'),        ('\u03c9', '\u03c9'),('i', '0^(\u03c9/2)'),('=', None),  ('x', 'x')],
+            [('', None),        ('', None),      ('', None),          ('', None),      ('t', 't')],
         ]
 
         for row_idx, row in enumerate(layout):
@@ -186,12 +188,33 @@ class CalculatorApp:
         self.viz_canvas.bind('<Motion>', self._on_viz_hover)
         self.viz_canvas.bind('<Leave>', self._on_viz_leave)
 
-        # Hover gauges: 3 scale boxes (Re, Im, |f|) + 1 phase compass
+        # HUD slot: container for gauge canvas OR t-slider (swapped dynamically)
         GAUGE_H = 72
         GAUGE_W = CANVAS_TOTAL
-        self.gauge_canvas = tk.Canvas(viz_frame, width=GAUGE_W, height=GAUGE_H,
+        self._hud_slot = tk.Frame(viz_frame, bg='#282828', width=GAUGE_W, height=GAUGE_H)
+        self._hud_slot.pack(padx=10, pady=(2, 2))
+        self._hud_slot.pack_propagate(False)
+
+        # Hover gauges: 3 scale boxes (Re, Im, |f|) + 1 phase compass
+        self.gauge_canvas = tk.Canvas(self._hud_slot, width=GAUGE_W, height=GAUGE_H,
                                       bg='#282828', highlightthickness=0)
-        self.gauge_canvas.pack(padx=10, pady=(2, 2))
+        self.gauge_canvas.pack(fill='both', expand=True)
+
+        # Time slider (hidden by default, shown when expression contains t)
+        self._t_frame = tk.Frame(self._hud_slot, bg='#282828')
+        t_label_font = tkfont.Font(family='Consolas', size=10)
+        t_slider_font = tkfont.Font(family='Consolas', size=9)
+        tk.Label(self._t_frame, text='t', font=t_label_font,
+                 bg='#282828', fg='#cccccc').pack(side='left', padx=(8, 4))
+        self._t_var = tk.DoubleVar(value=0.0)
+        self._t_slider = tk.Scale(
+            self._t_frame, variable=self._t_var, from_=0.0, to=1.0,
+            resolution=0.01, orient='horizontal', length=GAUGE_W - 80,
+            bg='#282828', fg='#cccccc', troughcolor='#444444',
+            highlightthickness=0, font=t_slider_font,
+            command=self._on_t_change
+        )
+        self._t_slider.pack(side='left', fill='x', expand=True, padx=(0, 8))
 
         # Button row: zoom controls
         btn_row = tk.Frame(viz_frame, bg=BG_BODY)
@@ -864,13 +887,24 @@ class CalculatorApp:
         expr_text = self.entry_var.get().strip()
         if not expr_text:
             self.viz_canvas.delete('all')
+            self._show_t_slider(False)
             self.display_expr.focus_set()
             return
 
         try:
+            # Detect t variable before computing
+            from sympy import Symbol as Sym
+            parsed_check = parse_and_eval(expr_text)
+            has_t = (parsed_check is not None
+                     and hasattr(parsed_check, 'has')
+                     and parsed_check.has(Sym('t')))
+            self._show_t_slider(has_t)
+
             proj_name = self.projection_names[self.projection_index]
+            t_val = self._t_var.get() if has_t else None
             result = compute_phase_grid(expr_text, bounds=self.viz_bounds,
-                                       projection_name=proj_name)
+                                       projection_name=proj_name,
+                                       t_value=t_val)
             if result is None:
                 # Expression has no plottable variables — show Explain tab instead
                 if self._active_tab == 'Plot':
@@ -879,8 +913,8 @@ class CalculatorApp:
 
             # Detect graded expression for title label and hover mode
             graded_label = None
-            parsed = parse_and_eval(expr_text)
-            if parsed is not None and parsed.has(GradedElement):
+            parsed = parsed_check
+            if parsed is not None and hasattr(parsed, 'has') and parsed.has(GradedElement):
                 graded_label = 'Z-action : r + p\u00b7\u03c9'
                 self._viz_graded = True
             elif isinstance(parsed, GradedElement):
@@ -2073,6 +2107,22 @@ class CalculatorApp:
 
     def _clear_gauges(self):
         self.gauge_canvas.delete('all')
+
+    def _show_t_slider(self, show):
+        """Show or hide the t slider, swapping with the gauge canvas."""
+        if show and not self._has_t:
+            self.gauge_canvas.pack_forget()
+            self._t_frame.pack(in_=self._hud_slot, fill='both', expand=True)
+            self._has_t = True
+        elif not show and self._has_t:
+            self._t_frame.pack_forget()
+            self.gauge_canvas.pack(in_=self._hud_slot, fill='both', expand=True)
+            self._has_t = False
+
+    def _on_t_change(self, _value):
+        """Re-render the plot when the t slider moves."""
+        if self._has_t:
+            self._refresh_viz()
 
     def _draw_overflow_gauge(self, p_val, q_val, z):
         """Draw an overflow/underflow indicator with p,q coordinates."""

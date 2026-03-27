@@ -35,16 +35,36 @@
 <div class="section">
 
     <div class="section-title" id="section-1">
-        1. Atomic Traction
+        1. Concepts
     </div>
 
     <p>
-        Computationally, a traction can be described as a 2D complex algebra over <span class="symbol">&reals;</span>.
-        It consists of two components: a coefficient and a phase.
+        A value is either
+    </p>
+
+    <p>
+        A location in 2D space can be described by an x and y coordinate:
     </p>
 
     <div class="expression font-lg">
-        <span class="dynamicexpr">c*0^{p}=[c,p]</span>
+        <span class="dynamicexpr">x + y*w = [x,y]</span>
+    </div>
+
+    <p>
+        And a location in 3D space by x, y, z, coordinates:
+    </p>
+
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">x + y*w + z*w_{2} = [x,y,z] </span>
+    </div>
+
+    <p>
+        A rotation may be applied to any coordinate:
+    </p>
+
+    <div class="expression font-lg">
+        <span class="dynamicexpr">w^{x + y*w} = Z([x,y])</span>
     </div>
 
     <div class="subsection-title" id="section-1_1">

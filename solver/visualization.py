@@ -27,7 +27,7 @@ PHASE_COLORS = np.array([
 
 
 def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
-                       projection_name='complex_lie'):
+                       projection_name='complex_lie', t_value=None):
     """
     Compute visualization data for a traction expression using a registered projection.
 
@@ -36,6 +36,7 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
         x    — projection's native unit coordinate. Defined by each projection:
                complex_lie: x = p + q*0^(w/2)
                q_surface:   x = 0^(w*p/q)
+        t    — time parameter (scalar, 0 to 1). Substituted before grid eval.
 
     Returns tuple (phase, brightness, Z, log_mag) or None on failure.
     """
@@ -46,12 +47,20 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
     p_sym = Symbol('p')
     q_sym = Symbol('q')
     x_sym = Symbol('x')
+    t_sym = Symbol('t')
     has_p = parsed.has(p_sym)
     has_q = parsed.has(q_sym)
     has_x = parsed.has(x_sym)
+    has_t = parsed.has(t_sym)
 
     if not has_p and not has_q and not has_x:
         return None
+
+    # Substitute t with its scalar value before grid evaluation
+    if has_t:
+        from sympy import Rational
+        tv = Rational(t_value) if t_value is not None else Rational(0)
+        parsed = parsed.subs(t_sym, tv)
 
     # Get the active projection from the registry
     proj = registry.get('projection', projection_name)

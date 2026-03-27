@@ -211,6 +211,9 @@ class Parser:
         if ch == 'c':
             self.consume()
             return Symbol('c')
+        if ch == 't':
+            self.consume()
+            return Symbol('t')
         # Legacy: y still works as alias for q
         if ch == 'y':
             self.consume()
