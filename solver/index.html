@@ -51,9 +51,10 @@
 
     <p>
         The COTT Calculator is a Python/SymPy implementation of Traction Theory's algebra,
-        with a tkinter calculator GUI, phase-plot visualizer, and Chebyshev ring decomposition engine.
+        with a tkinter calculator GUI, phase-plot visualizer, fractal engine,
+        and Chebyshev ring decomposition engine.
         It lives under <code>/solver</code>
-        and comprises roughly 4000 lines across eight files.
+        and comprises roughly 11,000 lines across two dozen files.
     </p>
 
     <p>
@@ -80,19 +81,51 @@
         <tbody>
         <tr>
             <td><code>traction.py</code></td>
-            <td>Core algebra engine: types, simplifier, projection, logarithms</td>
+            <td>Core algebra engine: types (<code>Zero</code>, <code>Omega</code>, <code>Null</code>, <code>GradedElement</code>), simplifier, projection, logarithms</td>
+        </tr>
+        <tr>
+            <td><code>parser.py</code></td>
+            <td>Recursive descent parser: expressions, equations, functions (<code>solve</code>, <code>expand</code>, <code>factor</code>, <code>log0</code>, <code>logw</code>)</td>
         </tr>
         <tr>
             <td><code>calculator.py</code></td>
-            <td>GUI: parser, calculator pad, phase-plot visualizer, hover gauges</td>
+            <td>Entry point and public API re-exports for backward compatibility</td>
         </tr>
         <tr>
             <td><code>evaluator.py</code></td>
-            <td>Numeric traction evaluator: TractionValue class, hybrid + exact grid modes</td>
+            <td>Numeric traction evaluator: <code>TractionValue</code> class with zero/omega class tracking</td>
+        </tr>
+        <tr>
+            <td><code>formatting.py</code></td>
+            <td>Display formatting: exact, approximate, complex projection, and numeric modes</td>
+        </tr>
+        <tr>
+            <td><code>decomposition.py</code></td>
+            <td>Chebyshev ring decomposition engine: auto-detects band, reduces, evaluates</td>
+        </tr>
+        <tr>
+            <td><code>visualization.py</code></td>
+            <td>Phase grid computation and RGB mapping (phase mode and continuity mode)</td>
+        </tr>
+        <tr>
+            <td><code>fractal.py</code></td>
+            <td>Escape-time fractal engine with smooth HSV colouring</td>
+        </tr>
+        <tr>
+            <td><code>streamlines.py</code></td>
+            <td>Gradient streamline computation (tangent and normal flow lines via RK2)</td>
         </tr>
         <tr>
             <td><code>registry.py</code></td>
             <td>General-purpose function registry (category &rarr; name &rarr; object)</td>
+        </tr>
+        <tr>
+            <td><code>chebyshev_ring.py</code></td>
+            <td>Exact arithmetic: <code>QsPoly</code>, <code>Element</code> (a + b&middot;u in &Qopf;[s][u]/(u&sup2;&minus;su+1)),
+                <code>TowerElement</code>, <code>MultiBandElement</code></td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>projections/</strong></td>
         </tr>
         <tr>
             <td><code>projections/base.py</code></td>
@@ -107,17 +140,38 @@
             <td>Q-norm surface projection for zero-power coordinates</td>
         </tr>
         <tr>
-            <td><code>chebyshev_ring.py</code></td>
-            <td>Exact arithmetic: <code>QsPoly</code>, <code>Element</code> (a + b&middot;u in &Qopf;[s][u]/(u&sup2;&minus;su+1)),
-                <code>TowerElement</code>, <code>MultiBandElement</code></td>
+            <td colspan="2"><strong>gui/</strong></td>
+        </tr>
+        <tr>
+            <td><code>gui/app.py</code></td>
+            <td>Main calculator window: five-tab UI, number pad, phase canvas, hover gauges</td>
+        </tr>
+        <tr>
+            <td><code>gui/fullscreen.py</code></td>
+            <td>Full-screen viewer with pan/zoom, progressive rendering, coordinate grid</td>
+        </tr>
+        <tr>
+            <td><code>gui/settings.py</code></td>
+            <td>Settings window: colour mode, projection selection, streamline toggles</td>
+        </tr>
+        <tr>
+            <td><code>gui/constants.py</code></td>
+            <td>Colour palette and layout constants</td>
+        </tr>
+        <tr>
+            <td><code>gui/utils.py</code></td>
+            <td>Tick formatting, colour scaling, line clipping utilities</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Tests</strong></td>
         </tr>
         <tr>
             <td><code>test_traction.py</code></td>
-            <td>160 pytest tests validating all identities</td>
+            <td>160 pytest tests validating all traction identities</td>
         </tr>
         <tr>
-            <td><code>test_calculator.py</code></td>
-            <td>173 tests for parser, evaluator, ring decomposition, and reduction</td>
+            <td><code>test_chebyshev_ring.py</code></td>
+            <td>173 tests for ring arithmetic, decomposition, and reduction</td>
         </tr>
         </tbody>
     </table>
@@ -176,6 +230,20 @@
         and <code>LogW</code> (base-&omega; logarithm).
         These are SymPy <code>Function</code> subclasses that stay symbolic
         until projected to &Copf;.
+    </p>
+
+    <p>
+        <code>GradedElement</code> (Z<sub>n</sub>) represents elements at grade <em>n</em>
+        in the operation hierarchy.
+        Grade arithmetic shifts operations one level:
+        Z<sub>n</sub>(<span class="variable">a</span>) + Z<sub>n</sub>(<span class="variable">b</span>)
+        = Z<sub>n&minus;1</sub>(<span class="variable">a</span>&middot;<span class="variable">b</span>),
+        and Z<sub>n</sub>(<span class="variable">a</span>) &times; Z<sub>n</sub>(<span class="variable">b</span>)
+        = Z<sub>n+1</sub>(<span class="variable">a</span>+<span class="variable">b</span>).
+        Fixed points: Z<sub>n</sub>(<span class="dynamicexpr">0</span>) = Z<sub>n&minus;1</sub>(1),
+        Z<sub>n</sub>(&omega;) = Z<sub>n&minus;1</sub>(&minus;1).
+        Z<sub>0</sub> is the identity grade.
+        The parser accepts both <code>Z_n(expr)</code> and <code>Z(n, expr)</code> syntax.
     </p>
 
     <div class="subsection-title" id="section-2_2">
@@ -443,6 +511,16 @@
             <td>Projection's native unit</td>
             <td>Defined per projection (see below)</td>
         </tr>
+        <tr>
+            <td><span class="variable">t</span></td>
+            <td>Time parameter</td>
+            <td>Scalar, controlled by slider in the GUI</td>
+        </tr>
+        <tr>
+            <td><span class="variable">c</span></td>
+            <td>Fractal parameter</td>
+            <td>Complex constant for escape-time iteration (the Mandelbrot <span class="variable">c</span>)</td>
+        </tr>
         </tbody>
     </table>
 
@@ -519,42 +597,13 @@
 
     <p>
         <strong>Step 5 &mdash; Evaluate:</strong>
-        Three evaluator modes are available, selectable in the Settings panel:
+        The projected expression is converted to a numpy vectorised function via
+        SymPy's <code>lambdify</code> and evaluated over the grid in one pass.
     </p>
 
-    <table class="fixed">
-        <thead>
-        <tr>
-            <th>Evaluator</th>
-            <th>Method</th>
-            <th>Speed</th>
-            <th>Correctness</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td><strong>Fast (numpy)</strong></td>
-            <td>SymPy <code>lambdify</code> &rarr; numpy vectorized</td>
-            <td>Instant</td>
-            <td>May have branch cuts at singularities; <span class="variable">p</span>/<span class="variable">q</span> at <span class="variable">q</span>=0 gives NaN</td>
-        </tr>
-        <tr>
-            <td><strong>Hybrid (TractionValue)</strong></td>
-            <td>Per-pixel Python loop with class-tracked arithmetic</td>
-            <td>Seconds</td>
-            <td>Correct zero/omega classes; <span class="variable">p</span>/<span class="variable">q</span> at <span class="variable">q</span>=0 gives <span class="variable">p</span>&middot;&omega;</td>
-        </tr>
-        <tr>
-            <td><strong>Exact (SymPy)</strong></td>
-            <td>Full <code>traction_simplify</code> + <code>project_complex</code> per pixel</td>
-            <td>Minutes</td>
-            <td>Exact &mdash; uses the full symbolic engine for every grid point</td>
-        </tr>
-        </tbody>
-    </table>
-
     <p>
-        The hybrid evaluator introduces <code>TractionValue</code> (<code>evaluator.py</code>),
+        For scalar display (the result line), the <code>TractionValue</code> evaluator
+        (<code>evaluator.py</code>) provides class-tracked arithmetic:
         a numeric type that tracks whether a value is a plain scalar, a zero-power
         (<span class="dynamicexpr">0^{a+b*w}</span>), or an omega-scaled quantity (result of division by zero).
         Each arithmetic operation preserves the class distinction:
@@ -588,9 +637,9 @@
     </table>
 
     <p>
-        The hybrid and exact evaluators run in a <strong>background thread</strong>,
-        keeping the GUI responsive. A progress indicator shows completion percentage,
-        and starting a new computation automatically cancels any in-progress one.
+        Long-running computations (fractal iteration, full-screen progressive render)
+        run in a <strong>background thread</strong>, keeping the GUI responsive.
+        Starting a new computation automatically cancels any in-progress one.
     </p>
 
     <p>
@@ -628,8 +677,8 @@
     <p>
         By the time the expression reaches numeric evaluation,
         the traction simplifier has already collapsed the nested powers.
-        The branch cut never forms. And with the hybrid evaluator,
-        even the numeric layer preserves traction semantics &mdash;
+        The branch cut never forms. And the <code>TractionValue</code> evaluator
+        preserves traction semantics at the numeric layer &mdash;
         division by zero produces &omega;, not NaN.
     </p>
 
@@ -886,7 +935,177 @@
 <div class="section">
 
     <div class="section-title" id="section-7">
-        7. Known Limitations
+        7. Parser &amp; Functions (<code>parser.py</code>)
+    </div>
+
+    <p>
+        The parser is a hand-written recursive descent parser supporting
+        full operator precedence (parentheses, exponentiation, multiplication/division,
+        addition/subtraction) with right-associative <code>^</code>.
+    </p>
+
+    <div class="subsection-title" id="section-7_1">
+        7.1 Built-in Functions
+    </div>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>Syntax</th>
+            <th>Meaning</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>log0(expr)</code></td>
+            <td>Base-<span class="dynamicexpr">0</span> logarithm (symbolic until projected)</td>
+        </tr>
+        <tr>
+            <td><code>logw(expr)</code></td>
+            <td>Base-&omega; logarithm</td>
+        </tr>
+        <tr>
+            <td><code>solve(expr)</code> or <code>solve(expr, var)</code></td>
+            <td>Solve <em>expr</em> = 0 for <em>var</em>. Returns a <code>SolutionSet</code>.</td>
+        </tr>
+        <tr>
+            <td><code>expand(expr)</code></td>
+            <td>Symbolic expansion (distributes products over sums)</td>
+        </tr>
+        <tr>
+            <td><code>factor(expr)</code></td>
+            <td>Symbolic factoring</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="subsection-title" id="section-7_2">
+        7.2 Equation Syntax
+    </div>
+
+    <p>
+        The parser supports equation syntax: <code>lhs = rhs</code> is automatically
+        converted to <code>solve(lhs &minus; rhs)</code> and solved.
+        The result is a single solution or a <code>SolutionSet</code>.
+    </p>
+
+    <div class="subsection-title" id="section-7_3">
+        7.3 Graded Element Syntax
+    </div>
+
+    <p>
+        Graded elements can be entered as <code>Z_n(expr)</code> or <code>Z(n, expr)</code>,
+        where <em>n</em> is the grade level.
+        These are first-class values: they can be combined with arithmetic operators,
+        and the grade algebra rules (see &sect;2) apply automatically.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+
+<div class="section">
+
+    <div class="section-title" id="section-8">
+        8. GUI (<code>gui/</code>)
+    </div>
+
+    <p>
+        The calculator GUI (<code>gui/app.py</code>) is a tkinter window with
+        an input display, a result display (with an &asymp; toggle for approximation mode),
+        and a five-tab workspace:
+    </p>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>Tab</th>
+            <th>Contents</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Plot</strong></td>
+            <td>Calculator number pad (left) + phase-plot canvas with hover gauges, zoom controls, and settings (right)</td>
+        </tr>
+        <tr>
+            <td><strong>Explain</strong></td>
+            <td>Chebyshev ring decomposition text + orbit plot (matplotlib)</td>
+        </tr>
+        <tr>
+            <td><strong>Phase Map</strong></td>
+            <td>Interactive phase-amplitude decomposition at varying &theta;, with orbit, amplitude, and table subplots</td>
+        </tr>
+        <tr>
+            <td><strong>Orient 3D</strong></td>
+            <td>3D tower visualisation with two rotation sliders (&theta;<sub>w</sub> and &theta;<sub>u</sub>)</td>
+        </tr>
+        <tr>
+            <td><strong>Help</strong></td>
+            <td>Scrollable, clickable examples organised by section</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="subsection-title" id="section-8_1">
+        8.1 Approximation Mode
+    </div>
+
+    <p>
+        The result display has an <code>=</code> / <code>&asymp;</code> toggle button.
+        In exact mode, results display as symbolic traction expressions (fractions, Z<sub>n</sub>, etc.).
+        In approximation mode, rationals and complex values are displayed as decimals.
+    </p>
+
+    <div class="subsection-title" id="section-8_2">
+        8.2 Full-Screen Viewer (<code>gui/fullscreen.py</code>)
+    </div>
+
+    <p>
+        A dedicated full-screen window with pan and zoom. Uses dual-layer image buffers:
+        a low-resolution persistent layer for instant feedback during interaction,
+        and a high-resolution progressive layer rendered after a 200&thinsp;ms debounce.
+        Includes a coordinate grid overlay and legend.
+    </p>
+
+    <div class="subsection-title" id="section-8_3">
+        8.3 Fractal Mode (<code>fractal.py</code>)
+    </div>
+
+    <p>
+        Expressions containing the variable <span class="variable">c</span> trigger
+        fractal (escape-time iteration) mode.
+        The iterator starts at traction zero
+        (<span class="dynamicexpr">x</span><sub>0</sub> = <span class="dynamicexpr">0</span>,
+        which projects to <em>e</em><sup><em>i</em>&pi;/2</sup> = <em>i</em> under &theta; = &pi;/2)
+        and iterates the expression at each grid point.
+        Colouring uses smooth HSV with anti-banding based on escape count and final magnitude.
+    </p>
+
+    <div class="subsection-title" id="section-8_4">
+        8.4 Settings (<code>gui/settings.py</code>)
+    </div>
+
+    <p>
+        The settings window provides controls for:
+        colour mode (phase or continuity),
+        active projection (Complex Lie or Q-Surface),
+        and gradient overlays (tangent lines following |<em>f</em>| gradient,
+        normal lines following constant-|<em>f</em>| contours).
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+
+<div class="section">
+
+    <div class="section-title" id="section-9">
+        9. Known Limitations
     </div>
 
     <p>
@@ -900,8 +1119,8 @@
 
     <p>
         <strong>Non-analytic two-variable mode:</strong>
-        When <span class="variable">x</span> and <span class="variable">y</span> are
-        independent real variables, the function is generally not analytic in the
+        When <span class="variable">p</span> and <span class="variable">q</span> are
+        used as independent real variables, the function is generally not analytic in the
         complex sense. Phase and magnitude gradients are independent, so the
         tangent/normal lines (which follow magnitude) may not align with the
         phase colouring. This is correct behaviour, not a bug.

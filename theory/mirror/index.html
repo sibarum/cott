@@ -3,10 +3,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <html xmlns="http://www.w3.org/1999/html" lang="en">
 <head>
+    <script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../lib/styles-v1.css">
+    <script src="../../lib/traction-interpret.js"></script>
 
-    <title>Mirror Calculus: Dual Duals</title>
+    <title>BeigePapers: Mirror Calculus</title>
 
 </head>
 <body>
@@ -19,19 +21,8 @@
 
     <div class="headings">
         <h1>Mirror Calculus</h1>
-        <h2>The Calculus of Dual Duals</h2>
+        <h2>calculus of emergence from void</h2>
     </div>
-
-    <div class="section-title">
-        Table of Contents
-    </div>
-    <ol>
-        <li>
-            <a href="#section-1">
-                Abstract
-            </a>
-        </li>
-    </ol>
 
     <div class="copyonly">---</div>
     <div class="section-footer">
@@ -42,11 +33,65 @@
 <div class="section">
 
     <div class="section-title" id="section-1">
-        1. Abstract
+        1. Motivation
     </div>
 
     <p>
-        We define an algebraic structure...
+        Many theories of calculus exist. Various notations have been popularized, each finding its own niche:
+        such as Lagrange for brevity or Leibniz for specificity. The use of the letter
+        <span class="variable">d</span> indicates a total derivative while the <span class="symbol">&part;</span>
+        indicates a partial derivative. The formulas change depending on the context, ranging from linear
+        maps to multiplicative and even logarithmic maps, which also differ depending on the number of variables
+        and which relationships are being measured. There is, indeed, a seemingly endless space of possible
+        calculi, all sharing common characteristics and goals while appearing at the surface to be
+        entirely unrelated.
+    </p>
+
+    <p>
+        I don't wish to diminish the contributions of mathematicians throughout history who made modern
+        mathematics possible. Their names belong in our books, to be taught to students, and remembered
+        for generations to come. But we do a disservice to ourselves and to humanity as a whole if we don't address
+        problems with a clear head and down-to-earth common sense.
+    </p>
+
+    <p>
+        Math is harder to learn than it needs to be. Math has a notation problem, and it's precisely the result
+        of inheriting all the historical tradition without embracing the art of theoretic reframing.
+    </p>
+
+    <div class="subsection-title" id="section-1_1">
+        1.1 Theory Consolidation
+    </div>
+
+    <p>
+        One type of theoretic reframing is theory consolidation. This involves merging several, disjointed theories into
+        a single, cohesive theory. The resulting theory may end up quite different from the source material, and
+        ideally simpler than any original theory itself. The goal is unification: getting more utility with
+        less mental investment is <em>criminally</em> underrated in the mathematical zeitgeist of modern
+        academia.
+    </p>
+
+    <p>
+        Using fewer symbols to accomplish the same thing makes theories easier to learn, analyze, and extend.
+        Undeniably, a pupil and practitioner alike will benefit from
+        formulating a unifying theory such that all its symmetries and expressive capability is easily generalized.
+        And yet this practice is rarely exercised, and is often perceived as controversial or somehow
+        disrespectful.
+    </p>
+
+    <p>
+        The deal-breaker is that theoretic reframing often requires making foundational changes across other,
+        well-established theories. This is seen as an insurmountable obstacle - almost as if the author of
+        the reframing would need to re-prove every theorem that has ever been written which derives from
+        the impacted theories - as if the ontology of the universe itself shifts with the penmanship of
+        a theorist.
+    </p>
+
+    <p>
+        In reality, a healthy reframing of a class of theories can illuminate the true nature of our
+        universe in a way that enables the future generations to more easily learn, participate in,
+        and appreciate the art and science of math. And isn't that the greatest good we can accomplish
+        with our talents? It's it our duty?
     </p>
 
     <div class="copyonly">---</div>
@@ -54,811 +99,321 @@
     </div>
 </div>
 
-
 <div class="section">
 
     <div class="section-title" id="section-2">
-        2. Signature
+        2. A Different Kind of Zero
     </div>
 
     <p>
-        We define the formal language of mirror terms.
+        Mirror Calculus builds upon <a href="/cott/theory/traction">Traction Theory</a>, an algebra with a
+        non-absorbing zero. Similar to a ring and field, a traction is a general-purpose algebraic object with
+        restrictions around zero notably absent from the definitions.
     </p>
 
-    <div class="subsection-title">
-        2.1 Atomic Terms
+    <p>
+        The classic assumption  <span class="dynamicexpr">0*x = 0</span> does not hold.
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">0*x != 0</span>
     </div>
 
     <p>
-        The following are atomic terms:
+        Instead, we conserve information, only erasing information under universal invariance, the operational
+        identities, and keeping everything else as residual terms.
     </p>
 
-    <ul>
-        <li>
-            The distinguished element <span class="symbol">0</span>
-        </li>
-        <li>
-            The distinguished element <span class="symbol">&omega;</span>
-        </li>
-    </ul>
+    <div class="expression">
+        <span class="dynamicexpr">x-x=null</span>
+    </div>
 
     <p>
-        These symbols are primitive elements of the language.
+        But the residuals are not merely formal bookkeeping terms. We find by
+        <a href="/cott/theory/chebyshev/">analyzing the
+        Chebyshev Polynomials</a>, real useful structure emerges from arithmetic
+        of the totalized zero. More on this later.
     </p>
 
-    <div class="subsection-title">
-        2.2 Function Symbols
+    <div class="subsection-title" id="section-2_1">
+        2.1 Emergence from Void
     </div>
-
-    <ul>
-        <li>
-            A unary function symbol
-            <span class="symbol">&#x1D54A;</span>
-            (successor)
-        </li>
-    </ul>
-
-    <div class="subsection-title">
-        2.3 Formation of Terms
-    </div>
-
-    <ul>
-        <li>
-            <p>
-                Every atomic term is a term.
-            </p>
-        </li>
-        <li>
-            <p>
-                If
-                <span class="variable">a</span>
-                is a term, then so is:
-            </p>
-
-            <div class="expression"><!--
-             --><span class="symbol">&#8722;</span><!--
-             --><span class="variable">a</span>
-            </div>
-        </li>
-        <li>
-            <p>
-                If
-                <span class="variable">a</span>
-                and
-                <span class="variable">b</span>
-                are terms, then the following are also terms:
-            </p>
-
-            <div class="expression"><!--
-             --><span class="symbol">&#x1D54A;</span><!--
-             --><sup><!--
-                 --><span class="copyonly">^</span><!--
-                 --><span class="variable">a</span><!--
-             --></sup><!--
-          --><span class="symbol">(</span><!--
-          --><span class="variable">b</span><!--
-          --><span class="symbol">)</span><!--
-         --></div>
-
-            <div class="expression"><!--
-             --><span class="variable">a</span><!--
-             --><span class="symbol">+</span><!--
-             --><span class="variable">b</span>
-            </div>
-
-            <div class="expression"><!--
-             --><span class="variable">a</span><!--
-             --><span class="symbol">&middot;</span><!--
-             --><span class="variable">b</span>
-            </div>
-
-            <div class="expression"><!--
-             --><span class="variable">a</span><!--
-             --><sup><!--
-                 --><span class="copyonly">^</span><!--
-                 --><span class="variable">b</span>
-                </sup>
-            </div>
-        </li>
-    </ul>
 
     <p>
-        Exponentiation is a primitive syntactic operation; at this stage, no semantic restrictions are imposed.
+        It's ironic how much structure can exist within a symbol that represents nothingness,
+        but we must recognise this apparent irony as mere ignorance. If all known existence can
+        emerge from primeval void, why do we assume void a dead end? Granted we cannot witness
+        the void directly, and all we know with certainty is it gave birth to everything
+        we can witness, why do we assume the transition from void to existence a rare
+        or unusual occurrence?
     </p>
 
-    <div class="subsection-title">
-        2.4 Notation
-    </div>
+    <p>
+        Let's start by changing our assumptions. Zero is no longer emptiness, no longer an exception,
+        no longer a dead end. Instead, let's assume zero is the beginning, a place from which endless
+        structure may emerge. What kind of structure would we expect to emerge from zero?
+        For this we consider the only example we know of: our own universe. Assuming it emerged from
+        nothingness, what does this tell us about the nature and quality of things that emerge from voids?
+    </p>
 
-    <div>
-        For each finite
-        natural number <span class="variable">n</span>,
-        we write:
-        <div>
-            <span class="variable">n</span><!--
-         --><span class="symbol">:=</span><!--
-         --><span class="symbol">&#x1D54A;</span><!--
-         --><sup><!--
-             --><span class="copyonly">^</span><!--
-             --><span class="variable">n</span><!--
-         --></sup><!--
-         --><span class="symbol">(</span><!--
-         --><span class="number">0</span><!--
-         --><span class="symbol">)</span>
-        </div>
-        as a notational convenience.
-    </div>
+    <p>
+        We consider the lowest foundations of physics.
+        Thermodynamics imply a balance of structure, symmetry of dynamics, and consistency of causality.
+        Quantum physics implies chaotic emergence, statistical averaging, and temporal, quantized
+        distinctions that always resolve, eventually.
+        These concepts are not at odds, in fact they tell us a great deal about the nature of the void.
+    </p>
+
+    <p>
+        In quantum mechanics, we observe virtual particles spontaneously phasing into and out of existence,
+        sometimes long enough to be observed, but always balanced out by a corresponding counter-particle or packet of
+        energy - as thermodynamics would mandate.
+    </p>
+
+    <p>
+        And in classic algebra, one might solve an equation by drawing structure from the void.
+        By adding a value alongside its inverse, conservation isn't violated, and consistency is
+        preserved with exact precision.
+    </p>
+
+    <p>
+        <em>Creating algebraic structure from nothing is, therefore, permissible so long as
+        the total offset of the addition is zero.</em> Or, at the least, contextually invariant.
+        This ensures consistency without diminishing potential utility.
+    </p>
+
+    <p>
+        The <a href="/cott/theory/reference">complex algebra of traction zero</a> is one
+        interpretation of this concept. Complex arithmetic, when described as imaginary
+        rotation with magnitude zero, can indeed emerge from the mere permission of its permanence.
+        Mirror Calculus, then, steps into a bolder frame of reference: <strong>How far can zero
+        be pushed, and what are its limits?</strong>
+    </p>
 
     <div class="copyonly">---</div>
     <div class="section-footer">
-        <em></em>
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-3">
+        3. The Polymorphic Zero
     </div>
 
+    <p>
+        <strong>Zero is a reservoir of latent structure.</strong> Within zero, all possible
+        structures exist in perfect balance, ready to be summoned anywhere for any reason,
+        as long as any nonzero emergence is accompanied by its inverse or "mirrored" counterpart.
+        This is a well-known fact, and commonplace in ordinary mathematics.
+    </p>
+
+    <p>
+        Consider the following illustration of arbitrary structure emerging from nothingness:
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">0=0</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">0=0+a-a</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">0-0+a=a</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">a=a</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">a*a^{-1}=a*a^{-1}</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">{a*a^{-1}}/a^{-1}={a*a^{-1}}*a</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">a=a^2*a^{-1}</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">{1/a^{-1}} + a/a^{-1}={1/a^{-1}} + a^2</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">{a+1}/a^{-1}={1/a^{-1}} + a^2*{a^{-1}/a^{-1}}</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">{a+1}/a^{-1}=(1/a^{-1} + a/a^{-1})*{a/a}</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">{a+1}/a^{-1}=a + a^2</span>
+    </div>
+
+    <div class="expression">
+        <span class="dynamicexpr">a={a + a^2}/{a+1}</span>
+    </div>
+
+    <p>
+        <em>It's easy to see how this exercise could go on forever</em>, leading to an infinite landscape
+        of equivalences, <em>many of which are not trivially trivial.</em>
+    </p>
+
+    <div class="subsection-title" id="section-2_1">
+        3.1 Differentials
+    </div>
+
+    <p>
+        In classic calculus, the differential is a confused concept. It is seen more as an incomplete derivative,
+        or as a kind of variable, rather than a function of infinitesimals. Then differentials appear in other
+        areas of mathematics, but by an entirely different name: the jet operation and Taylor polynomials.
+        This is an academic failure of cohesion: nobody benefits from these topics being disjointed.
+    </p>
+
+    <p>
+        In mirror calculus, <em>a mirror differential is any functor applied to an expression with the following
+        characteristics:</em>
+    </p>
+
+    <ol>
+        <li>
+            The functor evaluates to an expression with a zero magnitude in the dimension of measurement.
+        </li>
+        <li>
+            The functor conserves all information of the target expression.
+        </li>
+    </ol>
+
+    <p>
+        Information conservation is standard operating procedure under
+        <a href="/cott/intro">Constructive Operational Type Theory</a>. Differentials frequently serve
+        as a diagnostic, so they extract or add information to an expression, as long as this information
+        is maintained via residuals (hence "zero magnitude in the dimension of measurement").
+    </p>
+
+    <p>
+        Consider the following Taylor differential over some function f:
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">0*f(x+0)</span>
+    </div>
+
+    <p>
+        Notice:
+    </p>
+
+    <ul>
+        <li>
+            The expression is multiplied by traction zero, ensuring a zero magnitude as per rule 1.
+        </li>
+        <li>
+            We are not subtracting the identity, as this would erase the constant y-offset and violate rule 2.
+        </li>
+    </ul>
+
+    <p>
+        This, and any other mirror differential, may be used as a substitution anytime an expression comes within
+        multiplicative association with zero. For example:
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">f(x) = 0*(x^{2}+3*x-4)</div>
+    </div>
+
+    <div class="expression">
+        <div class="dynamicexpr">0*f(x+0) = 0*((x+0)^{2}+3*(x+0)-4)</div>
+    </div>
+
+    <div class="expression">
+        <div class="dynamicexpr">0*f(x+0) = 0*((x^2+2*0*x+0^2)+(3*x+3*0)-4)</div>
+    </div>
+
+    <div class="expression">
+        <div class="dynamicexpr">0*f(x+0) = 0*(x^2+3*x-4+2*0*x+3*0+0^2)</div>
+    </div>
+
+    <div class="expression">
+        <div class="dynamicexpr">0*f(x+0) = (0*x^2+3*0*x-4*0)+(2*0^2*x+3*0^2)+0^3</div>
+    </div>
+
+    <p>
+        We now have the complete Taylor differential, from which we may extract terms.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">w*(0*f(x+0)) = f(x+0)</div>
+    </div>
+
+    <div class="expression">
+        <div class="dynamicexpr">f(x+0) = x^2+3*x-4+(2*0*x+3*0)+0^2</div>
+    </div>
+
+    <p>
+        And we use the projection operator to truncate zero-terms.
+        This recovers the original function exactly.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">P(f(x+0)) = x^2+3*x-4</div>
+    </div>
+
+    <p>
+        And to recover the first derivative:
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">w*f(x+0) = w*x^2+w*3*x-w*4+(2*x+3)+0</div>
+    </div>
+
+    <div class="expression">
+        <div class="dynamicexpr">P(w*f(x+0)) = 2*x+3</div>
+    </div>
+
+
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
 </div>
 
 <div class="section">
 
     <div class="section-title" id="section-4">
-        3. Axioms
+        4.
     </div>
 
     <p>
-        The distinguished symbols satisfy the defining relations:
+
     </p>
-
-    <div class="subsection-title">
-        3.1 Reciprocity
-    </div>
-
-    <div class="expression">
-        <span class="symbol">0</span><!--
-     --><span class="symbol">&middot;</span><!--
-     --><span class="symbol">&omega;</span><!--
-     --><span class="symbol">=</span><!--
-     --><span class="number">1</span>
-    </div>
-
-    <div class="subsection-title">
-        3.2 Involution
-    </div>
-
-    <div class="expression">
-        <!-- 0^(0^n) = n -->
-        <span class="symbol">&alpha;</span><!--
-     --><sup><!--
-         --><span class="copyonly">^</span><!--
-         --><span class="copyonly">(</span>
-        <span class="symbol">&alpha;</span><!--
-     --><sup><!--
-         --><span class="copyonly">^</span><!--
-         --><span class="variable">n</span>
-        </sup>
-        <span class="copyonly">)</span>
-    </sup>
-        <span class="symbol">=</span>
-        <span class="variable">n</span>
-    </div>
 
     <div class="copyonly">---</div>
     <div class="section-footer">
-        <em></em>
     </div>
-
 </div>
-
 
 <div class="section">
 
     <div class="section-title" id="section-5">
-        4. Standard Identities
+        5.
     </div>
 
     <p>
-        These identities are standard for all terms
+
     </p>
-
-</div>
-
-<div class="section">
-
-    <div class="section-title" id="section-6">
-        5. Derived Properties
-    </div>
-
-    <div class="subsection-title">
-        5.1 Derivation Semantics
-    </div>
-
-    <p>
-        All logarithmic and exponential identities are consequences of the single reciprocity axiom
-        <span class="expression-inline"><!--
-         --><span class="symbol">&alpha;</span><!--
-         --><span class="symbol">&middot;</span><!--
-         --><span class="symbol">&omega;</span><!--
-         --><span class="symbol">=</span><!--
-         --><span class="number">1</span>,
-        </span>
-        combined with the inductive term structure and primitive operations.
-    </p>
-
-    <table class="fixed">
-        <thead>
-        <tr>
-            <th>
-                <h3 class="expression">
-                    <!-- 0^a = b -->
-                    <span class="variable">v</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^</span><!--
-                     --><span class="variable">x</span>
-                </sup>
-                    <span class="symbol">=</span>
-                    <span class="variable">y</span>
-                </h3>
-            </th>
-            <th>
-                <h3 class="expression">
-                    <!-- log_0 b = a -->
-                    <span class="variable">log</span><!--
-                 --><sub><!--
-                     --><span class="copyonly">_</span><!--
-                     --><span class="variable">v</span>
-                    </sub>
-                    <span class="variable">y</span>
-                    <span class="symbol">=</span>
-                    <span class="variable">x</span>
-                </h3>
-            </th>
-        </tr>
-        </thead>
-    </table>
-
-    <div class="subsection-title">
-        4.2 Reciprocity-Driven Mapping
-    </div>
-
-    <table class="fixed">
-    <tbody>
-        <tr>
-            <td>
-                <div class="expression">
-                    <!-- 0^(-n) = ω^n -->
-                    <span class="number">&alpha;</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^(</span><!--
-                     --><span class="variable">-n</span>
-                    <span class="copyonly">)</span>
-                </sup>
-                    <span class="symbol">=</span>
-                    <span class="symbol">&omega;</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^</span><!--
-                     --><span class="variable">n</span>
-                </sup>
-                </div>
-            </td>
-            <td>
-                <div class="expression">
-                    <span class="variable">log</span><!--
-                 --><sub><!--
-                     --><span class="copyonly">_</span><!--
-                     --><span class="number">&alpha;</span><!--
-                 --></sub><!--
-                 --><span class="copyonly">(</span>
-                    <span class="symbol">&omega;</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^</span><!--
-                     --><span class="variable">n</span>
-                </sup>
-                    <span class="copyonly">)</span>
-                    <span class="symbol">=</span>
-                    <span class="variable">-n</span>
-                </div>
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <div class="expression">
-                    <!-- 0^(0^n) = n -->
-                    <span class="number">&alpha;</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^</span><!--
-                     --><span class="copyonly">(</span>
-                    <span class="number">&alpha;</span><!--
-                     --><sup><!--
-                         --><span class="copyonly">^</span><!--
-                         --><span class="variable">n</span>
-                    </sup>
-                    <span class="copyonly">)</span>
-                </sup>
-                    <span class="symbol">=</span>
-                    <span class="variable">n</span>
-                </div>
-            </td>
-            <td>
-                <div class="expression">
-                    <!-- log_0 (n )= 0^n -->
-                    <span class="variable">log</span><!--
-                 --><sub><!--
-                     --><span class="copyonly">_</span><!--
-                     --><span class="number">&alpha;</span><!--
-                 --></sub><!--
-                 --><span class="copyonly">(</span>
-                    <span class="variable">n</span>
-                    <span class="copyonly">)</span>
-                    <span class="symbol">=</span>
-                    <span class="number">&alpha;</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^</span><!--
-                     --><span class="variable">n</span>
-                </sup>
-                </div>
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <div class="expression">
-                    <span class="number">&alpha;</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^(</span><!--
-                     --><span class="symbol">&omega;</span><!--
-                     --><sup><!--
-                         --><span class="copyonly">^</span><!--
-                         --><span class="variable">n</span>
-                </sup>
-                    <span class="copyonly">)</span>
-                </sup>
-                    <span class="symbol">=</span>
-                    <span class="variable">-n</span>
-                </div>
-            </td>
-            <td>
-                <div class="expression">
-                    <span class="variable">log</span><!--
-                 --><sub><!--
-                     --><span class="copyonly">_</span><!--
-                     --><span class="number">&alpha;</span><!--
-                 --></sub><!--
-                 --><span class="copyonly">(</span>
-                    <span class="variable">-n</span>
-                    <span class="copyonly">)</span>
-                    <span class="symbol">=</span>
-                    <span class="symbol">&omega;</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^</span><!--
-                     --><span class="variable">n</span>
-                </sup>
-                </div>
-            </td>
-        </tr>
-
-
-
-
-        <tr>
-            <td>
-                <div class="expression">
-                    <!-- 0^(-n) = ω^n -->
-                    <span class="number">&omega;</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^(</span><!--
-                     --><span class="variable">-n</span>
-                    <span class="copyonly">)</span>
-                </sup>
-                    <span class="symbol">=</span>
-                    <span class="symbol">&alpha;</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^</span><!--
-                     --><span class="variable">n</span>
-                </sup>
-                </div>
-            </td>
-            <td>
-                <div class="expression">
-                    <span class="variable">log</span><!--
-                 --><sub><!--
-                     --><span class="copyonly">_</span><!--
-                     --><span class="number">&alpha;</span><!--
-                 --></sub><!--
-                 --><span class="copyonly">(</span>
-                    <span class="symbol">&omega;</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^</span><!--
-                     --><span class="variable">n</span>
-                </sup>
-                    <span class="copyonly">)</span>
-                    <span class="symbol">=</span>
-                    <span class="variable">-n</span>
-                </div>
-            </td>
-        </tr>
-
-
-        <tr>
-            <td>
-                <div class="expression">
-                    <span class="number">&alpha;</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^(</span><!--
-                     --><span class="symbol">&omega;</span><!--
-                     --><sup><!--
-                         --><span class="copyonly">^</span><!--
-                         --><span class="variable">n</span>
-                </sup>
-                    <span class="copyonly">)</span>
-                </sup>
-                    <span class="symbol">=</span>
-                    <span class="variable">-n</span>
-                </div>
-            </td>
-            <td>
-                <div class="expression">
-                    <span class="variable">log</span><!--
-                 --><sub><!--
-                     --><span class="copyonly">_</span><!--
-                     --><span class="number">&alpha;</span><!--
-                 --></sub><!--
-                 --><span class="copyonly">(</span>
-                    <span class="variable">-n</span>
-                    <span class="copyonly">)</span>
-                    <span class="symbol">=</span>
-                    <span class="symbol">&omega;</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^</span><!--
-                     --><span class="variable">n</span>
-                </sup>
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <div class="subsection-title">
-        4.2 Rewrite Rules
-    </div>
-
-    <div class="expression">
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="variable">v</span><!--
-     --></sub>
-        <span class="symbol">(</span>
-        <span class="variable">x</span>
-        <span class="symbol">&middot;</span>
-        <span class="variable">y</span>
-        <span class="symbol">)</span>
-
-        <span class="symbol">=</span>
-
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="variable">v</span><!--
-     --></sub>
-        <span class="symbol">(</span>
-        <span class="variable">x</span>
-        <span class="symbol">)</span>
-        <span class="symbol">+</span>
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="variable">v</span><!--
-     --></sub>
-        <span class="symbol">(</span>
-        <span class="variable">y</span>
-        <span class="symbol">)</span>
-    </div>
-
-    <div class="expression">
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="variable">v</span><!--
-     --></sub>
-        <span class="symbol">(</span>
-        <span class="variable">x</span>
-        <span class="symbol">+</span>
-        <span class="variable">y</span>
-        <span class="symbol">)</span>
-
-        <span class="symbol">=</span>
-
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="variable">v</span><!--
-     --></sub>
-        <span class="symbol">(</span>
-        <span class="variable">x</span>
-        <span class="symbol">)</span>
-        <span class="symbol">&middot;</span>
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="variable">v</span><!--
-     --></sub>
-        <span class="symbol">(</span>
-        <span class="variable">y</span>
-        <span class="symbol">)</span>
-    </div>
-
 
     <div class="copyonly">---</div>
     <div class="section-footer">
     </div>
 </div>
 
-
-<div class="section">
-
-    <div class="section-title" id="section-7">
-        7. Derivations
-    </div>
-
-
-    <div class="subsection-title">
-        7.1 Reciprocity
-    </div>
-
-    <p>
-        The reciprocity axiom:
-    </p>
-
-    <div class="expression">
-        <span class="symbol">&alpha;</span>
-        <span class="symbol">&middot;</span>
-        <span class="symbol">&omega;</span>
-        <span class="symbol">=</span>
-        <span class="number">1</span>
-    </div>
-
-    <p>
-        Reciprocal rule of the exponential:
-    </p>
-
-
-    <div class="expression">
-        <span class="symbol">&alpha;</span><!--
-     --><sup><!--
-             --><span class="copyonly">^</span><!--
-             --><span class="variable">-v</span>
-    </sup>
-        <span class="symbol">=</span>
-        <span class="symbol">ω</span><!--
-     --><sup><!--
-         --><span class="copyonly">^(</span><!--
-         --><span class="variable">v</span>
-        <span class="copyonly">)</span>
-    </sup>
-    </div>
-
-    <div class="expression">
-        <span class="symbol">&alpha;</span><!--
-     --><sup><!--
-             --><span class="copyonly">^</span><!--
-             --><span class="variable">-n</span>
-        </sup>
-        <span class="symbol">=</span>
-        <span class="symbol">ω</span><!--
-     --><sup><!--
-         --><span class="copyonly">^(</span><!--
-         --><span class="variable">n</span>
-            <span class="copyonly">)</span>
-        </sup>
-    </div>
-
-
-
-    <p>
-        Reciprocal rule for logarithms:
-    </p>
-
-    <div class="expression">
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="variable">v</span><!--
-     --></sub><!--
-     --><span class="copyonly">(</span>
-        <span class="symbol">&alpha;</span>
-        <span class="copyonly">)</span>
-        <span class="symbol">=</span>
-        <span class="symbol">&ndash;</span>
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="variable">v</span><!--
-     --></sub><!--
-     --><span class="copyonly">(</span>
-        <span class="symbol">&omega;</span>
-
-        <span class="copyonly">)</span>
-    </div>
-
-    <div class="expression">
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="variable">v</span><!--
-     --></sub><!--
-     --><span class="copyonly">(</span>
-        <span class="symbol">&omega;</span>
-        <span class="copyonly">)</span>
-        <span class="symbol">=</span>
-        <span class="symbol">&ndash;</span>
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="variable">v</span><!--
-     --></sub><!--
-     --><span class="copyonly">(</span>
-        <span class="symbol">&alpha;</span>
-
-        <span class="copyonly">)</span>
-    </div>
-
-    <div class="expression">
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="variable">v</span><!--
-     --></sub><!--
-     --><span class="copyonly">(</span>
-        <span class="variable">n</span>
-        <span class="copyonly">)</span>
-        <span class="symbol">=</span>
-        <span class="symbol">&ndash;</span>
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="variable">v</span><!--
-     --></sub><!--
-     --><span class="copyonly">(</span>
-        <span class="fraction">
-            <span class="numerator">
-                <span class="number">1</span>
-            </span>
-            <span class="h-divider">
-                /
-            </span>
-            <span class="denominator">
-                <span class="variable">n</span>
-            </span>
-        </span>
-
-        <span class="copyonly">)</span>
-    </div>
-
-
-    <div class="subsection-title">
-        5.2 Involution
-    </div>
-
-    <p>
-        The involution axiom:
-    </p>
-
-    <div class="expression">
-        <!-- 0^(0^n) = n -->
-        <span class="symbol">&alpha;</span><!--
-     --><sup><!--
-         --><span class="copyonly">^</span><!--
-         --><span class="copyonly">(</span>
-        <span class="symbol">&alpha;</span><!--
-     --><sup><!--
-         --><span class="copyonly">^</span><!--
-         --><span class="variable">n</span>
-        </sup>
-        <span class="copyonly">)</span>
-    </sup>
-        <span class="symbol">=</span>
-        <span class="variable">n</span>
-    </div>
-
-    <p>
-        Forces:
-    </p>
-
-    <div class="expression">
-        <!-- log_0 (n )= 0^n -->
-        <span class="variable">log</span><!--
-                 --><sub><!--
-                     --><span class="copyonly">_</span><!--
-                     --><span class="number">&alpha;</span><!--
-                 --></sub><!--
-                 --><span class="copyonly">(</span>
-        <span class="variable">n</span>
-        <span class="copyonly">)</span>
-        <span class="symbol">=</span>
-        <span class="number">&alpha;</span><!--
-                 --><sup><!--
-                     --><span class="copyonly">^</span><!--
-                     --><span class="variable">n</span>
-    </sup>
-    </div>
-
-    <p>
-        Substitute the reciprocal in the exponent:
-    </p>
-
-    <div class="expression">
-        <!-- 0^(0^n) = n -->
-        <span class="symbol">&alpha;</span><!--
-     --><sup><!--
-         --><span class="copyonly">^</span><!--
-         --><span class="copyonly">(</span>
-        <span class="symbol">&omega;</span><!--
-     --><sup><!--
-         --><span class="copyonly">^</span><!--
-         --><span class="variable">&ndash;n</span>
-        </sup>
-        <span class="copyonly">)</span>
-    </sup>
-        <span class="symbol">=</span>
-        <span class="variable">n</span>
-    </div>
-
-    <p>
-        Take the logarithm:
-    </p>
-
-    <div class="expression">
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="number">&alpha;</span><!--
-     --></sub><!--
-     --><span class="symbol">(</span>
-        <span class="symbol">&alpha;</span><!--
-     --><sup><!--
-         --><span class="copyonly">^</span><!--
-         --><span class="copyonly">(</span>
-            <span class="symbol">&omega;</span><!--
-         --><sup><!--
-             --><span class="copyonly">^</span><!--
-             --><span class="variable">&ndash;n</span>
-            </sup>
-            <span class="copyonly">)</span>
-        </sup>
-        <span class="symbol">)</span>
-        <span class="symbol">=</span>
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="number">&alpha;</span><!--
-     --></sub>
-        <span class="variable">n</span>
-    </div>
-
-    <div class="expression">
-        <span class="symbol">&omega;</span><!--
-     --><sup><!--
-         --><span class="copyonly">^</span><!--
-         --><span class="variable">&ndash;n</span>
-        </sup>
-        <span class="symbol">&middot;</span>
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="number">&alpha;</span><!--
-     --></sub><!--
-     --><span class="symbol">(</span>
-        <span class="symbol">&alpha;</span>
-        <span class="symbol">)</span>
-        <span class="symbol">=</span>
-        <span class="variable">log</span><!--
-     --><sub><!--
-         --><span class="copyonly">_</span><!--
-         --><span class="number">&alpha;</span><!--
-     --></sub>
-        <span class="variable">n</span>
-    </div>
-
-
-</div>
 
 <script>
 </script>
