@@ -23,7 +23,7 @@ from parser import Parser, ParseError, parse_and_eval, SolutionSet, FunctionDef
 from parser import get_user_functions, delete_user_function
 from formatting import format_result, format_approx, format_complex, format_numeric_approx
 from decomposition import chebyshev_decompose, _eval_ring_exact, _reduce_ring_form, _complex_at_pi2
-from visualization import (compute_phase_grid, phase_to_rgb, continuity_to_rgb,
+from visualization import (compute_phase_grid, phase_to_rgb, magnitude_to_rgb, blended_to_rgb,
                            CANVAS_SIZE, GRID_RES, AXIS_MARGIN, CANVAS_TOTAL, DEFAULT_BOUNDS, PHASE_COLORS)
 from fractal import compute_fractal, fractal_to_rgb, parse_fractal_args
 from streamlines import compute_streamlines
@@ -57,7 +57,7 @@ class CalculatorApp:
         self.show_tangent = False
         self.show_normal = False
         self.show_diamond = False
-        self.color_mode = 'phase'  # 'phase' or 'continuity'
+        self.color_mode = 'phase'  # 'phase', 'magnitude', or 'blended'
         self.projection_names = registry.names('projection')
         self.projection_index = 0  # default to first registered (complex_lie)
         self._has_t = False  # True when current expression contains t
@@ -971,8 +971,10 @@ class CalculatorApp:
             label = proj_name.replace('_', ' ')
             self.viz_title_label.configure(text=f'Phase Plot [{label}]')
 
-        if self.color_mode == 'continuity':
-            rgb = continuity_to_rgb(phase, log_mag)
+        if self.color_mode == 'magnitude':
+            rgb = magnitude_to_rgb(phase, log_mag)
+        elif self.color_mode == 'blended':
+            rgb = blended_to_rgb(phase, brightness, log_mag)
         else:
             rgb = phase_to_rgb(phase, brightness)
         self._render_viz(rgb)
@@ -1139,11 +1141,10 @@ class CalculatorApp:
         self.display_expr.focus_set()
 
     def _toggle_color_mode(self):
-        """Toggle between Phase and Continuity color models."""
-        if self.color_mode == 'phase':
-            self.color_mode = 'continuity'
-        else:
-            self.color_mode = 'phase'
+        """Cycle through Phase, Magnitude, and Blended color models."""
+        cycle = ['phase', 'magnitude', 'blended']
+        idx = cycle.index(self.color_mode) if self.color_mode in cycle else 0
+        self.color_mode = cycle[(idx + 1) % len(cycle)]
         if self.viz_Z is not None:
             self._refresh_viz()
         self.display_expr.focus_set()

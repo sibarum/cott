@@ -136,8 +136,8 @@
             <td>Default projection: <span class="dynamicexpr">0^z</span> &rarr; <em>e</em><sup>&minus;<em>Wz</em></sup></td>
         </tr>
         <tr>
-            <td><code>projections/hyperbolic.py</code></td>
-            <td>Hyperbolic projection: <span class="dynamicexpr">0^z</span> &rarr; <em>e</em><sup><em>&theta;z</em></sup> (sinh/cosh)</td>
+            <td><code>projections/geometric_algebra.py</code></td>
+            <td>Geometric algebra: dot + wedge product, Cayley transform</td>
         </tr>
         <tr>
             <td colspan="2"><strong>gui/</strong></td>
@@ -739,59 +739,91 @@
     </p>
 
     <div class="subsection-title" id="section-5_3">
-        5.3 Hyperbolic Projection (<code>projections/hyperbolic.py</code>)
+        5.3 Geometric Algebra Projection (<code>projections/geometric_algebra.py</code>)
     </div>
 
     <p>
-        An alternative to the Lie exponential that uses the <em>real</em> exponential
-        instead of the imaginary one. Where the Lie projection maps
-        <span class="dynamicexpr">0^z &rarr; e^{i&theta;z}</span> (circular/oscillatory),
-        the hyperbolic projection maps
-        <span class="dynamicexpr">0^z &rarr; e^{&theta;z}</span> (growth/decay):
+        A purely algebraic alternative to the Lie exponential, grounded in
+        2D geometric algebra. The geometric product of two vectors decomposes as:
     </p>
 
     <div class="expression font-lg">
-        0<sup><span class="variable">z</span></sup> = cosh(&theta;<span class="variable">z</span>) + sinh(&theta;<span class="variable">z</span>)
-        = <em>e</em><sup>&theta;<span class="variable">z</span></sup>
+        <span class="variable">a</span><span class="variable">b</span>
+        = <span class="variable">a</span>&middot;<span class="variable">b</span>
+        + <span class="variable">a</span>&and;<span class="variable">b</span>
+        &emsp; (scalar + bivector)
     </div>
 
     <p>
-        The native unit coordinate is the same as Complex Lie:
-        <span class="variable">x</span> = <span class="dynamicexpr">p + q&middot;0^{&omega;/2}</span>,
-        so the input grid parameterizes the complex plane identically.
-        The difference is entirely in how zero-powers are evaluated.
-    </p>
-
-    <p>
-        This swaps the roles of the real and imaginary axes compared to Lie:
+        In 2D with basis vectors <span class="variable">e</span><sub>1</sub>,
+        <span class="variable">e</span><sub>2</sub>, the bivector
+        <span class="variable">I</span> = <span class="variable">e</span><sub>1</sub><span class="variable">e</span><sub>2</sub>
+        is the oriented unit area element. Its square determines the algebra's character:
     </p>
 
     <table class="fixed">
         <thead>
         <tr>
-            <th>Projection</th>
-            <th>Real axis</th>
-            <th>Imaginary axis</th>
+            <th>Metric</th>
+            <th><span class="variable">I</span>&sup2;</th>
+            <th>Exponential</th>
+            <th>Behavior</th>
         </tr>
         </thead>
         <tbody>
         <tr>
-            <td>Complex Lie</td>
-            <td>Oscillation (phase rotation)</td>
-            <td>Growth / decay (magnitude)</td>
+            <td>Circular (Lie)</td>
+            <td>&minus;1</td>
+            <td>cos &theta; + <span class="variable">I</span> sin &theta;</td>
+            <td>Rotation (phase)</td>
         </tr>
         <tr>
-            <td>Hyperbolic</td>
-            <td>Growth / decay (magnitude)</td>
-            <td>Oscillation (phase rotation)</td>
+            <td>Hyperbolic (GA)</td>
+            <td>+1</td>
+            <td>cosh &phi; + <span class="variable">I</span> sinh &phi;</td>
+            <td>Boost (magnitude)</td>
         </tr>
         </tbody>
     </table>
 
     <p>
-        The hyperbolic projection makes the sinh/cosh structure of traction
-        expressions visible: level curves follow hyperbolas rather than circles,
-        and exponential growth dominates along the real direction.
+        Same algebraic structure, different metric signature &rarr; completely different behavior.
+        A complex number <span class="dynamicexpr">a + bi</span> becomes a multivector
+        <span class="dynamicexpr">a + bI</span>: the real part is a scalar, the imaginary part
+        is an oriented area element.
+    </p>
+
+    <p>
+        Coloring derives from the geometric product of input
+        <span class="variable">p</span> and output <span class="variable">f</span>(<span class="variable">p</span>):
+    </p>
+
+    <table class="fixed">
+        <thead>
+        <tr>
+            <th>Product</th>
+            <th>Formula</th>
+            <th>Meaning</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Dot (scalar)</td>
+            <td><span class="variable">p</span>&middot;<span class="variable">f</span>(<span class="variable">p</span>) = <em>xu + yv</em></td>
+            <td>Radial stretch / alignment</td>
+        </tr>
+        <tr>
+            <td>Wedge (bivector)</td>
+            <td><span class="variable">p</span>&and;<span class="variable">f</span>(<span class="variable">p</span>) = <em>xv &minus; yu</em></td>
+            <td>Oriented rotation / angular twist</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>
+        For zero-powers, the Cayley rational transform replaces the transcendental exponential:
+        <span class="dynamicexpr">0^z &rarr; (1+z)/(1&minus;z)</span> &mdash;
+        conformal, rational, and unit-circle preserving. No exp, log, sin, cos, or atan2.
     </p>
 
     <div class="copyonly">---</div>

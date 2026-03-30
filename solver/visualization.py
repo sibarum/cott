@@ -253,9 +253,9 @@ def phase_to_rgb(phase_grid, brightness=None):
     return rgb
 
 
-def continuity_to_rgb(phase_grid, log_mag):
+def magnitude_to_rgb(phase_grid, log_mag):
     """
-    Color continuity model: same CMYT palette as phase mode, but follows
+    Magnitude color model: same CMYT palette as phase mode, but follows
     magnitude instead of phase. Double-cover mapping ensures |f|->0 and
     |f|->inf wrap to the same color (continuity at infinity).
     No brightness modulation — pure color from magnitude.
@@ -279,3 +279,21 @@ def continuity_to_rgb(phase_grid, log_mag):
     rgb[nan_mask] = [40, 40, 40]
 
     return rgb
+
+
+def blended_to_rgb(phase_grid, brightness, log_mag):
+    """
+    Blended color model: multiply-blends the phase and magnitude layers.
+
+    Phase layer provides hue from the angle (CMYT quadrants + brightness).
+    Magnitude layer provides hue from |f| (double-cover mapping).
+    The two are combined via multiply blend: out = (A * B) / 255.
+
+    This reveals both phase structure and magnitude contours simultaneously.
+    """
+    rgb_phase = phase_to_rgb(phase_grid, brightness).astype(np.float64)
+    rgb_mag = magnitude_to_rgb(phase_grid, log_mag).astype(np.float64)
+
+    # Multiply blend: each channel scaled by the other, normalized
+    blended = (rgb_phase * rgb_mag) / 255.0
+    return np.clip(blended, 0, 255).astype(np.uint8)

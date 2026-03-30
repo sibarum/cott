@@ -10,7 +10,7 @@ import threading
 from traction import Zero, Omega, Null, GradedElement, traction_simplify
 import registry
 from parser import Parser, parse_and_eval
-from visualization import (compute_phase_grid, phase_to_rgb, continuity_to_rgb,
+from visualization import (compute_phase_grid, phase_to_rgb, magnitude_to_rgb, blended_to_rgb,
                            CANVAS_SIZE, GRID_RES, AXIS_MARGIN, CANVAS_TOTAL, DEFAULT_BOUNDS)
 from fractal import compute_fractal, fractal_to_rgb, parse_fractal_args
 from streamlines import compute_streamlines
@@ -510,8 +510,10 @@ class FullScreenViewer:
         brightness = eval_result['brightness']
         log_mag = eval_result.get('log_mag')
 
-        if color_mode == 'continuity':
-            return continuity_to_rgb(phase, log_mag)
+        if color_mode == 'magnitude':
+            return magnitude_to_rgb(phase, log_mag)
+        elif color_mode == 'blended':
+            return blended_to_rgb(phase, brightness, log_mag)
         else:
             return phase_to_rgb(phase, brightness)
 
