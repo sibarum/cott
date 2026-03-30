@@ -136,8 +136,8 @@
             <td>Default projection: <span class="dynamicexpr">0^z</span> &rarr; <em>e</em><sup>&minus;<em>Wz</em></sup></td>
         </tr>
         <tr>
-            <td><code>projections/q_surface.py</code></td>
-            <td>Q-norm surface projection for zero-power coordinates</td>
+            <td><code>projections/hyperbolic.py</code></td>
+            <td>Hyperbolic projection: <span class="dynamicexpr">0^z</span> &rarr; <em>e</em><sup><em>&theta;z</em></sup> (sinh/cosh)</td>
         </tr>
         <tr>
             <td colspan="2"><strong>gui/</strong></td>
@@ -739,75 +739,59 @@
     </p>
 
     <div class="subsection-title" id="section-5_3">
-        5.3 Q-Surface Projection (<code>projections/q_surface.py</code>)
+        5.3 Hyperbolic Projection (<code>projections/hyperbolic.py</code>)
     </div>
 
     <p>
-        An alternative to the Lie exponential that maps zero-powers
-        directly to coordinates on a <span class="variable">q</span>-norm unit surface.
-        Given <span class="dynamicexpr">0^t</span>:
+        An alternative to the Lie exponential that uses the <em>real</em> exponential
+        instead of the imaginary one. Where the Lie projection maps
+        <span class="dynamicexpr">0^z &rarr; e^{i&theta;z}</span> (circular/oscillatory),
+        the hyperbolic projection maps
+        <span class="dynamicexpr">0^z &rarr; e^{&theta;z}</span> (growth/decay):
     </p>
 
     <div class="expression font-lg">
-        phase = <span class="variable">t</span>
-        &emsp;&emsp;
-        magnitude = (1 &minus; <span class="variable">t</span>&sup2;)<sup>1/<span class="variable">q</span></sup>
+        0<sup><span class="variable">z</span></sup> = cosh(&theta;<span class="variable">z</span>) + sinh(&theta;<span class="variable">z</span>)
+        = <em>e</em><sup>&theta;<span class="variable">z</span></sup>
     </div>
 
     <p>
-        The native unit for q-surface is
-        <span class="variable">x</span> = <span class="dynamicexpr">0^{p + q*0^{w/2}}</span>
-        &mdash; the same complex plane input as Complex Lie, but lifted into the zero-power domain.
-        This means the same expression (e.g. <span class="dynamicexpr">x^2</span>)
-        produces interesting zero-power structure on the q-surface
-        while appearing as a standard polynomial on Complex Lie.
+        The native unit coordinate is the same as Complex Lie:
+        <span class="variable">x</span> = <span class="dynamicexpr">p + q&middot;0^{&omega;/2}</span>,
+        so the input grid parameterizes the complex plane identically.
+        The difference is entirely in how zero-powers are evaluated.
     </p>
 
     <p>
-        The parameter <span class="variable">q</span> selects the geometry of the surface:
+        This swaps the roles of the real and imaginary axes compared to Lie:
     </p>
 
     <table class="fixed">
         <thead>
         <tr>
-            <th><span class="variable">q</span></th>
-            <th>Norm</th>
-            <th>Surface shape</th>
+            <th>Projection</th>
+            <th>Real axis</th>
+            <th>Imaginary axis</th>
         </tr>
         </thead>
         <tbody>
         <tr>
-            <td>1</td>
-            <td>Taxicab</td>
-            <td>Diamond</td>
+            <td>Complex Lie</td>
+            <td>Oscillation (phase rotation)</td>
+            <td>Growth / decay (magnitude)</td>
         </tr>
         <tr>
-            <td>2</td>
-            <td>Euclidean</td>
-            <td>Circle (default)</td>
-        </tr>
-        <tr>
-            <td>&infin;</td>
-            <td>Chebyshev</td>
-            <td>Square</td>
+            <td>Hyperbolic</td>
+            <td>Growth / decay (magnitude)</td>
+            <td>Oscillation (phase rotation)</td>
         </tr>
         </tbody>
     </table>
 
     <p>
-        For |<span class="variable">t</span>| &gt; 1, the magnitude formula takes a root of a
-        negative number, which in traction algebra naturally rotates into the
-        zero-power domain via <span class="dynamicexpr">0^{w/2}</span>.
-        This gives the projection its projective character &mdash;
-        values wrap through infinity rather than diverging.
-    </p>
-
-    <p>
-        The q-surface decomposer handles sums of zero-powers: each term in an
-        <code>Add</code> is decomposed independently, and the q-coordinates are
-        accumulated weighted by scalar factors. Expressions without zero-power
-        structure (e.g. plain <span class="dynamicexpr">x^2</span>) produce a blank plot &mdash;
-        the projection is honest about what it can and cannot represent.
+        The hyperbolic projection makes the sinh/cosh structure of traction
+        expressions visible: level curves follow hyperbolas rather than circles,
+        and exponential growth dominates along the real direction.
     </p>
 
     <div class="copyonly">---</div>

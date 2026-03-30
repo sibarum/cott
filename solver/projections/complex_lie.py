@@ -12,7 +12,7 @@ This is the standard/default projection for the COTT calculator.
 import numpy as np
 from sympy import symbols, lambdify
 from traction import traction_simplify, project_complex, Zero, Omega, Pow, Mul, Rational
-from projections.base import Projection
+from projections.base import Projection, z_to_metrics
 
 
 class ComplexLieProjection(Projection):
@@ -66,37 +66,7 @@ class ComplexLieProjection(Projection):
         except Exception:
             return None
 
-        return _z_to_metrics(Z)
-
-
-def _z_to_metrics(Z):
-    """Convert a complex Z grid to the standard metrics dict."""
-    phase = np.angle(Z)
-    phase = (phase + 2 * np.pi) % (2 * np.pi)
-
-    mag = np.abs(Z)
-    # Clamp magnitude floor to avoid log(0), but don't discard small values
-    log_mag = np.log(np.maximum(mag, 1e-300))
-
-    # Only truly invalid: non-finite Z or exactly zero
-    invalid = ~np.isfinite(Z) | (Z == 0)
-    phase[invalid] = np.nan
-    log_mag[invalid] = np.nan
-
-    brightness = 0.5 + np.arctan(log_mag) / np.pi
-    brightness = np.clip(brightness, 0.12, 0.95)
-    # Invalid pixels get zero brightness (renders as black, not gray)
-    brightness[invalid] = 0.0
-
-    return {
-        'Z': Z,
-        'Re': Z.real,
-        'Im': Z.imag,
-        'mag': mag,
-        'log_mag': log_mag,
-        'phase': phase,
-        'brightness': brightness,
-    }
+        return z_to_metrics(Z)
 
 
 # Auto-register on import

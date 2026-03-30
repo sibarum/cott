@@ -78,3 +78,34 @@ class Projection:
     def register_self(self):
         """Register this projection in the global registry."""
         register('projection', self.name, self, description=self.description)
+
+
+def z_to_metrics(Z):
+    """Convert a complex Z grid to the standard metrics dict.
+
+    Shared by all projections that produce a complex output grid.
+    Returns dict with keys: Z, Re, Im, mag, log_mag, phase, brightness.
+    """
+    phase = np.angle(Z)
+    phase = (phase + 2 * np.pi) % (2 * np.pi)
+
+    mag = np.abs(Z)
+    log_mag = np.log(np.maximum(mag, 1e-300))
+
+    invalid = ~np.isfinite(Z) | (Z == 0)
+    phase[invalid] = np.nan
+    log_mag[invalid] = np.nan
+
+    brightness = 0.5 + np.arctan(log_mag) / np.pi
+    brightness = np.clip(brightness, 0.12, 0.95)
+    brightness[invalid] = 0.0
+
+    return {
+        'Z': Z,
+        'Re': Z.real,
+        'Im': Z.imag,
+        'mag': mag,
+        'log_mag': log_mag,
+        'phase': phase,
+        'brightness': brightness,
+    }

@@ -19,7 +19,8 @@ from matplotlib.figure import Figure
 from traction import Zero, Omega, Null, GradedElement, traction_simplify, project_complex
 import registry
 import projections  # auto-discovers and registers projection plugins
-from parser import Parser, ParseError, parse_and_eval, SolutionSet
+from parser import Parser, ParseError, parse_and_eval, SolutionSet, FunctionDef
+from parser import get_user_functions, delete_user_function
 from formatting import format_result, format_approx, format_complex, format_numeric_approx
 from decomposition import chebyshev_decompose, _eval_ring_exact, _reduce_ring_form, _complex_at_pi2
 from visualization import (compute_phase_grid, phase_to_rgb, continuity_to_rgb,
@@ -142,6 +143,7 @@ class CalculatorApp:
             ('\u232b', self._backspace),      # backspace
             ('\u21ba', self._clear_entry),     # undo/clear entry
             ('C', self._clear_all),
+            ('\U0001d453', self._open_func_memory),  # 𝑓 — function memory
         ]
         for label, cmd in action_buttons:
             self._make_button(action_frame, label, cmd).pack(side='left', padx=1, pady=1)
@@ -150,15 +152,15 @@ class CalculatorApp:
         pad_frame = tk.Frame(body, bg=BG_BODY)
         pad_frame.pack(anchor='w', pady=(6, 12), padx=(12, 0))
 
-        # Layout: 5 columns x 5 rows
+        # Layout: 5 columns x 6 rows
         layout = [
             # col 0             col 1            col 2            col 3            col 4
-            [('(', '('),        (')', ')'),      ('^', '^'),      ('\u00f7', '/'), ('log\u2080','log0(')],
-            [('7', '7'),        ('8', '8'),      ('9', '9'),      ('\u00d7', '*'), ('log\u03c9','log\u03c9(')],
-            [('4', '4'),        ('5', '5'),      ('6', '6'),      ('\u2013', '-'), ('p', 'p')],
-            [('1', '1'),        ('2', '2'),      ('3', '3'),      ('+', '+'),      ('q', 'q')],
-            [('0', '0'),        ('\u03c9', '\u03c9'),('i', '0^(\u03c9/2)'),('=', None),  ('x', 'x')],
-            [('', None),        ('', None),      ('', None),          ('', None),      ('t', 't')],
+            [('(', '('),        (')', ')'),      ('^', '^'),      ('\u00f7', '/'), ('p', 'p')],
+            [('7', '7'),        ('8', '8'),      ('9', '9'),      ('\u00d7', '*'), ('q', 'q')],
+            [('4', '4'),        ('5', '5'),      ('6', '6'),      ('\u2013', '-'), ('x', 'x')],
+            [('1', '1'),        ('2', '2'),      ('3', '3'),      ('+', '+'),      ('t', 't')],
+            [('0', '0'),        ('\u03c9', '\u03c9'),('i', '0^(\u03c9/2)'),('=', None),  ('', None)],
+            [('log\u2080','log0('),('log\u03c9','log\u03c9('),('', None),  ('', None),      ('', None)],
         ]
 
         for row_idx, row in enumerate(layout):
@@ -715,6 +717,10 @@ class CalculatorApp:
         self._eq_label.configure(text='\u2248' if self._approx_mode else '=')
         self._update_live_preview()
 
+    def _open_func_memory(self):
+        """Open the function memory dialog showing all user-defined functions."""
+        FuncMemoryDialog(self.root, self)
+
     def _clear_all(self):
         self.entry_var.set('')
         self.history = []
@@ -734,7 +740,17 @@ class CalculatorApp:
             return
 
         try:
-            result = parse_and_eval(expr_text)
+            result = parse_and_eval(expr_text, allow_definition=True)
+
+            # Function definition: clear input, then show success with definition
+            if isinstance(result, FunctionDef):
+                params = ', '.join(result.params)
+                body_str = format_result(result.body)
+                self.entry_var.set('')  # clear first (triggers live preview → empty)
+                self._set_result_text(
+                    f'{result.name}({params}) = {body_str}  \u2713', fg=FG_RESULT)
+                return
+
             display_text = self._format_display_result(result)
             self._set_result_text(display_text, fg=FG_RESULT)
 
@@ -2302,5 +2318,83 @@ class CalculatorApp:
                 self._refresh_viz()
         else:
             self._refresh_viz()
+
+
+class FuncMemoryDialog:
+    """Dialog for viewing and deleting user-defined functions."""
+
+    def __init__(self, parent, app):
+        self.app = app
+        self.win = tk.Toplevel(parent)
+        self.win.title('Function Memory')
+        self.win.configure(bg=BG_BODY)
+        self.win.resizable(False, False)
+        self.win.transient(parent)
+        self.win.grab_set()
+
+        self._build_ui()
+        self.win.protocol('WM_DELETE_WINDOW', self._close)
+
+    def _build_ui(self):
+        funcs = get_user_functions()
+
+        header = tk.Label(self.win, text='Defined Functions', font=('Segoe UI', 14, 'bold'),
+                          bg=BG_BODY, fg=FG_TEXT)
+        header.pack(pady=(12, 8), padx=16)
+
+        if not funcs:
+            tk.Label(self.win, text='No functions defined.',
+                     font=('Segoe UI', 11), bg=BG_BODY, fg=FG_DIM).pack(pady=(0, 12), padx=16)
+        else:
+            list_frame = tk.Frame(self.win, bg=BG_BODY)
+            list_frame.pack(fill='both', expand=True, padx=16, pady=(0, 8))
+
+            for name, (params, body) in funcs.items():
+                row = tk.Frame(list_frame, bg=BG_BODY)
+                row.pack(fill='x', pady=2)
+
+                params_str = ', '.join(params)
+                body_str = format_result(body)
+                label_text = f'{name}({params_str}) = {body_str}'
+                tk.Label(row, text=label_text, font=('Consolas', 12),
+                         bg=BG_BODY, fg=FG_TEXT, anchor='w').pack(side='left', fill='x', expand=True)
+
+                del_btn = tk.Button(row, text='\u2715', font=('Segoe UI', 10),
+                                    fg='#aa3333', bg=BG_BTN, bd=1, width=3,
+                                    command=lambda n=name: self._delete_func(n))
+                del_btn.pack(side='right', padx=(8, 0))
+
+                edit_btn = tk.Button(row, text=':=', font=('Consolas', 10),
+                                     fg=FG_TEXT, bg=BG_BTN, bd=1, width=3,
+                                     command=lambda n=name: self._edit_func(n))
+                edit_btn.pack(side='right')
+
+        close_btn = tk.Button(self.win, text='Close', font=('Segoe UI', 11),
+                              bg=BG_BTN, fg=FG_TEXT, bd=1, command=self._close)
+        close_btn.pack(pady=(4, 12))
+
+    def _edit_func(self, name):
+        """Load a function definition into the calculator input for editing."""
+        funcs = get_user_functions()
+        if name not in funcs:
+            return
+        params, body = funcs[name]
+        params_str = ', '.join(params)
+        body_str = format_result(body)
+        self.app.entry_var.set(f'{name}({params_str})={body_str}')
+        self.app.display_expr.icursor('end')
+        self.app.display_expr.focus_set()
+        self._close()
+
+    def _delete_func(self, name):
+        delete_user_function(name)
+        # Rebuild the dialog
+        for widget in self.win.winfo_children():
+            widget.destroy()
+        self._build_ui()
+
+    def _close(self):
+        self.win.grab_release()
+        self.win.destroy()
 
 

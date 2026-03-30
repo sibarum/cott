@@ -33,9 +33,8 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
 
     Variable system:
         p, q — raw grid coordinates (horizontal, vertical). Always the same.
-        x    — projection's native unit coordinate. Defined by each projection:
-               complex_lie: x = p + q*0^(w/2)
-               q_surface:   x = 0^(w*p/q)
+        x    — projection's native unit coordinate. Defined by each projection.
+               e.g. complex_lie: x = p + q*0^(w/2)
         t    — time parameter (scalar, 0 to 1). Substituted before grid eval.
 
     Returns tuple (phase, brightness, Z, log_mag) or None on failure.

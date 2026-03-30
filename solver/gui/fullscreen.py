@@ -500,25 +500,15 @@ class FullScreenViewer:
         if projected is None:
             return None
 
-        from sympy import lambdify
-        try:
-            f = lambdify((a, b), projected, modules='numpy')
-        except Exception:
-            return None
-
         AA, BB = np.meshgrid(lin_p, lin_q)
-        try:
-            Z = f(AA, BB)
-            if np.isscalar(Z):
-                Z = np.full_like(AA, complex(Z), dtype=complex)
-            Z = np.asarray(Z, dtype=complex)
-        except Exception:
+        eval_result = proj.eval_grid(projected, a, b, AA, BB,
+                                     traction_expr=traction_expr)
+        if eval_result is None:
             return None
 
-        phase = np.angle(Z) % (2 * np.pi)
-        mag = np.abs(Z)
-        log_mag = np.log(mag + 1e-30)
-        brightness = 1 - 1 / (1 + mag ** 0.4)
+        phase = eval_result['phase']
+        brightness = eval_result['brightness']
+        log_mag = eval_result.get('log_mag')
 
         if color_mode == 'continuity':
             return continuity_to_rgb(phase, log_mag)

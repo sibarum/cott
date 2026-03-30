@@ -7,7 +7,7 @@ and complex projections for the calculator UI.
 
 from sympy import S, Integer, Rational, Pow, Mul, Add, Symbol, I
 from traction import Zero, Omega, Null, Log0, LogW, GradedElement, project_complex
-from parser import SolutionSet
+from parser import SolutionSet, _UserCall
 
 
 def format_result(expr):
@@ -32,6 +32,9 @@ def format_result(expr):
         grade = format_result(expr.grade)
         value = format_result(expr.value)
         return f'Z_{grade}({value})'
+    if isinstance(expr, _UserCall):
+        args_str = ', '.join(format_result(a) for a in expr._call_args)
+        return f'{expr._func_param}({args_str})'
     if isinstance(expr, Symbol):
         return str(expr)
     if isinstance(expr, Log0):

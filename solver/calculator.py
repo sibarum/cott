@@ -19,7 +19,8 @@ This module serves as the entry point. All logic is in submodules:
 import tkinter as tk
 
 # Re-export public API for backward compatibility
-from parser import Parser, ParseError, SolutionSet, parse_and_eval
+from parser import Parser, ParseError, SolutionSet, parse_and_eval, FunctionDef
+from parser import get_user_functions, delete_user_function, define_function
 from formatting import format_result, format_approx, format_complex, format_numeric_approx
 from decomposition import chebyshev_decompose, _eval_ring_exact, _reduce_ring_form, _complex_at_pi2
 from visualization import (compute_phase_grid, phase_to_rgb, continuity_to_rgb,
