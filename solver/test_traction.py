@@ -605,7 +605,7 @@ class TestPipeline:
         from calculator import compute_phase_grid, compute_streamlines
         result = compute_phase_grid('(1-(1/x)^2)^(1/x)')
         assert result is not None
-        phase, brightness, Z, log_mag = result
+        phase, brightness, Z, log_mag = result[:4]
         # Should produce a grid with mostly valid values
         import numpy as np
         valid = np.count_nonzero(np.isfinite(Z))
@@ -622,7 +622,7 @@ class TestPipeline:
         import numpy as np
         result = compute_phase_grid('0*((x^2+1)^(1/2))')
         assert result is not None
-        _, _, Z, _ = result
+        _, _, Z, _ = result[:4]
         # All pixels should be non-zero (C(0) = e^(-W), not 0)
         valid_nonzero = np.count_nonzero(np.isfinite(Z) & (np.abs(Z) > 1e-15))
         assert valid_nonzero == 150 * 150

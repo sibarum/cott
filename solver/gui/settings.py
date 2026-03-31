@@ -112,7 +112,8 @@ class SettingsWindow:
         self.color_var = tk.StringVar(value=self.app.color_mode)
         for mode, desc in [('phase', 'Phase (CMYT quadrants + brightness)'),
                            ('magnitude', 'Magnitude (double-cover contours)'),
-                           ('blended', 'Blended (phase \u00d7 magnitude)')]:
+                           ('blended', 'Blended (phase \u00d7 magnitude)'),
+                           ('mixed', 'Mixed signature (circular \u2194 hyperbolic)')]:
             rb = tk.Radiobutton(
                 color_frame, text=desc, font=font_small,
                 variable=self.color_var, value=mode,

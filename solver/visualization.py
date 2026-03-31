@@ -83,7 +83,10 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
 
     # Graded element path: any expression containing Z_n → plot as (r, p) in r + p*w
     if traction_expr.has(GradedElement):
-        return _compute_graded_grid(traction_expr, a, b, grid_res, bounds)
+        graded = _compute_graded_grid(traction_expr, a, b, grid_res, bounds)
+        if graded is None:
+            return None
+        return graded + ({},)  # append empty extras dict
 
     # Step 1: Symbolic projection
     projected = proj.project_expr(traction_expr, a, b)
@@ -99,7 +102,11 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
     if eval_result is None:
         return None
 
-    return eval_result['phase'], eval_result['brightness'], eval_result['Z'], eval_result['log_mag']
+    # Collect any extra keys the projection provides (e.g. sig_ratio)
+    extras = {k: v for k, v in eval_result.items()
+              if k not in ('phase', 'brightness', 'Z', 'log_mag')}
+
+    return eval_result['phase'], eval_result['brightness'], eval_result['Z'], eval_result['log_mag'], extras
 
 
 def _degrade(expr):
@@ -277,6 +284,65 @@ def magnitude_to_rgb(phase_grid, log_mag):
     # NaN -> dark gray
     nan_mask = np.isnan(phase_grid)
     rgb[nan_mask] = [40, 40, 40]
+
+    return rgb
+
+
+# Signature-split palettes for mixed mode
+# Circular (rotation, I²=-1): cool blue-green spectrum
+CIRCULAR_COLORS = np.array([
+    [0, 220, 255],     # cyan        — phase 0        (positive real)
+    [60, 0, 255],      # blue-violet — phase pi/2     (positive imaginary)
+    [0, 255, 160],     # spring      — phase pi       (negative real)
+    [0, 120, 200],     # steel blue  — phase 3*pi/2   (negative imaginary)
+], dtype=np.float64)
+
+# Hyperbolic (boost, I²=+1): warm red-orange spectrum
+HYPERBOLIC_COLORS = np.array([
+    [255, 200, 0],     # gold        — phase 0        (positive real)
+    [255, 30, 0],      # red         — phase pi/2     (positive imaginary)
+    [255, 100, 200],   # pink        — phase pi       (negative real)
+    [255, 140, 0],     # orange      — phase 3*pi/2   (negative imaginary)
+], dtype=np.float64)
+
+
+def mixed_to_rgb(phase_grid, brightness, sig_ratio):
+    """Mixed-signature color model: blends circular and hyperbolic palettes.
+
+    Where rotation dominates (sig_ratio ≈ 1): cool blue-green spectrum.
+    Where boost dominates (sig_ratio ≈ 0): warm red-orange spectrum.
+    Mixed regions blend between the two palettes.
+    Phase determines position within each palette's 4-quadrant cycle.
+    """
+    invalid = ~np.isfinite(phase_grid)
+    phase_clean = np.where(invalid, 0.0, phase_grid)
+
+    t = phase_clean / (2 * np.pi)
+    segment = t * 4
+    idx = segment.astype(int) % 4
+    frac = (segment - segment.astype(int))[..., np.newaxis]
+
+    # Circular palette interpolation
+    cc1 = CIRCULAR_COLORS[idx]
+    cc2 = CIRCULAR_COLORS[(idx + 1) % 4]
+    rgb_circ = cc1 + frac * (cc2 - cc1)
+
+    # Hyperbolic palette interpolation
+    hc1 = HYPERBOLIC_COLORS[idx]
+    hc2 = HYPERBOLIC_COLORS[(idx + 1) % 4]
+    rgb_hyp = hc1 + frac * (hc2 - hc1)
+
+    # Blend based on signature ratio
+    sig = np.where(np.isfinite(sig_ratio), sig_ratio, 0.5)
+    sig_3d = sig[..., np.newaxis]
+    rgb = sig_3d * rgb_circ + (1 - sig_3d) * rgb_hyp
+
+    # Modulate by brightness
+    if brightness is not None:
+        rgb = rgb * np.where(invalid, 0.0, brightness)[..., np.newaxis]
+
+    rgb = np.clip(rgb, 0, 255).astype(np.uint8)
+    rgb[invalid] = [0, 0, 0]
 
     return rgb
 

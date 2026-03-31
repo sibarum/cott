@@ -31,6 +31,14 @@ Coloring uses the geometric product decomposition of p and f(p):
 Phase from the diamond angle of (dot, wedge) — algebraic 4-quadrant proxy.
 Brightness from |f|² / (|f|² + |p|²) — algebraic sigmoid.
 
+Signature ratio: wedge²/(dot²+wedge²) measures how much of the
+transformation is circular rotation (I²=-1) vs hyperbolic boost (I²=+1)
+at each point. Traction naturally contains both: 0^(ω/2) squares to -1
+(circular) while 0^0 squares to +1 (hyperbolic), so both signatures
+coexist in the same algebra. The 'mixed' color mode visualizes this
+with cool colors for rotation-dominated regions and warm colors for
+boost-dominated regions.
+
 For zero-powers (0^z), the Cayley rational transform replaces the
 transcendental exponential:
     0^z  →  (1 + z) / (1 − z)    — conformal, rational, unit-circle preserving
@@ -241,6 +249,16 @@ class GeometricAlgebraProjection(Projection):
         mag = np.sqrt(norm_f)
         log_mag = np.log(np.maximum(norm_f, 1e-300)) / 2
 
+        # ── Signature ratio ──────────────────────────────────────
+        # How much of the transformation is circular (rotation) vs
+        # hyperbolic (boost) at each point.
+        #   wedge² → circular energy (bivector, I² = -1 rotation)
+        #   dot²   → hyperbolic energy (scalar, I² = +1 boost)
+        circ = wedge ** 2
+        hyp = dot ** 2
+        total = circ + hyp + 1e-15
+        sig_ratio = circ / total  # 1 = pure circular, 0 = pure hyperbolic
+
         return {
             'Z': Z,
             'Re': U,
@@ -251,6 +269,7 @@ class GeometricAlgebraProjection(Projection):
             'brightness': brightness,
             'dot': dot,
             'wedge': wedge,
+            'sig_ratio': sig_ratio,
         }
 
 

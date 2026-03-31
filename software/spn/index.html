@@ -205,12 +205,11 @@ class(stream) FibonacciStream {
     </p>
 
     <div class="code-border">
-        <div class="code-title">If Matching<span class="rfloat">Symbols</span></div>
+        <div class="code-title">Sample Data Model<span class="rfloat">Symbols</span></div>
         <div class="code">
-            numeric Year constraint Year>=1900, constraint Year%1;
-            numeric Month constraint 0 < Month <= 12;
-            numeric
-            Day constraint 0 < Day <= 31;
+            numeric Year, constraint Year>=1900, constraint Year%1;
+            numeric Month, constraint 0 < Month <= 12;
+            numeric Day, constraint 0 < Day <= 31;
 
             class (algebraic) Date {
                 product of (Year, Month, Day);

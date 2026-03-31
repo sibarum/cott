@@ -24,6 +24,7 @@ from parser import get_user_functions, delete_user_function
 from formatting import format_result, format_approx, format_complex, format_numeric_approx
 from decomposition import chebyshev_decompose, _eval_ring_exact, _reduce_ring_form, _complex_at_pi2
 from visualization import (compute_phase_grid, phase_to_rgb, magnitude_to_rgb, blended_to_rgb,
+                           mixed_to_rgb,
                            CANVAS_SIZE, GRID_RES, AXIS_MARGIN, CANVAS_TOTAL, DEFAULT_BOUNDS, PHASE_COLORS)
 from fractal import compute_fractal, fractal_to_rgb, parse_fractal_args
 from streamlines import compute_streamlines
@@ -53,6 +54,7 @@ class CalculatorApp:
         self.viz_image = None
         self.viz_Z = None  # complex grid for hover readout
         self.viz_log_mag = None  # log magnitude grid for gradient lines
+        self.viz_extras = {}  # extra data from projection (e.g. sig_ratio)
         self._viz_graded = False  # True when plotting a GradedElement
         self.show_tangent = False
         self.show_normal = False
@@ -959,10 +961,15 @@ class CalculatorApp:
         self.display_expr.focus_set()
 
     def _apply_viz_result(self, result, graded_label=None):
-        """Apply a completed visualization result (phase, brightness, Z, log_mag)."""
-        phase, brightness, Z, log_mag = result
+        """Apply a completed visualization result (phase, brightness, Z, log_mag, extras)."""
+        if len(result) == 5:
+            phase, brightness, Z, log_mag, extras = result
+        else:
+            phase, brightness, Z, log_mag = result
+            extras = {}
         self.viz_Z = Z
         self.viz_log_mag = log_mag
+        self.viz_extras = extras
 
         if graded_label:
             self.viz_title_label.configure(text=f'Phase Plot [{graded_label}]')
@@ -971,7 +978,9 @@ class CalculatorApp:
             label = proj_name.replace('_', ' ')
             self.viz_title_label.configure(text=f'Phase Plot [{label}]')
 
-        if self.color_mode == 'magnitude':
+        if self.color_mode == 'mixed' and 'sig_ratio' in extras:
+            rgb = mixed_to_rgb(phase, brightness, extras['sig_ratio'])
+        elif self.color_mode == 'magnitude':
             rgb = magnitude_to_rgb(phase, log_mag)
         elif self.color_mode == 'blended':
             rgb = blended_to_rgb(phase, brightness, log_mag)
@@ -1141,8 +1150,8 @@ class CalculatorApp:
         self.display_expr.focus_set()
 
     def _toggle_color_mode(self):
-        """Cycle through Phase, Magnitude, and Blended color models."""
-        cycle = ['phase', 'magnitude', 'blended']
+        """Cycle through Phase, Magnitude, Blended, and Mixed color models."""
+        cycle = ['phase', 'magnitude', 'blended', 'mixed']
         idx = cycle.index(self.color_mode) if self.color_mode in cycle else 0
         self.color_mode = cycle[(idx + 1) % len(cycle)]
         if self.viz_Z is not None:
@@ -1550,6 +1559,7 @@ class CalculatorApp:
             except Exception:
                 decomp['complex_val'] = None
         self._render_cheb_text(decomp)
+        self._render_grid_signature(tw)
         tw.configure(state='disabled')
         self._draw_cheb_orbit(self.cheb_ax_orbit, decomp)
         self.cheb_canvas_widget.draw()
@@ -1756,6 +1766,7 @@ class CalculatorApp:
             tw.insert('end', traction_str + '\n', 'expr')
             tw.insert('end', '\n')
             tw.insert('end', decomp.get('note', '') + '\n', 'dim')
+            self._render_grid_signature(tw)
             return
 
         # --- Ring form (general expressions: sums, products, etc.) ---
@@ -1852,6 +1863,7 @@ class CalculatorApp:
                     tw.insert('end', f'  0 + \u03c9 = \u2205,  T\u2099(s/2) = 0  (n={base_d})\n', 'dim')
                     tw.insert('end', f'  {reduced_str}\n', 'value')
 
+            self._render_signature_analysis(tw, decomp)
             return
 
         # --- Single zero-power form (legacy path) ---
@@ -1885,6 +1897,157 @@ class CalculatorApp:
             tw.insert('end', 'a\u2099 = (u+v)\u00b7a\u2099\u208b\u2081 \u2212 a\u2099\u208b\u2082\n', 'dim')
             for label, poly_str in trace:
                 tw.insert('end', f'  {label} = {poly_str}\n', 'value')
+
+        self._render_signature_analysis(tw, decomp)
+
+    def _render_signature_analysis(self, tw, decomp):
+        """Render circular vs hyperbolic signature analysis for constant expressions.
+
+        Traction naturally contains both signatures:
+            0^(ω/2) squares to -1  →  circular (rotation, I²=-1)
+            0^0 squares to +1      →  hyperbolic (boost, I²=+1)
+
+        Uses the complex projection value: |Im| measures circular content
+        (distance from real axis), |Re| measures hyperbolic content.
+        For ring elements, also shows the (a, b) component breakdown.
+        """
+        # Get complex value — works for both ring and single zero-power paths
+        cval = decomp.get('complex_val')
+        if cval is None:
+            # Try computing it
+            parsed = decomp.get('_parsed')
+            if parsed is not None:
+                try:
+                    proj = project_complex(traction_simplify(parsed))
+                    cval = complex(proj.evalf())
+                except Exception:
+                    pass
+        if cval is None:
+            return
+
+        re_part = abs(cval.real)
+        im_part = abs(cval.imag)
+        total = re_part + im_part
+        if total < 1e-15:
+            return
+
+        circ_frac = im_part / total   # imaginary = circular (rotation)
+        hyp_frac = re_part / total    # real = hyperbolic (boost)
+
+        # Classification
+        if circ_frac > 0.95:
+            label = 'pure circular (rotation)'
+        elif circ_frac > 0.7:
+            label = 'mostly circular'
+        elif hyp_frac > 0.95:
+            label = 'pure hyperbolic (boost)'
+        elif hyp_frac > 0.7:
+            label = 'mostly hyperbolic'
+        else:
+            label = 'mixed signature'
+
+        tw.insert('end', '\n')
+        tw.insert('end', 'Signature Analysis\n', 'header')
+        tw.insert('end', '  0^(\u03c9/2)\u00b2 = \u22121 (circular),  '
+                  '0\u2070 = 1 (hyperbolic)\n', 'dim')
+
+        # Bar visualization
+        bar_len = 24
+        circ_chars = round(circ_frac * bar_len)
+        hyp_chars = bar_len - circ_chars
+        bar = '\u2588' * circ_chars + '\u2591' * hyp_chars
+
+        tw.insert('end', f'  {label}\n', 'value')
+        tw.insert('end', f'  circular  {bar}  hyperbolic\n', 'dim')
+        tw.insert('end', f'  rotation: {circ_frac:.1%}   '
+                  f'boost: {hyp_frac:.1%}\n', 'value')
+
+        # Show complex value decomposition
+        tw.insert('end', f'  |Im| = {im_part:.4f} (circular),  '
+                  f'|Re| = {re_part:.4f} (hyperbolic)\n', 'dim')
+
+        # For ring elements, also show (a, b) component breakdown
+        ring_el = decomp.get('_ring_el')
+        if ring_el is not None:
+            a_poly, b_poly = ring_el.a, ring_el.b
+
+            def _fmt_poly(poly):
+                if poly.is_constant():
+                    v = poly.constant_value()
+                    return str(v) if v.denominator != 1 else str(v.numerator)
+                return repr(poly)
+
+            tw.insert('end', f'  ring: a = {_fmt_poly(a_poly)} (scalar),  '
+                      f'b = {_fmt_poly(b_poly)} (generator)\n', 'dim')
+
+    def _render_grid_signature(self, tw):
+        """Render grid-level signature statistics from the current visualization.
+
+        When the geometric algebra projection is active and a plot has been
+        computed, show aggregate statistics about circular vs hyperbolic
+        character across the visible domain.
+        """
+        extras = getattr(self, 'viz_extras', {})
+        sig_ratio = extras.get('sig_ratio')
+        if sig_ratio is None:
+            return
+
+        proj_name = self.projection_names[self.projection_index]
+        if proj_name != 'geometric_algebra':
+            return
+
+        valid = np.isfinite(sig_ratio)
+        if not valid.any():
+            return
+
+        sr = sig_ratio[valid]
+        mean_circ = float(sr.mean())
+        mean_hyp = 1.0 - mean_circ
+        median_circ = float(np.median(sr))
+
+        # Fraction of pixels dominated by each signature
+        circ_dominant = float((sr > 0.5).sum() / len(sr))
+        hyp_dominant = 1.0 - circ_dominant
+
+        # Entropy of the signature distribution (how mixed is it?)
+        # High entropy = evenly mixed, low = one signature dominates
+        p = np.clip(sr, 1e-10, 1 - 1e-10)
+        entropy = -float(np.mean(p * np.log2(p) + (1 - p) * np.log2(1 - p)))
+        # Normalize: max entropy is 1.0 (at sig_ratio=0.5 everywhere)
+
+        # Peak locations
+        peak_circ = float(sr.max())
+        peak_hyp = float((1 - sr).max())
+
+        if mean_circ > 0.7:
+            label = 'rotation-dominated'
+        elif mean_hyp > 0.7:
+            label = 'boost-dominated'
+        elif entropy > 0.8:
+            label = 'uniformly mixed'
+        else:
+            label = 'regionally split'
+
+        tw.insert('end', '\n')
+        tw.insert('end', 'Grid Signature  [geometric algebra]\n', 'header')
+        tw.insert('end', '  Per-pixel: wedge\u00b2/(dot\u00b2+wedge\u00b2)  '
+                  '(1=rotation, 0=boost)\n', 'dim')
+
+        bar_len = 24
+        circ_chars = round(mean_circ * bar_len)
+        hyp_chars = bar_len - circ_chars
+        bar = '\u2588' * circ_chars + '\u2591' * hyp_chars
+
+        tw.insert('end', f'  {label}\n', 'value')
+        tw.insert('end', f'  circular  {bar}  hyperbolic\n', 'dim')
+        tw.insert('end', f'  mean rotation: {mean_circ:.1%}   '
+                  f'mean boost: {mean_hyp:.1%}\n', 'value')
+        tw.insert('end', f'  circular-dominant pixels: {circ_dominant:.0%}   '
+                  f'hyperbolic-dominant: {hyp_dominant:.0%}\n', 'value')
+        tw.insert('end', f'  signature entropy: {entropy:.2f}  '
+                  f'(1.0 = evenly mixed, 0.0 = uniform)\n', 'dim')
+        tw.insert('end', f'  peak circular: {peak_circ:.3f}   '
+                  f'peak hyperbolic: {peak_hyp:.3f}\n', 'dim')
 
     @staticmethod
     def _traction_plane_coords(decomp):
