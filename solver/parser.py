@@ -264,7 +264,7 @@ class Parser:
         mult     = power (('*' | '/') power)*
         power    = unary ('^' power)?
         unary    = '-' unary | primary
-        primary  = '(' expr ')' | graded | funccall | number | 'w' | 'x' | 'omega'
+        primary  = '(' expr ')' | graded | funccall | number | 'ω' | 'omega' | var
         graded   = 'Z_' int '(' expr ')' | 'Z' '(' expr ',' expr ')'
         funccall = ('log0' | 'logw') '(' expr ')'
     """
@@ -382,14 +382,10 @@ class Parser:
         if self.match('factor'):
             return self._parse_func_call(sp_factor, 'factor')
 
-        # 'w' as standalone (must check after 'logw')
-        if ch == 'w' and not self._next_is_alpha(1):
-            self.consume()
-            return w
-
         # Single-letter variables: only match when not followed by more letters
         # (so 'poly' doesn't get eaten as 'p' + 'oly')
-        if ch in ('p', 'q', 'x', 'c', 't', 'y') and not self._next_is_alpha(1):
+        # 'w' is a regular variable — use ω (unicode) or 'omega' for Omega
+        if ch in ('p', 'q', 'x', 'c', 't', 'w', 'y') and not self._next_is_alpha(1):
             self.consume()
             if ch == 'y':
                 return Symbol('q')  # legacy alias
@@ -602,7 +598,7 @@ def parse_and_eval(text, allow_definition=False):
     Supports equation syntax: 'lhs = rhs' is solved as 'lhs - rhs = 0'.
     If allow_definition=True, also handles function definitions: name(params)=body.
     """
-    text = text.strip()
+    text = text.strip().replace('\u00b7', '*')
     if not text:
         return None
 

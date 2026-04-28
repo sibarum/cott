@@ -62,32 +62,38 @@ def _expr_to_ring(expr):
     2. Rational band: g = B^(1/n), θ-dependent
     3. Multi-band: both generators needed
     """
-    from chebyshev_ring import Element, ZERO_SPEC, OMEGA_SPEC, ZERO_OMEGA_SPEC, OMEGA_OMEGA_SPEC
+    from chebyshev_ring import (Element, ZERO_SPEC, OMEGA_SPEC,
+                                  ZERO_OMEGA_SPEC, OMEGA_OMEGA_SPEC,
+                                  ZERO_ZERO_SPEC, OMEGA_ZERO_SPEC)
     from fractions import Fraction as Frac
     from math import lcm
 
     expr = traction_simplify(expr)
 
-    # Classify exponents into omega and rational bands, and detect base
+    # Classify exponents into rational, omega, and zero bands, and detect base
     rational_denoms = set()
     omega_denoms = set()
+    zero_denoms = set()
     bases_seen = set()  # 'zero', 'omega'
-    _classify_exponents_full(expr, rational_denoms, omega_denoms, bases_seen)
+    _classify_exponents_full(expr, rational_denoms, omega_denoms, bases_seen, zero_denoms)
 
     # Determine the natural base spec
     if bases_seen == {'omega'}:
         rat_spec = OMEGA_SPEC
         omega_spec = OMEGA_OMEGA_SPEC
+        zero_spec = OMEGA_ZERO_SPEC
     elif bases_seen == {'zero'}:
         rat_spec = ZERO_SPEC
         omega_spec = ZERO_OMEGA_SPEC
+        zero_spec = ZERO_ZERO_SPEC
     else:
         # Mixed bases or scalars — default to zero
         rat_spec = ZERO_SPEC
         omega_spec = ZERO_OMEGA_SPEC
+        zero_spec = ZERO_ZERO_SPEC
 
     # --- Priority 1: Pure omega exponents → omega-band ring ---
-    if omega_denoms and not rational_denoms:
+    if omega_denoms and not rational_denoms and not zero_denoms:
         omega_lcd = 1
         for d in omega_denoms:
             omega_lcd = lcm(omega_lcd, d)
@@ -95,8 +101,17 @@ def _expr_to_ring(expr):
         if el is not None:
             return el, {'band': 'omega', 'omega_lcd': omega_lcd, 'spec': omega_spec}
 
+    # --- Priority 1b: Pure zero-channel exponents → zero-band ring ---
+    if zero_denoms and not omega_denoms and not rational_denoms:
+        zero_lcd = 1
+        for d in zero_denoms:
+            zero_lcd = lcm(zero_lcd, d)
+        el = _convert_zero_band(expr, zero_lcd)
+        if el is not None:
+            return el, {'band': 'zero', 'zero_lcd': zero_lcd, 'spec': zero_spec}
+
     # --- Priority 2: Pure rational exponents → rational-band ring ---
-    if rational_denoms or not omega_denoms:
+    if (rational_denoms or not omega_denoms) and not zero_denoms:
         denoms = _collect_exponent_denoms(expr)
         if not denoms:
             denoms = {1}
@@ -105,7 +120,7 @@ def _expr_to_ring(expr):
             base_denom = lcm(base_denom, d)
         base_denom = max(base_denom, 2)
 
-        el = _convert_with_scale(expr, base_denom)
+        el = _convert_with_scale(expr, base_denom, rat_spec.exponent_sign)
         if el is not None:
             return el, {'band': 'rational', 'base_denom': base_denom, 'spec': rat_spec}
 
@@ -117,8 +132,9 @@ def _expr_to_ring(expr):
     return None, None
 
 
-def _classify_exponents_full(expr, rational_denoms, omega_denoms, bases_seen):
-    """Classify exponent denominators and detect which bases appear."""
+def _classify_exponents_full(expr, rational_denoms, omega_denoms, bases_seen, zero_denoms=None):
+    """Classify exponent denominators and detect which bases appear.
+    zero_denoms tracks denominators from 0-channel exponents like c*Zero()."""
     from fractions import Fraction as Frac
     expr = traction_simplify(expr)
 
@@ -137,17 +153,21 @@ def _classify_exponents_full(expr, rational_denoms, omega_denoms, bases_seen):
         bases_seen.add(base_name)
         exp = expr.exp
         omega_info = _extract_omega_rational(exp)
+        zero_info = _extract_zero_rational(exp) if zero_denoms is not None else None
         if omega_info is not None:
             coeff, _ = omega_info
             omega_denoms.add(coeff.denominator)
+        elif zero_info is not None:
+            coeff, _ = zero_info
+            zero_denoms.add(coeff.denominator)
         elif isinstance(exp, (Integer, Rational)):
             rational_denoms.add(int(exp.q) if isinstance(exp, Rational) else 1)
         return
     if isinstance(expr, (Add, Mul)):
         for arg in expr.args:
-            _classify_exponents_full(arg, rational_denoms, omega_denoms, bases_seen)
+            _classify_exponents_full(arg, rational_denoms, omega_denoms, bases_seen, zero_denoms)
     if isinstance(expr, Pow) and isinstance(expr.exp, Integer):
-        _classify_exponents_full(expr.base, rational_denoms, omega_denoms, bases_seen)
+        _classify_exponents_full(expr.base, rational_denoms, omega_denoms, bases_seen, zero_denoms)
 
 
 def _convert_omega_band(expr, omega_lcd):
@@ -209,6 +229,65 @@ def _convert_omega_band(expr, omega_lcd):
     return None
 
 
+def _convert_zero_band(expr, zero_lcd):
+    """Convert an expression with zero-channel exponents to Element.
+    g = 0^(0/zero_lcd), scale = zero_lcd.
+    0^(c·0) → g^(zero_lcd·c). For n=2: g² = 0^0 = 1 (hyperbolic δ = +1)."""
+    from chebyshev_ring import Element
+    from fractions import Fraction as Frac
+
+    expr = traction_simplify(expr)
+
+    # Scalar atoms
+    if isinstance(expr, Integer):
+        return Element.from_int(int(expr))
+    if isinstance(expr, Rational):
+        return Element.from_fraction(Frac(expr.p, expr.q))
+    if isinstance(expr, Null):
+        return Element.zero_el()
+
+    # Zero/omega-base powers with zero-channel exponents
+    if isinstance(expr, Pow) and isinstance(expr.base, (Zero, Omega)):
+        exp = expr.exp
+        sign = -1 if isinstance(expr.base, Omega) else 1
+        zero_info = _extract_zero_rational(exp)
+        if zero_info is not None:
+            coeff, _ = zero_info
+            power = coeff * zero_lcd * sign
+            if power.denominator != 1:
+                return None
+            return Element.u_power(int(power))
+        return None
+
+    # Sums
+    if isinstance(expr, Add):
+        result = None
+        for term in Add.make_args(expr):
+            t = _convert_zero_band(term, zero_lcd)
+            if t is None:
+                return None
+            result = t if result is None else result + t
+        return result
+
+    # Products
+    if isinstance(expr, Mul):
+        result = None
+        for factor in Mul.make_args(expr):
+            f = _convert_zero_band(factor, zero_lcd)
+            if f is None:
+                return None
+            result = f if result is None else result * f
+        return result
+
+    # Powers with integer exponent
+    if isinstance(expr, Pow) and isinstance(expr.exp, Integer):
+        base_el = _convert_zero_band(expr.base, zero_lcd)
+        if base_el is not None:
+            return base_el ** int(expr.exp)
+
+    return None
+
+
 def _has_omega_exponent(expr):
     """Check if an expression contains zero-powers with omega in the exponent."""
     if isinstance(expr, Pow) and isinstance(expr.base, (Zero, Omega)):
@@ -245,6 +324,37 @@ def _extract_omega_rational(exp):
                 return None
     # Bare omega
     if isinstance(exp, Omega):
+        return Frac(1), 1
+    return None
+
+
+def _extract_zero_rational(exp):
+    """Extract (rational_coeff, zero_power) from an exponent like 0/7 or 0²·3/4.
+    Returns (coeff, zero_exp) such that the exponent = coeff * 0^zero_exp,
+    or None if it doesn't have this form. For simple 0*c, returns (c, 1)."""
+    from fractions import Fraction as Frac
+
+    # 0 * rational: Mul(Rational, Zero)
+    if isinstance(exp, Mul):
+        rational_parts = []
+        zero_count = 0
+        for f in Mul.make_args(exp):
+            if isinstance(f, (Integer, Rational)):
+                rational_parts.append(f)
+            elif isinstance(f, Zero):
+                zero_count += 1
+            elif isinstance(f, Pow) and isinstance(f.base, Zero) and isinstance(f.exp, Integer):
+                zero_count += int(f.exp)
+            else:
+                return None
+        if zero_count > 0 and rational_parts:
+            coeff = Mul(*rational_parts)
+            try:
+                return Frac(int(coeff.p), int(coeff.q)) if isinstance(coeff, Rational) else Frac(int(coeff)), zero_count
+            except (TypeError, ValueError, AttributeError):
+                return None
+    # Bare zero
+    if isinstance(exp, Zero):
         return Frac(1), 1
     return None
 
@@ -383,9 +493,12 @@ def _convert_multiband(expr, rat_scale, omega_scale):
     return None
 
 
-def _convert_with_scale(expr, scale):
+def _convert_with_scale(expr, scale, spec_sign=1):
     """Convert a traction expression to Element using the given scale factor.
-    0^(p/q) maps to u^(scale * p/q), which must be an integer."""
+
+    spec_sign=+1 (zero-base, default): 0^(p/q) → u^(+scale·p/q), ω^(p/q) → u^(-scale·p/q).
+    spec_sign=-1 (omega-base): 0^(p/q) → u^(-scale·p/q), ω^(p/q) → u^(+scale·p/q).
+    Whichever side is positive, that base is the one labeled as the ring generator g."""
     from chebyshev_ring import Element
     from fractions import Fraction as Frac
 
@@ -399,11 +512,11 @@ def _convert_with_scale(expr, scale):
     if isinstance(expr, Null):
         return Element.zero_el()
 
-    # Zero-powers: 0^(p/q) → u^(scale * p/q)
+    # Zero-powers: 0^(p/q) → u^(spec_sign · scale · p/q)
     if isinstance(expr, Zero):
-        return Element.u_power(scale)
+        return Element.u_power(spec_sign * scale)
     if isinstance(expr, Omega):
-        return Element.u_power(-scale)
+        return Element.u_power(-spec_sign * scale)
     if isinstance(expr, Pow) and isinstance(expr.base, (Zero, Omega)):
         exp = expr.exp
         try:
@@ -412,7 +525,7 @@ def _convert_with_scale(expr, scale):
             return None
         if isinstance(expr.base, Omega):
             r = -r
-        power = r * scale
+        power = r * scale * spec_sign
         if power.denominator != 1:
             return None
         return Element.u_power(int(power))
@@ -421,7 +534,7 @@ def _convert_with_scale(expr, scale):
     if isinstance(expr, Add):
         result = None
         for term in Add.make_args(expr):
-            t = _convert_with_scale(term, scale)
+            t = _convert_with_scale(term, scale, spec_sign)
             if t is None:
                 return None
             result = t if result is None else result + t
@@ -431,7 +544,7 @@ def _convert_with_scale(expr, scale):
     if isinstance(expr, Mul):
         result = None
         for factor in Mul.make_args(expr):
-            f = _convert_with_scale(factor, scale)
+            f = _convert_with_scale(factor, scale, spec_sign)
             if f is None:
                 return None
             result = f if result is None else result * f
@@ -439,7 +552,7 @@ def _convert_with_scale(expr, scale):
 
     # Powers with integer exponent
     if isinstance(expr, Pow):
-        base_el = _convert_with_scale(expr.base, scale)
+        base_el = _convert_with_scale(expr.base, scale, spec_sign)
         if base_el is not None and isinstance(expr.exp, Integer):
             return base_el ** int(expr.exp)
 
@@ -473,7 +586,16 @@ def _decompose_ring_element(ring_el, ring_info, traction_str, complex_str, simpl
     band = ring_info.get('band', 'rational')
     base_denom = ring_info.get('base_denom')
     omega_lcd = ring_info.get('omega_lcd')
+    zero_lcd = ring_info.get('zero_lcd')
     spec = ring_info.get('spec')
+
+    # Signature classification at n=2: δ = g² determines the geometric character.
+    #   δ = +1   → Hyperbolic   (j = 0^(0/2))
+    #   δ = 0    → Parabolic    (ε = 0^(1/2))
+    #   δ = -1   → Elliptic     (η = 0^(ω/2))
+    #   δ = ω    → Traction     (k = 0^(-1/2) = ω^(1/2))
+    signature = None
+    delta_str = None
 
     ring_label = f'Q[s][g] / (g\u00b2 \u2212 sg + 1)'
 
@@ -485,6 +607,8 @@ def _decompose_ring_element(ring_el, ring_info, traction_str, complex_str, simpl
         # s is exact traction: g + g⁻¹
         s_rational = {1: Frac(-2), 2: Frac(0), 3: Frac(1)}.get(n)
         if n == 2:
+            delta_str = '-1'
+            signature = 'Elliptic'
             gen_note = f'g = {g_str},  s = 0,  g\u00b2 = -1'
         else:
             gen_note = f'g = {g_str},  s = g + g\u207b\u00b9'
@@ -503,10 +627,33 @@ def _decompose_ring_element(ring_el, ring_info, traction_str, complex_str, simpl
                 ('a', repr(ring_el.a)),
                 ('b', repr(ring_el.b)),
             ]
+    elif band == 'zero':
+        n = zero_lcd
+        g_str = spec.format_generator(n) if spec else f'0^(0/{n})'
+        if n == 2:
+            delta_str = '1'
+            signature = 'Hyperbolic'
+            gen_note = f'g = {g_str},  s = g + g\u207b\u00b9,  g\u00b2 = 1'
+        else:
+            gen_note = f'g = {g_str},  s = g + g\u207b\u00b9'
+        components = [
+            ('a', repr(ring_el.a)),
+            ('b', repr(ring_el.b)),
+        ]
     else:
         sym = spec.symbol if spec else '0'
         g_str = spec.format_generator(base_denom) if spec else f'0^(1/{base_denom})'
-        gen_note = f'g = {g_str},  s = g + g\u207b\u00b9'
+        if base_denom == 2:
+            # \u03b4 at n=2: ZERO_SPEC \u2192 0 (parabolic), OMEGA_SPEC \u2192 \u03c9 (traction)
+            if spec is not None and spec.exponent_sign == -1:
+                delta_str = '\u03c9'
+                signature = 'Traction'
+            else:
+                delta_str = '0'
+                signature = 'Parabolic'
+            gen_note = f'g = {g_str},  s = g + g\u207b\u00b9,  g\u00b2 = {delta_str}'
+        else:
+            gen_note = f'g = {g_str},  s = g + g\u207b\u00b9'
         components = [
             ('a', repr(ring_el.a)),
             ('b', repr(ring_el.b)),
@@ -528,6 +675,9 @@ def _decompose_ring_element(ring_el, ring_info, traction_str, complex_str, simpl
         'base_denom': base_denom if band == 'rational' else None,
         'band': band,
         'omega_lcd': omega_lcd,
+        'zero_lcd': zero_lcd,
+        'signature': signature,
+        'delta_str': delta_str,
         '_ring_el': ring_el,
         '_ring_info': ring_info,
     }
@@ -611,8 +761,10 @@ def _eval_ring_exact(decomp):
         s_expr = traction_simplify(g_expr + g_inv)
     elif band == 'rational':
         base_denom = ring_info.get('base_denom', decomp.get('base_denom', 2))
-        g_expr = Pow(Zero(), SRat(1, base_denom))
-        g_inv = Pow(Zero(), SRat(-1, base_denom))
+        spec = ring_info.get('spec')
+        g_base = Omega() if (spec is not None and spec.exponent_sign == -1) else Zero()
+        g_expr = Pow(g_base, SRat(1, base_denom))
+        g_inv = Pow(g_base, SRat(-1, base_denom))
         s_expr = traction_simplify(g_expr + g_inv)
     else:
         return 'Multi-band exact evaluation not yet implemented'
@@ -809,10 +961,13 @@ def _reduce_ring_form(decomp):
 
     b_is_zero = all(c == Frac(0) for c in b_red)
 
-    # Evaluate reduced polynomials at s = 0^(1/n) + ω^(1/n), g = 0^(1/n)
+    # Evaluate reduced polynomials at s = 0^(1/n) + ω^(1/n), g = (base)^(1/n).
+    # The labeled base depends on the spec: zero-base → 0^(1/n), omega-base → ω^(1/n).
+    spec = ring_info.get('spec')
+    g_base = Omega() if (spec is not None and spec.exponent_sign == -1) else Zero()
     s_expr = traction_simplify(
         Pow(Zero(), Rational(1, n)) + Pow(Omega(), Rational(1, n)))
-    g_expr = Pow(Zero(), Rational(1, n))
+    g_expr = Pow(g_base, Rational(1, n))
 
     a_val = _eval_frac_poly_horner(a_red, s_expr)
 

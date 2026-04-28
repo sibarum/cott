@@ -221,6 +221,26 @@ class(stream) FibonacciStream {
         </div>
     </div>
 
+    <div class="subsection-title" id="section-3_1">
+        3.1 When Condition
+    </div>
+
+    <p>
+        "When" is a keyword that defines a cause and effect.
+    </p>
+
+    <div class="code-border">
+        <div class="code-title">Sample Data Model<span class="rfloat">Symbols</span></div>
+        <div class="code">
+            when Customer
+                .birthday
+                    .Date($current.year, $current.month, $current.day)
+            {
+                $sendBirthdayEmail()
+            }
+        </div>
+    </div>
+
     <div class="copyonly">---</div>
     <div class="section-footer">
     </div>

@@ -9,13 +9,13 @@ import numpy as np
 
 
 def compute_fractal(iter_func, grid_res, bounds, escape=2.0, max_iter=100,
-                    cancel_event=None):
+                    cancel_event=None, x0=1j):
     """Compute an escape-time fractal on a complex grid.
 
     iter_func(x, c) -> next_x : vectorised numpy function for one iteration.
-    c is the pixel coordinate.  x starts at traction zero (0), which
-    projects to e^{iπ/2} for the numeric computation.  The iteration
-    is algebraically identical to traction arithmetic at θ=π/2.
+    c is the pixel coordinate.  x starts at x0, which is the projection of
+    traction zero (0) under the active projection.  Different projections
+    produce different x0 values and different fractal geometry.
 
     Returns (counts, last_z, c_grid) where
       counts[r,c] = iteration at which |x| > escape (0 means did not escape)
@@ -26,10 +26,7 @@ def compute_fractal(iter_func, grid_res, bounds, escape=2.0, max_iter=100,
     AA, BB = np.meshgrid(lin, lin[::-1])
     c_grid = AA + 1j * BB
 
-    # x starts at traction zero (0).  Under the θ=π/2 projection this
-    # is e^{iπ/2} = 1j.  Note: 0 ≠ i = 0^(ω/2) — they are distinct
-    # traction elements that share 0² = i² = −1.
-    z = np.full_like(c_grid, 1j, dtype=complex)
+    z = np.full_like(c_grid, x0, dtype=complex)
     counts = np.zeros(c_grid.shape, dtype=int)  # 0 = did not escape
     last_z = np.zeros_like(c_grid, dtype=complex)
     mask = np.ones(c_grid.shape, dtype=bool)     # still iterating

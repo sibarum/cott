@@ -23,8 +23,8 @@ from parser import Parser, ParseError, parse_and_eval, SolutionSet, FunctionDef
 from parser import get_user_functions, delete_user_function
 from formatting import format_result, format_approx, format_complex, format_numeric_approx
 from decomposition import chebyshev_decompose, _eval_ring_exact, _reduce_ring_form, _complex_at_pi2
-from visualization import (compute_phase_grid, phase_to_rgb, magnitude_to_rgb, blended_to_rgb,
-                           mixed_to_rgb,
+from visualization import (compute_phase_grid, prepare_expr, eval_on_grid, compile_fractal,
+                           phase_to_rgb, magnitude_to_rgb, blended_to_rgb, mixed_to_rgb,
                            CANVAS_SIZE, GRID_RES, AXIS_MARGIN, CANVAS_TOTAL, DEFAULT_BOUNDS, PHASE_COLORS)
 from fractal import compute_fractal, fractal_to_rgb, parse_fractal_args
 from streamlines import compute_streamlines
@@ -112,7 +112,7 @@ class CalculatorApp:
         self._tab_buttons = {}
         self._active_tab = None
 
-        for tab_name in ['Plot', 'Explain', 'Phase Map', TOWER, 'Help']:
+        for tab_name in ['Plot', 'Explain', 'Phase Map', TOWER, 'Calculus', 'Help']:
             btn = tk.Button(
                 tab_bar, text=tab_name, font=self.font_label,
                 bd=0, padx=16, pady=3, bg=BG_FRAME, fg=FG_TEXT,
@@ -375,6 +375,48 @@ class CalculatorApp:
                                        foreground='#8899aa', spacing1=1, spacing3=1)
 
         self._tower_sphere_size = SPHERE_SIZE
+
+        # ===== Calculus tab =====
+        calc_frame = tk.Frame(self._tab_container, bg=BG_BODY, bd=1, relief='solid')
+        self._tab_frames['Calculus'] = calc_frame
+
+        calc_hframe = tk.Frame(calc_frame, bg=BG_BODY)
+        calc_hframe.pack(fill='both', expand=True, padx=6, pady=6)
+
+        # Left: scrollable text with embedded "Fill" buttons
+        calc_text_frame = tk.Frame(calc_hframe, bg='#1a1a2e', bd=1, relief='sunken')
+        calc_text_frame.pack(side='left', fill='both', expand=True, padx=(0, 4))
+
+        self.calc_text = tk.Text(
+            calc_text_frame, wrap='word', font=tkfont.Font(family='Consolas', size=11),
+            bg='#1a1a2e', fg='#eeeeee', insertbackground='#eeeeee',
+            selectbackground='#3a5a8a', selectforeground='#ffffff',
+            bd=0, highlightthickness=0, padx=12, pady=10,
+            state='disabled', cursor='arrow'
+        )
+        calc_scrollbar = tk.Scrollbar(calc_text_frame, command=self.calc_text.yview)
+        self.calc_text.configure(yscrollcommand=calc_scrollbar.set)
+        calc_scrollbar.pack(side='right', fill='y')
+        self.calc_text.pack(side='left', fill='both', expand=True)
+
+        self.calc_text.tag_configure('header', font=tkfont.Font(family='Segoe UI', size=13, weight='bold'),
+                                      foreground='#ffdd33', spacing1=8, spacing3=2)
+        self.calc_text.tag_configure('value', font=tkfont.Font(family='Consolas', size=12),
+                                      foreground='#ffffff', spacing1=2, spacing3=2)
+        self.calc_text.tag_configure('dim', font=tkfont.Font(family='Consolas', size=10),
+                                      foreground='#8899aa', spacing1=2, spacing3=2)
+        self.calc_text.tag_configure('expr', font=tkfont.Font(family='Consolas', size=14, weight='bold'),
+                                      foreground='#ffffff', spacing1=4, spacing3=6)
+
+        # Right: matplotlib graph
+        self.calc_fig = Figure(figsize=(3.5, 4.5), dpi=96, facecolor=FG_RESULT)
+        self.calc_fig.subplots_adjust(left=0.15, right=0.95, top=0.92, bottom=0.10)
+        self.calc_ax = self.calc_fig.add_subplot(1, 1, 1)
+
+        self.calc_canvas_widget = FigureCanvasTkAgg(self.calc_fig, master=calc_hframe)
+        self.calc_canvas_widget.get_tk_widget().pack(side='left', fill='y', padx=(4, 0))
+
+        self._calc_func_name = None  # track which function is displayed
 
         # ===== Help tab =====
         self._build_help_tab()
@@ -646,8 +688,7 @@ class CalculatorApp:
     def _bind_keys(self):
         self.display_expr.bind('<Return>', lambda e: self._evaluate())
         self.display_expr.bind('<Escape>', lambda e: self._clear_all())
-        # Intercept 'w' to insert ω instead
-        self.display_expr.bind('w', self._insert_omega)
+        # w passes through as a regular letter (use ω button for omega)
         # p, q, x pass through as-is (default Entry behavior)
         self.display_expr.focus_set()
 
@@ -751,6 +792,8 @@ class CalculatorApp:
                 self.entry_var.set('')  # clear first (triggers live preview → empty)
                 self._set_result_text(
                     f'{result.name}({params}) = {body_str}  \u2713', fg=FG_RESULT)
+                self._calc_func_name = result.name
+                self._select_tab('Calculus')
                 return
 
             display_text = self._format_display_result(result)
@@ -771,71 +814,31 @@ class CalculatorApp:
     def _handle_fractal(self, text):
         """Parse a fractal(...) command and launch background computation.
 
-        x starts at traction zero (0).  Under the θ=π/2 projection used for
-        rasterisation, 0 projects to e^{iπ/2} — the same magnitude-1 point
-        as i = 0^(ω/2), but a distinct traction element.  The numeric
-        iteration is algebraically equivalent to traction arithmetic.
-        Supports both 'c' and 'p'/'q' for the pixel coordinate.
+        x starts at traction zero (0).  Its numeric value depends on the
+        active projection:
+            Lie:       0 → e^{iθ}  (unit circle, θ=π/2 gives i)
+            Cayley/GA: 0 → ∞ (pole), so x₀ falls back to 0+0j
+
+        The projection also determines how ω and zero-powers evaluate,
+        producing genuinely different fractal geometry per projection.
         """
         import threading
-        from sympy import Symbol, lambdify, I as symI
+        from visualization import compile_fractal
 
         expr_str, escape, max_iter = parse_fractal_args(text)
 
-        # Parse the inner expression
-        c_sym = Symbol('c')
-        x_sym = Symbol('x')
-        p_sym = Symbol('p')
-        q_sym = Symbol('q')
-        try:
-            parsed = Parser(expr_str).parse()
-        except Exception as e:
-            raise ValueError(f'Parse error in fractal expression: {e}')
+        proj_name = self.projection_names[self.projection_index]
+        proj = registry.get('projection', proj_name)
 
-        # Support p/q as alternative to c: replace p + q·i → c
-        if parsed.has(p_sym) or parsed.has(q_sym):
-            parsed = parsed.subs(p_sym, (c_sym + c_sym.conjugate()) / 2)  # nah, just direct
-            # Simpler: p = Re(c), q = Im(c), so substitute p→Re(c), q→Im(c)
-            # But for lambdify it's easier: substitute at the numpy level
-            # Let's just replace p → c_real, q → c_imag via a wrapper
-            pass  # handled below in the wrapper
-
-        # Project traction types to θ=π/2: Zero→i, Omega→-i, Null→0
-        projected = parsed.subs(Zero(), symI).subs(Omega(), -symI).subs(Null(), 0)
-
-        # Determine which variables the expression uses
-        has_c = projected.has(c_sym)
-        has_pq = projected.has(p_sym) or projected.has(q_sym)
-
-        if has_pq:
-            # Replace p→Re(c), q→Im(c) by lambdifying with p,q then wrapping
-            from sympy import re as sym_re, im as sym_im
-            projected_pq = projected.subs(p_sym, sym_re(c_sym)).subs(q_sym, sym_im(c_sym))
-            try:
-                f_raw = lambdify((x_sym, c_sym), projected_pq, modules='numpy')
-            except Exception as e:
-                raise ValueError(f'Cannot compile fractal expression: {e}')
-        elif has_c:
-            try:
-                f_raw = lambdify((x_sym, c_sym), projected, modules='numpy')
-            except Exception as e:
-                raise ValueError(f'Cannot compile fractal expression: {e}')
-        else:
-            raise ValueError(
-                'Fractal expression must use c (pixel coordinate) '
-                'or p/q (real/imaginary parts)')
-
-        # Quick smoke test
-        try:
-            f_raw(np.array([1j]), np.array([0.1 + 0.1j]))
-        except Exception as e:
-            raise ValueError(f'Cannot evaluate fractal expression: {e}')
+        f_raw, x0 = compile_fractal(expr_str, proj)
 
         # Store raw text for re-render on zoom
         self._fractal_raw_text = text
 
+        proj_label = proj_name.replace('_', ' ')
         self._set_result_text(
-            f'fractal: {expr_str}  (x\u2080=0, esc={escape}, n={max_iter})', fg=FG_DIM)
+            f'fractal: {expr_str}  (x\u2080\u2192{x0:.4g}, esc={escape}, '
+            f'n={max_iter}, {proj_label})', fg=FG_DIM)
 
         # Switch to Plot tab
         if self._active_tab != 'Plot':
@@ -855,13 +858,13 @@ class CalculatorApp:
         self._fractal_expr_str = expr_str
 
         self.viz_title_label.configure(
-            text=f'Fractal [{expr_str}]  computing\u2026')
+            text=f'Fractal [{expr_str}]  [{proj_label}]  computing\u2026')
 
         def compute():
             result = compute_fractal(
                 f_raw, GRID_RES, self.viz_bounds,
                 escape=escape, max_iter=max_iter,
-                cancel_event=cancel)
+                cancel_event=cancel, x0=x0)
             if cancel.is_set() or result is None:
                 return
             self.root.after(0, lambda: self._finish_fractal(result, cancel))
@@ -891,10 +894,12 @@ class CalculatorApp:
         self._render_viz(rgb)
 
         escaped_pct = np.count_nonzero(counts) / counts.size * 100
+        proj_name = self.projection_names[self.projection_index]
+        proj_label = proj_name.replace('_', ' ')
         self.viz_title_label.configure(
-            text=f'Fractal [{expr_str}]  ({escaped_pct:.0f}% escaped)')
+            text=f'Fractal [{expr_str}]  [{proj_label}]  ({escaped_pct:.0f}% escaped)')
         self._set_result_text(
-            f'fractal: {expr_str}  (x\u2080=0, esc={escape}, n={max_iter})', fg=FG_RESULT)
+            f'fractal: {expr_str}  (esc={escape}, n={max_iter}, {proj_label})', fg=FG_RESULT)
 
     def _on_entry_change(self):
         """Live preview: evaluate as you type."""
@@ -1166,7 +1171,7 @@ class CalculatorApp:
         if hasattr(self, 'viz_title_label'):
             self.viz_title_label.configure(text=f'Phase Plot [{label}]')
         if self.viz_Z is not None:
-            self._refresh_viz()
+            self._refresh_viz_or_fractal()
         self.display_expr.focus_set()
 
     def _open_settings(self):
@@ -1200,6 +1205,8 @@ class CalculatorApp:
             self._update_phase_map()
         elif name == TOWER:
             self._update_tower()
+        elif name == 'Calculus':
+            self._run_calculus()
         # Re-bind mousewheel for Help tab scrolling
         if name == 'Help' and hasattr(self, '_help_mousewheel_handler'):
             self._help_canvas.bind_all('<MouseWheel>', self._help_mousewheel_handler)
@@ -1503,6 +1510,229 @@ class CalculatorApp:
 
         self.pm_fig.set_facecolor(BG_BODY)
         self.pm_canvas_widget.draw()
+
+    # ===== Calculus Tab =====
+
+    def _run_calculus(self):
+        """Compute and display calculus operations for the current user function."""
+        tw = self.calc_text
+        tw.configure(state='normal')
+        tw.delete('1.0', 'end')
+
+        # Destroy any previously embedded buttons
+        for child in tw.winfo_children():
+            child.destroy()
+
+        funcs = get_user_functions()
+        name = self._calc_func_name
+
+        if not name or name not in funcs:
+            # Pick the most recently defined function if available
+            if funcs:
+                name = list(funcs.keys())[-1]
+                self._calc_func_name = name
+            else:
+                tw.insert('end', '  Define a function to see its calculus.\n', 'dim')
+                tw.insert('end', '  Example:  f(x) = x^3 + 2*x\n', 'dim')
+                tw.configure(state='disabled')
+                self._draw_calc_graph(None)
+                return
+
+        params, body = funcs[name]
+        if len(params) != 1:
+            tw.insert('end', f'  {name}({", ".join(params)}) — ', 'value')
+            tw.insert('end', 'calculus requires a single-variable function\n', 'dim')
+            tw.configure(state='disabled')
+            self._draw_calc_graph(None)
+            return
+
+        param = params[0]
+        x = Symbol(param)
+        body_str = format_result(body)
+
+        tw.insert('end', 'Function\n', 'header')
+        tw.insert('end', f'  {name}({param}) = {body_str}\n', 'expr')
+
+        # Collect all derived expressions for graphing
+        graph_data = {'f': body}
+
+        # ── Standard derivative ──────────────────────────────
+        from sympy import diff, integrate, simplify
+        try:
+            deriv = diff(body, x)
+            deriv_simplified = traction_simplify(deriv) if deriv.has(Zero) or deriv.has(Omega) else deriv
+            deriv_str = format_result(deriv_simplified)
+            graph_data['df'] = deriv_simplified
+
+            tw.insert('end', '\n')
+            tw.insert('end', 'Derivative\n', 'header')
+            tw.insert('end', f'  {name}\u2032({param}) = {deriv_str}\n', 'value')
+            self._calc_fill_button(tw, f'd{name}({param})={deriv_str}')
+        except Exception as e:
+            tw.insert('end', '\n')
+            tw.insert('end', 'Derivative\n', 'header')
+            tw.insert('end', f'  could not compute: {e}\n', 'dim')
+
+        # ── Additive traction differential: f(x + 0·x) − f(x) ──
+        try:
+            body_shifted = body.subs(x, x + Zero() * x)
+            body_shifted = traction_simplify(body_shifted)
+            additive_diff = traction_simplify(body_shifted - body)
+            add_str = format_result(additive_diff)
+
+            tw.insert('end', '\n')
+            tw.insert('end', 'Additive Differential\n', 'header')
+            tw.insert('end', f'  f({param} + 0\u00b7{param}) \u2212 f({param})\n', 'dim')
+            tw.insert('end', f'  \u0394\u2080 {name}({param}) = {add_str}\n', 'value')
+            self._calc_fill_button(tw, f'D0{name}({param})={add_str}')
+        except Exception as e:
+            tw.insert('end', '\n')
+            tw.insert('end', 'Additive Differential\n', 'header')
+            tw.insert('end', f'  could not compute: {e}\n', 'dim')
+
+        # ── Multiplicative traction differential: f(x + ω·x) / f(x) ──
+        try:
+            body_omega = body.subs(x, x + Omega() * x)
+            body_omega = traction_simplify(body_omega)
+            # Use Mul with Pow for division to stay in traction
+            from sympy import Pow as SPow
+            mult_diff = traction_simplify(body_omega * SPow(body, -1))
+            mult_str = format_result(mult_diff)
+
+            tw.insert('end', '\n')
+            tw.insert('end', 'Multiplicative Differential\n', 'header')
+            tw.insert('end', f'  f({param} + \u03c9\u00b7{param}) / f({param})\n', 'dim')
+            tw.insert('end', f'  \u0394\u03c9 {name}({param}) = {mult_str}\n', 'value')
+            self._calc_fill_button(tw, f'Dw{name}({param})={mult_str}')
+        except Exception as e:
+            tw.insert('end', '\n')
+            tw.insert('end', 'Multiplicative Differential\n', 'header')
+            tw.insert('end', f'  could not compute: {e}\n', 'dim')
+
+        # ── Integral ──────────────────────────────────────────
+        try:
+            # Use a timeout approach: try integration, skip if too complex
+            antideriv = integrate(body, x)
+            if antideriv.has(integrate):
+                # sympy couldn't find a closed form
+                tw.insert('end', '\n')
+                tw.insert('end', 'Integral\n', 'header')
+                tw.insert('end', '  no closed form found\n', 'dim')
+            else:
+                int_str = format_result(antideriv)
+                graph_data['int'] = antideriv
+
+                tw.insert('end', '\n')
+                tw.insert('end', 'Integral\n', 'header')
+                tw.insert('end', f'  \u222b {name}({param}) d{param} = {int_str}\n', 'value')
+                self._calc_fill_button(tw, f'I{name}({param})={int_str}')
+        except Exception:
+            tw.insert('end', '\n')
+            tw.insert('end', 'Integral\n', 'header')
+            tw.insert('end', '  could not compute\n', 'dim')
+
+        # ── Function selector for multi-function support ──
+        if len(funcs) > 1:
+            tw.insert('end', '\n')
+            tw.insert('end', 'Functions\n', 'header')
+            for fname in funcs:
+                fparams, fbody = funcs[fname]
+                marker = '\u25b6 ' if fname == name else '  '
+                label = f'{marker}{fname}({", ".join(fparams)}) = {format_result(fbody)}'
+                if fname != name:
+                    btn = tk.Button(
+                        tw, text=label, font=tkfont.Font(family='Consolas', size=10),
+                        bg='#2a2a4e', fg='#aabbcc', activebackground='#3a3a5e',
+                        bd=0, padx=4, pady=1, cursor='hand2',
+                        command=lambda n=fname: self._calc_switch_func(n)
+                    )
+                    tw.window_create('end', window=btn)
+                    tw.insert('end', '\n')
+                else:
+                    tw.insert('end', f'{label}\n', 'value')
+
+        tw.configure(state='disabled')
+
+        # Draw the graph
+        self._draw_calc_graph(graph_data, x, name)
+
+    def _calc_fill_button(self, tw, definition_text):
+        """Insert a small 'Fill' button that loads a function definition into the input."""
+        btn = tk.Button(
+            tw, text='\u21d7 Fill', font=tkfont.Font(family='Segoe UI', size=9),
+            bg='#3a5a8a', fg='#ffffff', activebackground='#4a6a9a',
+            bd=0, padx=6, pady=1, cursor='hand2',
+            command=lambda t=definition_text: self._calc_fill_input(t)
+        )
+        tw.window_create('end', window=btn)
+        tw.insert('end', '\n')
+
+    def _calc_fill_input(self, definition_text):
+        """Load a function definition into the input field for editing."""
+        self.entry_var.set(definition_text)
+        self.display_expr.focus_set()
+        # Move cursor to end
+        self.display_expr.icursor('end')
+
+    def _calc_switch_func(self, name):
+        """Switch the Calculus tab to a different function."""
+        self._calc_func_name = name
+        self._run_calculus()
+
+    def _draw_calc_graph(self, graph_data, x=None, func_name=None):
+        """Draw curves for f(x), f'(x), and integral on the calc graph."""
+        ax = self.calc_ax
+        ax.clear()
+
+        if graph_data is None or x is None:
+            ax.set_facecolor('#1a1a2e')
+            ax.tick_params(colors='#555555')
+            self.calc_fig.set_facecolor(BG_BODY)
+            self.calc_canvas_widget.draw()
+            return
+
+        from sympy import lambdify as sym_lambdify
+
+        x_vals = np.linspace(-3, 3, 300)
+        colors = {'f': '#66ccff', 'df': '#ff6688', 'int': '#88ff88'}
+        labels = {'f': f'{func_name}(x)', 'df': f'{func_name}\u2032(x)',
+                  'int': f'\u222b{func_name}'}
+
+        for key in ['f', 'df', 'int']:
+            expr = graph_data.get(key)
+            if expr is None:
+                continue
+            try:
+                # Project traction elements for numeric evaluation
+                if expr.has(Zero) or expr.has(Omega):
+                    expr_proj = project_complex(traction_simplify(expr))
+                else:
+                    expr_proj = expr
+                f_num = sym_lambdify(x, expr_proj, modules=['numpy'])
+                y_vals = np.array(f_num(x_vals.astype(complex)), dtype=complex)
+                y_real = np.where(np.isfinite(y_vals.real), y_vals.real, np.nan)
+                # Clip extreme values for readability
+                y_clipped = np.clip(y_real, -10, 10)
+                ax.plot(x_vals, y_clipped, color=colors[key], label=labels[key],
+                        linewidth=1.5, alpha=0.9)
+            except Exception:
+                continue
+
+        ax.set_facecolor('#1a1a2e')
+        ax.set_xlim(-3, 3)
+        ax.set_ylim(-5, 5)
+        ax.axhline(y=0, color='#444466', linewidth=0.5)
+        ax.axvline(x=0, color='#444466', linewidth=0.5)
+        ax.grid(True, color='#333355', linewidth=0.3, alpha=0.5)
+        ax.tick_params(colors='#888888', labelsize=8)
+        for spine in ax.spines.values():
+            spine.set_color('#444466')
+        ax.legend(loc='upper left', fontsize=8, facecolor='#1a1a2e',
+                  edgecolor='#444466', labelcolor='#cccccc')
+        ax.set_title(f'{func_name}(x)', color='#cccccc', fontsize=10)
+
+        self.calc_fig.set_facecolor(BG_BODY)
+        self.calc_canvas_widget.draw()
 
     # ===== Explain Tab (Chebyshev Decomposition) =====
 
@@ -1903,13 +2133,16 @@ class CalculatorApp:
     def _render_signature_analysis(self, tw, decomp):
         """Render circular vs hyperbolic signature analysis for constant expressions.
 
-        Traction naturally contains both signatures:
-            0^(ω/2) squares to -1  →  circular (rotation, I²=-1)
-            0^0 squares to +1      →  hyperbolic (boost, I²=+1)
+        Every traction power 0^t generates both rotation and boost because
+        W = sqrt(-iπ) sits at 45° — equal real and imaginary parts.  So even
+        purely real exponents (no ω) produce circular behavior: 0^(1/3) is
+        63% circular despite having no omega content.
 
-        Uses the complex projection value: |Im| measures circular content
-        (distance from real axis), |Re| measures hyperbolic content.
-        For ring elements, also shows the (a, b) component breakdown.
+        The signature is measured from the complex projection value:
+            |Im(z)| → circular content (rotation, off the real axis)
+            |Re(z)| → hyperbolic content (boost, on the real axis)
+
+        Special cases: 0^(ω/2) = i (pure circular), 0^(1/2) = -1 (pure hyperbolic).
         """
         # Get complex value — works for both ring and single zero-power paths
         cval = decomp.get('complex_val')
@@ -1948,8 +2181,10 @@ class CalculatorApp:
 
         tw.insert('end', '\n')
         tw.insert('end', 'Signature Analysis\n', 'header')
-        tw.insert('end', '  0^(\u03c9/2)\u00b2 = \u22121 (circular),  '
-                  '0\u2070 = 1 (hyperbolic)\n', 'dim')
+        tw.insert('end', '  |Im| \u2192 rotation (circular),  '
+                  '|Re| \u2192 boost (hyperbolic)\n', 'dim')
+        tw.insert('end', '  W = \u221a(\u2212i\u03c0) at 45\u00b0 '
+                  '\u2014 every 0\u1d57 mixes both signatures\n', 'dim')
 
         # Bar visualization
         bar_len = 24
@@ -2485,12 +2720,23 @@ class CalculatorApp:
 
 
 class FuncMemoryDialog:
-    """Dialog for viewing and deleting user-defined functions."""
+    """Dialog for viewing system and user-defined functions."""
+
+    # System functions: (display_name, insert_text, description)
+    _SYSTEM_FUNCS = [
+        ('solve()',   'solve(',   'solve equation for x'),
+        ('expand()',  'expand(',  'expand products and powers'),
+        ('factor()',  'factor(',  'factor into irreducibles'),
+        ('log\u2080()',  'log0(',    'traction logarithm base 0'),
+        ('log\u03c9()',  'log\u03c9(', 'traction logarithm base \u03c9'),
+        ('fractal()', 'fractal(', 'iterate expression as fractal'),
+        ('Z(n, x)',   'Z(',       'graded element of grade n'),
+    ]
 
     def __init__(self, parent, app):
         self.app = app
         self.win = tk.Toplevel(parent)
-        self.win.title('Function Memory')
+        self.win.title('Functions')
         self.win.configure(bg=BG_BODY)
         self.win.resizable(False, False)
         self.win.transient(parent)
@@ -2500,54 +2746,78 @@ class FuncMemoryDialog:
         self.win.protocol('WM_DELETE_WINDOW', self._close)
 
     def _build_ui(self):
-        funcs = get_user_functions()
+        # ── System Functions ──────────────────────────────
+        tk.Label(self.win, text='System Functions', font=('Segoe UI', 13, 'bold'),
+                 bg=BG_BODY, fg=FG_TEXT).pack(anchor='w', pady=(12, 4), padx=16)
 
-        header = tk.Label(self.win, text='Defined Functions', font=('Segoe UI', 14, 'bold'),
-                          bg=BG_BODY, fg=FG_TEXT)
-        header.pack(pady=(12, 8), padx=16)
+        sys_frame = tk.Frame(self.win, bg=BG_BODY)
+        sys_frame.pack(fill='x', padx=16, pady=(0, 8))
+
+        for display, insert_text, desc in self._SYSTEM_FUNCS:
+            row = tk.Frame(sys_frame, bg=BG_BODY)
+            row.pack(fill='x', pady=1)
+
+            tk.Label(row, text=display, font=('Consolas', 11, 'bold'),
+                     bg=BG_BODY, fg=FG_TEXT, width=12, anchor='w').pack(side='left')
+            tk.Label(row, text=desc, font=('Segoe UI', 10),
+                     bg=BG_BODY, fg=FG_DIM, anchor='w').pack(side='left', fill='x', expand=True)
+
+            kb_btn = tk.Button(row, text='\u2328', font=('Segoe UI', 11),
+                               fg=FG_TEXT, bg=BG_BTN, bd=1, width=3,
+                               command=lambda t=insert_text: self._insert_func(t))
+            kb_btn.pack(side='right', padx=(4, 0))
+
+        # ── Separator ────────────────────────────────────
+        tk.Frame(self.win, bg=BORDER_COLOR, height=1).pack(fill='x', padx=16, pady=4)
+
+        # ── User Functions ────────────────────────────────
+        tk.Label(self.win, text='User Functions', font=('Segoe UI', 13, 'bold'),
+                 bg=BG_BODY, fg=FG_TEXT).pack(anchor='w', pady=(4, 4), padx=16)
+
+        funcs = get_user_functions()
 
         if not funcs:
             tk.Label(self.win, text='No functions defined.',
-                     font=('Segoe UI', 11), bg=BG_BODY, fg=FG_DIM).pack(pady=(0, 12), padx=16)
+                     font=('Segoe UI', 10), bg=BG_BODY, fg=FG_DIM).pack(
+                         anchor='w', pady=(0, 8), padx=24)
         else:
-            list_frame = tk.Frame(self.win, bg=BG_BODY)
-            list_frame.pack(fill='both', expand=True, padx=16, pady=(0, 8))
+            user_frame = tk.Frame(self.win, bg=BG_BODY)
+            user_frame.pack(fill='x', padx=16, pady=(0, 8))
 
             for name, (params, body) in funcs.items():
-                row = tk.Frame(list_frame, bg=BG_BODY)
+                row = tk.Frame(user_frame, bg=BG_BODY)
                 row.pack(fill='x', pady=2)
 
                 params_str = ', '.join(params)
                 body_str = format_result(body)
                 label_text = f'{name}({params_str}) = {body_str}'
-                tk.Label(row, text=label_text, font=('Consolas', 12),
-                         bg=BG_BODY, fg=FG_TEXT, anchor='w').pack(side='left', fill='x', expand=True)
+                tk.Label(row, text=label_text, font=('Consolas', 11),
+                         bg=BG_BODY, fg=FG_TEXT, anchor='w').pack(
+                             side='left', fill='x', expand=True)
 
                 del_btn = tk.Button(row, text='\u2715', font=('Segoe UI', 10),
                                     fg='#aa3333', bg=BG_BTN, bd=1, width=3,
                                     command=lambda n=name: self._delete_func(n))
-                del_btn.pack(side='right', padx=(8, 0))
+                del_btn.pack(side='right', padx=(4, 0))
 
-                edit_btn = tk.Button(row, text=':=', font=('Consolas', 10),
-                                     fg=FG_TEXT, bg=BG_BTN, bd=1, width=3,
-                                     command=lambda n=name: self._edit_func(n))
-                edit_btn.pack(side='right')
+                insert_text = f'{name}('
+                kb_btn = tk.Button(row, text='\u2328', font=('Segoe UI', 11),
+                                   fg=FG_TEXT, bg=BG_BTN, bd=1, width=3,
+                                   command=lambda t=insert_text: self._insert_func(t))
+                kb_btn.pack(side='right')
 
         close_btn = tk.Button(self.win, text='Close', font=('Segoe UI', 11),
                               bg=BG_BTN, fg=FG_TEXT, bd=1, command=self._close)
         close_btn.pack(pady=(4, 12))
 
-    def _edit_func(self, name):
-        """Load a function definition into the calculator input for editing."""
-        funcs = get_user_functions()
-        if name not in funcs:
-            return
-        params, body = funcs[name]
-        params_str = ', '.join(params)
-        body_str = format_result(body)
-        self.app.entry_var.set(f'{name}({params_str})={body_str}')
-        self.app.display_expr.icursor('end')
-        self.app.display_expr.focus_set()
+    def _insert_func(self, text):
+        """Insert function call at cursor and place cursor between parentheses."""
+        entry = self.app.display_expr
+        pos = entry.index('insert')
+        entry.insert(pos, text + ')')
+        # Place cursor between the parentheses
+        entry.icursor(pos + len(text))
+        entry.focus_set()
         self._close()
 
     def _delete_func(self, name):

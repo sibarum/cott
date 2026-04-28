@@ -630,13 +630,13 @@ class TestPipeline:
     def test_plot_omega_exponent(self):
         """x^(w/3) should plot via omega=W in exponent space."""
         from calculator import compute_phase_grid
-        result = compute_phase_grid('x^(w/3)')
+        result = compute_phase_grid('x^(\u03c9/3)')
         assert result is not None
 
     def test_plot_nested_traction(self):
         """(0^(w/2))^x should plot (simplifies to 0^(x*w/2))."""
         from calculator import compute_phase_grid
-        result = compute_phase_grid('(0^(w/2))^x')
+        result = compute_phase_grid('(0^(\u03c9/2))^x')
         assert result is not None
 
     def test_plot_two_variable(self):

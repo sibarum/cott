@@ -479,8 +479,12 @@ def traction_simplify(expr):
                 scalar = Mul(*scalars)
                 inner = Mul(*traction_parts) if len(traction_parts) > 1 else traction_parts[0]
                 inner_result = traction_simplify(Pow(Zero(), inner))
-                if not (isinstance(inner_result, Pow) and isinstance(inner_result.base, Zero)):
-                    # The identity fired — inner_result is a scalar, raise to scalar power.
+                # Skip when inner_result == 1: 1^c = 1 trivially for any c, which would
+                # collapse 0^(c·0) → 1 and discard phase info (e.g. 0^(0/2) ≠ 1, since
+                # i^(i/2) = e^(-π/4) under the standard projection).
+                if (inner_result != S.One
+                        and not (isinstance(inner_result, Pow) and isinstance(inner_result.base, Zero))):
+                    # The identity fired — inner_result is a non-trivial scalar, raise to scalar power.
                     # Only apply if the final result stays in traction (Integer, Rational, etc.)
                     # to avoid escaping to classical arithmetic (e.g. (-1)^(1/7)).
                     final = traction_simplify(Pow(inner_result, scalar))

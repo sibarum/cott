@@ -45,9 +45,9 @@ class GeneratorSpec:
     The ring is always Q[s][g]/(g²-sg+1), s = g + g⁻¹.
     Only the interpretation of g and the exponent mapping change.
     """
-    __slots__ = ['name', 'symbol', 'exponent_sign', 'omega_band']
+    __slots__ = ['name', 'symbol', 'exponent_sign', 'omega_band', 'zero_band']
 
-    def __init__(self, name, symbol, exponent_sign=1, omega_band=False):
+    def __init__(self, name, symbol, exponent_sign=1, omega_band=False, zero_band=False):
         """
         Args:
             name: Human-readable name ('zero', 'omega')
@@ -56,11 +56,16 @@ class GeneratorSpec:
                           -1 for ω-base (ω^n → g^{-scale·n})
             omega_band: If True, this is an omega-channel generator
                        (exponents contain ω, θ-independent)
+            zero_band: If True, this is a zero-channel generator
+                      (exponents contain traction-zero; for n=2, g² = 1, hyperbolic)
         """
+        if omega_band and zero_band:
+            raise ValueError("A generator cannot be in both omega- and zero-bands")
         self.name = name
         self.symbol = symbol
         self.exponent_sign = exponent_sign
         self.omega_band = omega_band
+        self.zero_band = zero_band
 
     def format_generator(self, scale):
         """Format the generator expression for display.
@@ -72,6 +77,13 @@ class GeneratorSpec:
                 return f'{self.symbol}^(\u03c9/2)'
             else:
                 return f'{self.symbol}^(\u03c9/{scale})'
+        elif self.zero_band:
+            if scale == 1:
+                return f'{self.symbol}^(0/1)'
+            elif scale == 2:
+                return f'{self.symbol}^(0/2)'
+            else:
+                return f'{self.symbol}^(0/{scale})'
         else:
             if scale == 1:
                 return self.symbol
@@ -98,6 +110,8 @@ ZERO_SPEC = GeneratorSpec('zero', '0', exponent_sign=+1, omega_band=False)
 OMEGA_SPEC = GeneratorSpec('omega', '\u03c9', exponent_sign=-1, omega_band=False)
 ZERO_OMEGA_SPEC = GeneratorSpec('zero-omega', '0', exponent_sign=+1, omega_band=True)
 OMEGA_OMEGA_SPEC = GeneratorSpec('omega-omega', '\u03c9', exponent_sign=-1, omega_band=True)
+ZERO_ZERO_SPEC = GeneratorSpec('zero-zero', '0', exponent_sign=+1, zero_band=True)
+OMEGA_ZERO_SPEC = GeneratorSpec('omega-zero', '\u03c9', exponent_sign=-1, zero_band=True)
 
 
 # ============================================================

@@ -7,13 +7,10 @@ from tkinter import font as tkfont
 import numpy as np
 import threading
 
-from traction import Zero, Omega, Null, GradedElement, traction_simplify
 import registry
-from parser import Parser, parse_and_eval
-from visualization import (compute_phase_grid, phase_to_rgb, magnitude_to_rgb, blended_to_rgb,
-                           mixed_to_rgb,
+from visualization import (prepare_expr, eval_on_grid, compile_fractal,
                            CANVAS_SIZE, GRID_RES, AXIS_MARGIN, CANVAS_TOTAL, DEFAULT_BOUNDS)
-from fractal import compute_fractal, fractal_to_rgb, parse_fractal_args
+from fractal import fractal_to_rgb, parse_fractal_args
 from streamlines import compute_streamlines
 from gui.constants import *
 from gui.utils import nice_tick_step, tick_label, scale_color, clip_line
@@ -460,118 +457,49 @@ class FullScreenViewer:
         if not expr_text:
             return None
 
+        prep = prepare_expr(expr_text, proj_name)
+        if prep is None:
+            return None
+
+        proj, projected, traction_expr, a, b, is_graded = prep
+
         p_min, p_max, q_min, q_max = self._view_bounds(center_p, center_q, bounds)
         res_x, res_y, _divisor = res
-
         lin_p = np.linspace(p_min, p_max, res_x)
         lin_q = np.linspace(q_max, q_min, res_y)
-
-        from sympy import Symbol, symbols
-        p_sym, q_sym, x_sym = Symbol('p'), Symbol('q'), Symbol('x')
-        a, b = symbols('a b', real=True)
-
-        parsed = parse_and_eval(expr_text)
-        if parsed is None:
-            return None
-
-        proj = registry.get('projection', proj_name)
-        if proj is None:
-            return None
-
-        has_p = parsed.has(p_sym)
-        has_q = parsed.has(q_sym)
-        has_x = parsed.has(x_sym)
-        if not has_p and not has_q and not has_x:
-            return None
-
-        subs = []
-        if has_p:
-            subs.append((p_sym, a))
-        if has_q:
-            subs.append((q_sym, b))
-        if has_x:
-            subs.append((x_sym, proj.native_x(a, b)))
-
-        traction_expr = traction_simplify(parsed.subs(subs))
-
-        if traction_expr.has(GradedElement):
-            return self._compute_graded_rgb(traction_expr, a, b, lin_p, lin_q)
-
-        projected = proj.project_expr(traction_expr, a, b)
-        if projected is None:
-            return None
-
         AA, BB = np.meshgrid(lin_p, lin_q)
-        eval_result = proj.eval_grid(projected, a, b, AA, BB,
-                                     traction_expr=traction_expr)
-        if eval_result is None:
+
+        result = eval_on_grid(proj, projected, traction_expr, a, b, AA, BB,
+                              is_graded=is_graded, color_mode=color_mode)
+        if result is None:
             return None
 
-        phase = eval_result['phase']
-        brightness = eval_result['brightness']
-        log_mag = eval_result.get('log_mag')
-        sig_ratio = eval_result.get('sig_ratio')
-
-        if color_mode == 'mixed' and sig_ratio is not None:
-            return mixed_to_rgb(phase, brightness, sig_ratio)
-        elif color_mode == 'magnitude':
-            return magnitude_to_rgb(phase, log_mag)
-        elif color_mode == 'blended':
-            return blended_to_rgb(phase, brightness, log_mag)
-        else:
-            return phase_to_rgb(phase, brightness)
-
-    def _compute_graded_rgb(self, traction_expr, a, b, lin_p, lin_q):
-        from sympy import lambdify
-        from traction import Omega
-
-        stripped = traction_expr
-        if isinstance(stripped, GradedElement):
-            stripped = stripped.value
-        projected = stripped.subs(Omega(), 1j)
-
-        try:
-            f = lambdify((a, b), projected, modules='numpy')
-        except Exception:
-            return None
-
-        AA, BB = np.meshgrid(lin_p, lin_q)
-        try:
-            Z = np.asarray(f(AA, BB), dtype=complex)
-        except Exception:
-            return None
-
-        phase = np.angle(Z) % (2 * np.pi)
-        brightness = 1 - 1 / (1 + np.abs(Z) ** 0.4)
-        return phase_to_rgb(phase, brightness)
+        rgb, *_ = result
+        return rgb
 
     def _compute_fractal_rgb(self, res, cw, ch, cancel, center_p, center_q, bounds,
                              fractal_text):
         expr_str, escape, max_iter = parse_fractal_args(fractal_text)
 
-        from sympy import Symbol, lambdify, I as symI
-        c_sym, x_sym = Symbol('c'), Symbol('x')
-        p_sym, q_sym = Symbol('p'), Symbol('q')
+        app = self.app
+        proj_name = app.projection_names[app.projection_index]
+        proj = registry.get('projection', proj_name)
 
-        parsed = Parser(expr_str).parse()
-        projected = parsed.subs(Zero(), symI).subs(Omega(), -symI).subs(Null(), 0)
-
-        has_pq = projected.has(p_sym) or projected.has(q_sym)
-        if has_pq:
-            from sympy import re as sym_re, im as sym_im
-            projected = projected.subs(p_sym, sym_re(c_sym)).subs(q_sym, sym_im(c_sym))
-
-        f_raw = lambdify((x_sym, c_sym), projected, modules='numpy')
+        try:
+            f_raw, x0 = compile_fractal(expr_str, proj)
+        except (ValueError, Exception):
+            return None
 
         p_min, p_max, q_min, q_max = self._view_bounds(center_p, center_q, bounds)
         res_x, res_y, _divisor = res
-
         lin_p = np.linspace(p_min, p_max, res_x)
         lin_q = np.linspace(q_max, q_min, res_y)
+
+        # Inline iteration with custom grid (panned/zoomed view)
         AA, BB = np.meshgrid(lin_p, lin_q)
         c_grid = AA + 1j * BB
 
-        z = np.full_like(c_grid, 1j, dtype=complex)
+        z = np.full_like(c_grid, x0, dtype=complex)
         counts = np.zeros(c_grid.shape, dtype=int)
         last_z = np.zeros_like(c_grid, dtype=complex)
         mask = np.ones(c_grid.shape, dtype=bool)

@@ -26,18 +26,12 @@ PHASE_COLORS = np.array([
 ], dtype=np.float64)
 
 
-def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
-                       projection_name='complex_lie', t_value=None):
-    """
-    Compute visualization data for a traction expression using a registered projection.
+def prepare_expr(expr_text, projection_name='complex_lie', t_value=None):
+    """Parse and project a traction expression for grid evaluation.
 
-    Variable system:
-        p, q — raw grid coordinates (horizontal, vertical). Always the same.
-        x    — projection's native unit coordinate. Defined by each projection.
-               e.g. complex_lie: x = p + q*0^(w/2)
-        t    — time parameter (scalar, 0 to 1). Substituted before grid eval.
+    Shared by both preview and fullscreen rendering paths.
 
-    Returns tuple (phase, brightness, Z, log_mag) or None on failure.
+    Returns (proj, projected, traction_expr, a, b, is_graded) or None.
     """
     parsed = parse_and_eval(expr_text)
     if parsed is None:
@@ -55,21 +49,17 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
     if not has_p and not has_q and not has_x:
         return None
 
-    # Substitute t with its scalar value before grid evaluation
     if has_t:
         from sympy import Rational
         tv = Rational(t_value) if t_value is not None else Rational(0)
         parsed = parsed.subs(t_sym, tv)
 
-    # Get the active projection from the registry
     proj = registry.get('projection', projection_name)
     if proj is None:
         return None
 
     a, b = symbols('a b', real=True)
 
-    # Substitute variables:
-    # p -> a (horizontal), q -> b (vertical), x -> projection's native unit
     subs = []
     if has_p:
         subs.append((p_sym, a))
@@ -81,32 +71,151 @@ def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
     traction_expr = parsed.subs(subs)
     traction_expr = traction_simplify(traction_expr)
 
-    # Graded element path: any expression containing Z_n → plot as (r, p) in r + p*w
     if traction_expr.has(GradedElement):
-        graded = _compute_graded_grid(traction_expr, a, b, grid_res, bounds)
-        if graded is None:
-            return None
-        return graded + ({},)  # append empty extras dict
+        return proj, None, traction_expr, a, b, True
 
-    # Step 1: Symbolic projection
     projected = proj.project_expr(traction_expr, a, b)
     if projected is None:
         return None
 
-    # Step 2: Grid evaluation
-    lin = np.linspace(-bounds, bounds, grid_res)
-    AA, BB = np.meshgrid(lin, lin[::-1])  # flip y so up = positive
+    # Bail out if free symbols remain beyond the grid variables —
+    # lambdify would produce a symbolic (non-numeric) result that hangs numpy.
+    extra_syms = projected.free_symbols - {a, b}
+    if extra_syms:
+        return None
+
+    return proj, projected, traction_expr, a, b, False
+
+
+def eval_on_grid(proj, projected, traction_expr, a, b, AA, BB,
+                 is_graded=False, color_mode='phase'):
+    """Evaluate a projected expression on a grid and return RGB + extras.
+
+    Shared by both preview and fullscreen rendering paths.
+
+    Returns (rgb, phase, brightness, Z, log_mag, extras) or None.
+    """
+    if is_graded:
+        graded = _eval_graded_on_grid(traction_expr, a, b, AA, BB)
+        if graded is None:
+            return None
+        phase, brightness, Z, log_mag = graded
+        rgb = phase_to_rgb(phase, brightness)
+        return rgb, phase, brightness, Z, log_mag, {}
 
     eval_result = proj.eval_grid(projected, a, b, AA, BB,
                                  traction_expr=traction_expr)
     if eval_result is None:
         return None
 
-    # Collect any extra keys the projection provides (e.g. sig_ratio)
+    phase = eval_result['phase']
+    brightness = eval_result['brightness']
+    Z = eval_result['Z']
+    log_mag = eval_result['log_mag']
     extras = {k: v for k, v in eval_result.items()
               if k not in ('phase', 'brightness', 'Z', 'log_mag')}
 
-    return eval_result['phase'], eval_result['brightness'], eval_result['Z'], eval_result['log_mag'], extras
+    sig_ratio = extras.get('sig_ratio')
+    if color_mode == 'mixed' and sig_ratio is not None:
+        rgb = mixed_to_rgb(phase, brightness, sig_ratio)
+    elif color_mode == 'magnitude':
+        rgb = magnitude_to_rgb(phase, log_mag)
+    elif color_mode == 'blended':
+        rgb = blended_to_rgb(phase, brightness, log_mag)
+    else:
+        rgb = phase_to_rgb(phase, brightness)
+
+    return rgb, phase, brightness, Z, log_mag, extras
+
+
+def compile_fractal(expr_text, proj):
+    """Compile a fractal expression using the given projection.
+
+    Shared by both preview and fullscreen fractal paths.
+
+    Returns (f_raw, x0) where f_raw(x, c) is the vectorised iteration function
+    and x0 is the projected starting value (traction zero under the projection).
+    Raises ValueError on failure.
+    """
+    from sympy import Symbol as Sym, lambdify as sym_lambdify, re as sym_re, im as sym_im
+    from parser import Parser
+
+    c_sym, x_sym = Sym('c'), Sym('x')
+    p_sym, q_sym = Sym('p'), Sym('q')
+    a, b = symbols('a b', real=True)
+
+    try:
+        parsed = Parser(expr_text).parse()
+    except Exception as e:
+        raise ValueError(f'Parse error in fractal expression: {e}')
+
+    expr_to_project = parsed
+    if parsed.has(p_sym) or parsed.has(q_sym):
+        expr_to_project = expr_to_project.subs(p_sym, a).subs(q_sym, b)
+
+    projected = proj.project_expr(traction_simplify(expr_to_project), a, b)
+    if projected is None:
+        raise ValueError('Projection failed for fractal expression')
+    try:
+        projected = projected.expand()
+    except Exception:
+        pass
+
+    has_pq = projected.has(a) or projected.has(b)
+    has_c = projected.has(c_sym)
+
+    if has_pq:
+        projected = projected.subs(a, sym_re(c_sym)).subs(b, sym_im(c_sym))
+    elif not has_c:
+        raise ValueError(
+            'Fractal expression must use c (pixel coordinate) '
+            'or p/q (real/imaginary parts)')
+
+    try:
+        f_raw = sym_lambdify((x_sym, c_sym), projected, modules='numpy')
+    except Exception as e:
+        raise ValueError(f'Cannot compile fractal expression: {e}')
+
+    # Compute x₀ = projection of traction zero
+    try:
+        zero_proj = proj.project_expr(traction_simplify(Zero()), a, b)
+        x0 = complex(zero_proj.evalf())
+        if not np.isfinite(x0):
+            x0 = 0j
+    except Exception:
+        x0 = 0j
+
+    # Smoke test
+    try:
+        f_raw(np.array([x0]), np.array([0.1 + 0.1j]))
+    except Exception as e:
+        raise ValueError(f'Cannot evaluate fractal expression: {e}')
+
+    return f_raw, x0
+
+
+def compute_phase_grid(expr_text, grid_res=GRID_RES, bounds=3.0,
+                       projection_name='complex_lie', t_value=None):
+    """Compute visualization data for a traction expression.
+
+    Returns tuple (phase, brightness, Z, log_mag, extras) or None on failure.
+    """
+    prep = prepare_expr(expr_text, projection_name, t_value)
+    if prep is None:
+        return None
+
+    proj, projected, traction_expr, a, b, is_graded = prep
+
+    lin = np.linspace(-bounds, bounds, grid_res)
+    AA, BB = np.meshgrid(lin, lin[::-1])
+
+    result = eval_on_grid(proj, projected, traction_expr, a, b, AA, BB,
+                          is_graded=is_graded)
+    if result is None:
+        return None
+
+    _rgb, phase, brightness, Z, log_mag, extras = result
+    return phase, brightness, Z, log_mag, extras
 
 
 def _degrade(expr):
@@ -183,16 +292,14 @@ def _split_omega(expr):
     return expr, S.Zero
 
 
-def _compute_graded_grid(graded_expr, a, b, grid_res, bounds):
-    """
-    Compute visualization for an expression containing GradedElements.
+def _eval_graded_on_grid(graded_expr, a, b, AA, BB):
+    """Evaluate a graded expression on a grid.
 
     Strips graded wrappers and maps omega -> i in all values,
-    so r + p*w becomes r + p*j. Axes: horizontal = r, vertical = p (omega coeff).
+    so r + p*w becomes r + p*j.
 
     Returns (phase, brightness, Z, log_mag) or None.
     """
-    # Recursively unwrap all graded elements and project omega -> i
     projected = _degrade(graded_expr)
     try:
         projected = projected.expand()
@@ -203,9 +310,6 @@ def _compute_graded_grid(graded_expr, a, b, grid_res, bounds):
         f = lambdify((a, b), projected, modules=['numpy'])
     except Exception:
         return None
-
-    lin = np.linspace(-bounds, bounds, grid_res)
-    AA, BB = np.meshgrid(lin, lin[::-1])
 
     try:
         AA_c = AA.astype(complex)
@@ -218,7 +322,6 @@ def _compute_graded_grid(graded_expr, a, b, grid_res, bounds):
     except Exception:
         return None
 
-    # Standard metrics from complex grid
     phase = np.angle(Z)
     phase = (phase + 2 * np.pi) % (2 * np.pi)
     mag = np.abs(Z)

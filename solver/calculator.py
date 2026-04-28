@@ -1,5 +1,5 @@
 """
-COTT Calculator — Traction Expression Evaluator
+COTT Calculator - Traction Expression Evaluator
 A tkinter GUI for interactively evaluating Traction Theory expressions.
 
 Usage:

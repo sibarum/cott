@@ -33,11 +33,12 @@ Brightness from |f|² / (|f|² + |p|²) — algebraic sigmoid.
 
 Signature ratio: wedge²/(dot²+wedge²) measures how much of the
 transformation is circular rotation (I²=-1) vs hyperbolic boost (I²=+1)
-at each point. Traction naturally contains both: 0^(ω/2) squares to -1
-(circular) while 0^0 squares to +1 (hyperbolic), so both signatures
-coexist in the same algebra. The 'mixed' color mode visualizes this
-with cool colors for rotation-dominated regions and warm colors for
-boost-dominated regions.
+at each point. Every traction power 0^t mixes both signatures because
+W = √(-iπ) sits at 45° — even purely real exponents (no ω) generate
+rotation. The ω content controls axis alignment, not the existence of
+rotation: 0^(1/3) is 63% circular despite having no omega.
+The 'mixed' color mode visualizes this with cool colors for
+rotation-dominated regions and warm colors for boost-dominated regions.
 
 For zero-powers (0^z), the Cayley rational transform replaces the
 transcendental exponential:
