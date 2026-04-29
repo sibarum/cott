@@ -81,6 +81,15 @@ sub.smaller {
     font-size: 0.6em;
 }
 
+.big-image-border {
+    border: 2px solid #333;
+    margin: 2em auto;
+}
+
+.big-image-border img.fullsize-image {
+    display: block;
+}
+
 img.fullsize-image {
     width: 100%;
     height: auto;

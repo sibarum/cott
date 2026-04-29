@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<html xmlns="http://www.w3.org/1999/html" lang="en">
+<head>
+    <script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../lib/styles-v1.css">
+    <script src="../lib/traction-interpret.js"></script>
+
+    <title>Traction Theory Introduction</title>
+
+</head>
+<body>
+
+<div class="section">
+
+    <a href="/cott">
+        <div class="icon-back"></div>
+    </a>
+
+    <div class="headings">
+        <h1>Traction Theory Intro</h1>
+        <h2>Introduction</h2>
+    </div>
+
+    <div class="section-title">
+        Table of Contents
+    </div>
+    <ol>
+        <li>
+            <a href="#section-1">
+                WIP
+            </a>
+        </li>
+    </ol>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        Published under the <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-1">
+        The Complex Plane
+    </div>
+
+    <p>
+        Unlike the typical complex plane focused around
+        <span class="expression-inline"><span class="dynamicexpr">sqrt(-1)</span></span>,
+        Traction Theory sees the complex plane from the perspective of zero-magnitude vector growing from the point at erasure.
+    </p>
+
+    <p>
+        We replace the standard additive identity with erasure, not a number.
+    </p>
+
+    <div class="expression font-xl">
+        <span class="dynamicexpr">x-x=null</span>
+    </div>
+
+    <p>
+        We redefine zero as a displacement without magnitude. Zero is no longer an absorbing element.
+    </p>
+
+    <div class="expression font-xl">
+        <span class="dynamicexpr">0*x != 0</span>
+    </div>
+
+    <p>
+        As a result, we receive a 2D complex space:
+    </p>
+
+    <div class="big-image-border">
+        <img src="../lib/img/traction-circle-w-background.png" width="2040" height="1680" class="fullsize-image" />
+    </div>
+
+    <p>
+        The "unit circle" is actually a 1D point. It's distorted in this image for illustrative purposes.
+        Traction theory doesn't change the shape of the number line.
+    </p>
+
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-2">
+        Generators
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th>Mode</th>
+                <th>Traction</th>
+                <th>δ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>j</td>
+                <td>Hyperbolic</td>
+                <td>0^(0/2)</td>
+                <td>+1</td>
+            </tr>
+            <tr>
+                <td>ε</td>
+                <td>Parabolic</td>
+                <td>0^(1/2)</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>η</td>
+                <td>Elliptic</td>
+                <td>0^(ω/2)</td>
+                <td>-1</td>
+            </tr>
+            <tr>
+                <td>k</td>
+                <td>Projective</td>
+                <td>0^(-1/2)</td>
+                <td>ω</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+</script>
+</body>
+</html>

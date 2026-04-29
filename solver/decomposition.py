@@ -111,7 +111,8 @@ def _expr_to_ring(expr):
             return el, {'band': 'zero', 'zero_lcd': zero_lcd, 'spec': zero_spec}
 
     # --- Priority 2: Pure rational exponents → rational-band ring ---
-    if (rational_denoms or not omega_denoms) and not zero_denoms:
+    # Mixed rational+omega must skip this path and fall through to multi-band.
+    if not omega_denoms and not zero_denoms:
         denoms = _collect_exponent_denoms(expr)
         if not denoms:
             denoms = {1}
@@ -151,17 +152,20 @@ def _classify_exponents_full(expr, rational_denoms, omega_denoms, bases_seen, ze
     if isinstance(expr, Pow) and isinstance(expr.base, (Zero, Omega)):
         base_name = 'zero' if isinstance(expr.base, Zero) else 'omega'
         bases_seen.add(base_name)
-        exp = expr.exp
-        omega_info = _extract_omega_rational(exp)
-        zero_info = _extract_zero_rational(exp) if zero_denoms is not None else None
-        if omega_info is not None:
-            coeff, _ = omega_info
-            omega_denoms.add(coeff.denominator)
-        elif zero_info is not None:
-            coeff, _ = zero_info
-            zero_denoms.add(coeff.denominator)
-        elif isinstance(exp, (Integer, Rational)):
-            rational_denoms.add(int(exp.q) if isinstance(exp, Rational) else 1)
+        # 0^(a+b) = 0^a · 0^b — classify each summand independently so a mix
+        # of rational, ω-rational, and 0-rational summands all get registered.
+        exp_terms = Add.make_args(expr.exp) if isinstance(expr.exp, Add) else (expr.exp,)
+        for exp in exp_terms:
+            omega_info = _extract_omega_rational(exp)
+            zero_info = _extract_zero_rational(exp) if zero_denoms is not None else None
+            if omega_info is not None:
+                coeff, _ = omega_info
+                omega_denoms.add(coeff.denominator)
+            elif zero_info is not None:
+                coeff, _ = zero_info
+                zero_denoms.add(coeff.denominator)
+            elif isinstance(exp, (Integer, Rational)):
+                rational_denoms.add(int(exp.q) if isinstance(exp, Rational) else 1)
         return
     if isinstance(expr, (Add, Mul)):
         for arg in expr.args:
@@ -403,13 +407,15 @@ def _classify_exponents(expr, rational_denoms, omega_denoms):
         rational_denoms.add(1)
         return
     if isinstance(expr, Pow) and isinstance(expr.base, (Zero, Omega)):
-        exp = expr.exp
-        omega_info = _extract_omega_rational(exp)
-        if omega_info is not None:
-            coeff, _ = omega_info
-            omega_denoms.add(coeff.denominator)
-        elif isinstance(exp, (Integer, Rational)):
-            rational_denoms.add(int(exp.q) if isinstance(exp, Rational) else 1)
+        # 0^(a+b) = 0^a · 0^b — classify each summand independently
+        exp_terms = Add.make_args(expr.exp) if isinstance(expr.exp, Add) else (expr.exp,)
+        for exp in exp_terms:
+            omega_info = _extract_omega_rational(exp)
+            if omega_info is not None:
+                coeff, _ = omega_info
+                omega_denoms.add(coeff.denominator)
+            elif isinstance(exp, (Integer, Rational)):
+                rational_denoms.add(int(exp.q) if isinstance(exp, Rational) else 1)
         return
     if isinstance(expr, (Add, Mul)):
         for arg in expr.args:
@@ -444,6 +450,18 @@ def _convert_multiband(expr, rat_scale, omega_scale):
     if isinstance(expr, Pow) and isinstance(expr.base, (Zero, Omega)):
         exp = expr.exp
         sign = -1 if isinstance(expr.base, Omega) else 1
+
+        # 0^(a+b) = 0^a · 0^b — convert each summand and multiply.
+        # SymPy auto-combines `0^a * 0^b` into `0^(a+b)`, so a user-written
+        # product of zero-powers with mixed bands lands here as one Pow.
+        if isinstance(exp, Add):
+            result = None
+            for term in Add.make_args(exp):
+                piece = _convert_multiband(Pow(expr.base, term), rat_scale, omega_scale)
+                if piece is None:
+                    return None
+                result = piece if result is None else result * piece
+            return result
 
         # Check for omega-containing exponent → band 2
         omega_info = _extract_omega_rational(exp)
