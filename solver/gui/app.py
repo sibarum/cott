@@ -65,6 +65,14 @@ class CalculatorApp:
         self._has_t = False  # True when current expression contains t
         self._approx_mode = False  # True when displaying ≈ approximations
 
+        # Explain-tab evaluation override: lets the user supply a custom g or s
+        # for the ring substitution step instead of the auto-detected one.
+        # mode is 'auto' | 'g' | 's'; expr is the parsed SymPy expression (or None).
+        self.eval_override_mode = 'auto'
+        self.eval_override_text = ''
+        self.eval_override_expr = None
+        self.eval_override_error = None
+
         self._build_ui()
         self._bind_keys()
 
@@ -1178,6 +1186,48 @@ class CalculatorApp:
         """Open the settings window (single-instance)."""
         SettingsWindow(self)
 
+    def _translate_override_text(self, text):
+        """Translate user-friendly notation in the s/g override field.
+
+        Replaces standalone 'w' with the unicode omega character so the parser
+        produces an Omega node rather than a free variable. Other identifiers
+        (omega, logw, solve, etc.) don't contain a standalone w, so word-boundary
+        matching is safe.
+        """
+        import re
+        return re.sub(r'\bw\b', 'ω', text)
+
+    def set_eval_override(self, mode, text):
+        """Update the evaluation override and re-render Explain.
+
+        mode ∈ {'auto', 'g', 's'}. text is the raw user input; for 'g'/'s'
+        modes it is parsed (with 'w' → 'ω') into a SymPy expression.
+        Errors are stored on self.eval_override_error and surfaced in Explain.
+        """
+        self.eval_override_mode = mode
+        self.eval_override_text = text
+        self.eval_override_error = None
+        self.eval_override_expr = None
+
+        if mode in ('g', 's') and text.strip():
+            try:
+                translated = self._translate_override_text(text)
+                parsed = parse_and_eval(translated)
+                self.eval_override_expr = traction_simplify(parsed)
+            except Exception as e:
+                self.eval_override_error = str(e)
+
+        if self._active_tab == 'Explain':
+            self._run_explain()
+
+    def _build_eval_override(self):
+        """Build the override dict for _eval_ring_exact, or None for auto mode."""
+        if self.eval_override_mode == 'auto':
+            return None
+        if self.eval_override_expr is None:
+            return None
+        return {'mode': self.eval_override_mode, 'expr': self.eval_override_expr}
+
     def _open_fullscreen(self):
         """Open the current plot in a full-screen viewer window."""
         if not self.entry_var.get().strip():
@@ -1809,18 +1859,30 @@ class CalculatorApp:
         cancel = threading.Event()
         self._exact_eval_cancel = cancel
 
+        override = self._build_eval_override()
+
         # Show "computing..." in the text widget
         tw = self.cheb_text
         tw.configure(state='normal')
         tw.insert('end', '\n')
-        tw.insert('end', 'Exact Value\n', 'header')
+        header = 'Exact Value'
+        if override is not None:
+            sym = 'g' if override['mode'] == 'g' else 's'
+            try:
+                shown = format_result(override['expr'])
+            except Exception:
+                shown = str(override['expr'])
+            header = f'Exact Value  [override: {sym} = {shown}]'
+        elif self.eval_override_mode != 'auto' and self.eval_override_error:
+            header = f'Exact Value  [override error: {self.eval_override_error}]'
+        tw.insert('end', f'{header}\n', 'header')
         tw.insert('end', '  computing...\n', 'dim')
         self._exact_eval_insert_pos = tw.index('end - 1 lines linestart')
         tw.configure(state='disabled')
 
         def compute():
             try:
-                result = _eval_ring_exact(decomp)
+                result = _eval_ring_exact(decomp, override=override)
                 if cancel.is_set():
                     return
                 # Schedule UI update on the main thread

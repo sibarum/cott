@@ -751,13 +751,19 @@ def _decompose_multiband(ring_el, rat_scale, omega_scale, traction_str, complex_
     }
 
 
-def _eval_ring_exact(decomp):
+def _eval_ring_exact(decomp, override=None):
     """
     Compute the exact symbolic value of a ring element by substituting
     the traction expressions for g and s, then simplifying.
 
     Uses Horner's method with traction_simplify at each step to keep
     intermediate expressions manageable.
+
+    override: optional dict {'mode': 'g'|'s', 'expr': SymPy expr}.
+        - mode='g': use override['expr'] as the generator g; s is derived as g + g⁻¹.
+        - mode='s': use override['expr'] as s; g is left as the algebraic generator
+          (output reports a(s) and b(s)·g separately).
+        - None or mode='auto': use the auto-detected g and s for the band.
 
     Returns a formatted string of the exact traction value.
     """
@@ -771,7 +777,18 @@ def _eval_ring_exact(decomp):
     if ring_el is None:
         return 'Ring element not available'
 
-    if band == 'omega':
+    mode = override.get('mode') if override else 'auto'
+
+    if mode == 'g':
+        # Custom g: derive s = g + g⁻¹
+        g_expr = override['expr']
+        g_inv = traction_simplify(Pow(g_expr, S.NegativeOne))
+        s_expr = traction_simplify(g_expr + g_inv)
+    elif mode == 's':
+        # Custom s: leave g symbolic (we'll output a(s) + b(s)·g)
+        g_expr = None
+        s_expr = override['expr']
+    elif band == 'omega':
         omega_lcd = ring_info.get('omega_lcd', 2)
         # g = 0^(ω/n), g⁻¹ = 0^(-ω/n), s = g + g⁻¹
         g_expr = Pow(Zero(), Mul(Omega(), SRat(1, omega_lcd)))
@@ -804,10 +821,20 @@ def _eval_ring_exact(decomp):
 
     if ring_el.b.is_zero():
         exact = a_val
-    else:
-        from sympy import expand
-        exact = traction_simplify(expand(a_val + expand(b_val * g_expr)))
+        return format_result(exact)
 
+    if g_expr is None:
+        # mode='s': g left as algebraic generator (g² = sg − 1)
+        a_str = format_result(a_val)
+        b_str = format_result(b_val)
+        if b_val == Integer(1):
+            return f'{a_str} + g'
+        if b_val == Integer(-1):
+            return f'{a_str} − g'
+        return f'{a_str} + ({b_str})·g'
+
+    from sympy import expand
+    exact = traction_simplify(expand(a_val + expand(b_val * g_expr)))
     return format_result(exact)
 
 

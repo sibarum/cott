@@ -43,6 +43,7 @@ class SettingsWindow:
 
         # Add tabs
         self._add_tab('Visualization', self._build_viz_tab)
+        self._add_tab('Evaluation', self._build_eval_tab)
 
         # Show first tab
         self.select_tab('Visualization')
@@ -194,6 +195,120 @@ class SettingsWindow:
                 self.app._draw_diamond_grid()
             else:
                 self.app.viz_canvas.delete('diamond')
+
+    def _build_eval_tab(self, parent):
+        """Build the Evaluation settings tab.
+
+        Lets the user override the generator g (or parameter s) used by the
+        Explain tab's exact-evaluation step. Default is auto-detect, which
+        derives g from the expression's exponents.
+        """
+        font = tkfont.Font(family='Segoe UI', size=10)
+        font_small = tkfont.Font(family='Segoe UI', size=9)
+        font_mono = tkfont.Font(family='Consolas', size=10)
+
+        tk.Label(parent, text='Generator override', font=font, bg=BG_BODY,
+                 fg=FG_TEXT, anchor='w').pack(fill='x', pady=(0, 4))
+
+        tk.Label(parent,
+                 text='Set a custom g or s for the Explain tab’s exact evaluation.\n'
+                      'In the field below, ‘w’ is auto-translated to ω.',
+                 font=font_small, bg=BG_BODY, fg=FG_DIM,
+                 justify='left', anchor='w').pack(fill='x', pady=(0, 8))
+
+        self.eval_mode_var = tk.StringVar(value=self.app.eval_override_mode)
+
+        mode_frame = tk.Frame(parent, bg=BG_BODY)
+        mode_frame.pack(fill='x', pady=(0, 6))
+
+        for value, label in [('auto', 'Auto-detect (default)'),
+                             ('g', 'Custom g')  ,
+                             ('s', 'Custom s')]:
+            tk.Radiobutton(
+                mode_frame, text=label, font=font_small,
+                variable=self.eval_mode_var, value=value,
+                bg=BG_BODY, activebackground=BG_BODY,
+                command=self._on_eval_mode_change
+            ).pack(anchor='w')
+
+        # Entry field for the expression
+        entry_frame = tk.Frame(parent, bg=BG_BODY)
+        entry_frame.pack(fill='x', pady=(4, 4))
+        tk.Label(entry_frame, text='Expression:', font=font_small,
+                 bg=BG_BODY, fg=FG_TEXT).pack(side='left', padx=(0, 4))
+
+        self.eval_expr_var = tk.StringVar(value=self.app.eval_override_text)
+        self.eval_expr_entry = tk.Entry(
+            entry_frame, textvariable=self.eval_expr_var, width=28,
+            font=font_mono
+        )
+        self.eval_expr_entry.pack(side='left', fill='x', expand=True)
+        self.eval_expr_entry.bind('<Return>', self._on_eval_expr_change)
+        self.eval_expr_entry.bind('<FocusOut>', self._on_eval_expr_change)
+
+        tk.Button(entry_frame, text='Apply', font=font_small,
+                  command=self._on_eval_expr_change).pack(side='left', padx=(4, 0))
+
+        # Status / error label
+        self.eval_status_var = tk.StringVar(value='')
+        tk.Label(parent, textvariable=self.eval_status_var, font=font_small,
+                 bg=BG_BODY, fg='#ff8866', anchor='w', justify='left',
+                 wraplength=380).pack(fill='x', pady=(2, 6))
+
+        # Examples
+        tk.Label(parent, text='Examples:', font=font_small,
+                 bg=BG_BODY, fg=FG_TEXT, anchor='w').pack(fill='x', pady=(8, 2))
+        examples = [
+            ('0^(1/2)', 'half-power of zero'),
+            ('0^(w/2)', 'i (after w → ω)'),
+            ('0^((w+1)/2)', '0^(ω/2) · 0^(1/2)'),
+            ('0^(1/4) + 0^(-1/4)', 's at scale 4'),
+        ]
+        for ex_expr, ex_desc in examples:
+            row = tk.Frame(parent, bg=BG_BODY)
+            row.pack(fill='x')
+            tk.Label(row, text=ex_expr, font=font_mono, bg=BG_BODY,
+                     fg=FG_TEXT, width=20, anchor='w').pack(side='left')
+            tk.Label(row, text=ex_desc, font=font_small, bg=BG_BODY,
+                     fg=FG_DIM, anchor='w').pack(side='left')
+
+        self._update_eval_entry_state()
+        self._refresh_eval_status()
+
+    def _on_eval_mode_change(self):
+        mode = self.eval_mode_var.get()
+        text = self.eval_expr_var.get()
+        self.app.set_eval_override(mode, text)
+        self._update_eval_entry_state()
+        self._refresh_eval_status()
+
+    def _on_eval_expr_change(self, event=None):
+        mode = self.eval_mode_var.get()
+        text = self.eval_expr_var.get()
+        self.app.set_eval_override(mode, text)
+        self._refresh_eval_status()
+
+    def _update_eval_entry_state(self):
+        """Disable the entry field when mode is auto."""
+        state = 'disabled' if self.eval_mode_var.get() == 'auto' else 'normal'
+        self.eval_expr_entry.configure(state=state)
+
+    def _refresh_eval_status(self):
+        """Show parse error or accepted-value summary."""
+        err = self.app.eval_override_error
+        if err:
+            self.eval_status_var.set(f'⚠  {err}')
+            return
+        if self.app.eval_override_mode == 'auto' or self.app.eval_override_expr is None:
+            self.eval_status_var.set('')
+            return
+        from formatting import format_result
+        try:
+            shown = format_result(self.app.eval_override_expr)
+        except Exception:
+            shown = str(self.app.eval_override_expr)
+        sym = 'g' if self.app.eval_override_mode == 'g' else 's'
+        self.eval_status_var.set(f'{sym} = {shown}')
 
     def _on_bounds_change(self, event=None):
         try:
