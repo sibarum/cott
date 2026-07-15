@@ -1,3 +1,6 @@
 .idea
 .claude
 **/*.iml
+__pycache__/
+*.pyc
+.venv/
