@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<html xmlns="http://www.w3.org/1999/html" lang="en">
+<head>
+    <script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../lib/styles-v1.css">
+    <script src="../../lib/traction-interpret.js"></script>
+
+    <title>BeigePapers: Void Calculus</title>
+
+</head>
+<body>
+
+<div class="section">
+
+    <a href="/cott">
+        <div class="icon-back"></div>
+    </a>
+
+    <div class="headings">
+        <h1>Void Calculus</h1>
+        <h2>structural emergence from the void</h2>
+    </div>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+        Published under the <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-1">
+        1. A Different Kind of Zero
+    </div>
+
+    <p>
+        Void Calculus builds upon <a href="/cott/theory/traction">Traction Theory</a>, an algebra with a
+        non-absorbing zero. Similar to a ring and field, a traction is a general-purpose algebraic object with
+        restrictions around zero notably absent from the definitions.
+    </p>
+
+    <p>
+        Standard zero is a non-invertible, idempotent, absorbing element.
+        Traction zero is none of these; it's a graded, invertible, information-conservative value.
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">0*x != 0</span>
+    </div>
+
+    <p>
+        Erasure is the additive identity, not zero.
+        This is the information-conservative equivalence transformation in reverse.
+    </p>
+
+    <div class="expression">
+        <span class="dynamicexpr">x-x=null</span>
+    </div>
+
+    <p>
+        Terms involving zero don't collapse unless it's by operational identity.
+        Expressions don't necessarily simplify down to a single number.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">0*0=0^2</div>
+    </div>
+
+    <p>
+        The traction type is constructed from the closure of total, reversible operations.
+        It doesn't have indeterminants.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">0*w = 0/0 = w/w = 1</div>
+    </div>
+
+    <p>
+        Void Calculus explores this alternative framing of zero as it applies to ordinary Calculus.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-2">
+        2. Taylor Jet
+    </div>
+
+    <p>
+        We define a sample function for illustrative purposes.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">f(x) = x^{2}+3*x-4</div>
+    </div>
+
+    <p>
+        By adding a zero offset, the information changes, but the projection to
+        Real numbers would not.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">f(x+0) = (x+0)^{2}+3*(x+0)-4</div>
+    </div>
+
+    <div class="expression">
+        <div class="dynamicexpr">f(x+0) = (x^2+2*0*x+0^2)+(3*x+3*0)-4</div>
+    </div>
+
+    <p>
+        By multiplying both sides of the equation by zero, both sides are effectively zero.
+        Traction zero prevents this from collapsing to a trivial tautology,
+        enabling zero-scaled expressions to be fully tractable.
+
+    <div class="expression">
+        <div class="dynamicexpr">0*f(x+0) = 0*((x^2+2*0*x+0^2)+(3*x+3*0)-4)</div>
+    </div>
+
+    <p>
+        Now we distribute the zero.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">0*f(x+0) = x^2*0+3*x*0-4*0+2*0^2*x+3*0^2+0^3</div>
+    </div>
+
+    <p>
+        Then we group the terms by the grade of zero.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">0*f(x+0) = (0*x^2+3*0*x-4*0)+(2*0^2*x+3*0^2)+0^3</div>
+    </div>
+
+    <p>
+        The resulting ordered expansion is called the Traction Jet.
+        It plays the role of a Taylor jet, with successive powers of the traction parameter encoding successive differential orders.
+    </p>
+
+    <p>
+        In Traction Theory,
+        <span class="expression-inline smaller">
+            <span class="dynamicexpr">0*w=1</span>
+        </span>
+        Multiplying by <span class="symbol">&omega;</span> cancels the first order of <span class="number">0</span>.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">w*(0*f(x+0)) = f(x+0)</div>
+    </div>
+
+    <p>
+        This reveals the same
+        <span class="expression-inline smaller">
+            <span class="dynamicexpr">f(x+0)</span>
+        </span>
+        as before.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">f(x+0) = x^2+3*x-4+(2*0*x+3*0)+0^2</div>
+    </div>
+
+    <p>
+        We use the projection operator to truncate zero-terms.
+        For the sake of simplicity, the projection operator ℚ discards every traction order, retaining only the zeroth-order component.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">Q(f(x+0)) = x^2+3*x-4</div>
+    </div>
+
+    <p>
+        Now we recover the first derivative by again multiplying by <span class="symbol">&omega;</span>
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">w*f(x+0) = w*x^2+w*3*x-w*4+(2*x+3)+0</div>
+    </div>
+
+    <p>
+        Because &omega; lowers traction order by one, the coefficient of the first-order traction term becomes the zeroth-order component.
+        After projection, this coefficient is precisely the derivative.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">Q(w*f(x+0)) = 2*x+3</div>
+    </div>
+
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-3">
+        3. Laurent Logarithmic Derivative
+    </div>
+
+    <p>
+        Using the same example as in the previous section:
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">f(x) = x^{2}+3*x-4</div>
+    </div>
+
+    <p>
+        We now apply a multiplicative variant:
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">f(x+0)/f(x) = {x^2+3*x-4+2*0*x+3*0+0^2} / {x^{2}+3*x-4}</div>
+    </div>
+
+    <p>
+        The
+        <span class="expression-inline smaller">
+            <span class="dynamicexpr">f(x)</span>
+        </span>
+        in the numerator cancels out:
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">f(x+0)/f(x) = {x^2+3*x-4}/{x^2+3*x-4} + {2*0*x+3*0+0^2} / {x^{2}+3*x-4}</div>
+    </div>
+
+    <p>
+        Leaving behind a residual with a unit offset.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">f(x+0)/f(x) = 1 + 0*{{2*x+3+0}/{x^2+3*x-4}}</div>
+    </div>
+
+    <p>
+        Prior to projection, the ratio differs from unity only by first-order traction terms.
+        Now see what happens when we divide out the zero:
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">f(x+0)/{0*f(x)} = 1/0 + {0/0}*{{2*x+3+0}/{x^2+3*x-4}}</div>
+    </div>
+
+    <p>
+        Recall from Traction Theory:
+        <span class="expression-inline smaller">
+            <span class="dynamicexpr">0/0=1</span>
+        </span>
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">f(x+0)/{0*f(x)} = 1/0 + {2*x+3+0}/{x^2+3*x-4}</div>
+    </div>
+
+    <p>
+        And the
+        <span class="expression-inline smaller">
+            <span class="dynamicexpr">1/0</span>
+        </span>
+        term can be written as
+        <span class="expression-inline smaller">
+            <span class="dynamicexpr">w</span>
+        </span>.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">f(x+0)/{0*f(x)} = w + {2*x+3+0}/{x^2+3*x-4}</div>
+    </div>
+
+    <p>
+        Then we could apply the projection to erase the residual terms.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">Q(f(x+0)/{0*f(x)}) = {2*x+3}/{x^2+3*x-4}</div>
+    </div>
+
+    <div class="subsection-title" id="section-3_1">
+        3.1 Finding the Critical Point
+    </div>
+
+    <p>
+        Wherever
+        <span class="expression-inline smaller">
+            <span class="dynamicexpr">f(x)=0</span>
+        </span>,
+        the multiplicative differential diverges.
+        This can be represented as:
+    </p>
+    <div class="expression">
+        <div class="dynamicexpr">{2*x+3}/{x^2+3*x-4}=0</div>
+    </div>
+
+    <p>
+        We multiply both sides by x^2+3*x-4:
+    </p>
+    <div class="expression">
+        <div class="dynamicexpr">2*x+3 = 0*(x^2+3x-4)</div>
+    </div>
+    <div class="expression">
+        <div class="dynamicexpr">3 = 0*(x^2+3x-4)-2x</div>
+    </div>
+
+    <p>
+        Use the projection to simplify the equation:
+    </p>
+    <div class="expression">
+        <div class="dynamicexpr">Q(3) = Q(0*(x^2+3x-4)-2x)</div>
+    </div>
+    <div class="expression">
+        <div class="dynamicexpr">3={-2*x}</div>
+    </div>
+    <div class="expression">
+        <div class="dynamicexpr">3/{-2}=x</div>
+    </div>
+
+    <p>
+        Therefore, the critical point is:
+    </p>
+    <div class="expression">
+        <div class="dynamicexpr">x={-3}/2</div>
+    </div>
+
+    <div class="subsection-title" id="section-3_2">
+        3.2 Finding Roots
+    </div>
+
+    <p>
+        Roots of <span class="dynamicexpr">f</span> are vertical asymptotes in the logarithmic derivative.
+        Vertical asymptotes are identified by their divergence, which is symbolized as the reciprocal of zero, &omega;.
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">{2*x+3}/{x^2+3*x-4}=w</div>
+    </div>
+
+    <p>
+        Multiply both sides by x^2+3*x-4:
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">2*x+3 = w*(x^2+3x-4)</div>
+    </div>
+
+    <div class="expression">
+        <div class="dynamicexpr">3 = w*(x^2+3x-4)-2x</div>
+    </div>
+
+    <p>
+        Isolate the w-terms:
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">3+2x=w*(x^2+3x-4)</div>
+    </div>
+
+    <p>
+        Then invert:
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">1/{3+2x}=1/{w*(x^2+3x-4)}</div>
+    </div>
+
+    <div class="expression">
+        <div class="dynamicexpr">1/{3+2x}=0 * 1/{x^2+3x-4}</div>
+    </div>
+
+    <p>
+        Truncate the zero terms to simplify the equation:
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">Q(1/{3+2x})=Q(0 * 1/{x^2+3x-4})</div>
+    </div>
+
+    <div class="expression">
+        <div class="dynamicexpr">1/{3+2x}=0</div>
+    </div>
+
+    <p>
+        Let
+        <span class="expression-inline smaller">
+            <span class="dynamicexpr">z</span>
+        </span>
+        be the value that
+        <span class="expression-inline smaller">
+            <span class="dynamicexpr">3 + 2x</span>
+        </span>
+         would have to take in order to make
+        <span class="expression-inline smaller">
+            <span class="dynamicexpr">1/{3+2x} ~= 0</span>
+        </span>:
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">3+2x=z</div>
+    </div>
+
+    <div class="expression">
+        <div class="dynamicexpr">2x=z-3</div>
+    </div>
+
+    <div class="expression">
+        <div class="dynamicexpr">x={z-3}/2</div>
+    </div>
+
+    <p>
+        Substitute
+        <span class="expression-inline smaller">
+            <span class="dynamicexpr">x => {z-3}/2</span>
+        </span>
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">{2*x+3}/{x^2+3*x-4} = {2*{{z-3}/2}+3}/{({z-3}/2)^2+3*{{z-3}/2}-4} = {4z}/{z^2-25}</div>
+    </div>
+
+    <p>
+        What could z be substituted with to cause
+        <span class="expression-inline smaller">
+            <span class="dynamicexpr">{4z}/{z^2-25}</span>
+        </span>
+        to diverge?
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">z = sqrt(25) = +-5</div>
+    </div>
+
+    <p>
+        Substitute
+        <span class="expression-inline smaller">
+            <span class="dynamicexpr">z => +-5</span>
+        </span>
+    </p>
+
+    <div class="expression">
+        <div class="dynamicexpr">{5-3}/2 = 2/2 = 1</div>
+    </div>
+
+    <div class="expression">
+        <div class="dynamicexpr">{-5-3}/2 = 2/2 = -4</div>
+    </div>
+
+    <div class="expression">
+        <div class="dynamicexpr">x = {1, -4}</div>
+    </div>
+
+    <p>
+        In this example, finding the roots would have been much easier if we had simply factored the polynomial.
+        However, factoring can be complex.
+        The value of this process is in isolating the complexity to a single square root.
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="section-title" id="section-4">
+        4.
+    </div>
+
+    <p>
+
+    </p>
+
+    <div class="copyonly">---</div>
+    <div class="section-footer">
+    </div>
+</div>
+
+
+<script>
+</script>
+</body>
+</html>
