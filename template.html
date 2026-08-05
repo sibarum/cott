@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Beige Papers — Template</title>
+
+    <!-- Branding fonts (new) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+    <!-- Math fonts (load-bearing for the expression renderer — keep) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+    <link rel="stylesheet" href="./lib/styles-v3.css">
+</head>
+<body>
+
+<!-- ============================================================
+     MASTHEAD
+     ============================================================ -->
+<div class="section">
+    <div class="headings">
+        <h1>Document Title <span class="stamp">Beige Papers</span></h1>
+        <h2>A working subtitle, set in italic — speculative until proven otherwise</h2>
+    </div>
+
+    <p>James Watkins</p>
+    <p><a href="https://github.com/sibarum/cott">Github: sibarum</a></p>
+    <p>X: @DoozerDiffuser</p>
+
+    <div class="section-footer">
+        Published under the
+        <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+        Work in progress — expect rough edges.
+    </div>
+</div>
+
+<!-- ============================================================
+     PROSE + INLINE VOCABULARY
+     ============================================================ -->
+<div class="section">
+    <div class="section-title">A Section Heading</div>
+
+    <p>
+        Body text is set in Newsreader at a comfortable measure. This is the register
+        the whole site speaks in: plain, unhurried, and readable at length. Inline
+        emphasis uses <span class="emphasis">the emphasis class</span>, and inline code
+        looks like <span class="code">reduce(zero)</span>. Links such as
+        <a href="#">this one</a> carry the single house accent.
+    </p>
+
+    <p>
+        Inline mathematics renders through the expression engine and flows with the
+        prose: the identity
+        <span class="expression-inline"><span class="variable">a</span><span class="symbol">&middot;</span><span class="variable">b</span></span>
+        sits on the baseline without disturbing the line.
+    </p>
+
+    <div class="subsection-title">A Subsection</div>
+
+    <p>
+        Subsections are lighter than section titles — a shift in weight and size, no
+        rule. The document builds structure through typography and whitespace rather
+        than boxes.
+    </p>
+
+    <div class="section-alt">
+        This is an aside — a callout for a remark, a caveat, or a "don't take this too
+        seriously" footnote to the argument. Flat, tinted, marked by a single accent rule.
+    </div>
+</div>
+
+<!-- ============================================================
+     A DISPLAYED EQUATION (rendered by the math engine)
+     Authored in the site's math source; the DOM below is what
+     the renderer produces, shown here so the template stands alone.
+     ============================================================ -->
+<div class="section">
+    <div class="section-title">Displayed Mathematics</div>
+
+    <p>Displayed expressions are centered and given room to breathe:</p>
+
+    <div class="expression centered">
+        <span class="expr-label">(1)</span>
+        <span class="variable">x</span>
+        <span class="symbol">=</span>
+        <span class="fraction">
+            <span class="numerator">
+                <span class="symbol">&ndash;</span><span class="variable">b</span>
+                <span class="symbol">&plusmn;</span>
+                <span class="sqrt"><span class="symbol">&radic;</span><span class="number radicand"><span class="variable">b</span><sup class="smaller">2</sup> <span class="symbol">&ndash;</span> 4<span class="variable">a</span><span class="variable">c</span></span></span>
+            </span>
+            <span class="h-divider symbol">/</span>
+            <span class="denominator">2<span class="variable">a</span></span>
+        </span>
+    </div>
+
+    <p>
+        The renderer keeps expressions copy-pasteable: hidden
+        <span class="code">copyonly</span> spans reconstruct plain-text operators when
+        selected, so a reader can lift the formula into anything.
+    </p>
+</div>
+
+<!-- ============================================================
+     TABLE
+     ============================================================ -->
+<div class="section">
+    <div class="section-title">A Table</div>
+    <table>
+        <caption>Table 1. Hairline rules, a single heavy header rule, no zebra.</caption>
+        <thead>
+            <tr><th>Construct</th><th>Reads as</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Section title</td><td>Chapter break</td><td>stable</td></tr>
+            <tr><td>Subsection</td><td>Local heading</td><td>stable</td></tr>
+            <tr><td>Aside</td><td>Marginal remark</td><td>draft</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ============================================================
+     CODE BLOCK
+     ============================================================ -->
+<div class="section">
+    <div class="section-title">A Code Block</div>
+    <div class="code-border">
+        <div class="code-title">example.spn <span class="rfloat">SPN</span></div>
+        <div class="code"><span class="spn-keyword">let</span> <span class="spn-ident">x</span> <span class="spn-assign">=</span> <span class="spn-number">3</span> <span class="spn-op">+</span> <span class="spn-number">4</span><span class="spn-punct">;</span></div>
+    </div>
+</div>
+
+<!-- ============================================================
+     INDEX-STYLE LIST (for the front page)
+     ============================================================ -->
+<div class="section">
+    <div class="section-title">A Table of Contents</div>
+    <ul>
+        <li>
+            <a href="#">A Published Work</a>
+            <div>Live links are set in the accent; the blurb is muted below.</div>
+        </li>
+        <li>
+            <i>A Planned Work</i>
+            <div>Italic, un-linked titles mean "planned but not yet written."</div>
+        </li>
+    </ul>
+
+    <div class="section-footer">End of template.</div>
+</div>
+
+<!-- Math rendering engine (unchanged) -->
+<!-- <script src="./lib/traction-interpret.js"></script> -->
+<script>
+</script>
+</body>
+</html>

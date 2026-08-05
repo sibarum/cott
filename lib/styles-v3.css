@@ -1,0 +1,552 @@
+/* ============================================================
+   Beige Papers — styles-v3
+   A house style for self-published intellectual work.
+
+   Tone: unpretentious but exacting. The "beige" is a wink —
+   these aren't whitepapers — but the typography is not joking.
+   Flat edges, hairline rules, a warm paper ground, one accent.
+
+   IMPORTANT: the math-rendering JS (lib/traction-interpret.js)
+   emits a fixed class contract. Everything under
+   "MATH EXPRESSIONS" preserves that contract verbatim — restyle
+   with care. Everything above it is document chrome and is free
+   to change.
+   ============================================================ */
+
+/* ---------- Design tokens ---------- */
+:root {
+    --paper:       #f6f2e9;   /* warm ground — the "beige", dialed way back */
+    --paper-edge:  #efe9db;   /* faint panel tint for asides */
+    --ink:         #23201b;   /* near-black, slightly warm */
+    --ink-soft:    #6b6455;   /* muted captions / metadata */
+    --rule:        #cdc4b0;   /* hairline dividers */
+    --rule-bold:   #23201b;   /* heavy rules under titles */
+    --accent:      #9a3324;   /* oxblood — links, marks, flourish */
+    --accent-deep: #6f2318;   /* hover / pressed */
+    --code-bg:     #262320;
+    --code-fg:     #d9d2c3;
+
+    --measure:     42rem;     /* comfortable reading width */
+    --leading:     1.62;
+
+    --font-display: "Fraunces", "IBM Plex Serif", Georgia, serif;
+    --font-body:    "Newsreader", "IBM Plex Serif", Georgia, serif;
+    --font-meta:    "IBM Plex Mono", ui-monospace, monospace;
+    --font-code:    "IBM Plex Mono", ui-monospace, monospace;
+    --font-math:    "STIX Two Text", "Cambria Math", "Latin Modern Math", serif;
+    --font-mathsym: "Libertinus Math", system-ui;
+}
+
+/* ---------- Reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+    /* subtle paper texture: two barely-there tints, no image needed */
+    background-color: #ece5d6;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--font-body);
+    font-optical-sizing: auto;
+    font-size: 1.125rem;
+    line-height: var(--leading);
+    color: var(--ink);
+    background-color: var(--paper);
+    max-width: var(--measure);
+    margin: 0 auto;
+    padding: 4.5rem 1.5rem 8rem;
+    /* one continuous sheet, flat-edged, sitting on the darker backdrop */
+    border-left: 1px solid var(--rule);
+    border-right: 1px solid var(--rule);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+p {
+    margin: 0 0 1.15rem;
+    hanging-punctuation: first;
+}
+
+/* ---------- Headings ---------- */
+h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    color: var(--ink);
+    line-height: 1.12;
+    text-wrap: balance;
+}
+
+h1 {
+    font-weight: 600;
+    font-size: 3rem;
+    letter-spacing: -0.02em;
+    text-align: center;
+    margin: 0 0 0.15em;
+}
+
+h2 {
+    font-weight: 380;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--ink-soft);
+    text-align: center;
+    letter-spacing: 0.01em;
+    margin: 0 0 1.5em;
+}
+
+h3 {
+    font-weight: 560;
+    font-size: 1.55rem;
+    letter-spacing: -0.01em;
+    margin: 2.4em 0 0.6em;
+}
+
+h4 {
+    font-weight: 560;
+    font-size: 1.15rem;
+    margin: 2em 0 0.5em;
+}
+
+/* ---------- Masthead ---------- */
+.headings {
+    padding: 0 0 1.4rem;
+    margin: 0 0 2.6rem;
+    border-bottom: 2px solid var(--rule-bold);
+}
+
+/* wry little wordmark option: use on the index masthead */
+.headings h1 .stamp {
+    display: inline-block;
+    font-family: var(--font-meta);
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    vertical-align: middle;
+}
+
+/* ---------- Sections (flat, no cards) ---------- */
+.section {
+    margin: 0 0 3.5rem;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    break-inside: avoid;
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: 1.55rem;
+    letter-spacing: -0.01em;
+    margin: 0 0 1.1rem;
+    padding: 0 0 0.4rem;
+    border-bottom: 1px solid var(--rule);
+}
+
+.subsection-title {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: 1.2rem;
+    margin: 2em 0 0.8em;
+    padding: 0;
+    border: none;
+}
+
+.section-footer {
+    margin: 2rem 0 0;
+    padding: 0.9rem 0 0;
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-meta);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--ink-soft);
+}
+
+.emphasis { font-weight: 600; }
+
+/* ---------- Aside / callout ---------- */
+.section-alt {
+    margin: 2rem 0;
+    padding: 1.25rem 1.5rem;
+    background-color: var(--paper-edge);
+    border: none;
+    border-left: 3px solid var(--accent);
+    border-radius: 0;
+    font-size: 0.98em;
+}
+.section-alt > :last-child { margin-bottom: 0; }
+
+/* ---------- Links ---------- */
+a, a:active, a:target {
+    color: var(--accent);
+    text-decoration: none;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 0.14em;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    transition: color 0.12s ease, border-color 0.12s ease;
+}
+a:hover, a:focus {
+    color: var(--accent-deep);
+    border-bottom-color: var(--accent-deep);
+}
+
+/* ---------- Lists ---------- */
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.5rem 0; }
+
+/* Index / table-of-contents lists: give each entry a title + blurb */
+ul li > a { font-weight: 500; }
+ul li > div,
+ol li > div {
+    color: var(--ink-soft);
+    font-size: 0.94em;
+    line-height: 1.5;
+    margin: 0.15rem 0 0;
+}
+/* an <i> title = "planned but unpublished" */
+ul li > i {
+    color: var(--ink-soft);
+    font-style: italic;
+}
+
+/* ---------- Tables ---------- */
+table {
+    font-family: var(--font-body);
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.8rem 0;
+    font-size: 0.98rem;
+}
+table.fixed { table-layout: fixed; width: 100%; }
+caption {
+    caption-side: bottom;
+    font-family: var(--font-meta);
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    padding-top: 0.6rem;
+    text-align: left;
+}
+tr { border: none; }
+th {
+    font-family: var(--font-display);
+    font-weight: 560;
+    text-align: left;
+    padding: 0.45rem 0.7rem;
+    border-bottom: 2px solid var(--rule-bold);
+}
+td {
+    padding: 0.4rem 0.7rem;
+    border-bottom: 1px solid var(--rule);
+}
+table.centered td, table.centered th { text-align: center; }
+table .expression { margin: 0.6em 0.1em; }
+
+/* ---------- Figures & images ---------- */
+figure { margin: 2.2rem 0; }
+figcaption {
+    font-family: var(--font-meta);
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin-top: 0.6rem;
+}
+img.fullsize-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    background-size: cover;
+}
+.big-image-border {
+    border: 1px solid var(--rule-bold);
+    margin: 2.2rem 0;
+}
+.big-image-border img.fullsize-image { display: block; }
+.fullsize-image-dark {
+    width: 100%;
+    background-color: #222;
+    border: 1px solid var(--rule-bold);
+}
+.fullsize-image-dark img { max-width: 100%; display: block; }
+
+/* ---------- Utilities ---------- */
+.centered { text-align: center; }
+.w50 { width: 50%; }
+.font-lg { font-size: 1.5em; }
+.font-xl { font-size: 2em; }
+.color-inv { color: var(--paper); background-color: var(--ink); }
+
+canvas { image-rendering: auto; }
+
+.icon-back {
+    width: 2em;
+    position: absolute;
+    aspect-ratio: 1/1;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url(./img/back-icon.png);
+    cursor: pointer;
+    opacity: 0.7;
+}
+.icon-back:hover { opacity: 1; }
+
+/* ============================================================
+   MATH EXPRESSIONS  — class contract from traction-interpret.js
+   Preserve structure; only colors/fonts routed through tokens.
+   ============================================================ */
+
+.expression, .expression-inline {
+    font-family: var(--font-math);
+    font-size: 1.2em;
+    margin: 1rem;
+    white-space: nowrap;
+}
+.expression-inline { margin: 0; }
+
+.expression sup { padding-right: 0.2em; }
+.expression-inline sup { padding-right: 0.35em; }
+
+.expr-label {
+    display: inline;
+    font-weight: bold;
+    padding-right: 1em;
+    font-size: 1.2rem;
+    font-family: var(--font-display);
+}
+
+sup {
+    display: inline-block;
+    position: relative;
+    top: -0.1em;
+    line-height: 1;
+    font-size: 0.8em;
+}
+sup.smaller { font-size: 0.65em; }
+sup.smaller sup.smaller { font-size: 0.9em; }
+sup.smaller sub.smaller { font-size: 0.9em; }
+
+sub {
+    display: inline-block;
+    position: relative;
+    bottom: -0.1em;
+    line-height: 1;
+    font-size: 0.9em;
+}
+sub.smaller { font-size: 0.6em; }
+
+span.variable, span.symbol, span.number, sup, sub, .fraction {
+    white-space: nowrap;
+}
+
+.variable {
+    font-family: var(--font-math);
+    font-style: italic;
+    margin: 0.1em;
+}
+.symbol {
+    font-family: var(--font-mathsym);
+    display: inline;
+    margin: 0.1em;
+}
+.symbol.stretch { display: inline-block; transform: scaleY(2); }
+.symbol.italics { font-style: italic; }
+.symbol.invisible { position: absolute; color: rgba(1,1,1,50%); }
+
+.fraction {
+    display: inline-flex;
+    flex-direction: column;
+    vertical-align: middle;
+    margin: 0 0.1em;
+    font-size: 0.75em;
+}
+sup .fraction, .sqrt .fraction, .nostack .fraction { display: inline; margin: 0; }
+p .fraction { margin: 0 0.2em; font-size: 0.8em; }
+
+.numerator { display: inline; vertical-align: middle; align-self: center; }
+.denominator { display: inline; vertical-align: middle; align-self: center; padding-top: 1px; }
+
+.h-divider {
+    display: inline;
+    height: 1px;
+    border-top: 1px solid currentColor;
+    color: rgba(1,1,1,0%);
+    white-space: nowrap;
+}
+sup .h-divider, .sqrt .h-divider, .nostack .h-divider {
+    height: auto;
+    border: none;
+    color: inherit;
+}
+
+.parens-group {
+    margin: 0 -0.4em;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+}
+.parens-group > .parens-content { display: flex; }
+
+.sqrt { font-family: var(--font-mathsym); }
+.sqrt .radicand {
+    font-family: var(--font-math);
+    border-top: 0.07em solid currentColor;
+    padding-top: 0.11em;
+    margin-left: -0.18em;
+}
+
+.narration sup { margin-right: -0.2em; display: inline; }
+
+.copyonly {
+    position: absolute;
+    opacity: 0;
+    padding: 0;
+    margin: 0;
+    width: 0;
+    height: 0;
+}
+
+.tiny-error {
+    display: inline-block;
+    font-family: var(--font-code);
+    white-space-collapse: preserve;
+    background-color: var(--paper);
+    color: var(--accent);
+    font-size: 0.5em;
+    min-width: 0;
+    padding: 0.2em;
+    border: 1px solid var(--accent);
+}
+
+/* ============================================================
+   CODE
+   ============================================================ */
+
+span.code {
+    font-family: var(--font-code);
+    font-size: 0.92em;
+    background: var(--paper-edge);
+    padding: 0.05em 0.3em;
+    border-radius: 2px;
+}
+
+.code-border { margin: 1.8rem 0; }
+
+.code-title {
+    background-color: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-meta);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    padding: 0.5em 0.8em;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+}
+.code-title .rfloat { font-family: var(--font-meta); color: var(--rule); }
+
+div.code {
+    background-color: var(--code-bg);
+    color: var(--code-fg);
+    border: none;
+    padding: 1em 0.9em;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    font-family: var(--font-code);
+    white-space: pre;
+    margin: 0;
+    overflow-x: auto;
+    position: relative;
+}
+
+/* SPN syntax highlighting — muted phosphor, no CRT gimmicks */
+.spn-keyword { color: #c8a25a; font-weight: 600; }
+.spn-ident   { color: #d9d2c3; }
+.spn-number  { color: #9ec6a3; }
+.spn-op      { color: #a89f8c; }
+.spn-assign  { color: #e0b968; font-weight: 600; }
+.spn-punct   { color: #857d6c; }
+.spn-not     { color: #d3705f; }
+.spn-error   { color: #d3705f; background: rgba(211,112,95,0.12); padding: 0 0.3em; }
+
+/* ---------- Numbered nested lists ---------- */
+ol.nested { list-style-type: none; counter-reset: level1; padding-left: 2em; }
+ol.nested li { counter-increment: level1; position: relative; }
+ol.nested > li::before {
+    content: counter(level1) ". ";
+    display: inline-block;
+    width: 2em;
+    margin-left: -2em;
+    font-family: var(--font-meta);
+    color: var(--ink-soft);
+}
+ol.nested > li > ol.nested { list-style-type: none; counter-reset: level2; }
+ol.nested > li > ol.nested > li { counter-increment: level2; position: relative; }
+ol.nested > li > ol.nested > li::before {
+    content: counter(level1) "." counter(level2);
+    display: inline-block;
+    width: 2.5em;
+    margin-left: -2.5em;
+    font-family: var(--font-meta);
+    color: var(--ink-soft);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media only screen and (max-width: 640px) {
+    body {
+        max-width: 100%;
+        padding: 2.5rem 1.15rem 5rem;
+        border-left: none;
+        border-right: none;
+        font-size: 1.06rem;
+    }
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.2rem; }
+    sup, sub { white-space: wrap; box-sizing: border-box; display: inline-block; }
+    .expression { box-sizing: border-box; width: 100%; white-space: normal; }
+}
+
+/* ============================================================
+   PRINT  — the whole point: clean paper, no ink-wasting chrome
+   ============================================================ */
+@media print {
+    html, body {
+        background: #fff;
+        color: #000;
+        max-width: none;
+        border: none;
+        padding: 0;
+        font-size: 11pt;
+    }
+    .section { break-inside: avoid; }
+    .section-alt {
+        background: none;
+        border-left: 2px solid #000;
+    }
+    a, a:active, a:target, a:hover, a:focus {
+        color: #000;
+        border-bottom: none;
+        text-decoration: none;
+    }
+    .color-inv {
+        color: #000;
+        background: #fff;
+        border: 1px solid #000;
+    }
+    .icon-back { display: none; }
+    div.code {
+        background: none;
+        color: #000;
+        border: 1px solid #000;
+    }
+    div.code span, .code-title {
+        background: none !important;
+        color: #000 !important;
+    }
+    .spn-keyword, .spn-assign { font-weight: 700; }
+}
