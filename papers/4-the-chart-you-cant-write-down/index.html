@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Chart You Can't Write Down — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="kicker">Constructive Operational Type Theory · the fourth expedition</div>
+    <h1>The Chart You Can't Write Down</h1>
+    <p class="sub">
+  The derivative, the logarithmic derivative, and the theory of iteration are one construction read through one coordinate.
+  This is that coordinate — and the four grades of its resistance to being an ordinary formula, ending at the exact point where the symbolic method stops and analysis has to begin.
+</p>
+    <div class="byline">
+      DoozerDiffuser · sibarum.github.io/cott · companion to <em>What Falls Out of an Invertible Zero</em>, <em>The Calculus of the Pole</em>, and <em>The Sum That Chooses Its Own Zero</em>
+    </div>
+    <div class="disclaimer">
+      <strong>This one stays on the ground.</strong> Where the other documents reach, this one holds altitude: it is the calculus of the program, and it is mostly proven or machine-checked. It does not speculate. The places these ideas turn out to be cryptography, or time, or physics are real and worth chasing — and they are deliberately kept separate, so this one can be trusted at the altitude it claims. Nothing here is tagged <span style="color:var(--gold)">Wild</span>, on purpose.
+      <div class="legend">
+        <span class="conf c-solid">Solid — proven, or machine-checked</span>
+        <span class="conf c-plausible">Plausible — a bet I'd take, stated as one</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="lead">
+  There is a single coordinate hiding behind three subjects that are taught as unrelated.
+  Once you see it, the "three different calculi" stop being three things, and the only interesting question left is a sharp one: <em>when can you actually write the coordinate down?</em> There are exactly four answers, and they line up in order of how hard the coordinate fights back — from an elementary formula, through the solution of an equation, through a genuine obstruction, to a thing you can only ever approach.
+  The last answer is where this program ends and analysis rightly takes over, and knowing precisely where that line falls is the point of the whole document.
+</p>
+
+  <h2><span class="num">I</span> The one coordinate</h2>
+
+  <p>
+  A "difference operator" compares a function to a shifted copy of itself and normalizes the difference.
+  There are quietly three, and they are siblings, not rivals.
+  The additive one compares by <em>subtraction</em> and gives the derivative <span class="math-inline">f′</span>.
+  The multiplicative one compares by <em>division</em> and gives the logarithmic derivative <span class="math-inline">f′/f</span>.
+  The compositional one compares <span class="math-inline">f∘f</span> to <span class="math-inline">f</span> and gives the generator of iteration.
+  Textbooks file the first two under calculus and the third under dynamical systems, and never remark that they are one construction.
+</p>
+
+  <p>
+  They are one construction, and the thing that unifies them is a <strong>chart</strong> <span class="math-inline">α</span> — a coordinate on the output line.
+  The derivative <em>in the chart</em> <span class="math-inline">α</span> is nothing but the ordinary derivative taken after recoordinatizing the output by <span class="math-inline">α</span>:
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <div class="math">D_α f (x)  =  (α ∘ f)′(x)  =  α′(f(x)) · f′(x)</div>
+
+  <p>
+  Set
+  <span class="math-inline">α = id</span>
+  and you get <span class="math-inline">f′</span>; set
+  <span class="math-inline">α = log</span>
+  and you get <span class="math-inline">f′/f</span>; set
+  <span class="math-inline">α = xᵖ</span>
+  and you get the rung of the <span class="math-inline">S_p</span> dial from the third document.
+  That is not a coincidence of notation: the same chart family
+  <span class="math-inline">x ↦ xᵖ</span>
+  that indexes the additions indexes the derivatives, because "compare outputs in group <span class="math-inline">G</span>" and "differentiate in the chart that linearizes <span class="math-inline">G</span>" are the same instruction.
+  So the object worth studying is not the three calculi.
+  It is the chart.
+  And the entire content of what follows is: <em>the chart is always there; the only question is whether it is a formula, and there are four ways it can fail to be one.</em>
+</p>
+
+  <h2><span class="num">II</span> Register one — writable</h2>
+
+  <p>
+  The easy charts are the ones you can put in a table: <span class="math-inline">id</span>, <span class="math-inline">log</span>, <span class="math-inline">xᵖ</span>.
+  Elementary functions with elementary inverses; the abelian calculi and the <span class="math-inline">S_p</span> dial live here entirely.
+  Nothing resists — you write the chart, you conjugate, you are done, and everything is exact and reversible.
+  <span class="conf c-solid">Solid</span> This is the register the program handles best, and most of classical analytic manipulation never leaves it.
+</p>
+
+  <p>
+  The cleanest inhabitant of this register is one nobody notices is a chart at all, because it hides inside an identity everyone throws away.
+  <strong>Even
+  <span class="math-inline">x^0 = 1</span>
+  is a writable chart in disguise.</strong>
+  <span class="conf c-solid">Solid</span> In the conserving reading it is not <span class="math-inline">1</span> — it is
+</p>
+
+  <div class="math">x^0  =  1 + 0·ln x</div>
+
+  <p>
+  the base's logarithm kept in the grade-<span class="math-inline">+1</span> tail.
+  That tail is the multiplicative differential: <em>raising to the zero power is differentiation</em>, and the familiar
+  <span class="math-inline">x^0 = 1</span>
+  is the collapse that burns the derivative and keeps only the ash.
+  The chart it secretly applies is <span class="math-inline">log</span>, the second row of the table above — written down, exact, and discarded a billion times a day.
+  Register one is where the whole toolkit works and where the only danger is mistaking a lossy shadow (<span class="math-inline">x^0 = 1</span>) for the conserving fact (<span class="math-inline">1 + 0·ln x</span>).
+</p>
+
+  <h2><span class="num">III</span> Register two — implicit</h2>
+
+  <p>
+  The compositional calculus looks like a third, non-abelian thing: compare
+  <span class="math-inline">f(f(x))</span>
+  to <span class="math-inline">f(x)</span> through <span class="math-inline">f</span> itself, and its infinitesimal is a vector field, not a slope.
+  But it is <em>not</em> a new axis.
+  <span class="conf c-solid">Solid</span> It is the additive calculus in the chart that linearizes <span class="math-inline">f</span> — and that chart is the solution of a functional equation rather than a formula:
+</p>
+
+  <div class="math">Abel:      α ∘ f = α + 1        (in the α-coordinate, f is "+1")     — parabolic,  λ = 1
+Schröder:  σ ∘ f = λ · σ        (in the σ-coordinate, f is "×λ")     — attracting/repelling, λ ≠ 0,1</div>
+
+  <p>
+  In the Abel gauge, iterating <span class="math-inline">f</span> <em>is</em> the additive column — <span class="math-inline">f^n</span> becomes "<span class="math-inline">+n</span>".
+  In the Schröder gauge it <em>is</em> the multiplicative column — <span class="math-inline">f^n</span> becomes "<span class="math-inline">×λ^n</span>".
+  So iteration was never non-abelian in essence; it is one of the two abelian columns, read in a coordinate you have to <em>solve for</em> instead of look up.
+  Same slot on the axis of §I; the coordinate is simply not elementary.
+</p>
+
+  <p>
+  And Schröder's equation is worth reading twice, because it names what the "transcendental content" of iteration actually is.
+  <span class="conf c-plausible">Plausible</span>
+  <span class="math-inline">σ ∘ f = λσ</span>
+  is an <em>eigenvalue equation</em>: <span class="math-inline">σ</span> is the eigenfunction of the composition operator and the multiplier
+  <span class="math-inline">λ = f′(x*)</span>
+  is its eigenvalue.
+  So the hard number that governs iteration near a fixed point is a spectrum, and the linearizing chart is an eigenvector.
+  This is the second document's "analysis without limits," sharpened into a slogan: <em>the transcendental content of a construction is the spectrum of the operator that generates it, not a decimal you approach.</em> Register two is the register of things that are determined but not written — the coordinate exists, uniquely, and there is no closed form for it.
+</p>
+
+  <h2><span class="num">IV</span> Register three — obstructed</h2>
+
+  <p>
+  The implicit chart of register two is only <em>local</em>.
+  Near a single fixed point it exists; ask it to cover more, and it can refuse.
+  <span class="conf c-solid">Solid</span> With several fixed points, or a parabolic germ, the chart develops <strong>monodromy</strong>: on a parabolic petal the local Abel coordinate exists, but the transition maps between petals are the Écalle–Voronin moduli — an infinite-dimensional invariant with no closed form — and globally the orbit structure is a Julia set, which no single chart flattens.
+  This is not "the coordinate is hard to write." It is "the coordinate cannot be made global at all," and the obstruction is a genuine curvature.
+</p>
+
+  <p>
+  The reason this register belongs in the same document as the residue is that it is <em>the same obstruction</em>.
+  <span class="conf c-plausible">Plausible</span> The residue's <span class="math-inline">2πi</span> is the monodromy of <span class="math-inline">log</span> around a pole.
+  The octonion associator is a closed, gauge-invariant <span class="math-inline">ℤ/2</span> sign — checked exactly: unchanged under every basis re-signing, first nonzero at the octonions, valued in the half-turn
+  <span class="math-inline">0^ω = −1</span>.
+  The Écalle–Voronin moduli are the obstruction to a global chart at a parabolic point.
+  These are one object at the <em>unipotent corner</em> — the place an eigenvalue degenerates to <span class="math-inline">1</span> and the content leaves the diagonal spectrum for the monodromy — and the residue's <span class="math-inline">2πi</span> is its simplest instance, the period of the parabolic point's own cylinder.
+</p>
+
+  <p class="pull">
+  A phase that will not cancel around a loop is not a pathology to route around.
+  It is the chart being honest about the fact that it is only ever local — the exact content the abelian columns cannot carry.
+</p>
+
+  <h2><span class="num">V</span> Register four — the chart you can only approach</h2>
+
+  <p>
+  The last register is the one the program was built to reach, and the one it must hand back.
+  Some coordinates are neither a formula nor the solution of a functional equation.
+  They are genuinely <em>analytic</em>: the endpoint of a limiting process, and there is no algebra that produces them exactly.
+  The marker for the boundary is one distinction, and it is the sharpest line in the whole theory.
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <p>
+  <span class="math-inline">ω</span> is not <span class="math-inline">∞</span>.
+  <span class="math-inline">∞</span> is analytic — the endpoint of a process, the limit of unbounded <em>magnitude</em>, the thing completion adds to the reals and that you only approach.
+  <span class="math-inline">ω</span> is symbolic — a unit magnitude at an <em>angle</em>, fixed by
+  <span class="math-inline">0·ω = 1</span>, reached by no process; it wraps around a circle and comes home,
+  <span class="math-inline">0^(2ω) = 1</span>, where <span class="math-inline">∞</span> runs off the end of a line and never returns.
+  The reciprocal of zero is <span class="math-inline">ω</span>, not <span class="math-inline">∞</span>; the two look alike only after a projection has discarded the direction and left nothing but a magnitude to blow up.
+  Everything in registers one through three is symbolic — it lives on <span class="math-inline">ω</span>'s side of that line.
+  Register four is <span class="math-inline">∞</span>'s side.
+</p>
+
+  <p>
+  The mathematics draws the same line under a different name.
+  <span class="conf c-solid">Solid</span> A <strong>holonomic</strong> (D-finite) function — one whose coefficients obey a linear recurrence with polynomial coefficients — has a <em>writable</em> generating rule: <span class="math-inline">exp</span>, <span class="math-inline">sin</span>, <span class="math-inline">cos</span>, Bessel, every hypergeometric.
+  Operated on as their recurrence, symbolically, never summed, they belong to registers one and two.
+  But not everything is holonomic.
+  <span class="math-inline">Γ</span> satisfies <em>no</em> algebraic differential equation at all — Hölder's theorem — and <span class="math-inline">ζ</span> is hypertranscendental likewise.
+  There is no finite construction; there is only the limit.
+  That is register four, and it is where the symbolic method genuinely ends.
+</p>
+
+  <p>
+  And so the "no limits" claim finally states itself precisely, without bravado.
+  <span class="conf c-solid">Solid</span> Limits are eliminated from registers one through three: the derivative needs no <span class="math-inline">ε</span> (register one), the residue no Riemann sum, the phase no completion (registers two and three are exact and symbolic).
+  Limits are <em>retained</em>, in their proper and only job, in register four: rebuilding magnitude and the continuum in the shadow — the one thing <span class="math-inline">ω</span> cannot do, because <span class="math-inline">ω</span> is a direction and the job is a size.
+  The program never abolished the limit.
+  It confined it to register four and showed how much of mathematics was living, unrecognized, in the first three.
+</p>
+
+  <h2><span class="num">VI</span> The map</h2>
+
+  <p>
+  One chart, four grades of resistance to being written:
+</p>
+
+  <table>
+    <tr><th>register</th><th>the chart is…</th><th>example</th><th>status</th></tr>
+    <tr><td>1 · writable</td><td>an elementary formula</td><td><span class="math-inline">id, log, xᵖ</span>; <span class="math-inline">x^0 = 1+0·ln x</span></td><td>symbolic, exact</td></tr>
+    <tr><td>2 · implicit</td><td>the solution of a functional equation</td><td>Abel / Schröder; the multiplier <span class="math-inline">λ</span></td><td>symbolic, no closed form</td></tr>
+    <tr><td>3 · obstructed</td><td>irreducibly local — global monodromy</td><td>residue, associator, Écalle–Voronin</td><td>symbolic, carries a cocycle</td></tr>
+    <tr><td>4 · analytic</td><td>reachable only by a limit</td><td><span class="math-inline">Γ</span>, <span class="math-inline">ζ</span>; the continuum; <span class="math-inline">∞</span></td><td>analytic — ceded to limits</td></tr>
+  </table>
+
+  <p>
+  The chart is the same object across all four rows.
+  What changes, going down, is only how far it has retreated from being an ordinary function: from a formula, to the answer to a question, to a thing with a genuine hole in it, to a thing you can only walk toward.
+  Traction handles the first three symbolically and exactly.
+  The fourth it cedes to analysis — not in defeat, but in bookkeeping: the honest content of the whole program is knowing that the line falls <em>there</em>, between the parabolic monodromy you can compute and the gamma function you cannot, between the <span class="math-inline">ω</span> that wraps and the <span class="math-inline">∞</span> that runs off.
+</p>
+
+  <h2><span class="num">VII</span> The honest ledger</h2>
+
+  <p>
+  What is proven or machine-checked: the chart unification of §I, that the three calculi are three coordinates on one primitive; that <span class="math-inline">x^0</span> is the multiplicative differential and
+  <span class="math-inline">x^0 = 1</span>
+  is its collapse; that the octonion associator is a closed, gauge-invariant monodromy first nonzero at the octonions; and the
+  <span class="math-inline">ω ≠ ∞</span>
+  distinction, with the holonomic/hypertranscendental boundary it names (Hölder's theorem for <span class="math-inline">Γ</span> is classical).
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <p>
+  What is a bet, stated as one.
+  <span class="conf c-plausible">Plausible</span> That Schröder's multiplier is the right reading of "the transcendental content is spectral," and that the residue, the associator, and the Écalle–Voronin moduli are literally one object at the unipotent corner rather than three cousins — these are identifications I would wager on and have not proven.
+  And the largest open claim of the document is that registers one through three are one axis: that iteration is the additive calculus in the chart that solves Abel's equation, and the only difference between it and the multiplicative calculus is <em>explicit</em> versus <em>implicit</em> coordinate.
+  Each ingredient is known in isolation — the explicit-chart dial is Kolmogorov–Nagumo, the implicit chart is Koenigs–Schröder–Abel, the obstruction is Écalle–Voronin — and what I claim is only that they are one axis with four registers, plus the <span class="math-inline">ω/∞</span> line at the far end of it.
+</p>
+
+  <p>
+  What is owed: a clean account of register four inside the framework — where the continuum and the hypertranscendental functions actually live once the symbolic core has done all it can.
+  That debt is real, and it is exactly the boundary this document was written to locate rather than to cross.
+</p>
+
+  <div class="foot">
+    <p>
+  Companion to <em>What Falls Out of an Invertible Zero</em>, <em>The Calculus of the Pole</em>, and <em>The Sum That Chooses Its Own Zero</em>.
+  This one is the calculus: one coordinate behind the derivative, the log-derivative, and iteration, and the four grades of its resistance to being written.
+  The reaches past the proof — where these registers turn out to be cryptography, and possibly time and physics — are held separately, so that this one can be read at the altitude it claims.
+</p>
+    <p>
+  Working notes, the Chebyshev tower, and the COTT solver: <strong>sibarum.github.io/cott</strong>.
+  The proven parts are proven; the two tagged claims are tagged.
+  Counterexamples remain more useful than agreement.
+  CC BY 4.0.
+</p>
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

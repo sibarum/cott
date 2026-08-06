@@ -1,0 +1,203 @@
+/* ============================================================
+   Beige Papers — papers.css
+   Essay layer for the long-form "expedition" documents.
+   Loads ON TOP of styles-v3.css and reuses its tokens; every
+   rule is scoped under .paper so it never touches the rest of
+   the site (which centers h1/h2 as a masthead — essays don't).
+   ============================================================ */
+
+.paper {
+    --gold:       #9a7b12;
+    --gold-bg:    #f7efd6;
+    --gold-rule:  #d8bf6a;
+    --steel:      #345a9e;
+    --steel-bg:   #e7edf6;
+    /* clear the absolutely-positioned back icon that sits at the top-left */
+    padding-top: 3.75rem;
+}
+
+/* ---------- Cover ---------- */
+.paper .cover {
+    border-bottom: 2px solid var(--rule-bold);
+    padding-bottom: 2rem;
+    margin-bottom: 2.6rem;
+}
+.paper .kicker {
+    font-family: var(--font-meta);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.72rem;
+    color: var(--accent);
+    margin-bottom: 1.1rem;
+}
+.paper h1 {
+    text-align: left;
+    font-size: 2.9rem;
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+}
+.paper .sub {
+    text-align: left;
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 1.3rem;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    margin: 0 0 1.4rem;
+}
+.paper .byline {
+    font-family: var(--font-meta);
+    font-size: 0.76rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+}
+.paper .byline em { font-style: italic; font-family: var(--font-body); }
+
+/* ---------- Disclaimer / legend ---------- */
+.paper .disclaimer {
+    background: var(--paper-edge);
+    border-left: 3px solid var(--accent);
+    padding: 1.1rem 1.3rem;
+    margin-top: 1.6rem;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+}
+.paper .disclaimer strong { color: var(--ink); }
+.paper .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+    font-family: var(--font-meta);
+    font-size: 0.7rem;
+}
+.paper .legend span { padding: 0.15rem 0.6rem; border-radius: 2px; }
+
+/* ---------- Section headings (I, II, …) ---------- */
+.paper h2 {
+    text-align: left;
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: 1.5rem;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    color: var(--ink);
+    margin: 3rem 0 0.7rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--rule);
+}
+.paper h2 .num {
+    font-family: var(--font-meta);
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--accent);
+    margin-right: 0.7em;
+    vertical-align: 0.12em;
+}
+
+/* ---------- Lead paragraph ---------- */
+.paper .lead {
+    font-size: 1.28rem;
+    line-height: 1.5;
+    color: var(--ink);
+}
+
+/* ---------- Display math ----------
+   .math  — literal Unicode multi-line derivations (kept as text)
+   .eqn   — a single equation rendered by the traction engine        */
+.paper .math,
+.paper .eqn {
+    background: var(--paper-edge);
+    border-left: 3px solid var(--accent);
+    padding: 0.9rem 1.2rem;
+    margin: 1.6rem 0;
+    overflow-x: auto;
+}
+.paper .math {
+    font-family: var(--font-math);
+    white-space: pre;
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--ink);
+}
+.paper .eqn { text-align: center; }
+.paper .eqn .expression { margin: 0.3rem; }
+
+/* ---------- Inline math ---------- */
+.paper .math-inline {
+    font-family: var(--font-math);
+    font-size: 0.98em;
+    white-space: nowrap;
+}
+
+/* ---------- Confidence tags ---------- */
+.paper .conf {
+    font-family: var(--font-meta);
+    font-size: 0.62rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    border-radius: 2px;
+    vertical-align: 0.15em;
+    white-space: nowrap;
+}
+.paper .c-solid     { background: var(--paper-edge); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+.paper .c-plausible { background: var(--steel-bg);   color: var(--steel); }
+.paper .c-wild      { background: var(--gold-bg);    color: var(--gold);  border: 1px solid var(--gold-rule); }
+
+/* ---------- Pull-quote ---------- */
+.paper .pull {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 380;
+    font-size: 1.5rem;
+    line-height: 1.32;
+    color: var(--accent);
+    margin: 2.4rem 0;
+    padding-left: 1.2rem;
+    border-left: 3px solid var(--accent);
+}
+
+/* ---------- Aside ---------- */
+.paper .aside {
+    background: var(--paper-edge);
+    border-left: 3px solid var(--rule-bold);
+    padding: 1.1rem 1.3rem;
+    margin: 1.8rem 0;
+    font-size: 1rem;
+    line-height: 1.55;
+}
+.paper .aside .tag {
+    font-family: var(--font-meta);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.66rem;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* ---------- Footer ---------- */
+.paper .foot {
+    margin-top: 4rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-meta);
+    font-size: 0.76rem;
+    line-height: 1.7;
+    color: var(--ink-soft);
+}
+.paper .foot strong { color: var(--ink); }
+.paper .foot em { font-family: var(--font-body); }
+
+/* ---------- Mobile ---------- */
+@media only screen and (max-width: 640px) {
+    .paper h1 { font-size: 2.1rem; }
+    .paper .sub { font-size: 1.12rem; }
+    .paper .lead { font-size: 1.14rem; }
+}

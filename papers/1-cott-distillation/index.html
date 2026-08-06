@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What Falls Out of an Invertible Zero — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="kicker">Constructive Operational Type Theory · a working distillation</div>
+    <h1>What Falls Out of an Invertible Zero</h1>
+    <p class="sub">
+  A total, reversible algebra, and the structure that emerges when you refuse to throw anything away.
+</p>
+    <div class="byline">
+      DoozerDiffuser · sibarum.github.io/cott<br>
+      Distilled from working notes and conversation. Version: exploratory.
+    </div>
+    <div class="disclaimer">
+      <strong>For entertainment and exploration only.</strong> This is a research program in progress, not a finished result. Several load-bearing claims are conjectures I am actively working to establish, and I have tried to mark them as such rather than smuggle them in as settled. Read it as a map of a frontier, not a survey of conquered ground. Where I write "falls out" or "is forced," I mean <em>within the framework as constructed</em> — whether the framework itself is consistent is the open question the whole thing rests on.
+    </div>
+  </div>
+
+  <p class="lead">
+  Most of mathematics is built by <em>adding</em>.
+  You start with something small and safe, notice an operation that sometimes fails, and enlarge the world until the operation always works.
+  Want subtraction to always make sense?
+  The naturals aren't enough — move to the integers.
+  Want division to always work?
+  Move to the rationals.
+  Want roots and logarithms of negatives?
+  Move to the complex numbers.
+  Each step is the same move: widen the domain so a useful operation stops throwing exceptions.
+</p>
+
+  <p>
+  There is one exception that everyone agrees to leave standing.
+  Division by zero.
+  It's treated as a different kind of failure — not "we haven't built the world big enough yet," but "this is genuinely forbidden, don't ask." And I want to take seriously the possibility that this last exception is exactly like all the others: a place where we stopped widening the world too early, and then built a century of machinery to route around the gap instead of closing it.
+</p>
+
+  <p>
+  This document is about what happens if you refuse to stop.
+  If you insist — really insist, with no compromises — that <strong>every operation be total</strong> (always defined) and <strong>every operation be reversible</strong> (never destroys information), and then you just follow the algebra wherever it goes.
+  It turns out it goes somewhere.
+  The imaginary unit shows up on its own.
+  Complex rotation shows up on its own, without limits or power series.
+  And a lot of the scaffolding we think of as load-bearing turns out to be optional — not wrong, just <em>provincial</em>, true only inside a particular projection we mistook for the whole.
+</p>
+
+  <div class="toc">
+    <strong>Where this goes</strong>
+    <ol>
+      <li><a href="#one">The two demands, and the one thing they forbid</a></li>
+      <li><a href="#two">Zero stops absorbing</a></li>
+      <li><a href="#three">A reciprocal for zero</a></li>
+      <li><a href="#four">Exponentiation forces the imaginary unit</a></li>
+      <li><a href="#five">Chebyshev, or: rotation without analysis</a></li>
+      <li><a href="#six">The reframe — zero as a unit seen edge-on</a></li>
+      <li><a href="#seven">Why the tower can't close (and why that's the good news)</a></li>
+      <li><a href="#eight">What's actually unproven</a></li>
+    </ol>
+  </div>
+
+  <h2><span class="num">01</span> The two demands, and the one thing they forbid</h2>
+
+  <p>
+  Start with the observation that "total" and "reversible" are not properties of <em>numbers</em>.
+  They're properties of <em>operations</em>.
+  So the honest thing is to stop caring what counts as a number at all, and instead define a type by the operations it's closed under without loss.
+  That's the whole starting move:
+</p>
+
+  <div class="aside">
+    <span class="tag">Definition</span>
+    A type is characterized not by intrinsic properties of its elements, but by the total, reversible operations it admits and remains stable under. Numbers are secondary — they're representations of what the operations produce. A value that can't yet be written as a single number isn't undefined; it's just an operational history that hasn't collapsed to a numeral.
+  </div>
+
+  <p>
+  Totality is the easy demand to state: when an operation would normally be undefined, we don't forbid it — we carry the unresolved structure forward explicitly, deferring the collapse instead of crashing.
+  Reversibility is subtler, and it's worth being careful.
+  It does <em>not</em> mean every operation is a bijection.
+  It means no operation performs an <em>irreversible collapse</em> — there's always a way back, even if the way back takes several steps or some auxiliary bookkeeping.
+</p>
+
+  <p>
+  Now here's the thing classical algebra never says out loud.
+  We all know division by zero is the problem child.
+  But <strong>multiplication</strong> by zero is just as guilty, and it's guilty of the exact crime reversibility forbids:
+</p>
+
+  <div class="math">multiply both sides by 0:   a = b   ⟶   0·a = 0·b   ⟶   0 = 0</div>
+
+  <p>
+  That step is "legal" — you did the same thing to both sides.
+  And it vaporized everything you knew.
+  In the usual telling, division fails to be <em>total</em> and we make a fuss about it; but multiplication fails to be <em>reversible</em> and we say nothing, because we've decided that particular information-destruction is fine.
+  Under the two demands, it is not fine.
+  It's the same defect, and it has to go.
+</p>
+
+  <p class="pull">
+  Division isn't total.
+  Multiplication isn't reversible.
+  Both are the same wound, and the whole theory is what happens when you refuse to leave either one open.
+</p>
+
+  <h2><span class="num">02</span> Zero stops absorbing</h2>
+
+  <p>
+  The reason
+
+  <span class="math-inline">0·a = 0</span>
+  destroys information is a single axiom: <strong>absorption</strong>.
+  Zero eats whatever it touches.
+  That's the property we have to give up — carefully, because we don't want to give up anything <em>else</em>.
+  And the careful version is deeper than "make zero behave." It is that <em>there was never a primitive zero to misbehave in the first place.</em>
+</p>
+
+  <p>
+  Cancellation is not an element you land on — it is an <em>operation</em>.
+  Write it <span class="math-inline">⊘</span>: "these two terms annihilated, erase both."
+
+  <span class="conf c-solid">Solid</span> What survives an annihilation is not <span class="math-inline">⊘</span> but a <em>residue</em>, and which residue survives depends on the association the cancellation was caught in:
+</p>
+
+  <div class="math">x − x  =  ⊘  → *0     subtractive cancel — deposits a 0 if bound in a product
+x / x  =  ⊘  → +1     divisive cancel   — deposits a 1 if bound in a sum</div>
+
+  <p>
+  Read them operationally.
+  When a term subtracts from itself, erase both — and if that pair stood in direct <em>multiplicative</em> association with some other term, a <span class="math-inline">0</span> is left in its place.
+  When a term divides itself, erase both — and if that pair stood in direct <em>additive</em> association, a <span class="math-inline">1</span> is left.
+  In each cancellation's <em>home</em> association it leaves nothing at all:
+
+  <span class="math-inline">z + (x−x) = z</span>
+  and
+
+  <span class="math-inline">z·(x/x) = z</span>, clean.
+  Only in the <em>foreign</em> association is a residue deposited.
+  So <span class="math-inline">0</span> and <span class="math-inline">1</span> are not primitives — they are the two shadows one operation casts when it fires in the wrong kind of company: <span class="math-inline">0</span> is a subtractive cancel seen multiplicatively, <span class="math-inline">1</span> a divisive cancel seen additively.
+  The additive ↔ multiplicative duality the whole theory runs on is already present in the two ground grains.
+</p>
+
+  <p class="pull">
+  No absorbing identity is baked into the ground floor.
+  There is one operation, ⊘, and two residues — and the residues are exactly the classical 0 and 1, caught in the act of being made.
+</p>
+
+  <p>
+  Why leave a residue at all — why not erase to nothing everywhere?
+  <strong>Reversibility forces it.</strong>
+
+  <span class="conf c-solid">Solid</span> A self-cancel may be dropped into a <em>sum</em> for free:
+
+  <span class="math-inline">y = z</span>
+  is identical to
+
+  <span class="math-inline">y = z + (x−x)</span>, since adding nothing changes nothing.
+  It may <em>not</em> be dropped into a <em>product</em>:
+
+  <span class="math-inline">y = z</span>
+  never licenses
+
+  <span class="math-inline">y = z·(x−x)</span>, which would annihilate <span class="math-inline">y</span>.
+  Now run simplification backward.
+  A
+
+  <span class="math-inline">+(x−x)</span>
+  can reverse to nothing, because it <em>could</em> have entered by the free insertion.
+  But a
+
+  <span class="math-inline">(x−x)</span>
+  sitting as a <em>factor</em> could not have arrived legally — it must have come from a pre-existing <span class="math-inline">0</span> factor — so the reverse step is <em>forced</em> to restore that <span class="math-inline">0</span>.
+  The residue is the memory that a cancellation happened inside a product.
+  Erase it to bare nothing and
+
+  <span class="math-inline">y = 0z</span>
+  silently collapses to
+
+  <span class="math-inline">y = z</span>; the calculation stops being reversible.
+  The <span class="math-inline">0</span> is not debris — it is the receipt that keeps the ledger balanced, and it is the same receipt discipline the rest of this program lives by.
+</p>
+
+  <p>
+  This is exactly why the classical picture felt compelled to make <span class="math-inline">0</span> absorb.
+  It had fused three separate jobs onto one glyph — additive identity, annihilator, "no quantity" — and absorption is what you get when the annihilator and the identity are forced to be the same object.
+  Traction <em>splits</em> them.
+  <span class="math-inline">⊘</span> takes annihilation, and because it is an <em>operation, not an element,</em> it never needs a reciprocal: the field theorem that forbids inverting the identity has nothing to bite on.
+  That frees <span class="math-inline">0</span> to be an ordinary, invertible, structured element — the invertible zero this whole document is about was <em>never</em> the thing that absorbs.
+  The residue, once deposited and bound to a variable, is simply tagged and carried, never freely cancelled — which is the <em>invariance condition for discharge</em> stated as bookkeeping:
+</p>
+
+  <div class="math">0·x  :=  0x        (a bound zero-displacement; may not be freely cancelled)</div>
+
+  <p>
+  And when zero binds to a whole expression, something nice happens — it lifts into a <em>structural differential</em>, with no limits anywhere in sight:
+</p>
+
+  <div class="math">0·f(x)  :=  f(x + 0x) − f(x)</div>
+
+  <p>
+  Watch this do actual work on
+
+  <span class="math-inline">f(x) = x² + c</span>:
+</p>
+
+  <div class="math">0·x²  =  (x + 0x)² + c − x² − c
+      =  2x(0x) + (0x)²
+
+divide by the displacement (legal — 0x is structured, not scalar zero):
+
+(0·x²)/(0x)  =  2x + 0x   ≈   2x</div>
+
+  <p>
+  There's the derivative.
+  No epsilon, no delta, no "let dx approach zero." The higher-order term
+
+  <span class="math-inline">(0x)²</span>
+  was never discarded — it's sitting right there as a visible residue, and the <span class="math-inline">≈</span> at the end means "select the linear component," not "destroy the rest." This is close in spirit to dual numbers, but dual numbers <em>impose</em> nilpotency (<span class="math-inline">ε² = 0</span>) as an axiom.
+  Here nothing is imposed.
+  The structure is retained and reversibility holds all the way through.
+  That difference — retain versus discard — is the whole personality of the theory in miniature.
+</p>
+
+  <div class="aside">
+    <span class="tag">On the notation "=" vs "≈"</span>
+    Throughout: <span class="math-inline">=</span> means an information-conserving rewrite (you can always run it backward). <span class="math-inline">≈</span> means a contextual identification that <em>does</em> lose something — a projection, a truncation. Keeping these two apart, visibly, is not pedantry. It's the honesty that the whole framework is built to enforce: every place information leaves, you can see it leave.
+  </div>
+
+  <h2><span class="num">03</span> A reciprocal for zero</h2>
+
+  <p>
+  Once zero no longer absorbs, the prohibition on dividing by it loses its foundation.
+  (This is not a coincidence — the impossibility of <span class="math-inline">1/0</span> in a field is a <em>theorem</em>, and its proof uses absorption.
+  Remove absorption and you've removed the proof.) So we give zero a reciprocal and a name:
+</p>
+
+  <div class="math">1/0  :=  ω</div>
+
+  <p>
+  The one thing <span class="math-inline">ω</span> has to satisfy, to make cancellation total rather than conditional, is the discharge condition:
+</p>
+
+  <div class="math">0·ω  =  1</div>
+
+  <p>
+  And that's the core axiom of the entire structure.
+  Everything downstream is bookkeeping around it.
+  A few immediate consequences, none of them assertions about classical arithmetic — just structural facts about a system where zero participates symmetrically instead of exceptionally:
+</p>
+
+  <div class="math">x/0 = ωx        x/x = 1  (no exceptions)        0/0 = 1</div>
+
+  <p>
+  That last one deserves a note, because it's the kind of thing that makes people reach for the fire alarm.
+
+  <span class="math-inline">0/0 = 1</span>
+  is not a claim that "zero over zero is one" in the sense you were taught it's undefined.
+  It's the statement that in <em>this</em> system,
+
+  <span class="math-inline">x/x = 1</span>
+  is allowed to hold without carving out an exception for
+
+  <span class="math-inline">x = 0</span>.
+  Wheel theory — the closest existing relative — also gives zero a reciprocal, but it pays by introducing a "bottom" element <span class="math-inline">⊥</span> for <span class="math-inline">0/0</span>, a genuine terminal collapse.
+  We don't want the collapse.
+  We normalize <span class="math-inline">0/0</span> to <span class="math-inline">1</span> and keep moving.
+  Different choice, different theory.
+</p>
+
+  <p>
+  Notice what we did and didn't do.
+  We did not add axioms.
+  We <em>removed</em> one — absorption — and let the reciprocal fall into the hole it left.
+  That subtractive move is the aesthetic of the whole program: strip a restriction without losing structure.
+  It's the least glamorous exercise in mathematics and, I'd argue, one of the most underrated.
+</p>
+
+  <h2><span class="num">04</span> Exponentiation forces the imaginary unit</h2>
+
+  <p>
+  Here's where it stops being bookkeeping and starts being surprising.
+  We extend exponentiation to the boundary elements <span class="math-inline">0</span> and <span class="math-inline">ω</span> using <em>only</em> identities that already hold for every other base.
+  No new axioms — just "apply the rules you already believe, uniformly, and don't flinch at the boundary."
+</p>
+
+  <div class="math">x⁰ = 1    ⟹    0⁰ = 1  and  ω⁰ = 1
+x¹ = x    ⟹    0¹ = 0  and  ω¹ = ω
+x⁻¹ = 1/x ⟹    0⁻¹ = ω  and  ω⁻¹ = 0</div>
+
+  <p>
+  Every integer power is now determined.
+  Only two values are left unfixed by the standard rules: <span class="math-inline">0^ω</span> and <span class="math-inline">ω^ω</span>.
+  Requiring the image to close reversibly pins both.
+  And the value that closure forces is the one worth the price of admission:
+</p>
+
+  <div class="math">0^ω  =  −1</div>
+
+  <p>
+  Take a breath at that.
+  If you know Euler's identity,
+
+  <span class="math-inline">e^(iπ) = −1</span>, you should feel a chime.
+  Because look what happens when we chase it.
+  Base-zero logarithm is defined as the inverse of base-zero exponentiation, and it obeys the ordinary quotient rule.
+  So:
+</p>
+
+  <div class="math">log₀(−1)  =  log₀(1/0)  =  log₀(1) − log₀(0)  =  0 − 1  =  ω</div>
+
+  <p>
+  Confirmed from the other direction:
+
+  <span class="math-inline">0^ω = −1</span>.
+  And now the imaginary unit is not far — it's just a square root of that half-turn.
+  Write any negative base through base-zero exponentiation and its inverse:
+</p>
+
+  <div class="math">(−1)^(1/2)  =  0^((1/2)·log₀(−1))  =  0^(ω/2)
+
+so:   i  =  0^(ω/2)</div>
+
+  <p>
+  And it behaves.
+  The powers of
+
+  <span class="math-inline">0^(ω/2)</span>
+  cycle exactly the way powers of <span class="math-inline">i</span> cycle:
+</p>
+
+  <div class="math">(0^(ω/2))⁰ = 1
+(0^(ω/2))¹ = 0^(ω/2)          = i
+(0^(ω/2))² = 0^ω              = −1
+(0^(ω/2))³ = −0^(ω/2)         = −i
+(0^(ω/2))⁴ = 1</div>
+
+  <p class="pull">
+  The imaginary unit was never adjoined.
+  It was hiding inside an invertible zero the whole time, waiting for exponentiation to read it out.
+</p>
+
+  <p>
+  The significance is a matter of accounting.
+  The standard construction of <span class="math-inline">ℂ</span> imports three heavy objects: you <em>posit</em> <span class="math-inline">i</span> as a new element, you <em>define</em> <span class="math-inline">exp</span> through an infinite series and its convergence, and you <em>define</em> <span class="math-inline">π</span> through a limit.
+  Here, <span class="math-inline">i</span> is derived, the rotation is algebraic, and no limit appears.
+  That doesn't make the machinery free — the cost relocates into requiring that zero be oriented and graded, which is its own structure to justify — but one primitive generating three derived objects is a better trade than three posited objects.
+  Whether it's a <em>legitimate</em> trade is exactly the projection question of §8.
+</p>
+
+  <h2><span class="num">05</span> Chebyshev, or: rotation without analysis</h2>
+
+  <p>
+  If
+
+  <span class="math-inline">i = 0^(ω/2)</span>
+  is real structure and not a coincidence, it should survive being pushed on.
+  So push on it: tabulate the powers of <span class="math-inline">0</span> at half-integer steps and see whether they hold together or fall apart.
+  They hold together — and the thing they hold together <em>into</em> is a structure Chebyshev found in the 19th century for entirely unrelated reasons.
+</p>
+
+  <p>
+  Introduce the half-step generators and their sum:
+</p>
+
+  <div class="math">u = 0^(1/2)      v = ω^(1/2) = 0^(−1/2)      u·v = 0⁰ = 1
+
+Chebyshev parameter:   s = u + v
+half-cycle sum:        aₙ = uⁿ + vⁿ  =  0^(n/2) + ω^(n/2)</div>
+
+  <p>
+  These sums satisfy a recurrence — and it's the modified Chebyshev recurrence of the first kind, exactly:
+</p>
+
+  <div class="math">aₙ  =  s·aₙ₋₁ − aₙ₋₂          a₀ = 2,  a₁ = s</div>
+
+  <table>
+    <tr><th>n</th><th>aₙ = uⁿ + vⁿ</th></tr>
+    <tr><td>0</td><td>2</td></tr>
+    <tr><td>1</td><td>s</td></tr>
+    <tr><td>2</td><td>s² − 2</td></tr>
+    <tr><td>3</td><td>s³ − 3s</td></tr>
+    <tr><td>4</td><td>s⁴ − 4s² + 2</td></tr>
+    <tr><td>5</td><td>s⁵ − 5s³ + 5s</td></tr>
+  </table>
+
+  <p>
+  These are <em>exact symbolic identities</em>, not approximations.
+  Every one is a polynomial in <span class="math-inline">s</span> with integer coefficients.
+  And the critical observation — the one that turned this from a curiosity into something I trust — is that they <strong>refuse to collapse</strong>.
+  There are a dozen opportunities for contradiction in here: zero is invertible, powers go negative, exponents go fractional.
+  Any of those could have produced
+
+  <span class="math-inline">1 = 0</span>
+  and ended the story.
+  None of them do.
+  The recurrence holds cleanly at every step.
+</p>
+
+  <p>
+  Since
+
+  <span class="math-inline">u + v = s</span>
+  and
+
+  <span class="math-inline">u·v = 1</span>, the generator <span class="math-inline">u</span> is a root of its minimal polynomial over <span class="math-inline">ℚ[s]</span>:
+</p>
+
+  <div class="math">u² − s·u + 1 = 0        ⟹        u² = s·u − 1  (reduction rule)</div>
+
+  <p>
+  which makes every element of the ring
+
+  <span class="math-inline">ℚ[s][u]/(u² − su + 1)</span>
+  reducible to a canonical form
+
+  <span class="math-inline">a + b·u</span>
+  with
+
+  <span class="math-inline">a, b ∈ ℚ[s]</span>.
+  Exact rational arithmetic, closed, computable, with a conjugation that swaps
+
+  <span class="math-inline">u ↔ v</span>
+  (the zero-class and omega-class generators) and a norm under which <em>every power of the generator is a unit of norm 1</em>.
+  And it doesn't stop at one level.
+  Adjoin the quarter-power
+
+  <span class="math-inline">0^(1/4)</span>, then
+
+  <span class="math-inline">0^(1/8)</span>, and you get a <em>dyadic tower</em> of quadratic extensions, dimensions doubling
+
+  <span class="math-inline">2, 4, 8, 16, …</span>, each level linked to the last by the Chebyshev doubling formula
+
+  <span class="math-inline">tₖ² = tₖ₋₁ + 2</span>.
+</p>
+
+  <div class="aside frontier">
+    <span class="tag">Why this is the strongest evidence so far</span>
+    I did not <em>design</em> the Chebyshev structure. I demanded totality and reversibility, tabulated powers of an invertible zero, and a well-known family of orthogonal polynomials fell out — one discovered independently, for unrelated reasons, over a century ago. When a constraint you imposed for aesthetic reasons reproduces something nature already found by another road, that's the kind of coincidence that's usually not a coincidence. The whole phase structure of the complex numbers, reconstructed with exact rational arithmetic, no power series, no branch cuts, no real-number completion underneath. That is the result I'd stake the program on.
+  </div>
+
+  <h2><span class="num">06</span> The reframe — zero as a unit seen edge-on</h2>
+
+  <p>
+  Here's the shift that made the rest click for me, and it's less a theorem than a change of eye.
+  We're trained to think of zero as <em>small</em> — the additive identity, the absence of magnitude, the origin where nothing is.
+  That's the picture the real number line hands us, and the real number line is a very particular, very flat slice of things.
+</p>
+
+  <p>
+  Try the opposite.
+  Suppose zero has <em>unit</em> magnitude — that it's a full-sized unit vector — and that what we call "0" is only its <strong>shadow on the real axis</strong>.
+  A unit vector pointing perpendicular to the real line casts a shadow of length zero.
+  Not because it's small.
+  Because it's pointing in a direction the real line can't see.
+</p>
+
+  <p>
+  Under that reading, "treat zero as a unit and it becomes <span class="math-inline">i</span>" stops being mystical.
+  Of course it does — a unit orthogonal to the reals, with the projection stripped off, <em>is</em> the imaginary unit.
+  It explains why the signed zero <span class="math-inline">−0</span> is a genuinely distinct object with the same shadow: <span class="math-inline">+0</span> and <span class="math-inline">−0</span> are <span class="math-inline">+i</span> and <span class="math-inline">−i</span> seen edge-on, two different units projecting to the same point.
+  It explains why
+
+  <span class="math-inline">ω = 1/0</span>
+  lands where it does — the reciprocal of a unit is a unit, and
+
+  <span class="math-inline">1/i = −i</span>, so <span class="math-inline">ω</span> and <span class="math-inline">−0</span> are close relatives rather than opposite ends of anything.
+</p>
+
+  <p>
+  And it says the real line was lying to us about distance.
+  On the projective line, <span class="math-inline">0</span> and <span class="math-inline">∞</span> sit at opposite poles, maximally far apart.
+  But that separation is an <em>artifact of the projection</em> — it took a single oriented unit and its sign-flip and stretched the sign into the whole diameter of the sphere.
+  Seen in the algebra rather than the shadow, the two poles are a sign apart, not a sphere apart.
+</p>
+
+  <p>
+  Then the last clause, the one that keeps the door open: <em>zero is the shadow of a unit — but which unit, and from what space?</em> Project a unit from <span class="math-inline">ℂ</span> and zero unfolds into <span class="math-inline">±i</span>.
+  Project from the quaternions and it unfolds into a whole sphere of imaginary units.
+  From higher algebras, a bigger sphere still.
+  Zero is the universal real-shadow of "an imaginary unit of whatever algebra you're standing in," and <em>which</em> hypercomplex unit it lifts to is precisely the choice of projection.
+  That's what "something beyond <span class="math-inline">i</span>, depending on what's being projected" means.
+  The origin isn't the emptiest point on the line.
+  It's the whole orthogonal unit-sphere of the ambient algebra, seen end-on.
+</p>
+
+  <h2><span class="num">07</span> Why the tower can't close (and why that's the good news)</h2>
+
+  <p>
+  Every classical algebra you know is bought by imposing a restriction that destroys information.
+  A field imposes absorption (zero eats everything — magnitude collapses).
+  Commutative multiplication collapses the two division-orders into one.
+  Associativity collapses bracketing history.
+  Norm-multiplicativity — the property behind Hurwitz's theorem, which caps the "nice" division algebras at exactly four (<span class="math-inline">ℝ, ℂ, ℍ, 𝕆</span>) — collapses direction-under-product down to a scalar.
+  Each of these is a one-way door.
+  Each one, once you walk through it, you can't walk back.
+</p>
+
+  <p>
+  The information-conservative structure is the one that declines to walk through <em>any</em> of them.
+  And the moment you decline them, the ceiling comes off.
+  The Cayley–Dickson construction that builds
+
+  <span class="math-inline">ℝ → ℂ → ℍ → 𝕆</span>
+  doesn't actually stop at the octonions — it keeps doubling forever, into the sedenions and beyond.
+  Everyone treats the step past <span class="math-inline">𝕆</span> as a disaster, because that's where zero divisors appear: nonzero things whose product is a shadow.
+  But zero divisors are exactly oriented-zeros-with-orientation.
+  In this framework they aren't a pathology to be outlawed; they're the native content the whole thing is built on.
+  Hurwitz's "there are only four" really means "there are only four <em>if you insist on throwing away magnitude-direction under multiplication</em>" — and we don't insist.
+  So there are infinitely many, and the classical four are just the shadows that survived the insisting.
+</p>
+
+  <div class="aside frontier">
+    <span class="tag">The conjecture the openness rests on</span>
+    I believe absorption is the most basic of the one-way projections, and that a structure refusing <em>all</em> of them sits upstream of every classical algebra and can project down to any of them. Sharpened honestly: the collapsing invariants form a lattice, and the full information-conservative traction is its single top element — the join of everything that hasn't yet collapsed. That is a real, falsifiable claim, and the way it could fail is specific: if two of the invariants turn out to be <em>jointly unrefusable</em> — impossible to decline at the same time without contradiction — then there's no top element and no universal structure. So the work isn't to show non-absorption is universal. It's to show the invariants can all be declined at once, consistently. I'm well on the way, but I have not finished it, and until I have, the open generator is a hypothesis, not a theorem.
+  </div>
+
+  <p>
+  If the conjecture holds, then something quietly enormous follows, and it's the part I care about most.
+  In an <em>entropic</em> universe, complexity comes from things breaking — symmetries shatter, information leaks, and structure precipitates out of the wreckage.
+  But a genuinely reversible, information-conserving substrate can't make complexity that way, because nothing is ever lost.
+  Its complexity has to come from <em>elaboration</em> — the ground element unfolding structure it already contained.
+  And "refuse to destroy information" is provably unbounded: the tower can't close.
+  A conserving universe that stayed simple is not on the menu.
+  Demand totality and reversibility and unbounded structure is <em>entailed</em>, not permitted.
+</p>
+
+  <p class="pull">
+  If complexity didn't emerge from nothing, we wouldn't be here to notice.
+  The refusal to throw anything away is not a stylistic preference.
+  It may be the reason there's something rather than nothing.
+</p>
+
+  <p>
+  And "nothing," in this telling, was never nothing.
+  It was everything, seen edge-on.
+</p>
+
+  <h2><span class="num">08</span> What's actually unproven</h2>
+
+  <p>
+  I want to end with the debts, plainly, because a theory that hides its debts is doing the exact thing this one was built to stop doing.
+  Here is what is <em>not</em> settled, in order of how much weight it carries.
+</p>
+
+  <p>
+  <strong>Consistency (joint-refusability).</strong> The whole edifice assumes the invariants — absorption, commutativity, associativity, norm-multiplicativity — can all be declined together without deriving a contradiction.
+  An inconsistent system feels wonderful right up until someone proves
+
+  <span class="math-inline">1 = 0</span>
+  inside it, at which point it proves everything and means nothing.
+  This is the ballgame.
+  Everything below rests on it.
+</p>
+
+  <p>
+  <strong>The projection theorem.</strong> The symbol <span class="math-inline">0</span> — used deliberately, refusing to rename it to something safer — is a promissory note.
+  It claims that the classical zero is <em>my</em> zero projected: that standard absorptive arithmetic is this structure modulo the imposition of absorption, with the classical axioms provably recovered.
+  Until that recovery is proven, "the field's exception for zero is a projection artifact" is a conjecture wearing a symbol rather than a theorem forcing one.
+  I keep the symbol because renaming it would concede the very point at issue — that the restricted zero and the free zero are two different things, when the claim is that they're one thing at two grades.
+  But I owe the theorem, and I know I owe it.
+</p>
+
+  <p>
+  <strong>The carrier and the transcendentals.</strong> "Calculus without limits" is real for the algebraic and rational part — the structural differential of §2 needs no limits, and the Chebyshev tower gives exact phase with no completion underneath.
+  But limits historically do two jobs: they compute derivatives (dispensable here) <em>and</em> they build the objects that need completing — the real continuum, the transcendental functions.
+  I owe a clean account of where <span class="math-inline">sin</span>, <span class="math-inline">exp</span>, and the continuum live in this framework, and whether "limits dissolve" means "from the same objects" or the more modest "I never built the objects that needed them." Those are different wins and I don't want to conflate them.
+</p>
+
+  <p>
+  <strong>The wild part of the tower.</strong> Past the octonions, the zero divisors aren't a tidy set — they form a genuine variety with real geometric structure.
+  Whether the information-conservative traction can carry that variety as legitimate graded content, or whether it needs a canonical normal form to tame it into something computable, is open.
+  The running implementation (exact rational numerator/denominator with sign, <span class="math-inline">0/0</span> normalized to <span class="math-inline">1/1</span>) lives in a tame projection where this problem doesn't bite — which means the implementation validates the accessible core and is silent on exactly the part where the hardest claims live.
+</p>
+
+  <p>
+  So: the ideas are, I think, better than the proofs behind them right now.
+  That gap is the entire content of the next stretch of work — and it's a gap I'd rather state out loud than paper over, because the honest ledger is the only one worth keeping.
+  If the two central theorems come through, this stops being a promising outsider's framework and becomes a thing that has to be reckoned with.
+  If they can't come through — if the invariants won't jointly refuse — I want to find that out as fast as possible, because that's information too, and information is the one thing this theory was built never to waste.
+</p>
+
+  <div class="foot">
+    <p>
+  <strong>Constructive Operational Type Theory</strong> comprises three interlocking parts: <em>Principled Emergence Metatheory</em> (an attempt to make "elegance" a measurable design criterion — fewer axioms, justified from core principles, reusing existing structure by reframing), <em>Traction Theory</em> (the total, reversible, exception-free algebra sketched here), and <em>Mirror Calculus</em> (where <span class="math-inline">0</span> reads as differentiation, <span class="math-inline">ω</span> as integration, and
+
+  <span class="math-inline">0ω = 1</span>
+  as their composition).
+</p>
+    <p>
+  Fuller working notes, the reference notebook, the Chebyshev tower in detail, and the open-source COTT solver: <strong>sibarum.github.io/cott</strong>.
+  This distillation is a companion to those, not a replacement — they carry details and dead-ends this omits.
+</p>
+    <p>
+  Distilled from working notes and an extended conversation, in the author's framing.
+  Exploratory throughout; corrections and counterexamples welcome, and in the spirit of the thing, more useful than agreement.
+  Published under CC BY 4.0.
+</p>
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

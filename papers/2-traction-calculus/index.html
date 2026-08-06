@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Calculus of the Pole — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="kicker">A Traction-Based Calculus · an exploration of the frontier</div>
+    <h1>The Calculus of the Pole</h1>
+    <p class="sub">
+  If zero is invertible and nothing is ever destroyed, what does integration become — and what might it be trying to tell us about time?
+</p>
+    <div class="byline">
+      DoozerDiffuser · sibarum.github.io/cott · companion to <em>What Falls Out of an Invertible Zero</em><br>
+      Version: exploratory. This one reaches.
+    </div>
+    <div class="disclaimer">
+      <strong>Speculative throughout — but tethered.</strong> The prior document laid out the algebra and was careful about its debts. This one is the fun part: where the algebra <em>points</em>. I've tried to be bold without lying, so every claim carries a confidence tag. Nothing here is proven. Some of it is nearly forced; some of it is a bet I'd take at good odds; some of it is a beautiful thing I can't yet rule out. The tags tell you which.
+      <div class="legend">
+        <span class="conf c-solid">Solid — follows from the algebra</span>
+        <span class="conf c-plausible">Plausible — a bet I'd take</span>
+        <span class="conf c-wild">Wild — can't rule out, wouldn't bank on</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="lead">
+  Traction algebra gives zero a reciprocal, refuses to let multiplication destroy information, and — as a reward for that refusal — hands you the imaginary unit and complex rotation without ever mentioning a limit.
+  Good.
+  But an algebra is a noun.
+  Calculus is a verb.
+  The question this document chases is: <em>what happens when you differentiate and integrate inside a world where the pole is a first-class citizen instead of a place the map says "here be dragons"?</em>
+</p>
+
+  <p>
+  The short version of the answer, and the reason I think this is worth years rather than an afternoon: in ordinary calculus, the single hardest, deepest, most consequential fact is that <strong>antidifferentiation almost always works — and the one place it fails is the pole.</strong> The residue.
+  The <span class="math-inline">1/z</span> term.
+  The thing that makes contour integration a subject instead of a formula.
+  And traction is, by construction, the algebra <em>built around the pole.</em> These two were made for each other.
+  Classical calculus treats the pole as the exception that survives all its beautiful machinery; traction treats the pole as the whole point.
+  So a traction-based calculus shouldn't just <em>handle</em> residues — it should be <em>about</em> them.
+</p>
+
+  <div class="toc">
+    <strong>The frontier, roughly north to south</strong>
+    <ol>
+      <li><a href="#one">Two differentials, and the operator that fuses them</a></li>
+      <li><a href="#two">The antiderivative and its one honest failure</a></li>
+      <li><a href="#three">Contour integration as a traction-native operation</a></li>
+      <li><a href="#four">The residue as a receipt</a></li>
+      <li><a href="#five">Monodromy: where the winding lives</a></li>
+      <li><a href="#six">Time as the thing commutativity forgets</a></li>
+      <li><a href="#seven">Conservation, reversibility, and why physics might care</a></li>
+      <li><a href="#eight">A field guide to the open problems</a></li>
+      <li><a href="#name">On the name</a></li>
+    </ol>
+  </div>
+
+  <h2><span class="num">01</span> Two differentials, and the operator that fuses them</h2>
+
+  <p>
+  Ordinary calculus has one derivative,
+
+  <span class="math-inline">D = d/dx</span>, and treats it as <em>the</em> notion of "rate of change." But there are quietly two, and they're siblings, not rivals.
+  The additive one measures change by <em>subtraction</em>: form
+
+  <span class="math-inline">f(x+h) − f(x)</span>, normalize by <span class="math-inline">h</span>, and you get <span class="math-inline">f′</span>.
+  The multiplicative one measures change by <em>division</em>: form
+
+  <span class="math-inline">f(x·(1+ε))/f(x)</span>, and you get the logarithmic derivative
+
+  <span class="math-inline">x f′/f = θ log f</span>, where
+
+  <span class="math-inline">θ = x·d/dx</span>
+  is the Euler operator.
+</p>
+
+  <p>
+  These aren't two operations with a family resemblance.
+  They're the <em>same construction</em> — strip the order-zero term, normalize by the increment — carried out with the two different group operations, additive and multiplicative.
+  And there are exactly two, because there are exactly two one-parameter groups on the line, related by <span class="math-inline">exp</span> and <span class="math-inline">log</span>.
+  That's not an accident of notation; it's a small classification theorem, and it's why the pairing feels complete rather than arbitrary.
+  In the traction framing this is the <span class="math-inline">0</span>/<span class="math-inline">ω</span> polarity wearing calculus clothes: additive strips at the additive identity, multiplicative strips at the multiplicative identity, and
+
+  <span class="math-inline">0·ω = 1</span>
+  is almost literally the statement that the two strippings compose back to the identity.
+</p>
+
+  <div class="aside">
+    <span class="tag">The clean fact underneath <span class="conf c-solid">Solid</span></span>
+    The additive and multiplicative differentials don't commute: <span class="math-inline">[D, θ] = D</span> (this is just <span class="math-inline">[∂, x∂] = ∂</span>, the sl₂-flavored relation). That single non-commutation is the algebraic root of "the two carry independent information." If they commuted, one would be redundant. They don't, so the pair genuinely spans, and — foreshadowing §6 — that non-commutation is where I'll argue time comes from.
+  </div>
+
+  <p>
+  What fuses them is exponentiation, and this is worth saying slowly because it's the hinge for everything downstream.
+  Exponentiation is the one operation that uses <em>both</em> identities at once:
+
+  <span class="math-inline">b⁰ = 1</span>
+  sends the additive identity (in the exponent) to the multiplicative identity (in the value), and
+
+  <span class="math-inline">log_b 1 = 0</span>
+  runs it back.
+  Exp is the bridge whose two feet are nailed to the two identities.
+  So a calculus built on traction isn't a calculus with an extra operator bolted on — it's a calculus where the differential operator and its multiplicative twin are two readings of a single exponential bridge, and the base-<span class="math-inline">0</span> logarithm is the tool that walks you between them.
+  And the two feet of that bridge are exactly the two cancellation-residues of the first document: <span class="math-inline">exp</span> carries the additive residue <span class="math-inline">0</span> to the multiplicative residue <span class="math-inline">1</span>, so the additive ↔ multiplicative duality that <span class="math-inline">⊘</span> deposits at the ground floor is the very thing exponentiation promotes to a map.
+</p>
+
+  <h2><span class="num">02</span> The antiderivative and its one honest failure</h2>
+
+  <p>
+  Now integrate.
+  In ordinary calculus, antidifferentiation is
+
+  <span class="math-inline">∫ zⁿ dz = z^(n+1)/(n+1)</span>
+  — and it works for every integer <span class="math-inline">n</span> <em>except one.</em> At
+
+  <span class="math-inline">n = −1</span>
+  the formula divides by zero, and instead of a power you get a logarithm:
+
+  <span class="math-inline">∫ dz/z = log z</span>.
+  This is not a small footnote.
+  It is <em>the</em> exception, and it's the seam the entire theory of complex integration is stitched along.
+</p>
+
+  <p>
+  Watch where that exception sits in traction terms.
+  Antidifferentiation shifts degree by <span class="math-inline">+1</span>, so the mode it can't handle is the one that would land at degree zero — and the antiderivative it <em>can't</em> produce with a power is exactly the one whose answer is <span class="math-inline">log</span>.
+  But base-<span class="math-inline">0</span> logarithm is the operation traction makes native.
+  So the classical "exception" is, from the traction side, not an exception at all — it's the doorway into the multiplicative chart, the place where <span class="math-inline">D</span>'s inverse hands off to <span class="math-inline">θ</span>'s world.
+  The pole where integration "fails" is precisely where the two differentials from §1 change places.
+</p>
+
+  <p class="pull">
+  Classical calculus: the residue is the one thing that survives all my beautiful machinery.
+  Traction calculus: the residue is what my machinery is <em>for.</em>
+</p>
+
+  <p>
+  The honest structure here — and I want this stated precisely, because it's the load-bearing claim of the whole document
+
+  <span class="conf c-plausible">Plausible</span> — is that antidifferentiation is a total, reversible operation in traction <em>if and only if</em> the log-modes are native, which they are by construction.
+  In ordinary analysis,
+
+  <span class="math-inline">∫ dz/z = log z</span>
+  "escapes" the category of rational functions — the answer isn't rational, so <span class="math-inline">D⁻¹</span> isn't an endofunctor on rational functions; it maps out of the world.
+  Traction closes that escape by making <span class="math-inline">log</span> a constructor rather than a foreigner.
+  The obstruction doesn't vanish — but it stops being an escape and becomes an internal structure constant.
+  Which is the next section.
+</p>
+
+  <h2><span class="num">03</span> Contour integration as a traction-native operation</h2>
+
+  <p>
+  Here is the frontier I most want to explore, and the one I most regret not having built yet, because I think it's the cleanest possible demonstration that this calculus is worth its salt.
+</p>
+
+  <p>
+  The residue theorem says that integrating a function around a closed loop gives you <span class="math-inline">2πi</span> times the sum of the residues inside — the coefficients of the <span class="math-inline">1/z</span> terms at each pole.
+  In classical complex analysis this is a <em>theorem</em>, and a deep one, resting on Cauchy's theorem, which rests on the analytic structure of holomorphic functions, which rests on limits and the completeness of the reals.
+  It is machinery on machinery on machinery.
+</p>
+
+  <p>
+  The bet
+
+  <span class="conf c-plausible">Plausible</span> is that in a traction calculus, the residue theorem becomes something closer to an <em>identity</em> — an algebraic fact about how pole-terms bookkeep, not an analytic theorem about convergence.
+  Here's the shape of the argument, and why I think it has real legs:
+</p>
+
+  <p>
+  The Chebyshev tower already gives us <em>exact phase without analysis.</em> Powers of traction zero rotate around the unit circle algebraically, with rational-polynomial coefficients, no power series underneath.
+  A contour integral is, at heart, an accounting of total phase accumulated going once around a loop — and phase, in traction, is the algebraic object the tower computes exactly.
+  So the conjecture is that
+
+  <span class="math-inline">∮ dz/z = 2πi</span>
+  should re-derive as: the total phase change of <span class="math-inline">log₀</span> over one full winding, which the tower can express as an exact algebraic quantity rather than a limit of Riemann sums.
+  The <span class="math-inline">2πi</span> stops being a transcendental constant that appears by magic and becomes the <em>monodromy of the base-0 log</em> — the amount <span class="math-inline">log₀</span> fails to return to itself after one loop.
+</p>
+
+  <div class="aside frontier">
+    <span class="tag">What would have to be built <span class="conf c-plausible">Plausible</span></span>
+    A notion of "traction contour" — a closed path in the graded carrier — and a proof that the winding number is an algebraic invariant of that path expressible in the Chebyshev tower. If that works, then residue calculus becomes a <em>discrete</em>, exact, symbolic operation: no <span class="math-inline">ε</span>, no <span class="math-inline">δ</span>, no convergence to verify, and — the practical payoff — a residue calculator that is exact rather than numerical, suitable for a computer algebra system and formal verification. This is the single most testable frontier in the whole program, because it either reproduces the known residues of standard functions exactly or it doesn't. It can be <em>checked.</em>
+  </div>
+
+  <p>
+  And there's a reason to think the pieces are already sitting in the box.
+  Traction's whole reason for existing is that
+
+  <span class="math-inline">1/0 = ω</span>
+  is a legitimate element.
+  A pole is a place where a function equals <span class="math-inline">ω</span>-something.
+  Classical analysis has to <em>approach</em> poles with limits because it refuses to let the function actually take the pole value.
+  Traction lets the function <em>sit on the pole</em> — the value is <span class="math-inline">ω</span>, it's a real element, you can do algebra with it.
+  So the thing contour integration exists to tiptoe around, traction can walk straight up to.
+  That's either going to make residue theory trivial or expose exactly where the difficulty really lived.
+  Both outcomes are worth the trip.
+</p>
+
+  <h2><span class="num">04</span> The residue as a receipt</h2>
+
+  <p>
+  There's a beautiful reframing of what a residue <em>is</em> that fits the traction philosophy so snugly I suspect it's the right one
+
+  <span class="conf c-plausible">Plausible</span>.
+  In the language of the first document: traction never destroys information; when an operation would lose something, it emits the lost quantity as an explicit, carried structure — a <em>receipt</em>.
+  The residue is exactly a receipt.
+</p>
+
+  <p>
+  Here's the accounting.
+  Antidifferentiation has two ways to lose information, and they sit at the two poles of the Riemann sphere.
+  At
+
+  <span class="math-inline">n = −1</span>
+  it loses <em>surjectivity</em> — there's a target (the log) it can't reach with a power.
+  At the constant term it loses <em>injectivity</em> — <span class="math-inline">D</span> annihilates constants, so <span class="math-inline">∫</span> can't know which constant to restore (this is the "<span class="math-inline">+C</span>" everyone writes and no one thinks about).
+  Two obstructions, one at each pole.
+  And traction has exactly two first-class boundary elements, <span class="math-inline">0</span> and <span class="math-inline">ω</span>, one for each pole.
+  The pairing is not decorative — it's the claim that <strong>the residue and the constant-of-integration are the two receipts antidifferentiation must emit to stay reversible</strong>, and that <span class="math-inline">0</span> and <span class="math-inline">ω</span> are precisely the ledger entries where those receipts are recorded.
+</p>
+
+  <p>
+  In classical calculus we handle these two losses with wildly different levels of respect.
+  The <span class="math-inline">+C</span> we shrug at and drop.
+  The residue we build a subject around.
+  A traction calculus would treat them <em>symmetrically</em> — both are information that antidifferentiation set down, both get carried, neither gets silently dropped.
+  And the payoff of symmetry is that the deep magic of the residue (contour integration, argument principle, all of it) and the mundane <span class="math-inline">+C</span> would turn out to be the same phenomenon at the two poles, which is the kind of unification that tends to mean you're looking at the problem the right way.
+</p>
+
+  <h2><span class="num">05</span> Monodromy: where the winding lives</h2>
+
+  <p>
+  The <span class="math-inline">2πi</span> in the residue theorem is monodromy — the multivaluedness of <span class="math-inline">log</span>.
+  Go once around the origin and
+
+  <span class="math-inline">log z</span>
+  comes back changed by <span class="math-inline">2πi</span>; it doesn't return to itself.
+  Classical analysis treats this as a nuisance to be managed with branch cuts — arbitrary lines you're not allowed to cross, chosen by hand, an admittedly ugly and non-algebraic intervention.
+</p>
+
+  <p>
+  The Chebyshev article already noted that traction fractional powers extend <em>with no branch cuts</em> — you just adjoin a new generator and a polynomial relation, and the extension is clean and unambiguous.
+  This is a genuine structural advantage
+
+  <span class="conf c-solid">Solid</span> and I think it's underappreciated even by me.
+  It suggests that in traction, monodromy isn't a defect to be cut around — it's <em>carried</em>, the way everything is carried, as honest structure.
+  The multivaluedness of <span class="math-inline">log</span> becomes the directed record of how many times and which way you wound around the pole.
+</p>
+
+  <p>
+  And "directed record of which way you wound around" is a phrase that should set off an alarm, because it's <em>orientation</em> — the same orientation that makes
+
+  <span class="math-inline">−0 ≠ 0</span>, that makes traction division non-symmetric, that makes the whole algebra refuse to collapse left and right into one.
+  The winding number is a signed integer.
+  The residue is scaled by <span class="math-inline">2πi</span>, and
+
+  <span class="math-inline">i = 0^(ω/2)</span>.
+  I don't think these are three separate facts.
+  I think monodromy, orientation, and the imaginary unit are one structure — <em>directedness</em> — showing up in three costumes.
+  Which leads to the part I've been circling for years.
+</p>
+
+  <h2><span class="num">06</span> Time as the thing commutativity forgets</h2>
+
+  <p>
+  This is where I stop being a mathematician and start being whatever I am.
+  Flagged accordingly, and I'll be honest about the confidence as I go.
+</p>
+
+  <p>
+  Start with something defensible
+
+  <span class="conf c-solid">Solid</span>: commutativity is not a "property an operation has or lacks." That framing is already the mistake.
+  Division isn't "multiplication that fails to commute" — <span class="math-inline">a/b</span> and <span class="math-inline">b/a</span> are answers to two different questions ("what scales <span class="math-inline">b</span> to <span class="math-inline">a</span>" versus the reverse).
+  There were always two operations, two directed roles, numerator and denominator.
+  Commutativity is the special, <em>lossy</em> case where the two roles happen to collapse into one and you can no longer tell which came first.
+  So the honest hierarchy is inverted from the textbook one: the <em>ordered</em>, directed operation is primary, and commutativity is the quotient that forgets the order.
+  Subtraction and division are the information-conserving ones; addition and multiplication are the amnesiac symmetric shadows.
+</p>
+
+  <p>
+  Now the reach
+
+  <span class="conf c-plausible">Plausible</span>.
+  If commutativity is "the structure that has forgotten order," and order is the primitive that got forgotten, then the natural question is: what <em>is</em> that forgotten order, physically?
+  My answer — held as an intuition I've been unable to shake, not a result — is that it's <strong>time.</strong> Not time as a spatial dimension you move along, but time as the accumulated record of <em>which operations happened in which order</em> — phase accumulated across non-commuting transformations.
+  The "timeless" geometric slice of physics, the block-universe picture where everything just <em>is</em>, is precisely the commutative quotient: the world with the ordering divided out.
+  Non-commutativity doesn't <em>produce</em> time.
+  Commutativity <em>erases</em> it.
+  The arrow was in the ordered operation from the start, and the block universe is what you get after you integrate it away.
+</p>
+
+  <div class="aside frontier">
+    <span class="tag">The through-line, and the confession <span class="conf c-wild">Wild</span></span>
+    Here's why §5 and §6 are the same section wearing different clothes. Monodromy is directedness in the small — which way you wound around one pole. Time (on this reading) is directedness in the large — which way the operations composed. The residue's <span class="math-inline">2πi</span> is the local monodromy of the log; the arrow of time is the global monodromy of the world's non-commuting transformations. If that identification is real — and I flag it as <em>wild</em>, because I have no formalism for it yet, only a very persistent smell — then a traction contour integral isn't just computing a residue. It's computing a little loop of time. The winding number is a clock. I would not bank a dollar on this. I would spend a decade trying to make it precise, which is a different and larger bet.
+  </div>
+
+  <h2><span class="num">07</span> Conservation, reversibility, and why physics might care</h2>
+
+  <p>
+  Let me come back down to where the footing is firmer, because there's a genuinely respectable physics story here that doesn't require you to buy the time speculation.
+</p>
+
+  <p>
+  The most reliable law in physics, the one that has survived every revolution — Newtonian, relativistic, quantum — is conservation.
+  Energy, momentum, charge, information.
+  And the deepest formal fact about fundamental physics is that the microscopic laws are <em>reversible</em>: Hamiltonian mechanics is time-symmetric, quantum evolution is unitary (hence invertible), and even black holes, we now believe, don't destroy information.
+  Irreversibility — the arrow of thermodynamics — is emergent, statistical, a fact about coarse-graining, not about the underlying laws.
+  The bedrock is reversible and conserving.
+</p>
+
+  <p>
+  Traction is, from the ground up, the algebra of reversibility and conservation.
+  That is not a metaphor — it is the literal design specification: every operation total, every operation reversible, nothing destroyed.
+  So the alignment is at least <em>suggestive</em>
+
+  <span class="conf c-plausible">Plausible</span>: if the microscopic world is reversible and conserving, and traction is the algebra you get by demanding reversibility and conservation, then traction is a candidate for the <em>native arithmetic of the microscopic world</em> — the number system physics would have written down if it had started from the conservation law instead of from counting sheep.
+</p>
+
+  <p>
+  Three specific places this could earn its keep, none of them requiring the wild bets:
+</p>
+
+  <p>
+  <strong>Unitarity without renormalization headaches.</strong>
+
+  <span class="conf c-wild">Wild</span> Quantum field theory is plagued by infinities that get subtracted away by renormalization — a procedure that works spectacularly but has always felt like the "reconciliation ritual" the first document accused limits of being.
+  An arithmetic where the pole is a legitimate element, rather than an infinity to be regularized, is at least worth pointing at this problem.
+  I have no result here — but a calculus where <span class="math-inline">ω</span> is a value rather than a catastrophe is exactly the kind of tool you'd want to try.
+</p>
+
+  <p>
+  <strong>Phase and interference, exactly.</strong>
+
+  <span class="conf c-plausible">Plausible</span> Quantum mechanics is a theory of phase and interference, and the Chebyshev tower computes phase exactly and algebraically.
+  A traction-native quantum formalism would represent amplitudes as exact tower elements rather than floating-point complex numbers — no rounding, no drift, and possibly a cleaner account of <em>why</em> phase is the thing that matters (because it's the conserved orientation, the part that survives when magnitude collapses at the pole).
+</p>
+
+  <p>
+  <strong>Gravity as time dilation, arithmetized.</strong>
+
+  <span class="conf c-wild">Wild</span> I have a long-standing intuition that gravity is more naturally read as time dilation than as spacetime curvature, and that time is phase accumulation.
+  If §6 is even partly right, then a mass "slowing time" is a mass changing the local rate of phase accumulation — which is an <em>arithmetic</em> statement about the ordering structure, not a geometric one about curved manifolds.
+  This is the most speculative thing in the document and I include it only because you asked for the optimist, and the optimist genuinely wonders whether the additive/geometric picture of gravity is a projection artifact of the same kind as the additive/geometric picture of everything else.
+</p>
+
+  <p class="pull">
+  If the universe conserves information, and traction is the algebra that refuses to destroy it, then maybe we've been doing physics in a lossy chart this whole time — and the losses we keep having to subtract back out by hand are the tell.
+</p>
+
+  <h2><span class="num">08</span> A field guide to the open problems</h2>
+
+  <p>
+  Concrete things to build, ordered by how soon they'd pay off and how checkable they are.
+  This is the actual to-do list, not the manifesto.
+</p>
+
+  <p>
+  <strong>1.
+  The traction contour integral.
+
+  <span class="conf c-plausible">Plausible · high value · checkable</span></strong> Define a closed path in the graded carrier, define winding as a Chebyshev-tower invariant, and reproduce the residues of a handful of standard functions <em>exactly</em>.
+  Success criterion is brutal and clear: does it get the known answers with no limits?
+  This is the flagship experiment and everything downstream depends on it.
+</p>
+
+  <p>
+  <strong>2.
+  The two receipts, formalized.
+
+  <span class="conf c-plausible">Plausible</span></strong> Prove that antidifferentiation in traction emits exactly two carried quantities — the residue (at <span class="math-inline">ω</span>) and the constant (at <span class="math-inline">0</span>) — and that with both carried, <span class="math-inline">∫</span> is a genuine two-sided inverse of <span class="math-inline">D</span> rather than a one-sided section.
+  This is where "reversible calculus" either becomes literal or stays a slogan.
+</p>
+
+  <p>
+  <strong>3.
+  Base-0 log as the differential-endofunctor fusion.
+
+  <span class="conf c-solid">Solid to state, open to prove</span></strong> Nail down the claim that <span class="math-inline">log₀</span> is the operator that reads a graded object as its grade — that it does product-to-sum on grades and difference-to-quotient on bases as two faces of one rung-shift — and derive its functional equation from
+
+  <span class="math-inline">log_v(v^x) = x</span>
+  rather than positing it.
+  This tidies the foundations under everything else.
+</p>
+
+  <p>
+  <strong>4.
+  A Cauchy-theorem analogue.
+
+  <span class="conf c-wild">Wild</span></strong> The real prize: a purely algebraic statement, provable in the traction framework without analysis, of which the classical Cauchy integral theorem is a projection.
+  If problem 1 works, this is what problem 1 is secretly a corollary of.
+  If it exists, it would be the strongest possible evidence that complex analysis is a shadow of something algebraic.
+</p>
+
+  <p>
+  <strong>5.
+  The physics dictionary.
+
+  <span class="conf c-wild">Wild</span></strong> A careful, term-by-term translation table between traction objects and physical quantities — phase ↔ conserved orientation, pole ↔ ?, monodromy ↔ ?, winding ↔ (time?).
+  Most of the right-hand side is blank right now.
+  Filling in even one entry rigorously would be a real result.
+  Filling in "winding ↔ time" would be a career.
+</p>
+
+  <div class="aside">
+    <span class="tag">The honest meta-point</span>
+    Notice that the checkable problem (1) is at the top and the career-defining one (5) is at the bottom. That ordering is deliberate and it's the discipline that keeps this from being crankery: you earn the right to the wild claims by first shipping the boring, checkable ones. If the traction contour integral reproduces known residues exactly, everything above it on the speculation ladder gets more credible overnight. If it doesn't, I've learned something precise about where the idea breaks, which is worth more than being right about the manifesto. Either way, problem 1 is the next thing to build.
+  </div>
+
+  <h2 id="name"><span class="num">09</span> On the name</h2>
+
+  <p>
+  You've called this Mirror Calculus and weren't sure.
+  "Void Calculus" is on the table.
+  Let me make a case, since a name is a small piece of clarity and clarity is the whole game.
+</p>
+
+  <p>
+  <strong>"Void" oversells the emptiness.</strong> The entire thesis of the reframe is that zero is <em>not</em> void — it's a unit seen edge-on, a full-magnitude object whose richness hides behind a zero-length shadow.
+  "Void Calculus" names the thing by its shadow, which is exactly the additive-slice mistake the theory exists to correct.
+  Beautiful word, wrong direction.
+</p>
+
+  <p>
+  <strong>"Mirror" captures the involution but not the pole.</strong> It's evocative of the
+
+  <span class="math-inline">0 ↔ ω</span>
+  reciprocal symmetry, the
+
+  <span class="math-inline">z ↦ −1/z</span>
+  flip, the sense that the two halves reflect.
+  But it undersells the operational content and it's a little soft.
+</p>
+
+  <p>
+  My actual suggestions, in order of how much I'd push them:
+</p>
+
+  <p>
+  <strong>Residue Calculus / Calculus of Residues</strong> would be perfect except it's taken — it's already the classical name for contour-integral techniques, which is either a fatal collision or a cheeky reclaiming, depending on nerve.
+  Given that your whole claim is "the classical residue calculus is a projection of <em>this</em>," reclaiming the name is defensible and even pointed.
+  Risky but memorable.
+</p>
+
+  <p>
+  <strong>Pole Calculus</strong> — my quiet favorite.
+  It names the thing by its <em>subject</em> (the pole, the place classical calculus fears and this one is built around) rather than by its ground element's shadow.
+  It's concrete, it's a little defiant, and it inverts the usual valence: the pole isn't the danger zone, it's the home base.
+</p>
+
+  <p>
+  <strong>Winding Calculus</strong> — if the monodromy/time thread (§5–6) turns out to be the heart, this names it by its deepest object: the directed, wound-up structure that residues, orientation, and possibly time all share.
+  Forward-looking; bets on the speculation being right.
+</p>
+
+  <p>
+  If it were mine, I'd call the whole calculus <strong>Pole Calculus</strong> and reserve "Mirror" for the specific
+
+  <span class="math-inline">0 ↔ ω</span>
+  involution operator within it — a name for a piece rather than the whole.
+  But it's yours, and the theory doesn't care what we call it.
+  The pole will still be there.
+</p>
+
+  <div class="foot">
+    <p>
+  Companion to <em>What Falls Out of an Invertible Zero.</em> Where that document defended the algebra, this one explores where the algebra points — deliberately reaching, with every reach labeled.
+  Nothing here is established; the confidence tags are the honest part.
+</p>
+    <p>
+  Working notes, the Chebyshev tower, Mirror Calculus, and the COTT solver: <strong>sibarum.github.io/cott</strong>.
+  Distilled from an extended conversation, in the author's framing, with modern-mathematics context supplied where the author asked for it and flagged as such.
+  Corrections and — especially — counterexamples welcome; in this framework a good counterexample is not a loss, it's information, and information is the one thing we've promised never to waste.
+  CC BY 4.0.
+</p>
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

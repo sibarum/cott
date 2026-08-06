@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Sum That Chooses Its Own Zero — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="kicker">Traction Theory · the search for its addition</div>
+    <h1>The Sum That Chooses Its Own Zero</h1>
+    <p class="sub">
+  Multiplication in a world with an invertible zero was settled long ago.
+  Addition was the wound left open — so I tried to grow one from <span class="math-inline">0</span> and <span class="math-inline">ω</span>, and watched which construction survived its own consequences.
+</p>
+    <div class="byline">
+      DoozerDiffuser · sibarum.github.io/cott · companion to <em>What Falls Out of an Invertible Zero</em> and <em>The Calculus of the Pole</em><br>
+      Version: fifth pass. The loop that doesn't close is the same loop everywhere — and now it's a −1 you can hold.
+    </div>
+    <div class="disclaimer">
+      <strong>Assumes the first two.</strong> I take for granted the invertible zero, <span class="math-inline">0·ω = 1</span>, the graded carrier, and <span class="math-inline">i = 0^(ω/2)</span>. What's new here is a hunt: rather than <em>positing</em> an addition and defending it, I generated candidates from the boundary elements under different identities and let each one break where it wanted to. Two survived. One of them turned out to already be written into the earlier work — which is the reason this document exists at all. Every claim carries a confidence tag; the solid ones are genuinely proven, which is a first for this series.
+      <br><br>
+      <strong>What the second pass changed.</strong> The <span class="math-inline">cos</span> in §5 turned out not to be a fact about <span class="math-inline">ℂ</span> at all — it is one of three values a single universal identity takes, indexed by a sign. Sections 6, 7, 9 and 10 are new; §5's claim to be <em>the</em> addition is now defended on a structural ground (compactness) rather than on taste, and two of my earlier readings are retracted outright in the ledger. The correction factor also turned out to be the Chebyshev trace variable and the Cayley–Dickson doubling constant, which is either the best news in the document or a coincidence I've talked myself into.
+      <br><br>
+      <strong>What the third pass changed.</strong> The one open question I called most tractable — whether the two dials are independent — is now settled by an elementary permutation, and the answer is yes: they are the two independent generators of a Klein four-group, and the real-form twist that kept relating them is their product, not a third axis. That promotes §13 from a bet to a proof and demotes the "three mirrors" of §14 from a guess to a count: two independent swaps, three involutions. §8's warning was right to keep them apart.
+      <br><br>
+      <strong>What the fourth pass changed.</strong> Two experiments in the exact testbed, both resolving open entries in §13. The germ obstruction is gone: carry a Laurent tail and <span class="math-inline">⊕</span> is total and associative at every grade, so the "grade tower bites" was a truncation of the chart, not a wall. And the algebra tower — <span class="math-inline">ℝ, ℂ, ℍ, 𝕆, 𝕊</span> — is now mapped exactly: the harmonic addition survives all of it, while its distributivity with <span class="math-inline">×</span> is bounded by Hurwitz's theorem and dies at the sedenions. One earlier reading, §10's account of <em>why</em> the sedenions fail, is corrected in place.
+      <br><br>
+      <strong>What the fifth pass changed.</strong> A new §12. The image the whole program keeps circling — a phase that doesn't cancel around a loop — is, at the octonions, an exact object: the associator is a closed, gauge-invariant <span class="math-inline">ℤ/2</span> monodromy, first nonzero at <span class="math-inline">𝕆</span>, valued in the half-turn <span class="math-inline">0^ω = −1</span>. Set beside the residue's <span class="math-inline">2πi</span> it reads as the same pole-monodromy one coefficient level down. The Solid part is machine-checked; the identification with the residue, and with time, is tagged Plausible and Wild — which is exactly where it should sit.
+      <div class="legend">
+        <span class="conf c-solid">Solid — proven, not just plausible</span>
+        <span class="conf c-plausible">Plausible — a bet I'd take</span>
+        <span class="conf c-wild">Wild — can't rule out, wouldn't bank on</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="lead">
+  Traction hands you a beautiful multiplication for free.
+  A value carries a coefficient and a <em>grade</em>; you multiply by multiplying the coefficients and <em>adding</em> the grades; <span class="math-inline">0</span> sits at grade <span class="math-inline">+1</span>, <span class="math-inline">ω</span> at grade <span class="math-inline">−1</span>, and
+
+  <span class="math-inline">0·ω = 1</span>
+  is just the two grades cancelling to the unit.
+  Reciprocal flips the grade.
+  Everything is total, everything is reversible, and — as the first document showed — the imaginary unit falls out of the boundary without a single limit.
+  Multiplication is a solved problem.
+</p>
+
+  <p>
+  Addition is not.
+  And it's not solved for a reason worth stating precisely, because the reason is the whole plot: <strong>the graded carrier resists ordinary addition at exactly the place multiplication found easiest.</strong> This document is the record of pushing on that resistance until it gave — trying to build a sum out of <span class="math-inline">0</span> and <span class="math-inline">ω</span> the way the first document built <span class="math-inline">i</span>, discarding the constructions that tore, and keeping the two that didn't.
+  The survivor is not a new axiom.
+  It's a dial, and the dial already knew about the pole.
+</p>
+
+  <div class="toc">
+    <strong>The search, in the order it happened</strong>
+    <ol>
+      <li><a href="#s01">The wound multiplication left open</a></li>
+      <li><a href="#s02">First attempt: make the grade carry the sum</a></li>
+      <li><a href="#s03">The move that holds: add through the reciprocal</a></li>
+      <li><a href="#s04">What that addition is, exactly</a></li>
+      <li><a href="#s05">A second, truer sum: the phase chart</a></li>
+      <li><a href="#s06">One identity, three regimes — the cos was never the point</a></li>
+      <li><a href="#s07">What separates them is compactness, not cos versus cosh</a></li>
+      <li><a href="#s08">The dial: every addition at once</a></li>
+      <li><a href="#s09">The grade dial: moving the correction between regimes</a></li>
+      <li><a href="#s10">The other turn of the screw: the doubling constant</a></li>
+      <li><a href="#s11">The striking part — the dial already knew 0 and ω</a></li>
+      <li><a href="#s12">The phase that doesn't close</a></li>
+      <li><a href="#s13">The honest ledger</a></li>
+      <li><a href="#name">On the name</a></li>
+    </ol>
+  </div>
+
+  <h2 id="s01"><span class="num">01</span> The wound multiplication left open</h2>
+
+  <p>
+  Here is the asymmetry, and it is exact rather than vibes.
+  Multiplication's only indeterminate form is <span class="math-inline">0·ω</span>, and it is cured by a <em>single integer</em>: grades add, <span class="math-inline">+1</span> and <span class="math-inline">−1</span> cancel, done.
+  That is the entire reason the graded carrier works — it took the one bad product and unrolled it into an integer that bookkeeps itself.
+  Multiplication's wound is one-dimensional, and one dimension of grade closes it.
+</p>
+
+  <p>
+  Addition's wound is not one-dimensional.
+
+  <span class="conf c-solid">Solid</span> Watch a cancellation of leading terms — two graded values whose tops are <span class="math-inline">a</span> and <span class="math-inline">−a</span>.
+  The tops annihilate cleanly (<span class="math-inline">a + (−a) = ⊘</span>, a subtractive cancel in its additive home, no residue).
+  But in a <em>graded</em> world you need to know the grade of what is <em>left</em>, and a leading-term cancellation is precisely the event that refuses to tell you.
+  The top vanished; what remains lives at some higher grade you cannot see without carrying the entire tail.
+  Multiplication resolves its indeterminacy with one integer; addition would need the whole series.
+  That is the difference between a valuation and a germ, and it is why "just track the grade" — which was the making of multiplication — is not enough for addition.
+</p>
+
+  <p>
+  So the honest starting position is: the algebra is a multiplicative success and an additive vacancy.
+  You cannot import ordinary <span class="math-inline">+</span>, because ordinary <span class="math-inline">+</span> assumes an ungraded field and the whole point is that we left it.
+  The question is whether an addition can be <em>grown</em> that respects the grading instead of fighting it.
+</p>
+
+  <h2 id="s02"><span class="num">02</span> First attempt: make the grade carry the sum</h2>
+
+  <p>
+  The obvious first move — and the one I chased longest — is to make the grade do for addition what it did for multiplication.
+  Push the identity
+
+  <span class="math-inline">−0 = ω</span>, let the grade absorb the difficulty, and hope cancellation lands somewhere nameable.
+  It's the right instinct and it fails in an instructive way, so it earns its section.
+</p>
+
+  <p>
+  The failure has a precise location: <strong>there are two different inverses trying to wear one minus sign.</strong>
+
+  <span class="conf c-solid">Solid</span> Reciprocal flips the grade —
+
+  <span class="math-inline">recip(0) = ω</span>, grade
+
+  <span class="math-inline">+1 ↦ −1</span>
+  — and it's the multiplicative inverse, the thing satisfying
+
+  <span class="math-inline">0·ω = 1</span>.
+  Negation keeps the grade and flips the coefficient's sign, and it's the <em>additive</em> inverse.
+  The seductive equation
+
+  <span class="math-inline">−0 = ω</span>
+  is true only if the <span class="math-inline">−</span> means <em>reciprocal</em>.
+  Read as negation it's false:
+
+  <span class="math-inline">neg(0)</span>
+  is a different grade-<span class="math-inline">+1</span> object, not <span class="math-inline">ω</span> at all.
+  Fold the two inverses together and you get an addition that looks consistent for a page and then quietly derives a grade it can't defend.
+</p>
+
+  <div class="aside">
+    <span class="tag">Why this was worth failing at <span class="conf c-solid">Solid</span></span>
+    The tear tells you the fix. Ordinary addition jams because its identity — <span class="math-inline">0</span> — sits at the grade that <em>swallows</em> information, the grade where cancellation dumps its unknowable remainder. If the identity of your addition is the same object that eats grades, cancellation has nowhere legal to land. So the repair isn't to patch the grade arithmetic. It's to move the additive identity <em>off</em> the swallowing grade entirely. Which points, unavoidably, at the other pole.
+  </div>
+
+  <h2 id="s03"><span class="num">03</span> The move that holds: add through the reciprocal</h2>
+
+  <p>
+  If the additive identity must not be <span class="math-inline">0</span>, make it <span class="math-inline">ω</span>.
+  The clean way to do that isn't to legislate it — it's to conjugate ordinary addition by the one map that swaps the two poles.
+  Add by reciprocal:
+</p>
+
+  <div class="eqn"><span class="dynamicexpr expression">a (+) b := 1/(1/a + 1/b) = a*b/(a+b)</span></div>
+
+  <p>
+  This is harmonic addition — the sum that resistors in parallel obey, that thin lenses obey, that reduced mass obeys.
+  And every one of the boundary facts we wanted falls straight out of it, none of them posited:
+
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <div class="math">ω ⊕ x  =  x            (ω is the additive identity)
+0 ⊕ x  =  0            (0 absorbs — it is the new "point at infinity" of ⊕)
+x ⊕ neg(x)  =  ω       (cancellation lands on ω, a definite pole)</div>
+
+  <p>
+  Look at that third line, because it is the whole reason this construction survives where §2 died.
+  In ordinary addition,
+
+  <span class="math-inline">x + (−x)</span>
+  targets <span class="math-inline">0</span> — the grade-swallowing pole, the one whose order you can't recover.
+  In harmonic addition,
+
+  <span class="math-inline">x ⊕ neg(x) = −x²/0 = ω</span>
+  — a <em>definite</em> element.
+  The reciprocal took the one event that destroyed grade information and pointed it at the pole that can hold it.
+  Cancellation stopped being a loss and became a receipt, filed at <span class="math-inline">ω</span>.
+</p>
+
+  <p class="pull">
+  Ordinary addition sends cancellation into the dark.
+  Reciprocal addition sends it to the pole — and the pole, in this algebra, is a place you're allowed to stand.
+</p>
+
+  <h2 id="s04"><span class="num">04</span> What that addition is, exactly</h2>
+
+  <p>
+  No hand-waving here — this one is nailed down.
+  Conjugate the whole structure by
+
+  <span class="math-inline">φ(x) = 1/x</span>
+  and it unmasks completely:
+
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <div class="math">(everything, ⊕, ×)   ≅   (ℝ, +, ×)   via   x ↦ 1/x
+
+     ω  ↔  0   (the additive zero)
+     1  ↔  1   (the unit, fixed)
+     0  ↔  ∞   (the excluded pole)</div>
+
+  <p>
+  It is the real field wearing a reciprocal coordinate, with the roles of <span class="math-inline">0</span> and <span class="math-inline">∞</span> exchanged.
+  Total, associative, commutative — and, the fact that makes it a field rather than two operations sharing a carrier, <strong>multiplication distributes over it</strong>:
+</p>
+
+  <div class="math">a·(x ⊕ y)  =  (a·x) ⊕ (a·y)        both sides = a·xy/(x+y)</div>
+
+  <p>
+  Two things this is <em>not</em>, said plainly because the temptation to overclaim is real.
+  It is not the Riemann sphere: the sphere is a <em>quotient</em> that forgets coefficient and grade, keeping only the ratio, which is exactly why it has no group structure and no total addition; this retains coefficient and grade and is a clean field precisely <em>because</em> it declined to quotient.
+  And it does not <em>extend</em> ordinary addition — it <em>replaces</em> it.
+
+  <span class="math-inline">2 ⊕ 3 = 6/5</span>, not <span class="math-inline">5</span>.
+
+  <span class="conf c-plausible">Plausible</span> that this is the addition traction actually wants;
+
+  <span class="conf c-solid">Solid</span> that it is <em>an</em> addition, exact and closed.
+  Whether it's the canonical one is a question §5 refuses to let me answer too quickly.
+</p>
+
+  <h2 id="s05"><span class="num">05</span> A second, truer sum: the phase chart</h2>
+
+  <p>
+  Because there is a second survivor, and it has a stronger claim to being <em>the</em> addition — it's the one already latent in the first document.
+  Recall
+
+  <span class="math-inline">i = 0^(ω/2)</span>, and the reframe's quiet consequence that
+
+  <span class="math-inline">0 ↔ i</span>
+  and
+
+  <span class="math-inline">ω ↔ 1/i = −i</span>.
+  So put the carrier where that correspondence lives: on the circle, a value written
+
+  <span class="math-inline">e^(iπa)</span>, with the grade <span class="math-inline">a</span> now a real-valued phase.
+  Then ordinary complex addition of two such points is not a mess — it's a clean trigonometric identity:
+
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <div class="math">e^(iπa) + e^(iπb)  =  2·cos(π(a−b)/2) · e^(iπ(a+b)/2)</div>
+
+  <p>
+  Read the two factors and the duality with multiplication leaps out.
+  The phase of the sum is
+
+  <span class="math-inline">(a+b)/2</span>
+  — the <em>average</em> of the two grades.
+  The magnitude is <span class="math-inline">2cos</span> of half the grade-gap.
+  So:
+</p>
+
+  <table>
+    <tr><th>operation</th><th>what it does to the grade</th></tr>
+    <tr><td>× &nbsp;(multiply)</td><td>grades <strong>add</strong> — <span class="math-inline">e^(iπa)·e^(iπb) = e^(iπ(a+b))</span></td></tr>
+    <tr><td>+ &nbsp;(add)</td><td>grades <strong>average</strong> — mean <span class="math-inline">(a+b)/2</span>, weighted by <span class="math-inline">2cos</span></td></tr>
+  </table>
+
+  <p>
+  This is a genuinely total, genuinely associative addition — trivially, because in these coordinates the carrier is <span class="math-inline">ℂ</span> and the operation is ordinary complex <span class="math-inline">+</span>.
+  It is the resolution of the thing the second document kept circling: you cannot make the Riemann <em>sphere</em> add (no compact surface of the wrong Euler characteristic can be a group), but you can make the <em>plane</em> add, and the phase chart is the plane.
+  The cost is honest and specific: in this chart <span class="math-inline">0</span> and <span class="math-inline">ω</span> demote to the ordinary points <span class="math-inline">i</span> and <span class="math-inline">−i</span>, the true additive identity becomes the origin (a genuinely new point,
+
+  <span class="math-inline">i + (−i) = 0</span>, which the identity above returns as
+
+  <span class="math-inline">2cos(π/2) = 0</span>), and the grade must run continuously rather than by integer steps.
+
+  <span class="conf c-plausible">Plausible</span> that this — not §4 — is the "real" traction addition, precisely because it's the one that honors
+
+  <span class="math-inline">i = 0^(ω/2)</span>
+  instead of routing around it.
+</p>
+
+  <p>
+  So I had two survivors and a decision I couldn't make on taste alone.
+  That's usually the sign that you're holding two views of one object and haven't found the axis between them yet.
+  There was an axis — two of them, as it turned out, and the first one runs straight through the <span class="math-inline">cos</span> I had just written down without looking at it hard enough.
+</p>
+
+  <h2 id="s06"><span class="num">06</span> One identity, three regimes — the cos was never the point</h2>
+
+  <p>
+  I read the <span class="math-inline">cos</span> in §5 as content: the phase chart's own contribution, the specific shape circular geometry imposes on a sum.
+  It isn't.
+  That identity uses no property of <span class="math-inline">i</span> whatsoever.
+  It is pure factoring:
+
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <div class="math">e^x + e^y  =  e^((x+y)/2) · ( e^((x−y)/2) + e^(−(x−y)/2) )
+
+           =  2·cosh((x−y)/2) · e^((x+y)/2)</div>
+
+  <p>
+  Split the exponent into its mean and its half-difference, pull the mean out front, and what remains is even in the half-difference.
+  That is the entire derivation, and it holds in <em>any</em> commutative algebra where <span class="math-inline">exp</span> converges — no sign, no dimension, no choice of generator enters anywhere.
+  §5 is this identity at
+
+  <span class="math-inline">x = iπa</span>, together with
+
+  <span class="math-inline">cosh(iu) = cos u</span>.
+  So mean-plus-correction is not a discovery about the phase chart.
+  The phase chart only chooses <em>which correction</em>.
+</p>
+
+  <p>
+  Then what does the choosing?
+  A single scalar, and this is the part worth having.
+  <span class="math-inline">cosh</span> is even, so only even powers appear, so it <em>factors through squaring</em>:
+
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <div class="math">cosh x  =  Σ x^(2n)/(2n)!  =  f(x²),        f(t)  :=  Σ tⁿ/(2n)!</div>
+
+  <p>
+  where <span class="math-inline">f</span> is a perfectly ordinary entire function of one variable.
+  Read that line slowly, because it carries the section: <strong><span class="math-inline">cosh</span> cannot see <span class="math-inline">x</span>.
+  It can only see <span class="math-inline">x²</span>.</strong> The moment <span class="math-inline">x²</span> is a <em>scalar</em>, the transcendental evaluates on a number and returns a number — and the whole zoo of cases collapses into <span class="math-inline">f</span> applied to three signs.
+</p>
+
+  <table>
+    <tr><th>d²</th><th>correction f(d²)</th><th>algebra ℝ[d]</th><th>orbit of exp</th><th>what the sum does</th></tr>
+    <tr><td>−1</td><td>cos</td><td>ℂ = Cl(0,1)</td><td>circle</td><td>average, correction <em>can vanish</em></td></tr>
+    <tr><td>0</td><td>1</td><td>dual numbers = Cl(0,0,1)</td><td>line</td><td>pure average, no correction</td></tr>
+    <tr><td>+1</td><td>cosh</td><td>split-complex = Cl(1,0)</td><td>hyperbola branch</td><td>average, correction ≥ 1 always</td></tr>
+  </table>
+
+  <p>
+  The middle row is the one to notice, and it is the same phrase I have been using since §5 without realising it had a home: <em>pure average</em>.
+  At
+
+  <span class="math-inline">d² = 0</span>
+  the correction is identically <span class="math-inline">1</span>, and
+
+  <span class="math-inline">e^x + e^y = 2e^((x+y)/2)</span>
+  exactly.
+  Checkable by hand —
+
+  <span class="math-inline">(1+εa) + (1+εb) = 2(1 + ε(a+b)/2)</span>.
+  Averaging the grade with no residue is not a special feature of the phase chart; it is what a <em>degenerate</em> square does.
+</p>
+
+  <p>
+  <strong>And "square is a scalar" has a name.</strong>
+
+  <span class="conf c-solid">Solid</span> It is the defining relation of a Clifford algebra,
+
+  <span class="math-inline">v² = Q(v)</span>.
+  My three rows are precisely the Clifford algebras of the three rank-one quadratic forms, signature
+
+  <span class="math-inline">−1, 0, +1</span>.
+  This is worth saying carefully, because the tempting reading is wrong: Clifford algebra is not an alternative framing of what I found, and it is not a generalization I could adopt or decline.
+  It is <em>the classification of it</em>.
+  The condition that makes the closed form exist at all — one scalar for <span class="math-inline">f</span> to eat — is the condition Clifford is built from.
+</p>
+
+  <p>
+  Two boundaries on that, so it doesn't get oversold.
+  <span class="math-inline">cosh</span> does not <em>need</em> a scalar square: the series converges in any Banach algebra, so <span class="math-inline">cosh</span> of an arbitrary matrix or operator exists.
+  Clifford is what makes it <em>closed-form</em> instead of requiring diagonalization.
+  And inside a Clifford algebra the closed form covers only elements whose square is scalar — vectors always, some bivectors (in
+
+  <span class="math-inline">Cl(3,0)</span>,
+
+  <span class="math-inline">B² = −|B|²</span>, which is exactly why rotors work), a general multivector never.
+</p>
+
+  <div class="aside">
+    <span class="tag">A retraction, because I had the interesting case backwards <span class="conf c-solid">Solid</span></span>
+    My first instinct was that the hyperbolic row was the rich one — a real <span class="math-inline">cosh</span> of a real argument, a genuine hyperbola, zero divisors on the null cone. That reading is empty and I want it on the record as retracted. Split-complex numbers <em>diagonalize</em>: <span class="math-inline">e± = (1±j)/2</span> are orthogonal idempotents, <span class="math-inline">ℝ[j] ≅ ℝ ⊕ ℝ</span>, and <span class="math-inline">e^(jθ) = e^θ e₊ + e^(−θ) e₋</span>. So the hyperbolic row is the <em>real</em> identity run twice, once per null coordinate, with the same amplitude factor in both slots because <span class="math-inline">cosh</span> is even — which is precisely why it collects into a scalar out front. Nothing new happens there. Worse, I had noted that two hyperbolic exponentials can't cancel "despite the zero divisors," which under diagonalization reduces to: two positive reals don't sum to zero. That is positivity of <span class="math-inline">exp</span>, dressed up as a fact about the null cone. The <em>elliptic</em> row is the outlier, and §7 says why on a ground that survives diagonalization.
+  </div>
+
+  <h2 id="s07"><span class="num">07</span> What separates them is compactness, not cos versus cosh</h2>
+
+  <p>
+  There is a real temptation here, and I fell into it for a full page: to treat
+
+  <span class="math-inline">cos ↔ cosh</span>
+  as a substitution that leaves the algebra untouched.
+  Almost true, and the exact size of the "almost" is informative.
+</p>
+
+  <p>
+  Every classical trigonometric identity is a polynomial consequence of
+
+  <span class="math-inline">e^(x+y) = e^x e^y</span>, and polynomial consequences don't see the generator's square.
+  So they hold in both regimes.
+  But the letters don't swap for free:
+
+  <span class="math-inline">cos² + sin² = 1</span>
+  becomes
+
+  <span class="math-inline">cosh² − sinh² = 1</span>, and the <span class="math-inline">tan</span> addition law's denominator flips from
+
+  <span class="math-inline">1 − tan·tan</span>
+  to
+
+  <span class="math-inline">1 + tanh·tanh</span>.
+  That is Osborn's rule, and the reason is one line: the odd part is
+
+  <span class="math-inline">sinh x = x·g(x²)</span>, with the <em>same</em> factoring through the square plus one leftover copy of <span class="math-inline">x</span>.
+  Each sine factor carries one <span class="math-inline">i</span>; a pair of them carries <span class="math-inline">i²</span>.
+
+  <span class="conf c-solid">Solid</span> The swap costs exactly one factor of the discriminant per pair of odd parts, and nothing else.
+  The sign <em>is</em> the <span class="math-inline">±1</span>, showing through.
+</p>
+
+  <p>
+  <strong>The invariant way to say it is in the trace variable — and it is already ours.</strong>
+
+  <span class="conf c-solid">Solid</span> Write
+
+  <span class="math-inline">u = e^d</span>.
+  Then the correction factor is
+</p>
+
+  <div class="math">2·cosh d  =  u + u⁻¹  =  s</div>
+
+  <p>
+  which is the Chebyshev variable of the earlier work, living in
+
+  <span class="math-inline">ℚ[s][u]/(u² − su + 1)</span>.
+  Depending on which real slice you take,
+
+  <span class="math-inline">s = 2cos θ</span>
+  or
+
+  <span class="math-inline">s = 2cosh θ</span>, and
+
+  <span class="math-inline">Tₙ(cos θ) = cos nθ</span>
+  while
+
+  <span class="math-inline">Tₙ(cosh θ) = cosh nθ</span>
+  — the <em>same</em> polynomials, both times.
+  So: the identities that survive the swap are exactly those expressible in <span class="math-inline">s</span>; the ones needing <span class="math-inline">u</span> and <span class="math-inline">u⁻¹</span> separately are where Osborn's bookkeeping lives.
+  I want to be blunt that this is not an analogy I imported.
+  The magnitude in §5 is
+
+  <span class="math-inline">2cos(π(a−b)/2)</span>, which is <span class="math-inline">s</span> at
+
+  <span class="math-inline">u = e^(iπ(a−b)/2)</span>.
+  <strong>The correction factor of the sum is the trace variable of the Chebyshev tower.</strong> Same object, no adjustment.
+</p>
+
+  <p>
+  Structurally,
+
+  <span class="math-inline">SO(2)</span>
+  and
+
+  <span class="math-inline">SO(1,1)</span>
+  are two real forms of one complex torus <span class="math-inline">ℂ*</span>.
+  Algebraic identities are defined over the common base and descend to both forms; the forms differ by a Galois twist, and Osborn's rule is that twist written out in trig.
+</p>
+
+  <p class="pull">
+  What descends to both real forms is every algebraic identity.
+  What does not descend is compactness — and cancellation lives on the side that doesn't descend.
+</p>
+
+  <p>
+  This is the sharp correction to §5, and it goes the good way.
+
+  <span class="conf c-solid">Solid</span> §5's entire claim to be an addition rests on one line:
+
+  <span class="math-inline">i + (−i) = 0</span>, delivered by
+
+  <span class="math-inline">2cos(π/2) = 0</span>.
+  The correction <em>vanishes</em>, so two points annihilate, so cancellation has a definite target.
+  Now look at what that requires.
+  Cancellation needs the correction to hit zero, i.e.
+
+  <span class="math-inline">s = 0</span>, i.e.
+  <span class="math-inline">−1</span> in the image of the exponential of the line — which needs <em>periodicity</em>.
+  The circle has it.
+  The hyperbola branch does not:
+
+  <span class="math-inline">cosh ≥ 1</span>, so the correction never vanishes and never even drops below the average.
+  The dual line does not: the correction is identically <span class="math-inline">1</span>.
+  So of the three regimes, <strong>only the elliptic one has cancellation at all</strong>, and it has it because
+
+  <span class="math-inline">exp(iℝ)</span>
+  is compact.
+</p>
+
+  <p>
+  That retires a piece of hand-waving I was carrying.
+  §5 was preferred over its alternatives on taste, and taste is not a reason.
+  The reason is that both §4 and §5 are built on the same requirement — cancellation must land on a <em>definite</em> element rather than an unrecoverable grade — and the trichotomy says exactly one of the three real forms can supply it.
+
+  <span class="conf c-solid">Solid</span> Given the phase chart, the elliptic form is <em>forced</em>, not chosen.
+  What this does <em>not</em> do, and I'll say so before anyone else has to, is adjudicate §4 against §5: harmonic addition sends cancellation to <span class="math-inline">ω</span> and the phase chart sends it to the origin, both definite, and compactness has nothing to say about which.
+  That question stays open in §13 exactly where it was.
+</p>
+
+  <h2 id="s08"><span class="num">08</span> The dial: every addition at once</h2>
+
+  <p>
+  Harmonic <span class="math-inline">⊕</span> and ordinary <span class="math-inline">+</span> are not two unrelated additions.
+  They are two settings of one dial.
+  For a real parameter <span class="math-inline">p</span>, define the <em>conjugate addition</em>:
+
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <div class="math">S_p(x, y)  =  (xᵖ + yᵖ)^(1/p)  =  φ⁻¹(φ(x) + φ(y)),    φ(x) = xᵖ</div>
+
+  <p>
+  Each <span class="math-inline">S_p</span> is ordinary addition conjugated by the bijection
+
+  <span class="math-inline">x ↦ xᵖ</span>, so <em>every one of them is associative and commutative for free</em>, with its own identity and inverses.
+  The named rungs:
+</p>
+
+  <table>
+    <tr><th>p</th><th>S_p(x, y)</th><th>where it already lives</th></tr>
+    <tr><td>1</td><td>x + y</td><td>ordinary addition</td></tr>
+    <tr><td>−1</td><td>xy/(x+y)</td><td>harmonic ⊕ — resistors, lenses, reduced mass</td></tr>
+    <tr><td>2</td><td>√(x² + y²)</td><td>quadrature — how variances and hypotenuses add</td></tr>
+    <tr><td>→ +∞</td><td>max(x, y)</td><td>tropical (max-plus)</td></tr>
+    <tr><td>→ −∞</td><td>min(x, y)</td><td>tropical (min-plus)</td></tr>
+    <tr><td>φ = log</td><td>x · y</td><td>multiplication itself, the recentred p→0 limit</td></tr>
+  </table>
+
+  <p>
+  Two facts, both proven, and they are the payload of the whole document.
+</p>
+
+  <p>
+  <strong>Theorem 1 — multiplication distributes over <em>every</em> <span class="math-inline">S_p</span>.</strong>
+
+  <span class="conf c-solid">Solid</span> One line does it:
+</p>
+
+  <div class="eqn"><span class="dynamicexpr expression">a*S_{p}(x, y) = (a^p*(x^p + y^p))^(1/p) = ((a*x)^p + (a*y)^p)^(1/p) = S_{p}(a*x, a*y)</span></div>
+
+  <p>
+  So
+
+  <span class="math-inline">(ℝ₊, S_p, ×)</span>
+  is a field isomorphic to
+
+  <span class="math-inline">(ℝ₊, +, ×)</span>
+  via
+
+  <span class="math-inline">x ↦ xᵖ</span>, for every <span class="math-inline">p</span> at once.
+  The reciprocal field of §4 is not special; it is the single rung
+
+  <span class="math-inline">p = −1</span>
+  of an infinite family, all of them compatible with the one multiplication.
+</p>
+
+  <p>
+  <strong>Theorem 2 — the sign of <span class="math-inline">p</span> chooses the additive zero.</strong>
+
+  <span class="conf c-solid">Solid</span> The identity <span class="math-inline">e</span> of <span class="math-inline">S_p</span> solves
+
+  <span class="math-inline">eᵖ = 0</span>, so
+</p>
+
+  <div class="math">p > 0   ⟹   additive identity = 0
+p < 0   ⟹   additive identity = ω</div>
+
+  <p>
+  That is why ordinary addition (<span class="math-inline">p = +1</span>) keeps its zero at <span class="math-inline">0</span> and harmonic addition (<span class="math-inline">p = −1</span>) keeps its zero at <span class="math-inline">ω</span>.
+  The two survivors of my search were on opposite sides of a sign.
+</p>
+
+  <div class="aside">
+    <span class="tag">The correction I owe, so I don't oversell it <span class="conf c-solid">Solid</span></span>
+    The geometric mean — and the phase-averaging of §5 — is <em>not</em> a rung of this dial, and I want that on the record because it's the easy mistake. <span class="math-inline">S_p</span> diverges as <span class="math-inline">p → 0</span>; the geometric mean is the normalized <em>mean</em> <span class="math-inline">√(xy)</span>, which is not even associative and is really <span class="math-inline">√∘×</span> — a multiplicative object in a mean's costume. The §5 phase addition is <span class="math-inline">p = 1</span> <em>on ℂ</em>, not <span class="math-inline">p = 0</span>; its geometric-mean <em>appearance</em> is just multiplication showing through when you add two equal-magnitude unit vectors. So the clean picture is: one multiplication, a whole dial of additions it distributes over, and "averaging the grade" is the multiplication leaking into the view — not another rung.
+  </div>
+
+  <p>
+  <strong>A bookkeeping warning before going on.</strong>
+
+  <span class="conf c-solid">Solid</span> This document now carries <em>two</em> one-parameter families and they are not the same family.
+  The <span class="math-inline">p</span>-dial above chooses <em>which addition</em>, by conjugating <span class="math-inline">+</span> with
+
+  <span class="math-inline">x ↦ xᵖ</span>.
+  The discriminant of §6–§7 chooses <em>which real form the correction lives in</em>, by fixing the square of a generator.
+  Both are indexed by a real number whose sign flips something important, which makes them easy to conflate; §13 now settles how they relate — they don't, beyond both being independent axes of one flat group, and the reciprocal appearing as a factor of each.
+  When I say "the dial" without qualification I mean <span class="math-inline">S_p</span>.
+  The other one I'll call the grade, for the reason §9 gives.
+</p>
+
+  <h2 id="s09"><span class="num">09</span> The grade dial: moving the correction between regimes</h2>
+
+  <p>
+  Here is what I think the trichotomy of §6 actually is, in this program's own terms.
+  It is not three algebras to pick between.
+  It is <em>one</em> algebra read at three grades — and the grade shift, which is just multiplication by <span class="math-inline">0</span>, walks the correction term from one regime to the next.
+  Changing the grade changes the hyperoperational alignment of the sum.
+</p>
+
+  <p>
+  <strong>Grade 1 gives the pure average, and it falls out.</strong>
+
+  <span class="conf c-solid">Solid</span> Push the arguments of the exponential up one grade — multiply them by <span class="math-inline">0</span>:
+</p>
+
+  <div class="math">e^(0x) + e^(0y)  =  2·cosh( 0(x−y)/2 ) · e^( 0(x+y)/2 )
+
+                 =  2·e^( 0(x+y)/2 )        since cosh(0d) = 1 + O(0²)
+
+                 =  2·( 1 + 0·(x+y)/2 )</div>
+
+  <p>
+  The correction dies, the mean survives.
+  That is exactly the degenerate row of §6's table — but reached by a <em>grade shift</em> rather than by positing
+
+  <span class="math-inline">ε² = 0</span>
+  in some other algebra.
+  Dual numbers are not a rival construction to adopt; they are grade <span class="math-inline">1</span> of this one, and <span class="math-inline">0² </span> being invisible at leading order <em>is</em> the degeneracy.
+  This also reconciles the two things I kept calling by different names: at grade <span class="math-inline">1</span> you get <em>average</em> in the sum picture and plain <em>addition</em> in the multiplicative picture of §10, because there the correction term drops to grade <span class="math-inline">2</span> and leaves
+
+  <span class="math-inline">t ↦ t + τ</span>.
+</p>
+
+  <p>
+  <strong>The elliptic regime needs <span class="math-inline">ω/2</span>, not <span class="math-inline">ω</span>.
+  That was my error and the fix is better than the error.</strong>
+
+  <span class="conf c-solid">Solid</span> I had assumed pushing the grade to <span class="math-inline">ω</span> would deliver <span class="math-inline">cos</span>.
+  It doesn't, and the trace variable of §7 says why immediately.
+  Elliptic means
+
+  <span class="math-inline">|s| &lt; 2</span>, and the extreme case is
+
+  <span class="math-inline">s = 0 ⟺ u² = −1</span>.
+  No finite grade reaches it:
+
+  <span class="math-inline">0^k + 0^(−k)</span>
+  is never zero for integer <span class="math-inline">k</span>.
+  But
+
+  <span class="math-inline">0^ω = −1</span>
+  forces
+
+  <span class="math-inline">0^(ω/2) = i</span>, and then
+</p>
+
+  <div class="math">s  =  u + u⁻¹  =  i + i⁻¹  =  i − i  =  0        exactly</div>
+
+  <p>
+  So <span class="math-inline">cos</span> sits at <em>half-infinite</em> grade.
+  And that is the same <span class="math-inline">ω/2</span> the first document already installed as
+
+  <span class="math-inline">i = 0^(ω/2)</span>
+  — now doing a second job it was not built for: <span class="math-inline">ω/2</span> is the grade at which the correction term can vanish, which is to say the grade at which cancellation becomes available at all.
+  Two independent routes to the same half-value is the strongest internal corroboration in this document.
+  It also forces <span class="math-inline">ω</span> to be <em>even</em>, which is an imposed parity of exactly the same species as
+
+  <span class="math-inline">0^ω = −1</span>, and should be filed next to it rather than smuggled in.
+</p>
+
+  <p>
+  <strong>And <span class="math-inline">ω</span> is not a fourth regime.</strong>
+
+  <span class="conf c-solid">Solid</span> Worth stating because I looked for one.
+  As a discriminant value it gives
+
+  <span class="math-inline">f(ω) = Σ 0^(−n)/(2n)!</span>, unbounded below in grade, hence not an element of
+
+  <span class="math-inline">K((0))</span>
+  at all.
+  There are three regimes, not four.
+  <span class="math-inline">ω</span>'s role here is as the <em>grade coordinate</em> that hosts the elliptic point at half its value — not as a new correction function.
+</p>
+
+  <div class="aside frontier">
+    <span class="tag">The grade operators, and the two of them I had glued together <span class="conf c-wild">Wild</span></span>
+    <p style="margin-top:0">
+  I had been sketching a family <span class="math-inline">Z_k</span> by table, one row at a time.
+  The scalar rows are not independent — each collapses to a single closed form:
+</p>
+    <div class="math" style="background:#fff">Z₁(t)  =  0^t              Z₋₁(t)  =  ω^t</div>
+    <p>
+  Check against
+
+  <span class="math-inline">0ω = 1</span>
+  and
+
+  <span class="math-inline">0^ω = −1</span>:
+
+  <span class="math-inline">0¹ = 0</span>,
+
+  <span class="math-inline">0⁰ = 1</span>,
+
+  <span class="math-inline">0^ω = −1</span>,
+
+  <span class="math-inline">0^(−1) = ω</span>
+  — all four rows I wrote by hand, and
+
+  <span class="math-inline">ω^ω = 1/0^ω = −1</span>
+  is forced rather than stipulated.
+  Nothing in the scalar block was free; I had been transcribing a formula.
+</p>
+    <p>
+  <strong>But the indexing is broken, and precisely here:</strong>
+
+  <span class="math-inline">Z₁(Z₋₁(1)) = Z₁(ω) = −1 ≠ 1</span>.
+  <span class="math-inline">Z₁</span> is an <em>involution</em> on the four points, since
+
+  <span class="math-inline">0^(0^t) = t</span>
+  throughout, while <span class="math-inline">Z₋₁</span> has order <span class="math-inline">4</span>.
+  An involution cannot invert a 4-cycle, so <span class="math-inline">Z₊₁</span> and <span class="math-inline">Z₋₁</span> are not inverse despite the naming — while the <em>graded</em> rows,
+
+  <span class="math-inline">x ↦ 0x</span>
+  and
+
+  <span class="math-inline">0x ↦ x</span>, are properly inverse.
+  Two different operators were wearing one label:
+</p>
+    <p>
+  <strong>σ</strong>, the grade shift
+
+  <span class="math-inline">x ↦ 0x</span>
+  — a genuine <span class="math-inline">ℤ</span>-action, invertible, what §9's opening paragraph means by "changing the grade."<br>
+    <strong>L</strong>, the lift
+
+  <span class="math-inline">t ↦ 0^t</span>
+  — which converts a <em>value</em> into a <em>grade</em>, and whose orbit set is the four boundary points.
+</p>
+    <p>
+  <span class="math-inline">L</span> is the one that earns the phrase "hyperoperational alignment," and conjugation is the mechanism.
+  Since
+
+  <span class="math-inline">L(s+t) = L(s)L(t)</span>,
+</p>
+    <div class="math" style="background:#fff">L σ L⁻¹ (t)  =  t^0</div>
+    <p>
+  multiply-by-<span class="math-inline">0</span> conjugates into raise-to-the-<span class="math-inline">0</span>: the same operation one rung up the hyperoperation ladder.
+  That is what the
+
+  <span class="math-inline">Z₁(0x) = 0^(0x)</span>
+  row of my sketch was reaching for.
+</p>
+    <p>
+  <strong>The payoff, and the reason this box exists.</strong> As a permutation,
+
+  <span class="math-inline">Z₋₁² = (1 &nbsp;−1)(0 &nbsp;ω)</span>
+  — which is the
+
+  <span class="math-inline">cos ↔ cosh</span>
+  swap, i.e.
+  Osborn's involution, i.e.
+  the real-form Galois twist of §7.
+  So <span class="math-inline">Z₋₁</span> is a <em>square root of the real-form twist</em>, and it can only exist because <span class="math-inline">ω</span> is first-class:
+
+  <span class="math-inline">{−1, 0, 1}</span>
+  has no room for an element of order 4.
+  And since
+
+  <span class="math-inline">ω^t = 0^(−t)</span>, that square root is exactly the failure of the exponential lift to commute with negation-in-the-exponent — where negation in the exponent is the Cayley–Dickson bar of §10.
+  Osborn's sign, the doubling conjugation, and <span class="math-inline">Z₋₁</span> look like one object seen three ways.
+  Tagged Wild because "look like" is doing real work in that sentence; the permutation computation itself is elementary and checkable.
+</p>
+  </div>
+
+  <h2 id="s10"><span class="num">10</span> The other turn of the screw: the doubling constant</h2>
+
+  <p>
+  The sum was mean-plus-correction.
+  The multiplication has the same shape, with the same parameter setting it, and this is the identification I'd defend hardest of anything new in the document.
+</p>
+
+  <p>
+  Take the Cayley–Dickson doubling rule with parameter <span class="math-inline">γ</span> — the bar is the involution of the level below, sign conventions vary:
+</p>
+
+  <div class="math">(a, b)(c, d)  =  ( a·c − γ·d·b̄ ,  ā·d + c·b )</div>
+
+  <p>
+  Look at the second slot.
+
+  <span class="math-inline">ād + cb</span>
+  is the numerator of a fraction addition:
+
+  <span class="math-inline">b/a + d/c = (bc + ad)/(ac)</span>, and the denominator <span class="math-inline">ac</span> is the leading term of the <em>first</em> slot.
+  So read
+
+  <span class="math-inline">(a, b)</span>
+  as the ratio
+
+  <span class="math-inline">t = b/a</span>, and multiplication by
+
+  <span class="math-inline">(c, d)</span>
+  acts as
+
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <div class="math">t  ⟼  (t + τ) / (1 − γ·τ·t),        τ = d/c</div>
+
+  <p>
+  Fraction addition in both slots, with the doubling parameter entering only as a correction to the denominator.
+  And the rungs are the same three:
+
+  <span class="math-inline">γ = 1</span>
+  is the <span class="math-inline">tan</span> addition law,
+
+  <span class="math-inline">γ = −1</span>
+  is <span class="math-inline">tanh</span>, and
+
+  <span class="math-inline">γ = 0</span>
+  leaves
+
+  <span class="math-inline">t ↦ t + τ</span>
+  — pure addition of ratios, correction gone.
+  §6's
+
+  <span class="math-inline">cos / 1 / cosh</span>
+  has become
+
+  <span class="math-inline">tan / slope / tanh</span>, one Osborn sign per pair of odd parts, exactly as before.
+</p>
+
+  <p>
+  <strong>Which means the phase reading is a computation, not a metaphor.</strong>
+
+  <span class="conf c-solid">Solid</span> The action is fractional-linear, so the sign of <span class="math-inline">γ</span> is the conjugacy class of a one-parameter subgroup of
+
+  <span class="math-inline">PGL₂(ℝ)</span>: rotation, shear, boost.
+  Explicitly, left multiplication is the matrix
+
+  <span class="math-inline">[[c, −γd], [d, c]]</span>, and
+</p>
+
+  <div class="math">tr² − 4·det  =  4c² − 4(c² + γd²)  =  −4γd²</div>
+
+  <p>
+  The Cayley–Dickson doubling parameter <em>is</em> the Möbius discriminant, up to a positive factor.
+  Normalize to
+
+  <span class="math-inline">det = 1</span>
+  and it is
+
+  <span class="math-inline">s² − 4</span>
+  with <span class="math-inline">s</span> the trace variable of §7 — the
+
+  <span class="math-inline">u² − su + 1</span>
+  ring, again.
+  <strong>The doubling constant and the Chebyshev discriminant are the same scalar wearing two hats.</strong> And the words <em>elliptic</em>, <em>parabolic</em>, <em>hyperbolic</em>, which I have been using since §6 as if they were a loose analogy to conic sections, are the Möbius classification — which classifies by trace.
+</p>
+
+  <p>
+  So the two halves of the document close on each other:
+</p>
+
+  <div class="math">e^x + e^y   =  2·cosh((x−y)/2) · e^((x+y)/2)        mean + correction,     additively
+
+(a,b)(c,d)  =  fraction-addition + correction                                 multiplicatively</div>
+
+  <p>
+  with one <span class="math-inline">γ</span> setting both corrections.
+  Two turns of the same screw.
+  That does not <em>prove</em> §11's sum-versus-mean identification — that one stays tagged where it is — but it is the first time the additive and multiplicative sides have been shown to be governed by a shared scalar rather than by a shared vibe.
+</p>
+
+  <p>
+  <strong>Why the doubling step, and not the tower.</strong>
+
+  <span class="conf c-plausible">Plausible</span> The reason to care about Cayley–Dickson here is not the sequence of algebras it produces; it's that the rule is an <em>endofunctor</em> — its output has its own input type, so it needs
+
+  <span class="math-inline">(ℝ, id)</span>
+  and one rule and everything after is iteration.
+  Clifford, by contrast, is a functor <em>from</em> quadratic spaces: you must hand it a form before it does anything, which is why §6's "Clifford is the classification" is praise of a classification of <em>input data</em>.
+  Those are different kinds of generativity and neither dominates.
+  What makes the doubling rule self-applicable is the involution, and the involution is what makes the ratio reading literal: in a composition algebra
+
+  <span class="math-inline">ā = N(a)/a</span>, so conjugation <em>is</em> inversion up to norm, and the new direction sees the old algebra through its reciprocal.
+  The two cross terms accumulate phase in opposite senses; the diagonal term is the level's own product.
+  Prior art, and it is stronger than I expected: Albuquerque–Majid show the whole tower is sign bookkeeping on
+
+  <span class="math-inline">(ℤ/2)ⁿ</span>, each algebra a group algebra twisted by a cochain, with octonion non-associativity appearing as an associator cocycle that fails to close — a phase that doesn't cancel around a loop.
+  Accumulating phases as a theorem, with the obstruction itself phase-valued.
+</p>
+
+  <div class="aside">
+    <span class="tag">Where the ratio reading lapses — two places, not one <span class="conf c-solid">Solid</span></span>
+    The fractional-linear action above is exact only at level one, where the involution is trivial. Higher up, the bars in <span class="math-inline">ād + cb</span> sit asymmetrically, so the action is <em>semilinear</em> and "ratio" means a twisted projective coordinate rather than a fraction. At level two it is still a group action: <span class="math-inline">b/a ∈ ℙ¹(ℂ) = S²</span>, unit quaternions acting through <span class="math-inline">SU(2) → SO(3)</span>, which is the Hopf fibration. At level three it is not an action at all — non-associativity kills it — even though <span class="math-inline">ā = N(a)/a</span> still holds in <span class="math-inline">𝕆</span>. At level four it fails for a subtler reason than I first wrote, and the exact tower forced the correction. Sedenion zero divisors do <em>not</em> have <span class="math-inline">N(a) = 0</span>: the pair the search turned up, <span class="math-inline">e₁ + e₁₀</span> and its partner, have norm <span class="math-inline">2</span> and genuine reciprocals. What fails is <em>composition</em> — <span class="math-inline">N(ab) = 0</span> while <span class="math-inline">N(a)N(b) = 4</span> — so a zero divisor coexists with an invertible norm, and cancellation dies not for want of a reciprocal but because non-associativity forbids it: <span class="math-inline">a⁻¹(ab) ≠ (a⁻¹a)b</span>. So the <em>phase-composition</em> reading dies at the octonions, and the <em>reciprocal</em> reading survives even the sedenions; what the sedenions kill is the multiplicativity of the norm. "Recursive ratio of accumulating phases" is coextensive with <em>composition</em> — Hurwitz's list, levels 0 through 3 — not with the rule, which runs forever regardless. Which is the argument for keeping the doubling <em>step</em> as a primitive and declining the commitment to iterate it into a regime where ratios stop existing.
+    <p>
+  One asymmetry that matters more here than it would elsewhere: standard Cayley–Dickson wants <span class="math-inline">γ</span> invertible, so that the norm stays multiplicative.
+  Force
+
+  <span class="math-inline">γ = 0</span>
+  and you get the degenerate rung formally, but composition dies and with it the whole point of the construction.
+  Clifford takes degenerate forms natively and seats them in the classification as equal citizens.
+  Since first-class degeneracy is this program's entire thesis, that is decisive for <em>this</em> document — and not a verdict on either construction, which answer different questions.
+  Norm multiplicativity and the exceptional structures: Cayley–Dickson.
+  Quadratic forms, scalar squares, degenerate directions, closed-form transcendentals: Clifford.
+</p>
+  </div>
+
+  <p>
+  <em>One thing that survives non-associativity, since it looks like it shouldn't:</em> <span class="math-inline">cosh</span> itself.
+  Octonions are alternative, hence power-associative, so <span class="math-inline">xⁿ</span> is unambiguous and the series is well-defined; and any single element generates a commutative associative subalgebra.
+  So for pure imaginary <span class="math-inline">x</span> with
+
+  <span class="math-inline">x² = −|x|²</span>, the closed form
+
+  <span class="math-inline">cosh x = cos|x|</span>
+  holds intact.
+  What breaks in that setting is the <em>sum</em> identity of §6 — and it breaks on commutativity, not associativity, since the factoring needs the mean and the half-difference to commute.
+  In a composition algebra that means collinear imaginary parts.
+</p>
+
+  <h2 id="s11"><span class="num">11</span> The striking part — the dial already knew 0 and ω</h2>
+
+  <p>
+  This is why I bothered to write it down, and I'll take it one identification at a time, in rising order of how much I'd wager.
+</p>
+
+  <p>
+  <strong>The additive zero flips at the reciprocal.</strong>
+
+  <span class="conf c-solid">Solid</span> Theorem 2 says the identity of the addition jumps from <span class="math-inline">0</span> to <span class="math-inline">ω</span> exactly as <span class="math-inline">p</span> crosses zero.
+  But <span class="math-inline">0</span> and <span class="math-inline">ω</span> are not two arbitrary elements — they are <em>the</em> reciprocal pair, the fixed content of the entire program, the two poles that
+
+  <span class="math-inline">1/0 = ω</span>
+  welds together.
+  The addition's choice of zero is governed by the same
+
+  <span class="math-inline">0 ↔ ω</span>
+  involution the multiplication was built on.
+  The sign of the addition-parameter <em>is</em> the reciprocal, read off the additive side.
+</p>
+
+  <p>
+  <strong>Sum-versus-mean is the additive/multiplicative differential, again.</strong>
+
+  <span class="conf c-plausible">Plausible</span> The second document's spine was that there are exactly two differentials — additive <span class="math-inline">D</span> and multiplicative <span class="math-inline">θ</span> — because there are exactly two one-parameter groups on the line, bridged by <span class="math-inline">exp</span>/<span class="math-inline">log</span>.
+  Here the very same polarity returns as an operational fact: <span class="math-inline">×</span> <em>sums</em> the grade, the phase-<span class="math-inline">+</span> <em>averages</em> it.
+  Sum and mean are the additive and multiplicative faces of grade-combination.
+  The
+
+  <span class="math-inline">[D, θ]</span>
+  non-commutation and the sum/mean split are, I'm fairly sure, one structure seen at two altitudes.
+  §10 firms up the mechanism without settling the claim: the additive correction and the multiplicative one are set by the same scalar <span class="math-inline">γ</span>, so whatever relates sum to mean is at least carried by a shared parameter rather than by resemblance.
+</p>
+
+  <p>
+  <strong>The addition and the residue keep the same ledger entry.</strong>
+
+  <span class="conf c-plausible">Plausible</span> Grade <span class="math-inline">−1</span> is <span class="math-inline">ω</span>.
+  It is where antidifferentiation hands off to <span class="math-inline">log</span> (the second document's one honest failure), where the residue lives, where contour integration deposits its receipt.
+  And it is where the negative-<span class="math-inline">p</span> additions keep their zero.
+  The pole that catches the residue and the pole that anchors reciprocal addition are the <em>same</em> pole.
+  Traction promised it would file every loss as a receipt at a boundary element; here the additive identity and the residue turn out to be receipts filed at the same address.
+</p>
+
+  <p>
+  <strong>The correction factor was the Chebyshev trace all along.</strong>
+
+  <span class="conf c-solid">Solid</span> This is the one that made me rewrite the document.
+  The magnitude of the §5 sum is
+
+  <span class="math-inline">u + u⁻¹ = s</span>, the trace variable of the Chebyshev ring
+
+  <span class="math-inline">ℚ[s][u]/(u² − su + 1)</span>
+  — and the discriminant deciding which regime it sits in is
+
+  <span class="math-inline">s² − 4</span>, which §10 identifies with the Cayley–Dickson doubling constant.
+  Three things I built in separate sittings for separate reasons — the graded exponent's sum, the Chebyshev tower, the doubling parameter — are one scalar and its trace.
+  I did not arrange that, and I can't find the place where I smuggled it in.
+</p>
+
+  <p>
+  <strong>The half-grade does a second job.</strong>
+
+  <span class="conf c-plausible">Plausible</span>
+
+  <span class="math-inline">i = 0^(ω/2)</span>
+  came out of the first document as a boundary consequence of
+
+  <span class="math-inline">0^ω = −1</span>
+  — an algebraic fact with no obvious operational content.
+  §9 arrives at the same half-value from the opposite direction: <span class="math-inline">ω/2</span> is the unique grade at which the correction term can vanish, hence the grade at which <em>cancellation exists</em>.
+  Same value, two unrelated derivations, and the second one is about addition, which is the thing this document went looking for.
+  If there is a reason the program keeps landing on <span class="math-inline">ω/2</span>, I don't have it yet; I have two arrows pointing at it.
+</p>
+
+  <p class="pull">
+  Zero was a unit seen edge-on.
+  Addition, it turns out, is a whole dial of operations seen at one setting — and we mistook the setting for the operation.
+</p>
+
+  <p>
+  <strong>And the largest reach.</strong>
+
+  <span class="conf c-wild">Wild</span> The first document's core heresy was that <span class="math-inline">0</span> is provincial — the additive slice mistook a single projection for the whole.
+  Theorem 1 says the same sentence one level up.
+  Ordinary <span class="math-inline">+</span> is provincial: it is the rung
+
+  <span class="math-inline">p = 1</span>
+  of a family that multiplication cannot tell apart, since it distributes over all of them equally.
+  We didn't just pick a chart for zero; we picked a chart for <em>addition itself</em> and forgot it was a choice.
+  If that reading holds, the free structure upstream of classical algebra has to be silent about which <span class="math-inline">p</span> is "the" sum — the dial is the un-projected object, and every particular addition, harmonic or ordinary or quadrature, is one more shadow of it.
+  I have no theorem forcing that last sentence.
+  I have a dial that behaves exactly as if it were true.
+</p>
+
+  <h2 id="s12"><span class="num">12</span> The phase that doesn't close</h2>
+
+  <p>
+  Three documents have circled one image without ever holding it: the residue's <span class="math-inline">2πi</span>, a thing that goes around a loop and comes back changed; the arrow of time as accumulated order; the octonion associator that "fails to close — a phase that doesn't cancel around a loop." I have used that last phrase as if it were a figure of speech.
+  It is not, and the octonions are where it stops being a smell and becomes a number you can compute exactly.
+</p>
+
+  <p>
+  <strong>The associator is a monodromy — proven, not asserted.</strong>
+
+  <span class="conf c-solid">Solid</span> The Cayley–Dickson algebras are
+
+  <span class="math-inline">(ℤ/2)ⁿ</span>-graded: the product of two basis units is a sign times the unit at the XOR of their indices,
+
+  <span class="math-inline">e_j·e_k = β(j,k)·e_{j⊕k}</span>.
+  The sign cochain <span class="math-inline">β</span> has a coboundary, and that coboundary is the associator sign
+</p>
+
+  <div class="math">f(i,j,k)  =  β(i,j)·β(i⊕j,k)·β(j,k)·β(i,j⊕k)   ∈   {+1, −1}</div>
+
+  <p>
+  which is <span class="math-inline">+1</span> when a triple reassociates and <span class="math-inline">−1</span> when it picks up a sign.
+  Three properties, each checked exactly over <span class="math-inline">ℚ</span> in the solver:
+</p>
+
+  <div class="math">closed:            δf = 1  on all 4096 loops
+gauge-invariant:   f unchanged under all 256 basis re-signings
+born at 𝕆:         quaternions  0/64  anti-associate;   octonions  168/512</div>
+
+  <p>
+  The middle line is the one that earns the word <em>monodromy</em>.
+  Re-sign the octonion basis any of the <span class="math-inline">2⁸</span> ways and <span class="math-inline">f</span> is identical — every time.
+  You cannot relabel it away; it is not an artifact of a chart.
+  It is holonomy: what a triple product picks up when it is carried around the loop
+
+  <span class="math-inline">i → j → k</span>, independent of the frame you measure it in.
+  And it is trivial through the quaternions and first nonzero at the octonions — the loop lies flat until the third doubling, and then it doesn't.
+</p>
+
+  <p>
+  <strong>Its only nontrivial value is <span class="math-inline">−1</span>.</strong>
+
+  <span class="conf c-solid">Solid</span> Not a generic sign — the half-turn,
+
+  <span class="math-inline">0^ω = e^(iπ)</span>, the element the first document read out of the invertible zero.
+  The obstruction to octonion associativity is valued in the same <span class="math-inline">−1</span> the whole program is built from.
+</p>
+
+  <p class="pull">
+  The tree, the residue, and the arrow were the same loop all along — the octonions are just the smallest room it fits in.
+</p>
+
+  <p>
+  <strong>Set it beside the residue.</strong>
+
+  <span class="conf c-plausible">Plausible</span>
+
+  <span class="math-inline">∮ dz/z = 2πi</span>
+  is the monodromy of <span class="math-inline">log</span> around the pole: go around once, return changed by <span class="math-inline">2πi</span>.
+  That phase is <span class="math-inline">ℤ</span>-valued — <span class="math-inline">2πi</span> times a winding number.
+  The associator is the same kind of object — gauge-invariant holonomy around a loop of a structure that is not flat — but <span class="math-inline">ℤ/2</span>-valued: one sign, and the sign is
+
+  <span class="math-inline">0^ω = −1 = e^(iπ)</span>, which is half of the residue's full turn.
+  So the claim is not that they are the same number.
+  It is that the associator is the <em>mod-2 reduction</em> of the residue's winding — the finite avatar of one pole-monodromy, both generated by <span class="math-inline">0^ω</span>.
+  The residue counts the turns; the associator remembers only their parity.
+  One loop, two coefficient depths.
+</p>
+
+  <p>
+  <strong>And the third face.</strong>
+
+  <span class="conf c-wild">Wild</span> The second document argued time is retained order — phase accumulated across non-commuting operations, the thing commutativity forgets.
+  Non-associativity is order retained one level deeper: not which sequence, but which bracketing.
+  So the associator that doesn't close is directedness in the small — the same directedness the residue winds and the arrow accumulates.
+  One operator, three names, and for the first time a place where it is a specific, gauge-invariant, exactly-computable <span class="math-inline">−1</span> rather than a persistent intuition.
+  What remains is to prove the <span class="math-inline">ℤ/2</span> sign and the <span class="math-inline">ℤ</span> winding are two faces of one monodromy and not merely analogous — and that is the decade, not the afternoon.
+  But the afternoon got the first rung, and the rung is real.
+</p>
+
+  <h2 id="s13"><span class="num">13</span> The honest ledger</h2>
+
+  <p>
+  What is actually proven, so the tags mean something.
+  The dial <span class="math-inline">S_p</span>, its associativity, Theorem 1 (distributivity for all <span class="math-inline">p</span>), and Theorem 2 (the sign picks the zero) are <em>done</em> — ordinary algebra, no conjecture.
+  The reciprocal field of §4 and the phase identity of §5 are exact.
+  From the second pass, also done and merely elementary: the universal factoring of §6, the fact that
+
+  <span class="math-inline">cosh = f(x²)</span>
+  and therefore sees only the square, the identification of the three regimes with the rank-one Clifford algebras, Osborn's rule as one discriminant factor per pair of odd parts, the correction factor as the Chebyshev trace <span class="math-inline">s</span>, the grade-1 collapse to a pure average, the non-existence of a fourth regime at <span class="math-inline">ω</span>, the fractional-linear form of the doubling rule, and
+
+  <span class="math-inline">tr² − 4det = −4γd²</span>.
+  From the third pass, also done and elementary: that the two dials are the independent generators of a Klein four-group on the four boundary points, and that the real-form twist is their product
+
+  <span class="math-inline">R∘U = Z₋₁²</span>.
+  From the fourth pass, checked exactly in the testbed: that carrying a Laurent germ restores <span class="math-inline">⊕</span> to total, associative behaviour at every grade; that the harmonic addition
+
+  <span class="math-inline">(a⁻¹ + b⁻¹)⁻¹</span>
+  stays commutative and associative at every level of the Cayley–Dickson tower; and that <span class="math-inline">×</span> distributes over it exactly through the composition algebras and no further.
+  From the fifth pass, checked exactly: that the octonion associator is a closed, gauge-invariant <span class="math-inline">ℤ/2</span> cocycle — a monodromy — identically trivial on the quaternions and first nonzero at the octonions, valued in
+
+  <span class="math-inline">0^ω = −1</span>.
+  This document is, by the standards of the first two, embarrassingly well-founded.
+</p>
+
+  <p>
+  <strong>What I retract.</strong>
+
+  <span class="conf c-solid">Solid</span> Two readings from the first pass were wrong and are now removed rather than softened.
+  <em>First:</em> that the hyperbolic regime is the substantive one.
+  It diagonalizes to
+
+  <span class="math-inline">ℝ ⊕ ℝ</span>, so it is the real identity run twice, and my remark that its zero divisors fail to produce cancellation reduces to the observation that two positive reals don't sum to zero — positivity of <span class="math-inline">exp</span> in a costume.
+  <em>Second:</em> that direction-dependent signature is a distinguishing virtue of the Cayley–Dickson route.
+  It isn't a property of the construction at all; split-quaternions have it as an algebra and are equally
+
+  <span class="math-inline">Cl(1,1)</span>.
+  Both errors have the same shape — crediting a construction with a feature of the object it happened to reach — which is a failure mode I should expect from myself now.
+</p>
+
+  <p>
+  What is a bet, not a proof:
+</p>
+
+  <p>
+  <strong>Which survivor is the addition.</strong>
+
+  <span class="conf c-plausible">Plausible</span> §4 (harmonic, <span class="math-inline">≅ ℝ</span>, keeps <span class="math-inline">0</span> and <span class="math-inline">ω</span> as poles) and §5 (phase, <span class="math-inline">≅ ℂ</span>, demotes them to <span class="math-inline">±i</span>) are different objects, not two charts of one.
+  I lean toward §5 as canonical because it honors
+
+  <span class="math-inline">i = 0^(ω/2)</span>
+  — and §9 sharpens that lean, since <span class="math-inline">ω/2</span> turns out to be where cancellation lives — but I still can't derive one from the other, and "the theory should adopt exactly one" may be the wrong demand.
+  What §7 <em>does</em> settle, and I want the scope stated exactly: <em>given</em> the phase chart, the elliptic real form is forced by compactness rather than chosen by taste.
+  That is a claim about which of three regimes, not about which of two survivors.
+  §4 versus §5 is untouched.
+</p>
+
+  <p>
+  <strong>Are the two dials independent?
+  — settled, and they are.</strong>
+
+  <span class="conf c-solid">Solid</span> This was the most tractable of the open questions, and it fell to an elementary permutation.
+  Each dial's sign-flip acts on the four boundary points as an involution: the <span class="math-inline">p</span>-dial's is
+
+  <span class="math-inline">R = (0&nbsp;ω)</span>, the reciprocal — it swaps the additive zero and fixes the units; the discriminant's is
+
+  <span class="math-inline">U = (1&nbsp;−1)</span>
+  — it swaps <span class="math-inline">cos</span> and <span class="math-inline">cosh</span> and fixes the poles.
+  <span class="math-inline">R</span> and <span class="math-inline">U</span> move <em>disjoint</em> pairs, so they commute and neither drags the other: they are the two independent generators of a Klein four-group
+
+  <span class="math-inline">ℤ/2 × ℤ/2</span>.
+  The suspicious shared feature — both are real parameters whose sign flips an identity — is real, but it is not a relation between the dials; it is the two of them being the two axes of one <em>flat</em> product.
+  And the operator that made them look entangled is now named: the real-form twist of §7 is their diagonal,
+
+  <span class="math-inline">R∘U = Z₋₁²</span>, built from both, which is exactly why it surfaced wherever either dial did.
+  So §8's title stands and its instinct was right.
+  The "one surface" the first draft feared does exist — it is just flat, and its two coordinates never mix.
+</p>
+
+  <p>
+  <strong>The parity of <span class="math-inline">ω</span>.</strong>
+
+  <span class="conf c-plausible">Plausible</span> §9 forces <span class="math-inline">ω</span> even, in the same way and with the same status as
+
+  <span class="math-inline">0^ω = −1</span>.
+  I don't think that is free, and I don't think it is harmless.
+  It should be derived from the completion or admitted as a second imposed parity, and until one of those happens it is a debt, not a result.
+</p>
+
+  <p>
+  <strong>The <span class="math-inline">Z</span> operators need rewriting, not repairing.</strong>
+
+  <span class="conf c-plausible">Plausible</span> §9's box shows the family I was sketching is two operators — the grade shift <span class="math-inline">σ</span> and the lift <span class="math-inline">L</span> — glued under one index that cannot be consistent, since an involution cannot invert a 4-cycle.
+  The right move is to present them separately, with
+
+  <span class="math-inline">L σ L⁻¹(t) = t^0</span>
+  as the bridge, and let the hyperoperation ladder be a <em>consequence</em> of the conjugation rather than a table I fill in by hand.
+  That the resulting <span class="math-inline">Z₋₁</span> squares to Osborn's involution is the part I'd most like to be real, and is exactly the part I've checked least.
+</p>
+
+  <p>
+  <strong>The grade tower stopped biting — it was a truncation.</strong>
+
+  <span class="conf c-solid">Solid</span> The exact field lives at grades
+
+  <span class="math-inline">{−1, 0, +1}</span>, and I had it that <span class="math-inline">⊕</span> could not act on
+
+  <span class="math-inline">|grade| ≥ 2</span>
+  because double-pole cancellation "sends the remainder to an unknowable grade." That was the
+
+  <span class="math-inline">(coeff, grade)</span>
+  chart carrying a single term.
+  Carry the whole germ — a truncated Laurent series, exact — and the tear vanishes: <span class="math-inline">⊕</span> is total and associative at every grade, because
+
+  <span class="math-inline">ℝ((ε))</span>
+  is an honest field.
+  The sharp statement is that leading-term <span class="math-inline">⊕</span> is already associative generically and tears <em>only</em> at cancellation, and a germ of length <span class="math-inline">N</span> resolves a cancellation of depth <span class="math-inline">M</span> exactly when
+
+  <span class="math-inline">N &gt; M</span>.
+  So the "unknowable remainder" was never unknowable — it was discarded.
+  The boundary was a chart artifact, not a wall.
+</p>
+
+  <p>
+  <strong>The distribution law across the whole tower — run, and answered.</strong>
+
+  <span class="conf c-solid">Solid</span> The experiment I called next got done, exactly, in the Cayley–Dickson tower over <span class="math-inline">ℚ</span>, and the result is cleaner than either branch I feared.
+  The harmonic addition
+
+  <span class="math-inline">⊕ = (a⁻¹ + b⁻¹)⁻¹</span>
+  stays commutative <em>and</em> associative at <em>every</em> level — through non-commutative <span class="math-inline">ℍ</span>, non-associative <span class="math-inline">𝕆</span>, and the zero-divisor <span class="math-inline">𝕊</span> — because it is built from <span class="math-inline">+</span> and the inversion involution and never touches the product's commutativity or associativity.
+  The one thing that breaks is <span class="math-inline">×</span> distributing over it, and it breaks at exactly one level: the sedenions, where the norm stops being multiplicative.
+</p>
+
+  <table>
+    <tr><th>algebra</th><th>× comm</th><th>× assoc</th><th>N mult</th><th>⊕ comm</th><th>⊕ assoc</th><th>× dist ⊕</th></tr>
+    <tr><td>ℝ</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+    <tr><td>ℂ</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+    <tr><td>ℍ</td><td>✗</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+    <tr><td>𝕆</td><td>✗</td><td>✗</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+    <tr><td>𝕊</td><td>✗</td><td>✗</td><td>✗</td><td>✓</td><td>✓</td><td>✗</td></tr>
+  </table>
+
+  <p>
+  So the question is settled, and both of its horns were wrong.
+  The dial is not "a structure on all of traction" in the naïve sense, nor "a fact about the field and nothing larger." Its <em>addition</em> is a fact about the whole tower; its <em>distributivity with</em> <span class="math-inline">×</span> is a fact about the composition algebras — Hurwitz's four,
+
+  <span class="math-inline">ℝ, ℂ, ℍ, 𝕆</span>
+  — and it fails precisely where composition does.
+  Which is the same boundary read a third way: the phase that stops cancelling, the norm that stops multiplying, the associator that stops closing.
+  The link between the dial and multiplication is exactly as wide as Hurwitz's theorem, and no wider.
+</p>
+
+  <h2 id="name"><span class="num">14</span> On the name</h2>
+
+  <p>
+  The reciprocal sum has a name in engineering — harmonic addition, parallel combination — and borrowing it would undersell what's going on, the same way "Void Calculus" undersold the pole.
+  The engineering name is one rung.
+  The object is the dial.
+</p>
+
+  <p>
+  My quiet preference is to name the dial and let the rungs stay descriptive: call the family the <strong>grade sum</strong> — the parameterized operation that combines grades, additively at
+
+  <span class="math-inline">p &gt; 0</span>
+  and reciprocally at
+
+  <span class="math-inline">p &lt; 0</span>, with multiplication as its <span class="math-inline">log</span>-conjugate sibling.
+  Then "addition" and "harmonic addition" are just the
+
+  <span class="math-inline">p = +1</span>
+  and
+
+  <span class="math-inline">p = −1</span>
+  readings, and neither gets to pretend it's the whole thing.
+  If <em>Mirror Calculus</em> is the name for the
+
+  <span class="math-inline">0 ↔ ω</span>
+  involution as it acts on the differentials, then the grade sum is that same mirror acting on the sums — the reflection that carries <span class="math-inline">p</span> to <span class="math-inline">−p</span> and, with it, the additive zero from one pole to the other.
+</p>
+
+  <p>
+  The second pass thought it had found a third mirror.
+  The third pass can say what the mirrors actually are, and the count was the tell.
+
+  <span class="conf c-solid">Solid</span> There are three reflections in play — <em>Mirror Calculus</em> on the differentials, the <em>grade sum</em> on the additions, and Osborn's twist on the real forms — and the tempting first sentence was that all three are one
+
+  <span class="math-inline">0 ↔ ω</span>
+  swap seen in different slots.
+  That sentence is wrong, and pleasantly so.
+  §13 shows the reflections are the three non-identity elements of a Klein four-group, and a Klein four-group is generated by <em>two</em> involutions, not one: the reciprocal
+
+  <span class="math-inline">(0&nbsp;ω)</span>
+  and the unit-swap
+
+  <span class="math-inline">(1&nbsp;−1)</span>.
+  The real-form twist is not a third independent mirror — it is the product of the other two,
+
+  <span class="math-inline">(1&nbsp;−1)(0&nbsp;ω) = Z₋₁²</span>.
+  So the object the program is circling is not a single swap worn in three slots; it is a <em>pair</em> of independent swaps, and everything named so far is one of them or their composite.
+  That is a better answer than the one I was reaching for, because it is finite, checkable, and forces the fourth element: an order-4 root of the twist, <span class="math-inline">Z₋₁</span>, which the pole <span class="math-inline">ω</span> makes room for and the reals
+
+  <span class="math-inline">{−1, 0, 1}</span>
+  cannot.
+</p>
+
+  <div class="foot">
+    <p>
+  Companion to <em>What Falls Out of an Invertible Zero</em> and <em>The Calculus of the Pole.</em> Where the first defended the algebra and the second explored where it points, this one went looking for the operation both of them left out — and found that the search terminates at the same two poles everything else in the program orbits.
+  The second pass then found that the correction term of the sum, the trace variable of the Chebyshev tower, and the Cayley–Dickson doubling constant are one scalar, and that two of my earlier readings were crediting constructions with properties of the objects they reached.
+  The third pass settled the last open structural question — the two dials are the independent generators of a Klein four-group, and the twist that related them is their product.
+  The fourth pass carried both dials into the Cayley–Dickson tower and found that the harmonic addition survives all of it while its distributivity with multiplication is bounded by Hurwitz's theorem — and corrected an earlier claim about why the sedenions fail.
+  The fifth pass found the associator to be an exact, gauge-invariant monodromy valued in
+
+  <span class="math-inline">0^ω = −1</span>, and set it beside the residue's <span class="math-inline">2πi</span> as the same loop one coefficient level down — the seam where the three documents fuse.
+  Each of those came out of being argued with, which is the recommended method.
+</p>
+    <p>
+  Working notes, the Chebyshev tower, Mirror Calculus, and the COTT solver: <strong>sibarum.github.io/cott</strong>.
+  Distilled from an extended conversation, in the author's framing, with modern-mathematics context supplied where asked and flagged as such.
+  The proven parts are proven; the tagged parts are tagged.
+  Counterexamples remain more welcome than agreement — a good one is information, and information is the one thing we've promised never to waste.
+  CC BY 4.0.
+</p>
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

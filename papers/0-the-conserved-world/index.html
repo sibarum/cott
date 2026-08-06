@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Conserved World — Beige Papers</title>
+
+<!-- Branding fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<!-- Math fonts (load-bearing for the expression renderer) -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="kicker">Constructive Operational Type Theory &middot; Traction Theory</div>
+    <h1>The Conserved World</h1>
+    <p class="sub">
+      Refuse to destroy information, and everything else is forced: the reciprocal of zero, the imaginary unit, the addition dial, the residue, the monodromy — and, at the end of the same thread, the difference between a reversible calculation and a one-way one.
+    </p>
+    <div class="byline">
+      DoozerDiffuser · sibarum.github.io/cott · the connected argument behind <em>What Falls Out of an Invertible Zero</em>, <em>The Calculus of the Pole</em>, <em>The Sum That Chooses Its Own Zero</em>, and <em>The Chart You Can't Write Down</em>
+    </div>
+    <div class="disclaimer">
+      <strong>One thread, not a highlights reel.</strong> The four companion documents are the expeditions — the false starts and the tests that failed and taught something. This is the theory itself, stated as a single derivation: start from one demand and let each step force the next. The journey is stripped out; the <em>logic</em> is kept, because the logic is what makes it a theory rather than a list of results. Confidence is not a filing system here — it is the altitude. The argument begins on proven ground and climbs; it thins as it rises, and every claim is marked with where it stands, so you can see exactly where the rock ends and the rope begins.
+      <div class="legend">
+        <span class="conf c-solid">Solid — proven, or machine-checked</span>
+        <span class="conf c-plausible">Plausible — load-bearing, unproven</span>
+        <span class="conf c-wild">Wild — where the thread points, past its proof</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="lead">
+  The whole theory is the consequence of a single refusal.
+  Insist that no operation ever destroy information — that every operation be total and every operation reversible — and you are not making a wish; you are removing a permission the rest of mathematics quietly grants itself.
+  What follows is what the removal forces, taken one implication at a time, from an axiom you could write on a coin to a frontier where the same structure turns out to be cryptography, and possibly time.
+</p>
+
+  <h2><span class="num">I</span> The one demand, and the one crime</h2>
+
+  <p>
+  "Total" and "reversible" are not properties of numbers; they are properties of operations.
+  So the honest way to define a world is to stop asking what counts as a number and instead ask which operations it is closed under <em>without loss</em>.
+  That single reframing is the whole starting move, and it immediately indicts a suspect no one usually names.
+</p>
+
+  <p>
+  Everyone knows division by zero is the problem child.
+  But <em>multiplication</em> by zero is guilty of the exact crime reversibility forbids:
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <div class="math">a = b   ⟶   0·a = 0·b   ⟶   0 = 0</div>
+
+  <p>
+  That step is legal — the same thing done to both sides — and it vaporized everything you knew.
+  Division failing to be <em>total</em> gets a century of fuss; multiplication failing to be <em>reversible</em> gets silence, because we decided that particular destruction was acceptable.
+  Under the demand it is not.
+  And the axiom responsible has a name: <strong>absorption</strong>,
+  <span class="math-inline">0·a = 0</span>, the rule that lets zero eat whatever it touches.
+  The entire program is what happens when you delete that one line and refuse to delete anything else.
+</p>
+
+  <h2><span class="num">II</span> Zero is forced open, and the imaginary unit falls out</h2>
+
+  <p>
+  Remove absorption and the prohibition on <span class="math-inline">1/0</span> loses its foundation — because the impossibility of a reciprocal for zero is a <em>theorem</em>, and its proof uses absorption.
+  Take away the premise and the reciprocal falls into the hole it left:
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <div class="math">1/0 := ω ,        0 · ω = 1 ,        0/0 = 1,   x/x = 1  with no exception</div>
+
+  <p>
+  Nothing was added.
+  A restriction was removed, and the reciprocal was already implied.
+  That subtractive character is worth marking, because it recurs: at every stage the new object is not posited but <em>uncovered</em> once a frozen constraint is lifted.
+</p>
+
+  <p>
+  <strong>And <span class="math-inline">ω</span> is not infinity.</strong>
+  <span class="conf c-solid">Solid</span> This is the seam the whole "no limits" claim rests on, so draw it sharply.
+  <span class="math-inline">∞</span> is <em>analytic</em>: the endpoint of a process, the limit of unbounded <em>magnitude</em>, the point completion adds to the reals and that one only ever approaches.
+  <span class="math-inline">ω</span> is <em>symbolic</em>: a unit magnitude at an <em>angle</em> — the conjugate direction to <span class="math-inline">0</span> — fixed by an algebraic law and reached by no process.
+  Infinity runs off the end of a line; <span class="math-inline">ω</span> wraps around a circle and comes home,
+  <span class="math-inline">0^(2ω) = 1</span>.
+  The classical reading
+  <span class="math-inline">1/0 = ∞</span>
+  conflated the two, because it inverts the <em>shadow</em> — the projected small zero, whose magnitude is already gone — so the missing magnitude blows up.
+  Invert the full edge-on unit instead and you get <span class="math-inline">ω</span>, bounded and clean.
+  So the reciprocal of zero is not infinity; the two look alike only after a projection has thrown the direction away.
+  This is exactly where the symbolic world parts from the analytic one — and the honest home of the limits that genuinely remain, whose job is to rebuild magnitude in the shadow, the one thing <span class="math-inline">ω</span> cannot do for them.
+</p>
+
+  <p>
+  Now push exponentiation to the boundary using only identities that already hold everywhere else — no new axioms, just "apply the rules you believe, uniformly, and don't flinch." Closure forces the values, and the one it forces is the one worth the price of admission:
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <div class="math">0^ω = −1 ,        i = 0^(ω/2) ,        log₀(−1) = ω</div>
+
+  <p>
+  The powers of
+  <span class="math-inline">0^(ω/2)</span>
+  cycle exactly as the powers of <span class="math-inline">i</span> do.
+  The standard construction of <span class="math-inline">ℂ</span> posits <span class="math-inline">i</span>, defines <span class="math-inline">exp</span> through a convergent series, and defines <span class="math-inline">π</span> through a limit; here all three are derived, and no limit appears anywhere.
+  And the phase is not approximate: the powers of the invertible zero rotate on the unit circle <em>algebraically</em>, their sums satisfying the Chebyshev recurrence exactly, in a ring of exact rational arithmetic with no power series and no branch cuts underneath.
+  The roots of unity are literally <span class="math-inline">0</span> raised to evenly-spaced graded exponents.
+  The circle is exact, and it was free.
+</p>
+
+  <h2><span class="num">III</span> The reframe: the shadow and the receipt</h2>
+
+  <p>
+  Stop and ask <em>why</em> a thing called zero should carry a reciprocal and unfold into <span class="math-inline">i</span>.
+  The answer reorganizes everything before it and everything after.
+  <span class="conf c-solid">Solid</span> We are trained to read zero as <em>small</em> — the absence of magnitude, the origin where nothing is.
+  Read it instead as a full unit vector seen <strong>edge-on</strong>: a unit pointing perpendicular to the real line casts a shadow of length zero, not because it is small but because it points in a direction the real line cannot see.
+</p>
+
+  <p>
+  Under that reading nothing is mystical.
+  A unit orthogonal to the reals, with its projection stripped off, <em>is</em> the imaginary unit.
+  The signed zero <span class="math-inline">−0</span> is a genuinely distinct object with the same shadow, because <span class="math-inline">+0</span> and <span class="math-inline">−0</span> are <span class="math-inline">+i</span> and <span class="math-inline">−i</span> seen edge-on.
+  And
+  <span class="math-inline">ω = 1/0</span>
+  lands where it does because the reciprocal of a unit is a unit and
+  <span class="math-inline">1/i = −i</span>.
+  The classical zero is <em>this</em> zero with a coordinate projected away — and the thing projected away is not gone.
+  It is a <strong>receipt</strong>: the information a lossy shadow discards but a conserving world must carry.
+</p>
+
+  <p>
+  The plainest instance is one everyone has used ten thousand times:
+  <span class="math-inline">x^0 = 1</span>.
+  In the conserving reading it is <em>not</em> <span class="math-inline">1</span> — it is
+  <span class="math-inline">1 + 0·ln x</span>, the base's logarithm kept in the grade-<span class="math-inline">+1</span> tail.
+  And that tail is the derivative: raising to the zero power <em>is</em> differentiation, and the familiar
+  <span class="math-inline">x^0 = 1</span>
+  is the collapse that burns the derivative and keeps only the ash.
+  True as a shadow, lossy as a fact — the whole program in a single over-familiar equation.
+</p>
+
+  <p class="pull">
+  Every classical object is a shadow.
+  The theory is the arithmetic of refusing to throw the receipt away — and the whole rest of this argument is one receipt after another, followed to where it leads.
+</p>
+
+  <h2><span class="num">IV</span> Multiplication is solved; addition is the wound</h2>
+
+  <p>
+  Carry the grading forward: a value is a coefficient and an integer <em>grade</em>; multiplication multiplies the coefficients and <em>adds</em> the grades; reciprocal flips the grade; <span class="math-inline">0</span> sits at grade <span class="math-inline">+1</span>, <span class="math-inline">ω</span> at grade <span class="math-inline">−1</span>, and
+  <span class="math-inline">0·ω = 1</span>
+  is just the two grades cancelling.
+  Multiplication is now completely solved, and solved cheaply: its only indeterminate form, <span class="math-inline">0·ω</span>, is cured by a single integer.
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <p>
+  Addition is not, and the reason it isn't is the hinge of the entire second half.
+  <span class="conf c-solid">Solid</span> Watch a cancellation of leading terms — two graded values whose tops are <span class="math-inline">a</span> and <span class="math-inline">−a</span>.
+  The tops annihilate cleanly (<span class="math-inline">a + (−a) = ⊘</span>, a subtractive cancel in its additive home, no residue), but in a <em>graded</em> world you must know the grade of what is <em>left</em>, and a leading-term cancellation is exactly the event that refuses to say.
+  The top vanished; what remains lives at a higher grade you cannot see without carrying the entire tail.
+  Multiplication's wound closes with one integer; addition's would need a whole series.
+  So the algebra is a multiplicative success and an additive vacancy — and you cannot simply import ordinary <span class="math-inline">+</span>, because ordinary <span class="math-inline">+</span> assumes the ungraded field you just left.
+  The question is forced: can an addition be <em>grown</em> that respects the grading instead of fighting it?
+</p>
+
+  <h2><span class="num">V</span> The wound becomes a dial, and the dial is a chart</h2>
+
+  <p>
+  Ordinary addition jams because its identity, <span class="math-inline">0</span>, sits at the very grade that swallows information.
+  Move the identity off that grade — onto the other pole — and the jam clears.
+  Add through the reciprocal:
+  <span class="conf c-solid">Solid</span>
+</p>
+
+  <div class="eqn"><span class="dynamicexpr expression">a (+) b := 1/(1/a + 1/b) = a*b/(a+b)</span></div>
+
+  <p>
+  Now <span class="math-inline">ω</span> is the identity <em>of this operation</em>, <span class="math-inline">0</span> is <em>its</em> point at infinity (it absorbs under <span class="math-inline">⊕</span>, which is a role inside this constructed addition — not the ground-floor annihilator, which is the operation <span class="math-inline">⊘</span>, never an element), and cancellation lands on <span class="math-inline">ω</span> — a definite pole rather than an unrecoverable grade.
+  The one event that destroyed information became a receipt filed at <span class="math-inline">ω</span>.
+  And this is not a lucky trick but a single rung of a dial: for a real parameter <span class="math-inline">p</span>,
+</p>
+
+  <div class="eqn"><span class="dynamicexpr expression">S_{p}(x, y) = (x^p + y^p)^(1/p)</span></div>
+
+  <p>
+  is ordinary addition conjugated by the chart
+  <span class="math-inline">x ↦ xᵖ</span>.
+  Harmonic addition is
+  <span class="math-inline">p = −1</span>; ordinary addition is
+  <span class="math-inline">p = +1</span>; and — machine-checked — multiplication distributes over <em>every</em> <span class="math-inline">S_p</span>, while the sign of <span class="math-inline">p</span> chooses the additive zero, <span class="math-inline">0</span> for
+  <span class="math-inline">p&gt;0</span>
+  and <span class="math-inline">ω</span> for
+  <span class="math-inline">p&lt;0</span>.
+  <span class="conf c-solid">Solid</span> So "the addition" was never one operation.
+  It is a <em>choice of chart</em> on the output — and that word, <em>chart</em>, is the knob the rest of the theory turns.
+</p>
+
+  <h2><span class="num">VI</span> The chart is the method</h2>
+
+  <p>
+  Once you see that an addition is a chart, the same chart unfreezes everywhere.
+  <span class="conf c-solid">Solid</span> The ordinary derivative, the multiplicative (logarithmic) derivative, and the generator of iteration are one primitive read through a chart <span class="math-inline">α</span>:
+</p>
+
+  <div class="math">D_α f = (α∘f)′        α = id → f′,   α = log → f′/f,   α = xᵖ → the S_p rung</div>
+
+  <p>
+  The three "different calculi" are three coordinates on one axis; the compositional one is the additive one in the chart that solves Abel's equation — implicit rather than elementary, but the same slot.
+  This is the point at which the program stops being a pile of results and becomes a <em>method</em>, and the method is one sentence: <strong>impossibility is gauge-relative.</strong>
+  <span class="conf c-plausible">Plausible</span> Every "must be undefined" or "cannot exist" is a claim that holds only while some structure stays frozen — an identity, a distributor, a coordinate.
+  Unfreeze it and the no-go becomes a coherent transition.
+  The walls are gauge-dependent, and the entire discipline is finding which gauge is frozen and moving it.
+</p>
+
+  <p>
+  Carry the chart up as far as it goes.
+  <span class="conf c-solid">Solid</span> Over the Cayley–Dickson tower, checked exactly, the harmonic addition stays commutative and associative at <em>every</em> level — through non-commutative <span class="math-inline">ℍ</span>, non-associative <span class="math-inline">𝕆</span>, the zero-divisor <span class="math-inline">𝕊</span> — because it routes through the inversion involution and never touches the product's commutativity or associativity.
+  What breaks is multiplication <em>distributing</em> over it, and it breaks at exactly one level: the sedenions, where the norm stops being multiplicative.
+  So the dial's addition is a fact about the whole tower; its handshake with multiplication is bounded precisely by Hurwitz's theorem.
+  And on the way, the residue: sampling a contour at the roots of unity — the traction phase points — recovers every residue as an exact rational by a finite orthogonality identity, with no limit anywhere, and the <span class="math-inline">2πi</span> is never computed because it is the winding <span class="math-inline">2ω</span>, the monodromy of <span class="math-inline">log₀</span>, generated by
+  <span class="math-inline">0^ω = −1</span>.
+</p>
+
+  <h2><span class="num">VII</span> Obstruct the chart, and a phase won't close</h2>
+
+  <p>
+  The chart can be written down (the abelian calculi), or left implicit (iteration), or — the case that matters now — it can refuse to exist <em>globally</em>.
+  Where a single chart cannot be made to cover everything, the gauge develops <strong>monodromy</strong>, and monodromy is one object wearing three faces.
+  <span class="conf c-plausible">Plausible</span>
+</p>
+
+  <p>
+  The residue's <span class="math-inline">2πi</span> is the monodromy of <span class="math-inline">log</span> around a pole.
+  The octonion associator is a closed, gauge-invariant <span class="math-inline">ℤ/2</span> sign — checked exactly: unchanged under every basis re-signing, first nonzero at <span class="math-inline">𝕆</span>, valued in the half-turn
+  <span class="math-inline">0^ω = −1</span>.
+  The Écalle–Voronin moduli are the obstruction to a global chart at a parabolic fixed point.
+  These are the <em>same</em> object at the unipotent corner — where an eigenvalue degenerates to <span class="math-inline">1</span> and the content moves into the monodromy — and the residue's <span class="math-inline">2πi</span> is its simplest instance.
+  A phase that does not cancel around a loop.
+  The thing the classical theory flees as a pathology is, here, just the chart being honest about the fact that it is only local.
+</p>
+
+  <h2><span class="num">VIII</span> The switch: keep the receipt, or burn it</h2>
+
+  <p>
+  Now the whole thread ties off, and the figure it ties into is one you could not have been handed at the start because it had to be earned.
+  <span class="conf c-plausible">Plausible</span> There is a single coordinate — the chart <span class="math-inline">α</span> — and everything the derivation passed through is a decision about it:
+</p>
+
+  <div class="math">write it down        →  reversible calculus, the addition dial
+leave it implicit    →  iteration; for modular arithmetic, the discrete
+                        logarithm — a one-way function, a trapdoor
+obstruct it globally →  monodromy: the residue, the associator</div>
+
+  <p>
+  Keeping the chart makes an operation reversible; hiding it makes it one-way.
+  And for the iteration
+  <span class="math-inline">x ↦ ax</span>
+  inside a modulus, the implicit chart <em>is</em> the discrete logarithm — the coordinate that exists but cannot be efficiently written, which is exactly the trapdoor cryptography is built on.
+  So <strong>reversibility and one-wayness are two settings of one switch: keep the receipt, or burn it.</strong> The obstruction the analyst flees is the security the cryptographer sells.
+  Traction is the setting that never burns the receipt — which is why it is exact and reversible, and equally why it is not a code-breaker: security <em>is</em> the burning, and this is the algebra that refuses to.
+</p>
+
+  <h2><span class="num">IX</span> Where the thread points, past its proof</h2>
+
+  <p>
+  Here the rock ends and the rope begins.
+  The derivation keeps pointing after it stops proving, and honesty means marking the difference sharply rather than letting the momentum carry the claims.
+  <span class="conf c-wild">Wild</span>
+</p>
+
+  <p>
+  <strong>Time is the retained order.</strong> Commutativity is the lossy quotient that forgets which operation came first; the directed operation is primary, and what the quotient forgets is time — phase accumulated across non-commuting transformations.
+  The block universe is the commutative shadow; non-commutativity does not produce time, commutativity erases it, and the arrow is the global monodromy of the world's non-commuting composition.
+  Bell's inequality is this claim with a number on it: a commuting, order-forgetting hidden variable is bounded, and only an order-remembering one reaches the quantum
+  <span class="math-inline">cos(a−b)</span>.
+  Read through the same lens, a photon's polarization — non-abelian where the photon itself is abelian — is the receipt Bell went looking for: not a property the photon carries, but the record of its history, the register where its geometric phase is kept even though its worldline clock reads zero.
+</p>
+
+  <p>
+  <strong>The native arithmetic of a reversible world.</strong> Microscopic physics is reversible and conserving; traction is the algebra one gets by demanding exactly that.
+  So it is a candidate for the number system physics would have written down starting from the conservation law instead of from counting — the pole a value rather than an infinity to regularize, the phase an exact element rather than a floating-point drift, the obstruction a resource rather than a catastrophe.
+</p>
+
+  <p>
+  <strong>One swap in every slot.</strong> The
+  <span class="math-inline">0 ↔ ω</span>
+  reciprocal — acting on the differentials, on the additions as
+  <span class="math-inline">p ↦ −p</span>, on the real forms as Osborn's twist — may be a single involution seen in different rooms.
+  If so, the object the whole program has been circling is not the sum, the differential, or the algebra.
+  It is the swap, and everything named so far is a place it acts.
+</p>
+
+  <h2><span class="num">X</span> The wall the thread is bolted to</h2>
+
+  <p>
+  A derivation is a chain, and a chain is only as sound as the wall its top link is anchored to.
+  Two claims carry the anchor, and if either fails, the argument above stays internally valid but stops meaning what it claims to mean.
+  <span class="conf c-plausible">Plausible</span>
+</p>
+
+  <p>
+  <strong>Consistency — that the collapse-invariants can all be declined together.</strong> Absorption, commutativity, associativity, norm-multiplicativity: the theory drops them not one at a time but jointly, and assumes no contradiction follows.
+  This is the ballgame.
+  An inconsistent system feels wonderful until someone derives
+  <span class="math-inline">1 = 0</span>
+  inside it, at which point it proves everything and means nothing.
+</p>
+
+  <p>
+  <strong>The projection theorem — that the classical world really is this one, shadowed.</strong> The symbol <span class="math-inline">0</span> is used deliberately rather than renamed to something safer, and that is a promissory note: that classical absorptive arithmetic is this structure modulo the imposition of absorption, with the classical axioms provably recovered.
+  Until that recovery is proven, "the exception for zero is a projection artifact" is a conjecture wearing a symbol rather than a theorem forcing one.
+</p>
+
+  <p>
+  So the honest shape of the whole thing is a single implication with two unproven premises at the top and a machine-checked core in the middle.
+  From "refuse to destroy information," and granting consistency and projection, the reciprocal of zero, the imaginary unit, the exact circle, the addition dial, the tower, the residue, and the monodromy all follow — most of them checked exactly, no faith required — and the thread continues, tagged and honest, into time, physics, and the one-way functions that guard the world's secrets.
+  The theory is not a collection of surprising results.
+  It is one refusal, and its consequences, all the way down.
+</p>
+
+  <div class="foot">
+    <p>
+  <strong>Constructive Operational Type Theory</strong> comprises <em>Principled Emergence Metatheory</em> (elegance as a measurable design criterion), <em>Traction Theory</em> (the total, reversible, exception-free algebra derived above), and <em>Mirror Calculus</em> (the
+  <span class="math-inline">0 ↔ ω</span>
+  involution acting on differentials, sums, and forms).
+  This document is the connected argument; the four companions are the expeditions that found and tested each link.
+  The machine-checked claims run green in an exact-arithmetic solver; the rest are marked for exactly what they are.
+</p>
+    <p>
+  Working notes, the Chebyshev tower, and the COTT solver: <strong>sibarum.github.io/cott</strong>.
+  Corrections and — especially — counterexamples welcome; in this framework a good counterexample is not a loss but information, and information is the one thing the theory was built never to waste.
+  CC BY 4.0.
+</p>
+  </div>
+
+</div>
+
+<!-- Math rendering engine -->
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>
