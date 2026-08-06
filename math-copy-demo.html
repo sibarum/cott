@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Math Copy Round-Trip — Beige Papers</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+    <link rel="stylesheet" href="./lib/styles-v3.css?v=4">
+
+    <!-- the math engine, exactly as the real pages load it -->
+    <script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+    <script src="./lib/traction-interpret.js?v=4"></script>
+
+    <style>
+        /* demo scaffolding only — not part of the house style */
+        .rt { width: 100%; margin: 1.5rem 0; }
+        .rt td { vertical-align: middle; padding: 0.6rem 0.8rem; }
+        .rt .src, .rt .clip { font-family: var(--font-meta); font-size: 0.9rem; }
+        .rt .rendered { font-size: 1.15rem; }
+        .verdict { font-family: var(--font-meta); font-size: 0.82rem; }
+        .ok  { color: #2f6b2f; }
+        .bad { color: var(--accent); }
+        kbd { font-family: var(--font-meta); font-size: 0.85em; border: 1px solid var(--rule);
+              border-bottom-width: 2px; border-radius: 3px; padding: 0 0.35em; }
+    </style>
+</head>
+<body>
+
+<div class="section">
+    <div class="headings">
+        <h1>Copy Round-Trip <span class="stamp">Beige Papers</span></h1>
+        <h2>What the eye sees, and what the clipboard gets</h2>
+    </div>
+    <p>
+        Each row renders an expression through the interpreter, then shows the
+        <span class="emphasis">exact clipboard text</span> a reader would get by selecting
+        it (this is the element's <span class="code">textContent</span> — it contains the
+        hidden <span class="code">.copyonly</span> characters and omits the
+        <span class="code">::before</span> glyphs, so it matches a real copy). That text is
+        then fed back through the parser: <span class="verdict ok">round-trips</span> means
+        the pasted formula re-parses to the same thing.
+    </p>
+    <p>
+        Try it for real: select an equation below and <kbd>Ctrl</kbd>+<kbd>C</kbd>, then
+        paste into the box.
+        <input id="scratch" placeholder="paste here…" style="font-family:var(--font-meta);
+            width:100%;margin-top:0.5rem;padding:0.5em;border:1px solid var(--rule);
+            background:var(--paper);color:var(--ink);">
+        <span id="scratch-verdict" class="verdict"></span>
+    </p>
+</div>
+
+<div class="section">
+    <div class="section-title">The five cases that used to garble</div>
+    <table class="rt">
+        <thead>
+            <tr><th>Source (DSL)</th><th>Rendered</th><th>Clipboard text</th><th>Re-parse</th></tr>
+        </thead>
+        <tbody id="rows">
+            <!-- filled by script; each data-src is authored in your expression DSL -->
+        </tbody>
+    </table>
+</div>
+
+<div class="section">
+    <div class="section-title">In prose</div>
+    <p>
+        The identity <span class="dynamicexpr">x = (-b +- sqrt(b^2 - 4*a*c)) / (2*a)</span>
+        copies as clean ASCII you can paste straight back into the solver.
+    </p>
+</div>
+
+<script>
+const CASES = [
+    "x - 4",
+    "3*a*b",
+    "+-x",
+    "(2*x + 3) / (x^2 + 3*x - 4)",
+    "sqrt(b^2 - 4*a*c)",
+    "((x+1)^2) / (x-2)",   // slot parens dropped on screen, kept in copy
+    "2*(x+1) / y",         // NOT one wrapping group — inner parens stay
+    "2*x*y^2",             // juxtaposition: displays 2xy², copies 2*x*y^2
+    "2*f(x)",              // function call keeps the dot: 2·f(x)
+    "x*(y+1)",             // group keeps the dot: x·(y+1)
+];
+
+function reparses(text) {
+    const r = INTERPRET.parseExpression(text);
+    return !r.error;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const tbody = document.getElementById("rows");
+    for (const src of CASES) {
+        const tr = document.createElement("tr");
+
+        const tdSrc = document.createElement("td");
+        tdSrc.className = "src";
+        tdSrc.textContent = src;
+
+        const tdR = document.createElement("td");
+        tdR.className = "rendered expression-inline";
+        INTERPRET.printToHtml(INTERPRET.parseExpression(src), tdR);
+
+        // textContent == what the clipboard receives
+        const clip = tdR.textContent;
+
+        const tdClip = document.createElement("td");
+        tdClip.className = "clip";
+        tdClip.textContent = clip;
+
+        const tdV = document.createElement("td");
+        const ok = reparses(clip);
+        tdV.className = "verdict " + (ok ? "ok" : "bad");
+        tdV.textContent = ok ? "round-trips ✓" : "fails ✗";
+
+        tr.append(tdSrc, tdR, tdClip, tdV);
+        tbody.appendChild(tr);
+    }
+
+    const scratch = document.getElementById("scratch");
+    const sv = document.getElementById("scratch-verdict");
+    scratch.addEventListener("input", () => {
+        const t = scratch.value.trim();
+        if (!t) { sv.textContent = ""; return; }
+        const ok = reparses(t);
+        sv.className = "verdict " + (ok ? "ok" : "bad");
+        sv.textContent = ok ? "✓ parses" : "✗ does not parse";
+    });
+});
+</script>
+</body>
+</html>

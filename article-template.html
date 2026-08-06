@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Article Title — Beige Papers</title>
+
+    <!-- Branding fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+    <!-- Math fonts (load-bearing for the expression renderer) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+    <link rel="stylesheet" href="./lib/styles-v3.css">
+</head>
+<body>
+
+<!-- back to index -->
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/'"></div>
+
+<!-- ============================================================
+     MASTHEAD
+     ============================================================ -->
+<div class="section">
+    <div class="headings">
+        <h1>The Title of the Article <span class="stamp">Beige Papers</span></h1>
+        <h2>A speculative subtitle, hedged in italic — provisional until it isn't</h2>
+    </div>
+
+    <p class="centered" style="color:var(--ink-soft);font-family:var(--font-meta);font-size:0.82rem;letter-spacing:0.04em;">
+        James Watkins &nbsp;·&nbsp; Draft &nbsp;·&nbsp; 2026
+    </p>
+
+    <div class="section-alt">
+        <span class="emphasis">Abstract.</span>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. We claim, with
+        appropriate humility, that a small idea worked out carefully may turn out to
+        matter. Curabitur pretium tincidunt lacus; nulla gravida orci a odio. The
+        remainder of this note develops the claim, states it precisely, and gestures
+        at where it might lead.
+    </div>
+</div>
+
+<!-- ============================================================
+     1. INTRODUCTION
+     ============================================================ -->
+<div class="section">
+    <div class="section-title">1. Introduction</div>
+
+    <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+        incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+        nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        Inline mathematics reads naturally in a sentence: we write the discriminant as
+        <span class="expression-inline"><span class="variable">b</span><sup class="smaller">2</sup><span class="symbol">&ndash;</span>4<span class="variable">a</span><span class="variable">c</span></span>,
+        and it flows with the prose without breaking the line.
+    </p>
+
+    <p>
+        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+        fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+        culpa qui officia deserunt mollit anim id est laborum.
+    </p>
+
+    <div class="subsection-title">1.1. Motivation</div>
+    <p>
+        Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium
+        doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore
+        veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+    </p>
+</div>
+
+<!-- ============================================================
+     2. THE RESULT (displayed math + definition)
+     ============================================================ -->
+<div class="section">
+    <div class="section-title">2. The Central Identity</div>
+
+    <p>
+        Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet. Displayed
+        expressions are centered and given room to breathe:
+    </p>
+
+    <div class="expression centered">
+        <span class="expr-label">(1)</span>
+        <span class="variable">x</span>
+        <span class="symbol">=</span>
+        <span class="fraction">
+            <span class="numerator">
+                <span class="symbol">&ndash;</span><span class="variable">b</span>
+                <span class="symbol">&plusmn;</span>
+                <span class="sqrt"><span class="symbol">&radic;</span><span class="number radicand"><span class="variable">b</span><sup class="smaller">2</sup> <span class="symbol">&ndash;</span> 4<span class="variable">a</span><span class="variable">c</span></span></span>
+            </span>
+            <span class="h-divider symbol">/</span>
+            <span class="denominator">2<span class="variable">a</span></span>
+        </span>
+    </div>
+
+    <p>
+        Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit
+        laboriosam. A second identity, this time a ratio of polynomials:
+    </p>
+
+    <div class="expression centered">
+        <span class="expr-label">(2)</span>
+        <span class="variable">f</span><span class="symbol">(</span><span class="variable">x</span><span class="symbol">)</span>
+        <span class="symbol">=</span>
+        <span class="fraction">
+            <span class="numerator">2<span class="variable">x</span> <span class="symbol">+</span> 3</span>
+            <span class="h-divider symbol">/</span>
+            <span class="denominator"><span class="variable">x</span><sup class="smaller">2</sup> <span class="symbol">+</span> 3<span class="variable">x</span> <span class="symbol">&ndash;</span> 4</span>
+        </span>
+    </div>
+
+    <div class="section-alt">
+        <span class="emphasis">Definition (Enclosure).</span>
+        An <span class="emphasis">enclosure</span> is the region bounded above and below
+        by consecutive branches of a function across a discontinuity. We use asides like
+        this one for definitions, remarks, and the occasional "don't take this too
+        seriously" caveat.
+    </div>
+</div>
+
+<!-- ============================================================
+     3. FIGURE — custom pontif-plot, re-themed to paper
+     ============================================================ -->
+<div class="section">
+    <div class="section-title">3. A Worked Example</div>
+
+    <p>
+        The function in equation (2) has vertical asymptotes at
+        <span class="expression-inline"><span class="variable">x</span><span class="symbol">=</span><span class="symbol">&ndash;</span>4</span>
+        and
+        <span class="expression-inline"><span class="variable">x</span><span class="symbol">=</span>1</span>,
+        a single real zero, and three monotone branches. Plotted:
+    </p>
+
+    <figure>
+        <svg xmlns="http://www.w3.org/2000/svg" class="pontif-plot" viewBox="0 0 900 600" data-domain="-5.6089,2.6089" data-range="-12.6102,11.4894" role="img" aria-label="Plot of f(x) = (2x+3)/(x^2+3x-4) with asymptotes at x=-4 and x=1 and a zero at x=-1.5">
+        <style>
+        .pontif-plot{
+            --pontif-fg:#3a352c;        /* ink for labels */
+            --pontif-grid:#ded4bf;      /* faint tan gridlines */
+            --pontif-axis:#8c8471;      /* muted frame/ticks */
+            --pontif-curve:#9a3324;     /* oxblood accent — the curve */
+            --pontif-asymptote:#b1794a; /* warm ochre, dashed */
+            --pontif-feature:#7a6a1f;   /* dark goldenrod — feature marks */
+            --pontif-enclosure:#9a3324;
+            --pontif-halo:#f6f2e9;      /* paper, for text outlines */
+            color:var(--pontif-fg);font-family:'IBM Plex Mono',monospace;
+        }
+        .pontif-plot .gridline{stroke:var(--pontif-grid);stroke-width:1}
+        .pontif-plot .frame{fill:none;stroke:var(--pontif-axis);stroke-width:1.2}
+        .pontif-plot .tick-label{fill:var(--pontif-fg);font-size:13px;paint-order:stroke;stroke:var(--pontif-halo);stroke-width:3px;stroke-linejoin:round}
+        .pontif-plot .tick-x{text-anchor:middle}
+        .pontif-plot .tick-y{text-anchor:end;dominant-baseline:middle}
+        .pontif-plot .curve{fill:none;stroke:var(--pontif-curve);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+        .pontif-plot .asymptote{stroke:var(--pontif-asymptote);stroke-width:1.5;stroke-dasharray:4 3;opacity:0.85}
+        .pontif-plot .asymptote-label{fill:var(--pontif-asymptote);font-size:13px;text-anchor:middle}
+        .pontif-plot .feature-mark{fill:var(--pontif-halo);stroke:var(--pontif-feature);stroke-width:2}
+        .pontif-plot .feature-label{fill:var(--pontif-fg);font-size:12px}
+        .pontif-plot .label{paint-order:stroke;stroke:var(--pontif-halo);stroke-width:3px;stroke-linejoin:round}
+        </style>
+        <defs><clipPath id="pontif-plot-area"><rect x="64" y="24" width="812" height="532"/></clipPath></defs>
+        <g class="axes">
+        <line class="gridline" x1="222.9745" y1="24" x2="222.9745" y2="556"/>
+        <line class="gridline" x1="420.5949" y1="24" x2="420.5949" y2="556"/>
+        <line class="gridline" x1="618.2153" y1="24" x2="618.2153" y2="556"/>
+        <line class="gridline" x1="815.8358" y1="24" x2="815.8358" y2="556"/>
+        <line class="gridline" x1="64" y1="498.3801" x2="876" y2="498.3801"/>
+        <line class="gridline" x1="64" y1="277.6291" x2="876" y2="277.6291"/>
+        <line class="gridline" x1="64" y1="56.878" x2="876" y2="56.878"/>
+        <rect class="frame" x="64" y="24" width="812" height="532"/>
+        <text class="tick-label tick-x" x="222.9745" y="574">-4</text>
+        <text class="tick-label tick-x" x="420.5949" y="574">-2</text>
+        <text class="tick-label tick-x" x="618.2153" y="574">0</text>
+        <text class="tick-label tick-x" x="815.8358" y="574">2</text>
+        <text class="tick-label tick-y" x="56" y="498.3801">-10</text>
+        <text class="tick-label tick-y" x="56" y="277.6291">0</text>
+        <text class="tick-label tick-y" x="56" y="56.878">10</text>
+        </g>
+        <g class="curves" clip-path="url(#pontif-plot-area)">
+        <path class="curve" d="M100.9091,299.0545 L103.8039,299.5064 L106.6988,299.9801 L109.5936,300.4775 L112.4884,301.0002 L115.3832,301.5504 L118.2781,302.1302 L121.1729,302.7424 L124.0677,303.3896 L126.9626,304.0751 L129.8574,304.8024 L132.7522,305.5756 L135.6471,306.3992 L138.5419,307.2785 L141.4367,308.2193 L144.3316,309.2286 L147.2264,310.3141 L150.1212,311.485 L153.016,312.7521 L155.9109,314.1278 L158.8057,315.627 L161.7005,317.2672 L164.5954,319.0698 L167.4902,321.0604 L170.385,323.2705 L173.2799,325.739 L176.1747,328.5146 L179.0695,331.6593 L181.9643,335.253 L184.8592,339.4004 L187.754,344.2424 L190.6488,349.9718 L193.5437,356.8616 L196.4385,365.3108 L199.3333,375.9281 L202.2282,389.694 L205.123,408.3023 L208.0178,434.9775 L210.9127,476.7987 L212.9916,531.8182"/>
+        <path class="curve" d="M233.4984,48.1818 L234.0713,67.8032 L236.9661,117.6813 L239.861,148.2148 L242.7558,168.9902 L245.6506,184.1029 L248.5455,195.6186 L251.4403,204.6992 L254.3351,212.0513 L257.2299,218.1306 L260.1248,223.2447 L263.0196,227.6088 L265.9144,231.3786 L268.8093,234.6691 L271.7041,237.5674 L274.5989,240.1407 L277.4938,242.4416 L280.3886,244.512 L283.2834,246.3854 L286.1783,248.0893 L289.0731,249.6464 L291.9679,251.0752 L294.8627,252.3916 L297.7576,253.6087 L300.6524,254.7377 L303.5472,255.7883 L306.4421,256.7689 L309.3369,257.6864 L312.2317,258.5471 L315.1266,259.3566 L318.0214,260.1195 L320.9162,260.84 L323.8111,261.522 L326.7059,262.1686 L329.6007,262.7829 L332.4955,263.3675 L335.3904,263.9247 L338.2852,264.4567 L341.18,264.9654 L344.0749,265.4525 L346.9697,265.9197 L349.8645,266.3683 L352.7594,266.7997 L355.6542,267.215 L358.549,267.6154 L361.4439,268.0019 L364.3387,268.3754 L367.2335,268.7367 L370.1283,269.0866 L373.0232,269.4259 L375.918,269.7553 L378.8128,270.0753 L381.7077,270.3866 L384.6025,270.6896 L387.4973,270.985 L390.3922,271.2732 L393.287,271.5546 L396.1818,271.8297 L399.0766,272.0988 L401.9715,272.3624 L404.8663,272.6207 L407.7611,272.8742 L410.656,273.1231 L413.5508,273.3677 L416.4456,273.6083 L419.3405,273.8453 L422.2353,274.0787 L425.1301,274.309 L428.025,274.5363 L430.9198,274.7609 L433.8146,274.9829 L436.7094,275.2027 L439.6043,275.4204 L442.4991,275.6362 L445.3939,275.8502 L448.2888,276.0628 L451.1836,276.2741 L454.0784,276.4842 L456.9733,276.6934 L459.8681,276.9018 L462.7629,277.1096 L465.6578,277.317 L468.5526,277.5241 L471.4474,277.734 L474.3422,277.9411 L477.2371,278.1484 L480.1319,278.3562 L483.0267,278.5646 L485.9216,278.7737 L488.8164,278.9838 L491.7112,279.195 L494.6061,279.4075 L497.5009,279.6216 L500.3957,279.8373 L503.2906,280.0549 L506.1854,280.2746 L509.0802,280.4966 L511.975,280.721 L514.8699,280.9482 L517.7647,281.1784 L520.6595,281.4118 L523.5544,281.6486 L526.4492,281.8891 L529.344,282.1336 L532.2389,282.3823 L535.1337,282.6356 L538.0285,282.8938 L540.9234,283.1572 L543.8182,283.4262 L546.713,283.7011 L549.6078,283.9823 L552.5027,284.2702 L555.3975,284.5654 L558.2923,284.8682 L561.1872,285.1792 L564.082,285.4989 L566.9768,285.8279 L569.8717,286.1669 L572.7665,286.5164 L575.6613,286.8773 L578.5561,287.2503 L581.451,287.6363 L584.3458,288.0361 L587.2406,288.4509 L590.1355,288.8816 L593.0303,289.3295 L595.9251,289.7959 L598.82,290.2821 L601.7148,290.7899 L604.6096,291.3208 L607.5045,291.8768 L610.3993,292.4601 L613.2941,293.0729 L616.1889,293.7179 L619.0838,294.398 L621.9786,295.1167 L624.8734,295.8776 L627.7683,296.6846 L630.6631,297.5427 L633.5579,298.4572 L636.4528,299.4341 L639.3476,300.4807 L642.2424,301.6051 L645.1373,302.8166 L648.0321,304.1265 L650.9269,305.5478 L653.8217,307.0957 L656.7166,308.7888 L659.6114,310.6491 L662.5062,312.7033 L665.4011,314.9842 L668.2959,317.5326 L671.1907,320.3993 L674.0856,323.6491 L676.9804,327.3655 L679.8752,331.6583 L682.7701,336.6748 L685.6649,342.6168 L688.5597,349.7695 L691.4545,358.5487 L694.3494,369.5862 L697.2442,383.8912 L700.139,403.1847 L703.0339,430.6676 L705.9287,473.0791 L708.2096,531.8182"/>
+        <path class="curve" d="M727.1152,48.1818 L729.0873,89.58 L731.9822,125.9601 L734.877,150.254 L737.7718,167.6523 L740.6667,180.7372 L743.5615,190.9415 L746.4563,199.1254 L749.3512,205.8369 L752.246,211.442 L755.1408,216.1946 L758.0357,220.2762 L760.9305,223.8201 L763.8253,226.9266 L766.7201,229.6724 L769.615,232.1172 L772.5098,234.3082 L775.4046,236.2834 L778.2995,238.0733 L781.1943,239.703 L784.0891,241.1934 L786.984,242.5617 L789.8788,243.8224 L792.7736,244.988 L795.6684,246.0689 L798.5633,247.0742 L801.4581,248.0116 L804.3529,248.8878 L807.2478,249.7088 L810.1426,250.4796 L813.0374,251.2048 L815.9323,251.8885 L818.8271,252.5341 L821.7219,253.1448 L824.6168,253.7233 L827.5116,254.2723 L830.4064,254.794 L833.3012,255.2903 L836.1961,255.7632 L839.0909,256.2143"/>
+        </g>
+        <g class="asymptotes">
+        <line class="asymptote" data-x="-4" x1="222.9745" y1="24" x2="222.9745" y2="556"/>
+        <text class="label asymptote-label" data-x="-4" x="222.9745" y="42">x=-4</text>
+        <line class="asymptote" data-x="1" x1="717.0255" y1="24" x2="717.0255" y2="556"/>
+        <text class="label asymptote-label" data-x="1" x="717.0255" y="42">x=1</text>
+        </g>
+        <g class="features">
+        <g class="feature zero" data-x="-1.5" data-y="0" data-kind="zero"><circle class="feature-mark" cx="470" cy="277.6291" r="4"/><text class="label feature-label" x="477" y="270.6291">-1.5</text></g>
+        </g>
+        </svg>
+        <figcaption>
+            Figure 1. &nbsp;<span class="expression-inline"><span class="variable">f</span><span class="symbol">(</span><span class="variable">x</span><span class="symbol">)</span><span class="symbol">=</span><span class="fraction nostack"><span class="numerator">2<span class="variable">x</span>+3</span><span class="h-divider symbol">/</span><span class="denominator"><span class="variable">x</span><sup class="smaller">2</sup>+3<span class="variable">x</span>&ndash;4</span></span></span>,
+            with asymptotes (dashed), a zero at <span class="expression-inline"><span class="variable">x</span>=&ndash;1.5</span>, and three branches.
+        </figcaption>
+    </figure>
+
+    <p>
+        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis
+        praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias
+        excepturi sint occaecati cupiditate non provident.
+    </p>
+</div>
+
+<!-- ============================================================
+     4. TABLE + CODE
+     ============================================================ -->
+<div class="section">
+    <div class="section-title">4. Data and Computation</div>
+
+    <table class="centered">
+        <caption>Table 1. Sampled values of <span class="expression-inline"><span class="variable">f</span></span> near each asymptote.</caption>
+        <thead>
+            <tr><th><span class="expression-inline"><span class="variable">x</span></span></th><th><span class="expression-inline"><span class="variable">f</span><span class="symbol">(</span><span class="variable">x</span><span class="symbol">)</span></span></th><th>branch</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>&ndash;4.1</td><td>+53.9</td><td>left</td></tr>
+            <tr><td>&ndash;1.5</td><td>0.0</td><td>middle</td></tr>
+            <tr><td>&nbsp;1.1</td><td>+26.2</td><td>right</td></tr>
+        </tbody>
+    </table>
+
+    <p>The plot above is regenerated by the solver:</p>
+
+    <div class="code-border">
+        <div class="code-title">plot.spn <span class="rfloat">SPN</span></div>
+        <div class="code"><span class="spn-keyword">plot</span> <span class="spn-ident">f</span> <span class="spn-assign">=</span> <span class="spn-punct">(</span><span class="spn-number">2</span><span class="spn-op">*</span><span class="spn-ident">x</span> <span class="spn-op">+</span> <span class="spn-number">3</span><span class="spn-punct">)</span> <span class="spn-op">/</span> <span class="spn-punct">(</span><span class="spn-ident">x</span><span class="spn-op">^</span><span class="spn-number">2</span> <span class="spn-op">+</span> <span class="spn-number">3</span><span class="spn-op">*</span><span class="spn-ident">x</span> <span class="spn-op">-</span> <span class="spn-number">4</span><span class="spn-punct">)</span><span class="spn-punct">;</span></div>
+    </div>
+</div>
+
+<!-- ============================================================
+     5. CONCLUSION + REFERENCES
+     ============================================================ -->
+<div class="section">
+    <div class="section-title">5. Conclusion</div>
+    <p>
+        Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit. The
+        idea is small; the hope is not. Quis autem vel eum iure reprehenderit qui in ea
+        voluptate velit esse quam nihil molestiae consequatur.
+    </p>
+
+    <div class="subsection-title">References</div>
+    <ol class="nested">
+        <li>Author, A. <i>A Prior Work That This Extends</i>. Beige Papers, 2025.</li>
+        <li>Author, B. <i>Something Foundational</i>. Somewhere Reputable, 1998.</li>
+    </ol>
+
+    <div class="section-footer">
+        Published under the
+        <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+    </div>
+</div>
+
+<!-- Math rendering engine (uncomment when authoring in the expression DSL) -->
+<!-- <script src="./lib/traction-interpret.js"></script> -->
+<script>
+</script>
+</body>
+</html>
