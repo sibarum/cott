@@ -19,6 +19,7 @@ A reader who likes math but isn't a mathematician should be able to start at Cha
 - Keep the three-tier tag: **Solid** (proven / machine-checked), **Plausible** (load-bearing bet), **Wild** (past the proof).
 - **Speak only as confidently as the evidence supports.** Reframes and caveats go in **footnotes/asides**, not hedged into every sentence — but never omit a known problem. Specifically: `0^ω = −1` reads confidently as "the natural normalization," with a footnote that it is a branch/character choice, not a forced theorem; the Chebyshev chapter states the correct math plainly, with a footnote that it holds for any reciprocal pair; borrowed vocabulary (monodromy, gauge, eigenvalue) is defined as local jargon with a caveat or replaced.
 - **"Machine-checked" must be scoped honestly**: it covers the exact rational/algebraic fragment, the tower, and the associator cocycle — *not* the consistency/projection conjectures.
+- **Never reference the old pages in reader-facing prose.** The reader won't know them, so "this fixes an earlier confusion / see the legacy notes" is just noise. Apply every reframe and fix *silently*; footnotes and cross-links point only forward, into other chapters of this book.
 
 ## 4. Global notation canon (one fix that touches everything)
 

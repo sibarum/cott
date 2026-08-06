@@ -195,6 +195,47 @@
 .paper .foot strong { color: var(--ink); }
 .paper .foot em { font-family: var(--font-body); }
 
+/* ---------- Book-chapter chrome ---------- */
+.paper .chapter-meta {
+    font-family: var(--font-meta);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    margin-bottom: 1rem;
+}
+.paper .chapter-meta .part { color: var(--accent); }
+
+/* footnote references + list (the candor channel) */
+.paper sup.fnref { font-size: 0.66em; }
+.paper sup.fnref a { border-bottom: none; font-family: var(--font-meta); }
+.paper .footnotes {
+    margin-top: 3rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+}
+.paper .footnotes ol { padding-left: 1.4rem; }
+.paper .footnotes li { margin: 0.6rem 0; }
+
+/* prev / next / contents nav */
+.chapter-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    margin-top: 3.5rem;
+    padding-top: 1.3rem;
+    border-top: 2px solid var(--rule-bold);
+    font-family: var(--font-meta);
+    font-size: 0.82rem;
+}
+.chapter-nav a { border-bottom: none; }
+.chapter-nav .prev::before { content: "\2190\00a0"; }   /* ←  */
+.chapter-nav .next::after  { content: "\00a0\2192"; }   /* →  */
+.chapter-nav .toc { color: var(--ink-soft); }
+
 /* ---------- Mobile ---------- */
 @media only screen and (max-width: 640px) {
     .paper h1 { font-size: 2.1rem; }

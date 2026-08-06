@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cancellation as an Operation — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/intro/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 4 &middot; <span class="part">The One Idea</span></div>
+    <h1>Cancellation as an Operation</h1>
+    <p class="sub">
+      Zero and one are what's left behind
+    </p>
+  </div>
+
+  <p class="lead">
+  Before we can hand zero a reciprocal, we have to notice something strange about it.
+  The symbol <span class="math-inline">0</span> is quietly doing three unrelated jobs at once and pretending they are one.
+  Pull the three apart, and the whole knot around zero comes loose on its own.
+  </p>
+
+  <h2>The overloaded glyph</h2>
+
+  <p>
+  Ask what <span class="math-inline">0</span> means and you get three answers that have nothing to do with each other.
+  It is the thing you <em>add</em> to a number to change nothing — <span class="math-inline">a + 0 = a</span>, the additive identity.
+  It is the thing you <em>multiply</em> a number by to destroy everything — <span class="math-inline">a·0 = 0</span>, the annihilator.
+  And it is the name for "no quantity at all," an empty count.
+  </p>
+
+  <p>
+  We write all three with one mark and assume they must be one object.
+  They needn't be.
+  And the instant you force the identity and the annihilator to be the <em>same</em> element, you have written down absorption — <span class="math-inline">a·0 = 0</span> — which is exactly the rule that lets multiplication throw information away.<sup class="fnref"><a href="#fn1" id="fnref1">1</a></sup>
+  So the overloading is not cosmetic bookkeeping.
+  It is the source of the crime.
+  </p>
+
+  <h2>Cancellation is not a number</h2>
+
+  <p>
+  Start again from the one job that is actually primitive: annihilation.
+  When two things cancel — the <span class="math-inline">x</span> and the <span class="math-inline">−x</span> in <span class="math-inline">x − x</span>, or the <span class="math-inline">x</span> and the <span class="math-inline">1/x</span> in <span class="math-inline">x/x</span> — something genuinely happens.
+  But nothing in "<span class="math-inline">x − x</span>" says the result is a particular number sitting somewhere on the number line.
+  What happened is an <em>operation</em>: two terms met and erased each other.
+  Call that operation <strong>cancellation</strong>, and write it <span class="math-inline">⊘</span>.
+  <span class="conf c-solid">Solid</span>
+  </p>
+
+  <p>
+  <span class="math-inline">⊘</span> is a verb, not a noun.
+  It is the act of two things annihilating, and — unlike the classical zero — it never needs a reciprocal, because "undo an annihilation" is not "divide by the annihilator." It is simply to not have cancelled.
+  This is the first dividend of the reversible demand.
+  In a world that refuses to lose information, a cancellation cannot be a silent disappearance.
+  It has to leave a mark — otherwise you could never tell it happened, and could never walk it back.
+  </p>
+
+  <h2>What's left behind: two residues</h2>
+
+  <p>
+  So a cancellation leaves a mark. Which mark?
+  Here is the part worth slowing down for: the mark depends on <em>where the cancellation was trapped</em>.
+  <span class="conf c-solid">Solid</span>
+  </p>
+
+  <div class="math">x − x   =   ⊘   →   ✳0        (subtractive cancel, caught in a product, leaves a 0)
+x ÷ x   =   ⊘   →   +1        (divisive cancel, caught in a sum, leaves a 1)</div>
+
+  <p>
+  Why those two values, and why crossed like that?
+  Because a factor of <span class="math-inline">(x − x)</span> could only have gotten <em>into</em> a product if a <span class="math-inline">0</span> had been multiplied in to begin with; reversibility forces the cancellation to put that <span class="math-inline">0</span> back, so the product still reads correctly when you undo it.
+  Dually, a term <span class="math-inline">(x/x)</span> could only have entered a <em>sum</em> as a <span class="math-inline">1</span>, so the divisive cancellation must restore a <span class="math-inline">1</span>.
+  </p>
+
+  <p>
+  Read that again, because it reorganizes everything.
+  <span class="math-inline">0</span> and <span class="math-inline">1</span> are not two unrelated constants we assume at the start.
+  They are the two shadows a single operation casts — the <strong>residues</strong> of cancellation, one for the multiplicative world and one for the additive one.<sup class="fnref"><a href="#fn2" id="fnref2">2</a></sup>
+  The additive and multiplicative halves of arithmetic turn out to share one ground grain, seen from two sides.
+  </p>
+
+  <p>
+  It is tempting to keep treating zero as one thing with three moods — identity, annihilator, empty count — but that bundling is the confusion we started with, and there is a cleaner story.
+  <span class="math-inline">⊘</span> is the operation; <span class="math-inline">0</span> and <span class="math-inline">1</span> are what it leaves behind; and "erasure" — the bare fact that a cancellation happened — is just <span class="math-inline">⊘</span> before you read off which residue it deposited.
+  </p>
+
+  <h2>Three kinds of equals</h2>
+
+  <p>
+  One more piece of discipline, because the rest of the book leans on it hard.
+  We will use three different signs where ordinary mathematics reaches for one.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">The three signs.</span>
+    <span class="math-inline">=</span> is a <em>reversible rewrite</em>: both sides carry exactly the same information, and you can always go back.
+    <span class="math-inline">≈</span> is a <em>lossy projection</em>: the right side is the left with something deliberately dropped — and we write <span class="math-inline">≈</span> precisely so you can watch the information leave.
+    <span class="math-inline">:=</span> is a <em>structure-introduction</em>: a definition, not a claim that two things are equal.
+  </p>
+
+  <p>
+  The entire ethos of the theory is visible in that one distinction.
+  Every place information is discarded, we mark it.
+  Nothing is allowed to disappear quietly.
+  </p>
+
+  <h2>What this buys</h2>
+
+  <p>
+  We have added nothing.
+  We only refused to fuse three jobs onto one glyph, and insisted that cancellation — being an operation — leave a reversible mark.
+  But that refusal has a consequence you can already feel arriving.
+  If <span class="math-inline">0</span> is no longer <em>forced</em> to be the annihilator — if absorption was a bundling accident rather than a law — then the oldest prohibition in arithmetic, the ban on dividing by zero, has just lost the theorem it stood on.
+  That is the next chapter.
+  </p>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">The claim that <span class="math-inline">a·0 = 0</span> is the specific axiom to blame — and what "reversibility forbids" means precisely — is the subject of <a href="../totality-reversibility/">Chapter 2</a>. Here we only need that fusing identity and annihilator is what writes it down. <a href="#fnref1">↩</a></li>
+      <li id="fn2">"Residue" here is the <em>ground-floor</em> sense: the mark <span class="math-inline">⊘</span> leaves. It is not yet the residue of complex analysis — that one arrives in <a href="../phases-that-wont-close/">Chapter 16</a> and turns out to rhyme with this one, which is worth watching but is not (yet) a proof that they are the same object. <a href="#fnref2">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../method/">The Method</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../invertible-zero/">The Invertible Zero</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<!-- Math rendering engine -->
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>
