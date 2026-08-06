@@ -307,6 +307,18 @@ canvas { image-rendering: auto; }
 }
 .expression-inline { margin: 0; }
 
+/* The interpreter emits <wbr> break-hints after +/- so LONG inline expressions
+   can wrap at term boundaries. But <wbr> breaks even under white-space:nowrap,
+   which must never happen inside an atomic unit (a fraction, root, or its
+   radicand) or inside a centered display equation — a split there breaks the
+   fraction bar / radical overbar. Suppress the hint in exactly those places. */
+.expression wbr,
+.fraction wbr,
+.sqrt wbr,
+.radicand wbr,
+sup wbr,
+sub wbr { display: none; }
+
 .expression sup { padding-right: 0.2em; }
 .expression-inline sup { padding-right: 0.35em; }
 
@@ -372,8 +384,8 @@ p .fraction { margin: 0 0.2em; font-size: 0.8em; }
 .h-divider {
     display: inline;
     height: 1px;
-    border-top: 1px solid currentColor;
-    color: rgba(1,1,1,0%);
+    border-top: 1px solid var(--ink);  /* the visible bar — an explicit color, */
+    color: transparent;                /* while the copyable "/" text stays hidden */
     white-space: nowrap;
 }
 sup .h-divider, .sqrt .h-divider, .nostack .h-divider {
@@ -400,6 +412,19 @@ sup .h-divider, .sqrt .h-divider, .nostack .h-divider {
 
 .narration sup { margin-right: -0.2em; display: inline; }
 
+/* ---- Plain-text copy channels -----------------------------------
+   Two complementary primitives keep a copied formula re-parseable:
+
+   .copyonly   — IN the clipboard, INVISIBLE on screen. Real text kept
+                 in the DOM but pulled out of flow (used for ^, _, and
+                 grouping parens the eye doesn't need but the parser does).
+
+   .op-*       — the reverse: pretty operator ON screen via ::before
+                 (generated content is never copied), with the ASCII the
+                 grammar expects carried in a nested .copyonly. So the
+                 screen shows  x − 4 · √y  while the clipboard gets the
+                 round-trippable  x-4*sqrt(y).
+   ------------------------------------------------------------------ */
 .copyonly {
     position: absolute;
     opacity: 0;
@@ -408,6 +433,22 @@ sup .h-divider, .sqrt .h-divider, .nostack .h-divider {
     width: 0;
     height: 0;
 }
+
+.op-minus::before { content: "\2212"; }  /* − true minus, not a hyphen */
+.op-times::before { content: "\00B7"; }  /* · middle dot */
+.op-pm::before    { content: "\00B1"; }  /* ± unary "+-", or binary "(+/-)" */
+.op-radic::before { content: "\221A"; }  /* √ (copies as "sqrt(…)") */
+
+/* Explicit parenthesised operators — glyph here, "(TOK)" in the copy stream. */
+.op-mp::before        { content: "\2213"; }  /* ∓  (-/+) */
+.op-cross::before     { content: "\00D7"; }  /* ×  (><) cross product */
+.op-le::before        { content: "\2264"; }  /* ≤  bare <= =< */
+.op-ge::before        { content: "\2265"; }  /* ≥  bare >= */
+.op-dimplies::before  { content: "\21D2"; }  /* ⇒  (=>) */
+.op-dimpliedby::before{ content: "\21D0"; }  /* ⇐  (<=) */
+.op-iff::before       { content: "\21D4"; }  /* ⇔  (<=>) */
+.op-oplus::before     { content: "\2295"; }  /* ⊕  (+) harmonic addition */
+.op-def::before       { content: "\2254"; }  /* ≔  :=  definition */
 
 .tiny-error {
     display: inline-block;
@@ -508,7 +549,9 @@ ol.nested > li > ol.nested > li::before {
     h1 { font-size: 2.2rem; }
     h2 { font-size: 1.2rem; }
     sup, sub { white-space: wrap; box-sizing: border-box; display: inline-block; }
-    .expression { box-sizing: border-box; width: 100%; white-space: normal; }
+    /* expressions stay nowrap at every width — they may overflow-scroll, but a
+       term must never break across lines. Do not add white-space:normal here. */
+    .expression { box-sizing: border-box; width: 100%; }
 }
 
 /* ============================================================
