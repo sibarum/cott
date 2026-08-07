@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Method — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/intro/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 4 &middot; <span class="part">The One Idea</span></div>
+    <h1>The Method</h1>
+    <p class="sub">
+      Delete one axiom, keep everything else
+    </p>
+  </div>
+
+  <p class="lead">
+  How do you tell a good theory from a merely correct one?
+  Correctness is the price of entry — the theorems have to hold.
+  Past that, mathematicians reach for a word that sounds soft but does real work: <em>elegance</em>.
+  This chapter is about one particular, slightly contrarian idea of what elegance means — the idea that quietly governs every choice in this book.
+  </p>
+
+  <h2>The bias toward more</h2>
+
+  <p>
+  There is a habit in how mathematics rewards its practitioners.
+  You make your name by <em>adding</em>: a new axiom, a new structure, a new object that unlocks a whole landscape of theorems.
+  Nobody has ever become famous for <em>removing</em> an axiom.
+  Adding looks like discovery; subtracting looks like retreat.
+  </p>
+
+  <p>
+  The bias isn't baseless — a well-chosen new axiom really can open enormous territory, and mathematics is richer for the great ones.
+  But it has trained a reflex: when something doesn't fit, add machinery to handle it.
+  And that reflex runs up a bill nobody adds together.
+  </p>
+
+  <h2>The inverse principle</h2>
+
+  <p>
+  The method behind this book runs the other way.
+  Its name is a mouthful — Principled Emergence Metatheory, PEM for short — but its rule of taste is one sentence: a theory is more elegant the more of its structure <em>emerges</em> from fewer, simpler axioms stated plainly, rather than being installed by hand, one axiom per feature.<sup class="fnref"><a href="#fn1" id="fnref1">1</a></sup>
+  </p>
+
+  <p>
+  <em>Emergence</em> is the operative word.
+  In an emergent theory you do not write in the reciprocal of zero, or the imaginary unit, or the circle.
+  You state a few plain demands, and those things appear on their own — forced into being by what you already committed to.
+  The less you have to declare, and the more that falls out unbidden, the better the theory, by this measure.
+  Elegance is fewness at the top paying for richness below.
+  </p>
+
+  <h2>The true cost of an axiom</h2>
+
+  <p>
+  Here is the line item the "add more" reflex skips.
+  An axiom's cost is not just itself.
+  It is every exception, caveat, and special case it forces downstream.
+  Each time a theorem has to say "for all <span class="math-inline">x</span>, provided <span class="math-inline">x</span> isn't the troublesome one," that little <em>provided</em> is a tax — and the whole landscape of results pays it, permanently.
+  Judge an object not by how simple it looks but by how many caveats it spawns, and some very "simple" objects turn out to be ruinously expensive.
+  </p>
+
+  <h2>The most expensive object in mathematics</h2>
+
+  <p>
+  By that accounting, the absorbing zero — the ordinary <span class="math-inline">0</span>, carrying its rule that <span class="math-inline">0·a = 0</span> — is the most expensive object in all of mathematics.
+  Look at what it charges:
+  </p>
+
+  <ul>
+    <li>Every theorem that divides by a variable has to stop and fence it off — "for <span class="math-inline">x ≠ 0</span>." Multiply that one little exclusion across all of mathematics and you have inflated the entire landscape of results just to route around a single object.</li>
+    <li>Every exact value that sits at it gets outsourced to a limit. You can't evaluate there, so you <em>approach</em> instead, dragging in the whole apparatus of limits to report what ought to have been a plain answer.</li>
+  </ul>
+
+  <p>
+  In fairness, absorption does buy something: it keeps the ordinary number systems tidy, a clean field with one well-behaved zero.
+  PEM's question is simply whether that tidiness is worth the sprawl of exceptions it demands everywhere else — and PEM's answer is no.
+  An absorbing zero is not an elegant object.
+  It is a landmine, and it has been claiming victims since the third grade, the first time "you can't divide by zero" arrived with no reason attached to it.
+  It pays no rent and charges everyone else.
+  </p>
+
+  <h2>What the method tells us to do</h2>
+
+  <p>
+  Faced with a landmine, the reflex is to build better warning signs: more axioms, sharper caveats, careful fences around the hole.
+  PEM says something blunter.
+  Don't fence the landmine — remove the thing that planted it.
+  Find the single axiom responsible, delete it, and delete nothing else, so you can see exactly what it was costing you all along.
+  </p>
+
+  <p>
+  That axiom is absorption.
+  Everything from here is what happens when you pull it out and add nothing back in its place: the reciprocal of zero, the imaginary unit, an exact circle — none of them posited, all of them emergent, each a piece of structure that was being held just out of reach by one line nobody thought to question.
+  </p>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">Stated honestly, PEM is a design stance — a compass, not a calibrated instrument. "Fewer axioms" is a direction to walk, not a number you can always compute, and turning elegance into a genuine measure is unfinished work rather than a settled result. This book uses PEM the way a craftsman uses a level: to tell which way is downhill, not to certify anything. <a href="#fnref1">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../values/">What a Value Is</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../cancellation/">Cancellation as an Operation</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>
