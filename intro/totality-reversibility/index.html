@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Totality and Reversibility — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/intro/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 2 &middot; <span class="part">The One Idea</span></div>
+    <h1>Totality and Reversibility</h1>
+    <p class="sub">
+      The one thing we refuse to do
+    </p>
+  </div>
+
+  <p class="lead">
+  Every number system you were ever taught was born the same way: someone refused to let an operation fail.
+  Refuse to let subtraction fail and the negatives appear.
+  Refuse to let division fail and the fractions appear.
+  Refuse to let square roots fail and the imaginary numbers appear.
+  This whole book is one more turn of that same crank — pushed further, and applied to the one operation everyone agreed to let fail.
+  </p>
+
+  <h2>Two demands, about operations</h2>
+
+  <p>
+  We ask two things of arithmetic, and we ask them of the <em>operations</em>, not of the numbers.
+  This is the first thing to hold onto: "total" and "reversible" are not properties a number has.
+  They are promises an operation keeps.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">Totality.</span> Every operation is defined on every value. No inputs are off-limits, no case throws up its hands and says "undefined." There are no holes.<br>
+    <span class="emphasis">Reversibility.</span> No operation destroys information. Whatever you did, there is always a way back to what you started with.
+  </div>
+
+  <p>
+  Ordinary arithmetic keeps neither promise perfectly, and we have simply learned to live with the gaps.
+  Division "can't" take a zero denominator — a hole in totality.
+  And one operation quietly breaks reversibility so completely that no one even flags it.
+  </p>
+
+  <h2>The operation that destroys information</h2>
+
+  <p>
+  Watch what multiplication by zero does to a true statement.
+  <span class="conf c-solid">Solid</span>
+  </p>
+
+  <div class="math">a = b   ⟶   0·a = 0·b   ⟶   0 = 0</div>
+
+  <p>
+  Every step is legal — we did the same thing to both sides — and yet the ending, <span class="math-inline">0 = 0</span>, has forgotten everything.
+  It is true no matter what <span class="math-inline">a</span> and <span class="math-inline">b</span> were.
+  Whatever information the first line carried is simply gone, with no way back.
+  Division by zero gets a century of anxious footnotes; this — multiplication quietly shredding the page — gets silence, because long ago we decided this particular destruction was acceptable.
+  Under our demand, it is not.
+  The rule responsible has a name, <strong>absorption</strong> — <span class="math-inline">0·a = 0</span>, the rule that lets zero swallow whatever it touches — and it is the single thing the rest of the book removes.<sup class="fnref"><a href="#fn1" id="fnref1">1</a></sup>
+  </p>
+
+  <h2>Reversible does not mean "has a neat inverse"</h2>
+
+  <p>
+  It is easy to hear "reversible" and think "every operation must have a tidy undo button." That is more than we need, and it is not quite what we mean.<sup class="fnref"><a href="#fn2" id="fnref2">2</a></sup>
+  </p>
+
+  <p>
+  Multiplying by <span class="math-inline">2</span> is reversible: halve it and you are home.
+  Multiplying by <span class="math-inline">0</span>, classically, is not: everything lands on <span class="math-inline">0</span>, and once there, nothing tells you where it came from.
+  The difference between the two is not whether there is a clean inverse formula.
+  It is whether the operation ever fuses genuinely different inputs into one result and keeps <em>no record</em> of the difference.
+  That — an irreversible <em>collapse</em>, a merge with no receipt — is the only thing we forbid.
+  An operation may take several steps to undo, or have no single-formula inverse, and still be perfectly reversible, so long as nothing was thrown away without a trace.
+  </p>
+
+  <h2>What limits are really for</h2>
+
+  <p>
+  There is a tell that classical mathematics already knows these gaps are there: the <em>limit</em>.
+  When an expression wanders into forbidden territory — a denominator sliding toward zero, a sum with infinitely many terms — the standard move is to step outside the sanctioned rules, do the illegal thing carefully, and then forgive it with a limiting process that lands you back on safe ground.
+  A limit is a reconciliation ritual: permission to trespass, granted after the fact.
+  </p>
+
+  <p>
+  The demand of this book is the obvious, impertinent question that follows.
+  What if you never had to trespass in the first place?
+  What if the operations were total and reversible from the start, so there was no forbidden territory to be forgiven for entering?
+  You would not need the ritual.
+  You would need, instead, to give up the one permission the ritual was covering for: the permission to throw information away.
+  </p>
+
+  <h2>What this costs, and what it buys</h2>
+
+  <p>
+  The cost is exactly that permission.
+  We may no longer let any operation collapse without a receipt — no silent absorption, no quiet rounding of something down to nothing.
+  The purchase is a world with no exceptions and no special cases, where every operation runs on every input and every step can be walked back.
+  </p>
+
+  <p>
+  And there is a consequence we will feel immediately, one that sounds like a paradox until you see it happen.
+  Refusing to destroy information does not only forbid things — it <em>forces new objects into existence</em>.
+  When an operation is no longer allowed to fail or to collapse, the result it used to refuse has to go somewhere, and that somewhere is a new value.
+  The first and strangest of them is the reciprocal of zero.
+  But before we meet it, we have to be honest about what these "values" even are — because in this world, most of them are not numbers.
+  </p>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">Why absorption specifically — rather than "0 has no reciprocal" or some other phrasing — is the right thing to blame, and how <span class="math-inline">0</span> ended up carrying it, is the subject of <a href="../cancellation/">Chapter 4</a>. <a href="#fnref1">↩</a></li>
+      <li id="fn2">"No irreversible collapse" is stated here as a working definition, and it is doing real work, but it is not yet a fully formal criterion — pinning down exactly what counts as "keeping a record" is genuine unfinished business, not a settled theorem. We will be careful to flag where the informal version is load-bearing. <a href="#fnref2">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../types-as-operations/">Types as Operations</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../values/">What a Value Is</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<!-- Math rendering engine -->
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

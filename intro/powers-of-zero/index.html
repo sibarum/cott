@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Powers of the Zero — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/intro/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 6 &middot; <span class="part">The Circle for Free</span></div>
+    <h1>Powers of the Zero</h1>
+    <p class="sub">
+      Where −1 comes from
+    </p>
+  </div>
+
+  <p class="lead">
+  We have a zero with a reciprocal and a grade.
+  The natural next thing to do with any number is raise it to powers and see what comes out.
+  Almost every rung of that ladder is forced on us by rules we already accept — and then exactly one rung is left open.
+  What we choose to write there is where the number <span class="math-inline">−1</span> comes from, and with it, the whole complex plane.
+  </p>
+
+  <h2>The ladder that's forced</h2>
+
+  <p>
+  Take the ordinary rules of exponents — the ones you already believe — and apply them to <span class="math-inline">0</span> and <span class="math-inline">ω</span> without flinching, without adding a single new assumption.
+  <span class="conf c-solid">Solid</span>
+  Anything to the zero power is <span class="math-inline">1</span>. Anything to the first power is itself. A negative power is a reciprocal, and we already know zero's reciprocal is <span class="math-inline">ω</span>.
+  That alone pins down the entire integer ladder:
+  </p>
+
+  <div class="math">0⁰ = 1          0¹ = 0          0⁻¹ = ω          0⁻ⁿ = ωⁿ
+ω⁰ = 1          ω¹ = ω          ω⁻¹ = 0          ω⁻ⁿ = 0ⁿ</div>
+
+  <p>
+  None of that is a choice.
+  Every entry follows from rules you would insist on for any ordinary number, applied evenly to the two new poles.
+  The grades line up too: <span class="math-inline">0ⁿ</span> sits at grade <span class="math-inline">+n</span>, <span class="math-inline">ωⁿ</span> at grade <span class="math-inline">−n</span>, exactly as the bookkeeping demands.
+  </p>
+
+  <h2>The one rung left open</h2>
+
+  <p>
+  Run down that ladder and you find something surprising: after the integer powers are all fixed, essentially <em>one</em> value is left unpinned.
+  The rules say nothing about raising zero to the power <span class="math-inline">ω</span> itself — <span class="math-inline">0^ω</span> — nor its mirror image.
+  It is the one genuinely free choice in the whole construction.
+  </p>
+
+  <p>
+  But it is a free choice hemmed in on every side.
+  Whatever we put there has to keep the powers closing consistently — reciprocals still reciprocals, the ladder still reversible, the whole system still total.
+  Run through the constraints and one value threads all of them at once.
+  We set it, as the natural normalization that makes everything close:<sup class="fnref"><a href="#fn1" id="fnref1">1</a></sup>
+  </p>
+
+  <div class="eqn"><span class="dynamicexpr expression">0^w = -1</span></div>
+
+  <h2>Where −1 comes from — and i, and the circle</h2>
+
+  <p>
+  That single line pays for the whole complex plane, and it does it without positing anything.
+  Watch what the half-power does.
+  If <span class="math-inline">0^ω = −1</span>, then <span class="math-inline">0^(ω/2)</span> is the thing that, squared, gives <span class="math-inline">−1</span> — which is precisely the job description of the imaginary unit:
+  <span class="conf c-solid">Solid</span>
+  </p>
+
+  <div class="eqn"><span class="dynamicexpr expression">i = 0^(w/2)</span></div>
+
+  <p>
+  And because the powers of <span class="math-inline">ω</span> wrap rather than run off, going twice around brings you home:
+  </p>
+
+  <div class="eqn"><span class="dynamicexpr expression">0^(2*w) = 1</span></div>
+
+  <p>
+  So from one forced ladder and one natural normalization, three things arrive together that ordinarily cost real machinery: the number <span class="math-inline">−1</span>, the imaginary unit <span class="math-inline">i</span>, and a circle that closes exactly.
+  The standard route to these posits <span class="math-inline">i</span> by decree, builds <span class="math-inline">exp</span> from an infinite series, and defines <span class="math-inline">π</span> through a limit.
+  Here none of that is needed — no series, no limit, no decree beyond the one normalization we were honest about choosing.
+  </p>
+
+  <h2>What this buys</h2>
+
+  <p>
+  We now have the imaginary unit sitting inside the powers of zero, and a hint that those powers trace a circle.
+  Two questions come straight out of that.
+  First — in what sense is <span class="math-inline">i</span> "a zero," really?
+  And second — if the circle is exact, can we actually compute points on it, by hand, with no limits and no approximation?
+  Those are the next two chapters.
+  </p>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">It is tempting to say this value is "forced," and it is nearly so — but honestly it is a <em>normalization</em>, not a theorem. The integer ladder above is forced; <span class="math-inline">0^ω</span> is the one place a choice enters, and <span class="math-inline">−1</span> is the choice that makes everything close cleanly. There is a family of formally-consistent alternatives (they amount to choosing a branch); <span class="math-inline">−1</span> is the natural one, and we take it deliberately rather than pretending it was inevitable. One can also "check" it by noting <span class="math-inline">log₀(−1) = ω</span>, but that is not independent confirmation: <span class="math-inline">log₀</span> is <em>defined</em> as the inverse of raising <span class="math-inline">0</span> to a power, so the check just restates the choice in a mirror. <a href="#fnref1">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../invertible-zero/">The Invertible Zero</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../imaginary-unit/">The Imaginary Unit</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<!-- Math rendering engine -->
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>
