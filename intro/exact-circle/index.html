@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Exact Circle — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/intro/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 9 &middot; <span class="part">The Circle for Free</span></div>
+    <h1>The Exact Circle</h1>
+    <p class="sub">
+      Phase without limits; roots of unity by hand
+    </p>
+  </div>
+
+  <p class="lead">
+  We have seen <span class="math-inline">i</span> hiding in the powers of zero, and that going twice around comes home: <span class="math-inline">0^(2ω) = 1</span>.
+  If those powers really sweep a unit around a circle, there is one honest way to test it.
+  Compute points on that circle exactly — by hand, with nothing but ordinary whole-number arithmetic, no sine tables, no infinite series, no <span class="math-inline">π</span>.
+  It works, and this chapter does it.
+  </p>
+
+  <h2>The half-step and its shadow</h2>
+
+  <p>
+  Take the smallest step around the circle we can name: the half-power <span class="math-inline">u = 0^(1/2)</span>, and its reciprocal <span class="math-inline">v = 0^(−1/2)</span>.
+  Because one is the reciprocal of the other, their product is just <span class="math-inline">1</span> — they are a matched pair, a step and its undo.
+  Add them together and you get a single number that stands in for the angle of the step:
+  </p>
+
+  <div class="math">u · v = 1                s = u + v</div>
+
+  <p>
+  Everything below is built from <span class="math-inline">s</span>.
+  You never have to know what <span class="math-inline">u</span> "is" as a decimal — only that it and <span class="math-inline">v</span> multiply to one.
+  </p>
+
+  <h2>One rule generates the whole circle</h2>
+
+  <p>
+  Now ask for the combined step-sizes further around: <span class="math-inline">aₙ = uⁿ + vⁿ</span>, the sum of the <span class="math-inline">n</span>-th step and its undo.
+  Because <span class="math-inline">u</span> and <span class="math-inline">v</span> are reciprocals, these obey one clean rule — multiply the previous one by <span class="math-inline">s</span> and subtract the one before it:
+  </p>
+
+  <div class="math">aₙ = s · aₙ₋₁ − aₙ₋₂            a₀ = 2 ,  a₁ = s</div>
+
+  <p>
+  That is the entire engine.
+  Turn the crank and every term is an exact polynomial in <span class="math-inline">s</span> with whole-number coefficients — no rounding, ever:
+  </p>
+
+  <div class="math">a₂ = s² − 2
+a₃ = s³ − 3s
+a₄ = s⁴ − 4s² + 2
+a₅ = s⁵ − 5s³ + 5s</div>
+
+  <p>
+  If those polynomials look familiar to anyone who has met them, they should: this is the Chebyshev recurrence, the same rule that turns the cosine of an angle into the cosine of its multiples.
+  Stepping it is stepping around the circle by equal angles — exactly, with no trigonometry underneath and no limit anywhere in sight.<sup class="fnref"><a href="#fn1" id="fnref1">1</a></sup>
+  </p>
+
+  <h2>Roots of unity, by hand</h2>
+
+  <p>
+  The payoff is concrete.
+  Choose <span class="math-inline">s</span> so the steps divide the circle evenly, and the arithmetic hands you the exact corner points — the roots of unity — as clean surds, not decimal approximations:
+  </p>
+
+  <div class="math">0^(ω/3)  =  1/2 + (√3 / 2) i                    (a third of a half-turn)
+0^(ω/5)  =  cos 36° + i sin 36° ,   cos 36° = (1 + √5) / 4</div>
+
+  <p>
+  No calculator produced those; the recurrence did, in exact fractions and roots.
+  The circle isn't being <em>approximated</em> here — it is being computed, corner by corner, in the same whole-number arithmetic you'd use to balance a checkbook.
+  </p>
+
+  <h2>Climbing the tower</h2>
+
+  <p>
+  And you can keep halving the step — <span class="math-inline">0^(1/4)</span>, <span class="math-inline">0^(1/8)</span>, and so on — each level doubling the number of points and locking in finer angles, exactly, all the way down.
+  This is the "dyadic tower": a staircase of ever-finer exact divisions of the circle.<sup class="fnref"><a href="#fn2" id="fnref2">2</a></sup>
+  </p>
+
+  <h2>What this buys</h2>
+
+  <p>
+  This is the concrete engine under the phrase "no limits."
+  The circle — phase, rotation, the whole apparatus that usually arrives dressed in sines and <span class="math-inline">π</span> and infinite series — is here a whole-number recurrence you can run by hand and check to the last digit.
+  It is the most solid, most verifiable thing in the book, and it fell out of one normalization and a matched pair of reciprocals.
+  </p>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">Worth being honest about what this does and doesn't show: the recurrence <span class="math-inline">aₙ = s·aₙ₋₁ − aₙ₋₂</span> holds for <em>any</em> pair whose product is <span class="math-inline">1</span> — it is a basic fact about reciprocal pairs, not something special to the invertible zero. That it lands on the classical Chebyshev polynomials is therefore natural structure, not a lucky coincidence and not, by itself, independent proof that the zero-machinery is "right." What it genuinely delivers is the <em>exactness</em>: an algebraic, limit-free model of phase. <a href="#fnref1">↩</a></li>
+      <li id="fn2">The tower reaches the angles whose fractions are powers of two — the dyadic angles — exactly. That is a lot of the circle, but not all of it; the claim here is exact reach to those points, not that this arithmetic recovers every point of the plane. Where the continuum genuinely needs limits is marked off later, when we reach the edge of the method. <a href="#fnref2">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../imaginary-unit/">The Imaginary Unit</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../multiplication/">Multiplication, Solved</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

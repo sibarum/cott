@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What a Value Is — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/intro/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 3 &middot; <span class="part">The One Idea</span></div>
+    <h1>What a Value Is</h1>
+    <p class="sub">
+      Deferred, not yet a number
+    </p>
+  </div>
+
+  <p class="lead">
+  This is the chapter that trips people up, so we are going to meet it directly rather than let it ambush you later.
+  In this world, most values — and nearly all the interesting ones — are not numbers.
+  They are deferred operations: computations that have not collapsed to a numeral, and shouldn't.
+  Once that lands, almost nothing in the rest of the book feels strange.
+  </p>
+
+  <h2>Numbers are the easy case</h2>
+
+  <p>
+  Take an ordinary value like <span class="math-inline">3</span>.
+  It is completely settled.
+  There is nothing about "how it got here" that you need to keep, because you can do anything to it and always find your way back without that history.
+  Reversibility asks nothing extra of it.
+  A plain number is a value that has to remember <em>nothing</em>.
+  </p>
+
+  <h2>Some values cannot be collapsed</h2>
+
+  <p>
+  Now take <span class="math-inline">√−1</span>.
+  Try to boil it down to a plain number on the line and you can't — there is no such number.
+  But look at <em>why</em>, in the language of the last chapter.
+  To be able to reverse it, the value has to carry three things: a number (<span class="math-inline">1</span>), a sign (the minus), and an operation (the square root).
+  Throw any of those away and you have destroyed exactly the information you'd need to undo it — which is the one thing we've forbidden.
+  So it doesn't collapse. It stays as what it is: a held, unfinished operation.
+  </p>
+
+  <p>
+  You might think the native notation would fix this — write it as <span class="math-inline">0^(ω/2)</span> instead and surely it becomes "a value" rather than "an operation."
+  It doesn't, and this is the point.
+  <span class="math-inline">0^(ω/2)</span> carries the <em>same</em> three pieces of information as <span class="math-inline">√−1</span> — a base, a power, a direction.
+  The notation changed; the amount of history that must be recorded did not.
+  Whatever you call it, the value is exactly as deferred as reversibility requires it to be.
+  </p>
+
+  <h2>The definition</h2>
+
+  <p>
+  So here is the inversion, stated plainly.
+  </p>
+
+  <div class="section-alt">
+    A <span class="emphasis">value</span> is a deferred operation — an operational history that has not collapsed.
+    It carries exactly as much of that history as reversibility demands, and no more.
+    A <span class="emphasis">number</span> is the special case: the value where that demand is zero.
+  </div>
+
+  <p>
+  Read the usual picture and this one side by side.
+  The usual picture says numbers are the real things and operations act on them.
+  This one says operations are the real things and a number is just an operation that happened to need no memory.
+  The interesting values live in between — carrying a little history, or a lot — and they never finish resolving into a numeral because finishing would mean forgetting.
+  </p>
+
+  <h2>Why it feels uneasy — and why it shouldn't</h2>
+
+  <p>
+  The discomfort is real and worth naming: we are trained from childhood that every value must "come out to a number," and a value that stays an operation feels unfinished, like an answer someone forgot to compute.
+  But that instinct is the very habit this theory rejects.
+  Forcing every value down to a numeral <em>is</em> the information-destruction we outlawed in the last chapter — it is the same move as letting zero swallow what it multiplies.
+  A deferred value is not a placeholder for some "real" answer waiting to be found.
+  It is the answer, kept in the only form that doesn't throw part of itself away.
+  </p>
+
+  <h2>What this buys</h2>
+
+  <p>
+  Everything ahead gets easier once you stop trying to collapse.
+  The reciprocal of zero, the leftovers of a cancellation, the differential that falls out of multiplying by zero — each is a deferred operation carrying precisely the history it needs, no more.
+  When one of them shows up looking like "not a real number," that is not a warning sign.
+  It is the theory working exactly as defined.
+  </p>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../totality-reversibility/">Totality and Reversibility</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../method/">The Method</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

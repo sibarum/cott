@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Imaginary Unit — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/intro/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 8 &middot; <span class="part">The Circle for Free</span></div>
+    <h1>The Imaginary Unit</h1>
+    <p class="sub">
+      A zero seen edge-on
+    </p>
+  </div>
+
+  <p class="lead">
+  The last chapter handed us something that ought to feel impossible: the imaginary unit, sitting inside the powers of zero, as <span class="math-inline">i = 0^(ω/2)</span>.
+  How can <span class="math-inline">i</span> — the very emblem of the abstract and unreal — be hiding in <span class="math-inline">0</span>, the very emblem of nothing?
+  The answer isn't a trick of algebra. It's a change in how you look at zero.<sup class="fnref"><a href="#fn1" id="fnref1">1</a></sup>
+  </p>
+
+  <h2>A shadow of length zero</h2>
+
+  <p>
+  Picture a unit arrow — length exactly <span class="math-inline">1</span> — but pointing straight up, at a right angle to the number line.
+  Now look at it <em>edge-on</em>, from within the line itself, and measure the shadow it casts on the line.
+  The shadow has length <span class="math-inline">0</span>.
+  Not because the arrow is small — it is a full unit — but because it points in a direction the line cannot see.
+  Its whole length is real; it is simply spent pointing somewhere the line has no room for.
+  </p>
+
+  <h2>Zero as an edge-on unit</h2>
+
+  <p>
+  That is the reframe, and it is the whole chapter in one sentence: the <span class="math-inline">0</span> of ordinary arithmetic is a full unit whose direction has been projected away, leaving only its length-zero shadow.
+  Restore the direction — refuse to throw it out — and a unit pointing at a right angle to the reals is precisely the imaginary unit.
+  <span class="math-inline">i</span> and <span class="math-inline">0</span> are not strangers who happen to satisfy the same equation.
+  <span class="math-inline">i</span> is what <span class="math-inline">0</span> looks like when you stop discarding where it points.
+  </p>
+
+  <p>
+  This is also why the reciprocal from two chapters ago pointed the way it did.
+  The reciprocal of a unit is a unit, and turning the edge-on arrow over gives another edge-on arrow aimed the opposite way — a direction, not a runaway size.
+  That is exactly the sense in which <a href="../invertible-zero/">the invertible zero's</a> reciprocal <span class="math-inline">ω</span> was "a direction, not an infinity": it is the edge-on unit inverted.
+  In the same picture, <span class="math-inline">+0</span> and <span class="math-inline">−0</span> are just <span class="math-inline">+i</span> and <span class="math-inline">−i</span> seen edge-on — two genuinely different arrows that happen to cast the same zero-length shadow.
+  </p>
+
+  <h2>The receipt</h2>
+
+  <p>
+  Step back and the theme of the whole book is sitting right here.
+  The classical zero is this richer zero with one coordinate projected away — and the thing projected away is not gone.
+  It is a <em>receipt</em>: the piece of information a lossy shadow throws out, but a world that refuses to destroy information has to keep.
+  Ordinary arithmetic reads the shadow and files the receipt in the trash.
+  This one keeps the receipt, and the imaginary unit is what's written on it.
+  </p>
+
+  <h2>What this buys</h2>
+
+  <p>
+  We now have a reason, not just a formula, for <span class="math-inline">i</span> living inside <span class="math-inline">0</span>: they are the same unit, shadowed and unshadowed.
+  And if <span class="math-inline">0</span> is really a unit pointing off the line, its powers should sweep that unit <em>around</em> — tracing a circle.
+  The next chapter takes that literally and computes points on the circle exactly, by hand, with nothing but whole-number arithmetic.
+  </p>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">This "edge-on unit" is a change of eye — a picture that organizes the facts and tells you what to expect — not, by itself, a constructed theorem. The precise setting in which "zero is a unit at an angle" becomes exact machinery is the circle of the next chapter; even there, the picture is an interpretation laid over the algebra, and it earns its keep by predicting the right answers rather than by being proved from below. <a href="#fnref1">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../powers-of-zero/">Powers of the Zero</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../exact-circle/">The Exact Circle</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

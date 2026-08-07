@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Types as Operations — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/intro/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 1 &middot; <span class="part">The One Idea</span></div>
+    <h1>Types as Operations</h1>
+    <p class="sub">
+      What a number is for, not what it is
+    </p>
+  </div>
+
+  <p class="lead">
+  You already know what a number is — or you feel like you do.
+  This book turns on a different and more useful question: not what a number <em>is</em>, but what it is <em>for</em>.
+  Answer that, and a lot of things that look like separate rules turn out to be one rule seen from different angles.
+  </p>
+
+  <h2>A ladder nobody points out</h2>
+
+  <p>
+  Think back over the number systems you were handed, one at a time, and notice why each new one showed up.
+  You start with the counting numbers, which are all you need until you try to take <span class="math-inline">3 − 5</span> and fall off the bottom.
+  So the negatives get invented, and now subtraction always works.
+  Then <span class="math-inline">1 ÷ 2</span> falls between the whole numbers, and the fractions get invented, and now division always works.
+  Then <span class="math-inline">√2</span> isn't any fraction, and the irrationals fill the gaps.
+  Then <span class="math-inline">√−1</span> isn't anywhere on the line at all, and the imaginary numbers appear.
+  </p>
+
+  <p>
+  Every rung of that ladder is the same move.
+  An operation you already trusted — subtracting, dividing, taking a root — ran off the edge of the numbers you had.
+  And instead of banning the operation, we widened the world until the operation fit back inside it.
+  The numbers didn't come first and the operations second.
+  It was the other way around: the operations were the pressure, and each new kind of number was what had to exist to relieve it.
+  </p>
+
+  <h2>A type is "which operations stay total"</h2>
+
+  <p>
+  So ask what actually distinguishes those systems from one another.
+  It is tempting to say they contain different <em>kinds of stuff</em> — but that is not the working difference.
+  The working difference is which operations you can perform without falling out.
+  You can subtract freely in the integers and not in the counting numbers; you can divide freely in the fractions and not in the integers.
+  A number system is pinned down not by what its members look like but by the operations it is <em>closed under</em>.
+  </p>
+
+  <p>
+  That is the definition this book runs on.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">A type</span> is characterized not by the intrinsic nature of its members, but by the total, reversible operations it admits and stays stable under.
+  </div>
+
+  <p>
+  It is a small shift in wording and a large shift in stance.
+  The usual order is: here are the objects, and here is what you may do to them.
+  The order here is reversed: here are the operations we refuse to let fail, and the type is whatever must exist to keep them working.
+  "What a number is for" comes first; "what a number is" is downstream of it.
+  </p>
+
+  <h2>Where this is heading</h2>
+
+  <p>
+  Reversing the order has a consequence that is easy to say and surprisingly hard to sit with.
+  If a value's job is to keep operations total and reversible, then a value does not have to be a tidy number on a line — it only has to carry whatever is needed to do that job.
+  Some of the most important values in this book will not look like numbers at all.
+  That is not a bug to be explained away; it is the direct result of the definition above, and it is the very next thing we need to make peace with.
+  </p>
+
+  <nav class="chapter-nav">
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../totality-reversibility/">Totality and Reversibility</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>
