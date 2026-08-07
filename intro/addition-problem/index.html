@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Addition Problem — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/intro/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 11 &middot; <span class="part">The Two Operations</span></div>
+    <h1>The Addition Problem</h1>
+    <p class="sub">
+      The wound the grades can't close
+    </p>
+  </div>
+
+  <p class="lead">
+  Multiplication was solved by one integer.
+  You would expect addition to be no harder.
+  It is much harder — and the exact reason why is the hinge the rest of the theory turns on, so it is worth slowing down to see it clearly.
+  </p>
+
+  <h2>Adding across grades</h2>
+
+  <p>
+  Most of the time, adding graded values is uneventful.
+  If two values sit at the same grade, you add their coefficients and keep the grade:
+  </p>
+
+  <div class="math">0·5  +  0·3   =   0·8            (same grade, nothing to worry about)</div>
+
+  <p>
+  The trouble is not the everyday case.
+  It is one specific event — and it is the same event we met at the very start, cancellation, now seen from the addition side.
+  </p>
+
+  <h2>The wound</h2>
+
+  <p>
+  Take two values whose leading, top-grade parts are exactly opposite — an <span class="math-inline">a</span> and a <span class="math-inline">−a</span>.
+  Add them, and those tops annihilate: <span class="math-inline">a + (−a) = ⊘</span>, a clean cancellation with nothing left at that grade.
+  In ordinary arithmetic that is the end of the story — the answer is what's underneath.
+  But in a <em>graded</em> world you are now obliged to answer a question the cancellation refuses to: what grade does the survivor live at?
+  </p>
+
+  <p>
+  The top vanished, so whatever remains lives at some <em>lower</em> grade — and you cannot know which without looking further down.
+  </p>
+
+  <div class="math">(a + …)  +  (−a + …)   =   ⊘  +  (what's left, at a grade you can't see from up here)</div>
+
+  <p>
+  This is the wound.
+  Multiplication's one sore spot, <span class="math-inline">0·ω</span>, closed with a single integer because grades just add.
+  A leading-term cancellation closes with no such luck: to know where the result sits you may have to carry the entire tail of the expression, term after term, all the way down.
+  </p>
+
+  <h2>One integer versus the whole tail</h2>
+
+  <p>
+  Here is the asymmetry stated plainly, because it is the whole point.
+  To do multiplication you needed only the leading order — a single integer, the grade.
+  To do addition through a cancellation you may need the <em>whole</em> expansion — every lower term, not just the top.<sup class="fnref"><a href="#fn1" id="fnref1">1</a></sup>
+  One integer versus an endless tail.
+  That gap is exactly why multiplication came for a penny and addition sends a bill with no bottom line — and it is the reason addition, not multiplication, is where the real work of this theory happens.
+  </p>
+
+  <h2>Why you can't just borrow ordinary +</h2>
+
+  <p>
+  The tempting shortcut is to shrug and use ordinary addition, the one you already know.
+  You can't, and the reason is precise.
+  Ordinary addition is built around an identity — its "add-nothing" element — and that identity is <span class="math-inline">0</span>.
+  But <span class="math-inline">0</span> is the object that sits at the very grade a cancellation drops into and hides.
+  Ordinary addition's home base is planted directly on the trapdoor.
+  Borrow it unchanged and you have chosen the one addition guaranteed to fight the grading instead of respecting it.
+  </p>
+
+  <h2>The question this forces</h2>
+
+  <p>
+  So the wound sharpens into a demand.
+  We need an addition whose identity does <em>not</em> sit on the information-swallowing grade — one built to respect the grading rather than trip over it.
+  Is there such a thing? Can an addition be <em>grown</em> to order, with its "nothing" relocated somewhere safe?
+  There is, and it is not one addition but a whole dial of them.
+  That is the next chapter.
+  </p>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">In the usual vocabulary, multiplication needs only a <em>valuation</em> — the single number that says the leading order — while addition through a cancellation needs the whole <em>germ</em>, the entire local expansion. The names aren't important; the gap between "one number" and "the entire tail" is. <a href="#fnref1">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../multiplication/">Multiplication, Solved</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../addition-dial/">The Addition Dial</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

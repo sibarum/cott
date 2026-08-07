@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multiplication, Solved — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/intro/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 10 &middot; <span class="part">The Two Operations</span></div>
+    <h1>Multiplication, Solved</h1>
+    <p class="sub">
+      Bookkeeping with grades
+    </p>
+  </div>
+
+  <p class="lead">
+  We gave zero a reciprocal and put its "size" on a shelf called the grade.
+  Now we actually do arithmetic with it — and multiplication turns out to be completely, almost embarrassingly, solved.
+  The whole of it is bookkeeping with a single integer.
+  </p>
+
+  <h2>A value has two parts</h2>
+
+  <p>
+  Every value here splits cleanly into two pieces: an ordinary coefficient, and a grade that says how many factors of zero it carries.
+  The tidiest way to write that is a coefficient times a power of zero:
+  </p>
+
+  <div class="math">5      =   5 · 0⁰       (an ordinary number: coefficient 5, grade 0)
+0·5    =   5 · 0¹       (five, held one grade down)
+ω      =   1 · 0⁻¹      (coefficient 1, grade −1)</div>
+
+  <p>
+  The grade is the exponent on the zero; the coefficient is whatever ordinary number rides in front.
+  That is the entire data of a value — a number, and a place for it to stand.
+  </p>
+
+  <h2>Multiply the coefficients, add the grades</h2>
+
+  <p>
+  Once values look like that, multiplication writes itself.
+  To multiply two of them, multiply the coefficients the ordinary way and <em>add</em> the grades — because multiplying powers of the same base adds their exponents, which is a rule you already trust.
+  </p>
+
+  <div class="math">(c₁ · 0^g₁) · (c₂ · 0^g₂)   =   (c₁ · c₂) · 0^(g₁ + g₂)</div>
+
+  <p>
+  That one line is the whole multiplication table.
+  Watch the case that used to be forbidden fall straight out of it:
+  </p>
+
+  <div class="math">0 · ω   =   (1 · 0¹) · (1 · 0⁻¹)   =   1 · 0⁰   =   1</div>
+
+  <p>
+  The grades <span class="math-inline">+1</span> and <span class="math-inline">−1</span> simply add to <span class="math-inline">0</span>, the coefficients multiply to <span class="math-inline">1</span>, and you are left standing on the ordinary numbers holding a plain <span class="math-inline">1</span>.
+  Taking a reciprocal is just as easy: flip the sign of the grade and invert the coefficient.
+  </p>
+
+  <h2>The one indeterminate form, cured for a penny</h2>
+
+  <p>
+  In ordinary mathematics <span class="math-inline">0 · ω</span> — "zero times infinity" — is the archetype of an <em>indeterminate form</em>, a question limits are summoned to argue over because the plain arithmetic refuses to answer.
+  Here there is nothing to argue.
+  It is grade <span class="math-inline">+1</span> meeting grade <span class="math-inline">−1</span>; they cancel to grade <span class="math-inline">0</span>; the answer is <span class="math-inline">1</span>.
+  The single indeterminate form multiplication ever had is closed by one integer of bookkeeping — no limit, no approach, no argument.
+  Multiplication is total, reversible, and exact, with no exceptions left anywhere in it.
+  </p>
+
+  <h2>A fair worry: two things at grade zero</h2>
+
+  <p>
+  A careful reader might stop here.
+  We just said <span class="math-inline">0·ω = 1</span> lands at grade <span class="math-inline">0</span> — but so does <span class="math-inline">0^ω = −1</span> from a few chapters back.
+  Two different values, same grade. Isn't that a contradiction?
+  </p>
+
+  <p>
+  No — and seeing why keeps the bookkeeping straight.
+  The grade is only <em>one</em> coordinate of a value; it tracks size and order, not the whole thing.
+  Grade <span class="math-inline">0</span> is simply the ordinary numbers, and ordinary numbers of course still differ among themselves — <span class="math-inline">+1</span> and <span class="math-inline">−1</span> are both grade <span class="math-inline">0</span>, told apart by their coefficient, exactly as they always were.
+  The grade never claimed to name the value by itself; it names where the value stands, and the coefficient says which one it is.
+  </p>
+
+  <h2>What this buys — and what it doesn't</h2>
+
+  <p>
+  Multiplication is finished: one integer per value, one rule, no gaps.
+  It is the cheap, clean half of arithmetic in this world.
+  You might reasonably expect addition to be just as easy — and here the good news stops.
+  Addition, it turns out, is the hard half, and the precise reason it's hard is the hinge the whole second half of this book swings on.
+  </p>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../exact-circle/">The Exact Circle</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../addition-problem/">The Addition Problem</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>
