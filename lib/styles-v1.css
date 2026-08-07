@@ -304,6 +304,24 @@ sup .h-divider, .sqrt .h-divider, .nostack .h-divider {
     height: 0;
 }
 
+/* Operator glyphs for the math renderer: the visible symbol is drawn here as
+   a ::before, while the ASCII the parser needs rides invisibly in a nested
+   .copyonly. These MUST stay in sync with the same block in styles-v3.css —
+   the shared traction-interpret.js emits these classes for every page. */
+.op-minus::before     { content: "\2212"; }  /* − */
+.op-times::before     { content: "\00B7"; }  /* · */
+.op-pm::before        { content: "\00B1"; }  /* ± */
+.op-radic::before     { content: "\221A"; }  /* √ */
+.op-mp::before        { content: "\2213"; }  /* ∓ */
+.op-cross::before     { content: "\00D7"; }  /* × */
+.op-le::before        { content: "\2264"; }  /* ≤ */
+.op-ge::before        { content: "\2265"; }  /* ≥ */
+.op-dimplies::before  { content: "\21D2"; }  /* ⇒ */
+.op-dimpliedby::before{ content: "\21D0"; }  /* ⇐ */
+.op-iff::before       { content: "\21D4"; }  /* ⇔ */
+.op-oplus::before     { content: "\2295"; }  /* ⊕ */
+.op-def::before       { content: "\2254"; }  /* ≔ */
+
 .narration sup {
     margin-right: -0.2em;
     display: inline;
