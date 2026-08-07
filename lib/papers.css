@@ -237,6 +237,60 @@
 .chapter-nav .next::after  { content: "\00a0\2192"; }   /* →  */
 .chapter-nav .toc { color: var(--ink-soft); }
 
+/* ---------- Table of contents (landing page) ---------- */
+.paper .toc-part {
+    font-family: var(--font-meta);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.74rem;
+    color: var(--accent);
+    margin: 2.6rem 0 0.4rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--rule);
+}
+.paper ol.contents { list-style: none; padding: 0; margin: 0; }
+.paper ol.contents li {
+    display: grid;
+    grid-template-columns: 2.4rem 1fr;
+    column-gap: 0.8rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: baseline;
+    margin: 0;
+}
+.paper ol.contents .ch-num {
+    font-family: var(--font-meta);
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    text-align: right;
+}
+.paper ol.contents .ch-title {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: 1.1rem;
+    letter-spacing: -0.01em;
+}
+.paper ol.contents .ch-title a { border-bottom: none; }
+.paper ol.contents .ch-sub {
+    grid-column: 2;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    margin-top: 0.1rem;
+}
+.paper ol.contents li.soon { opacity: 0.5; }
+.paper ol.contents .soon-tag {
+    font-family: var(--font-meta);
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.05em 0.4em;
+    margin-left: 0.5em;
+    vertical-align: 0.18em;
+}
+
 /* ---------- Mobile ---------- */
 @media only screen and (max-width: 640px) {
     .paper h1 { font-size: 2.1rem; }
