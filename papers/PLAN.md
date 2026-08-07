@@ -71,15 +71,19 @@ Fields per chapter — **Thesis** (one breath) · **Tag** · **Consolidates** (s
 - **Fix:** state the tag definitions precisely up front.
 - **Links:** → every chapter (it's the TOC); esp. → 1, 21, 22.
 
+> **Numbering note:** the standalone "Values as Deferred Operations" chapter (below, after Totality & Reversibility) is a late insertion; it shifts every subsequent number by +1. Final chapter numbers are assigned when the TOC / landing page (Ch 0) is built — treat the numbers here as provisional order, not fixed labels.
+
 ### The One Idea (Solid)
 
 **1 · Types as Operations** — *What a number is for, not what it is*
 - **Thesis:** a type is defined by the total, reversible operations it stays closed under, not by its elements.
 - **Tag:** Solid.
-- **Consolidates:** `intro §1`, `theory/reference §4.3`, `papers/1 §01` (the Type definition).
+- **Consolidates:** `intro §1` (operational deferral), `theory/reference §4.3`, `papers/1 §01` (the Type definition).
 - **Keep:** the ℕ→ℤ→ℚ→ℂ progression ("types emerge from which operations must stay total") — the strongest intuition pump in the corpus.
+- **Explicit beat — "A value is a deferred operation" (unconventional; state it plainly):** most values, and *all* the interesting ones, are not numerals — they are operational histories that haven't collapsed. **Numbers are the special case: the fully-collapsed values.** Frame the inversion as a feature, not a defect, and tie it to necessity — you can only refuse to destroy information if a value is *allowed* to stay uncollapsed rather than be forced to a numeral. This defuses the single most common source of reader unease (trying to collapse every value back to a number). Presented as a Definition, not a tagged claim.
+- **Recurring motif:** reinforce with one-line callbacks wherever the reader first meets a deferred value — the residues (Ch 4), `0·5` "held one grade down" (Ch 5), the structural differential (Ch 12). Keep them light, not repetitive.
 - **Fix:** —
-- **Links:** → 2, 4.
+- **Links:** → 2, 4, 5, 12.
 
 **2 · Totality and Reversibility** — *The one thing we refuse to do*
 - **Thesis:** demand every operation be total and reversible (no information destroyed); that single refusal drives everything.
@@ -88,6 +92,14 @@ Fields per chapter — **Thesis** (one breath) · **Tag** · **Consolidates** (s
 - **Keep:** "limits as a reconciliation ritual" (manipulate beyond the domain, then forgive by a limit).
 - **Fix:** reversibility ≠ bijectivity; state precisely what "no irreversible collapse" means (currently informal).
 - **Links:** → 3, 4, 15 (where limits legitimately return).
+
+**★ Values as Deferred Operations** *(standalone; slot after Totality & Reversibility)* — *Deferred, not yet a number*
+- **Thesis:** most values — and all the interesting ones — are not numerals but operational histories that haven't collapsed. **Numbers are the special case: the values where *none* of the operation history must be recorded to stay reversible.** A value carries exactly as much history as reversibility demands.
+- **Tag:** — (a Definition / reframe, not a tagged claim).
+- **Consolidates:** `intro §1` (operational deferral), `papers/1 §01`.
+- **Keep / core argument (the author's framing, preserve it):** the amount of information a value must carry *is* the amount reversibility demands. A plain number needs none. `sqrt(−1)` needs a number, a sign, and an operation to stay reversible — and rewriting it as `0^(ω/2)` carries the *same* amount of information, just in native notation. So a deferred operation is the minimal record required for reversibility, not a vagueness. The inversion — numbers are the collapsed special case — turns the reader's unease ("but that's not a number!") into the point.
+- **Why standalone:** this is the single most common stumbling block; it deserves its own address so a confused reader can be linked straight to it, and its own title signals the unconventionality is deliberate.
+- **Links:** → 1, 2, and every chapter where a deferred value appears (Cancellation residues, `0·5`, the differential).
 
 **3 · The Method (PEM)** — *Delete one axiom, keep everything else*
 - **Thesis:** a design discipline — seeds (a one-sentence intent), minimal axioms justified from the seed, reuse-by-reframing; hence "delete only absorption."

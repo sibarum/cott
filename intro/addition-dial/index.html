@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Addition Dial — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/intro/'"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 11 &middot; <span class="part">The Two Operations</span></div>
+    <h1>The Addition Dial</h1>
+    <p class="sub">
+      Every average is a different plus
+    </p>
+  </div>
+
+  <p class="lead">
+  You have been taught there is one addition.
+  There isn't.
+  There is a whole family of them, laid out along a dial, and the "plus" you grew up with is just one setting.
+  Seeing the dial is what lets addition survive in a graded world — and it starts with an addition you already use without noticing.
+  </p>
+
+  <h2>An addition that isn't plus</h2>
+
+  <p>
+  Wire two resistors side by side and the combined resistance is not <span class="math-inline">x + y</span>.
+  It is this:
+  </p>
+
+  <div class="eqn"><span class="dynamicexpr expression">a (+) b := 1/(1/a + 1/b) = a*b/(a+b)</span></div>
+
+  <p>
+  That operation — call it <span class="math-inline">⊕</span> — is a perfectly good addition.
+  It has an identity, it is commutative and associative, it behaves.
+  It is simply not the <em>same</em> addition as <span class="math-inline">+</span>.
+  Engineers call it "resistors in parallel" and never think of it as arithmetic, but arithmetic is exactly what it is: a second way to combine two quantities into one.
+  Once you have two additions, the obvious question is how many there are.
+  </p>
+
+  <h2>A plus for every reshaping</h2>
+
+  <p>
+  Here is the pattern that ties them together.
+  Take your two numbers, <em>reshape</em> each by raising it to some power <span class="math-inline">p</span>, add the reshaped versions the ordinary way, then reshape the total back.
+  Write that out and you get a single formula with one knob in it:
+  <span class="conf c-solid">Solid</span>
+  </p>
+
+  <div class="eqn"><span class="dynamicexpr expression">S_{p}(x, y) = (x^p + y^p)^(1/p)</span></div>
+
+  <p>
+  The knob is <span class="math-inline">p</span>, and turning it sweeps through additions you already know under other names:
+  </p>
+
+  <div class="math">p = +1   →   x + y                ordinary addition
+p = −1   →   xy / (x + y)          harmonic — the resistor rule
+p = +2   →   √(x² + y²)            quadrature — the Pythagoras rule
+p → +∞   →   max(x, y)             keep the larger
+p → −∞   →   min(x, y)             keep the smaller</div>
+
+  <p>
+  These are not exotic inventions.
+  They are the classical <em>power means</em>, and they run quietly through statistics, engineering, and geometry.<sup class="fnref"><a href="#fn1" id="fnref1">1</a></sup>
+  What the dial does is stop treating them as five unrelated tricks and show them as one operation at five settings — ordinary addition among them, no more fundamental than the rest.
+  </p>
+
+  <h2>Two things that stay true at every setting</h2>
+
+  <p>
+  A dial of additions would be a curiosity if nothing held them together.
+  Two things do, and both are provable, not hopeful.
+  <span class="conf c-solid">Solid</span>
+  </p>
+
+  <p>
+  <strong>First: multiplication passes cleanly through all of them.</strong>
+  Scaling both inputs by the same factor scales the result — for <em>every</em> setting of the dial at once:
+  </p>
+
+  <div class="eqn"><span class="dynamicexpr expression">a*S_{p}(x, y) = S_{p}(a*x, a*y)</span></div>
+
+  <p>
+  This is the property that makes the whole family behave like arithmetic rather than a grab-bag: one multiplication distributes over the entire dial of additions, not just over ordinary <span class="math-inline">+</span>.
+  </p>
+
+  <p>
+  <strong>Second: the sign of the knob decides where "nothing" sits.</strong>
+  Every addition needs an identity — the value you can add without changing anything.
+  For the dial, that value is wherever <span class="math-inline">xᵖ</span> vanishes, and the sign of <span class="math-inline">p</span> decides which pole that is: a positive setting puts the identity at <span class="math-inline">0</span>, a negative setting puts it at <span class="math-inline">ω</span>.
+  <span class="conf c-solid">Solid</span>
+  Turn the knob from positive to negative and the additive zero jumps from one pole to the other.
+  </p>
+
+  <h2>Why this heals the wound</h2>
+
+  <p>
+  Recall the trouble with ordinary addition in a graded world: its identity, <span class="math-inline">0</span>, sits at the very grade that hides information when terms cancel.
+  The dial is the way out.
+  Turn the knob negative and the identity moves off that grade and onto the other pole, <span class="math-inline">ω</span> — and the jam clears.
+  Harmonic addition is not a novelty item; it is ordinary addition with its "nothing" relocated to the safe pole.
+  Addition was never a single fixed operation that grades happened to break.
+  It was always a <em>choice</em> — and grades simply force you to make the choice on purpose.
+  </p>
+
+  <p>
+  That is why the theory prefers to call this the <strong>grade sum</strong>: the setting you pick is a choice about the output's grade, not a new gadget bolted on.<sup class="fnref"><a href="#fn2" id="fnref2">2</a></sup>
+  </p>
+
+  <h2>What this buys</h2>
+
+  <p>
+  Addition has gone from a fixed rule to a dial with a setting.
+  And the word for "a setting that reshapes the output before combining" is going to turn out to be the most reusable idea in the book — because it is not only additions that have one.
+  The derivative has a setting. So does the logarithm. So does iteration.
+  That shared knob is the next thread to pull.
+  </p>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">The <span class="math-inline">S_p</span> family is the classical <em>power mean</em> (or Kolmogorov–Nagumo mean); the values above are standard results. What is being claimed here is not the formula but the <em>reading</em> — that ordinary addition is one rung of it rather than the ground floor. <a href="#fnref1">↩</a></li>
+      <li id="fn2">There is a further question — whether one particular setting deserves to be called <em>the</em> addition of the theory — with a real answer that turns on which rung is "compact." It is more than this chapter needs; it returns later, where the circle does. <a href="#fnref2">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../addition-problem/">The Addition Problem</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../structural-differential/">The Structural Differential</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<!-- Math rendering engine -->
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>
