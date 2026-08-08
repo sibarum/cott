@@ -207,6 +207,11 @@
     font-size: 0.76rem;
     color: var(--ink-soft);
 }
+/* the popover lives outside .paper, so re-apply the inline-math font here */
+.cite-popover .math-inline {
+    font-family: var(--font-math);
+    white-space: nowrap;
+}
 /* arrow */
 .cite-popover::after {
     content: "";
