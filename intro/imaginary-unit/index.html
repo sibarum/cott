@@ -15,7 +15,7 @@
 </head>
 <body>
 
-<div class="icon-back" onclick="history.length>1?history.back():location.href='/cott/intro/'"></div>
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
 
 <div class="paper">
 
