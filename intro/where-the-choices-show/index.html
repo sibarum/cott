@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where the Choices Show — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta"><span class="part">Beyond the Dial &middot; a deeper result</span></div>
+    <h1>Where the Choices Show</h1>
+    <p class="sub">
+      The dial, the tower, and what fixes 0<sup class="smaller">ω</sup>
+    </p>
+  </div>
+
+  <p class="lead">
+  We have found two ways to bend ordinary arithmetic: a whole dial of additions, and — climbing the other axis — a tower of multiplications.
+  The obvious temptation is to mix them: pick a nonstandard addition, pick a nonstandard multiplication, and see whether the pair makes a genuinely new number system.
+  The answer sorts the entire landscape into two kinds, and the thing that tells them apart turns out to be a single object we already know: <span class="math-inline">0<sup class="smaller">ω</sup></span>.
+  </p>
+
+  <h2>Two axes of variation</h2>
+
+  <p>
+  Recall the shape.
+  An "addition" is ordinary <span class="math-inline">+</span> read through a chart, and sweeping the chart gives the <a href="../addition-dial/">dial</a> — harmonic, quadrature, and at its extremes the tropical <span class="math-inline">max</span> and <span class="math-inline">min</span>.
+  Multiplication has an axis too, but a different one: conjugating <span class="math-inline">×</span> by its own symmetries changes nothing, so its real variation runs <em>upward</em>, into commutative-exponentiation and the rest of the tower.
+  Two knobs, then. The question is whether you may turn both at once.
+  </p>
+
+  <h2>You cannot build a new field this way</h2>
+
+  <p>
+  Turn everything into one coordinate where the addition is ordinary <span class="math-inline">+</span>, and ask which re-charted multiplications distribute over it.
+  Fix one input; distributivity says the map that "multiplies by it" must send sums to sums — it must be <em>additive</em> — and an additive map (barring pathological monsters) is linear.
+  Chase that back and the multiplication is forced to be ordinary <span class="math-inline">×</span>.
+  <a class="conf c-proven" href="../proofs/#rigidity" data-cite="<span class='cite-head'>Proven</span>Distributivity forces &ldquo;multiply by <span class='math-inline'>a</span>&rdquo; to be additive, hence linear — Cauchy's functional equation — so the multiplication collapses to ordinary <span class='math-inline'>×</span>. Every field reached this way is <span class='math-inline'>&reals;</span> in disguise.<cite>Aczél, <em>Lectures on Functional Equations</em>, ch. 2. Full proof in the Appendix.</cite>">Proven</a>
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">Rigidity.</span>
+    If the addition is any reversible re-charting of <span class="math-inline">+</span>, the only re-charted multiplication that distributes over it is ordinary multiplication.
+    You cannot dial the two axes independently and land on a ring or field.
+    Every field you reach this way is the real numbers in disguise.
+  </div>
+
+  <p>
+  So the two knobs are not free — distributivity welds them together.
+  This is why every attempt to re-chart arithmetic into something new kept collapsing back to <span class="math-inline">&reals;</span>: there was never a new field to find.<sup class="fnref"><a href="#fn1" id="fnref1">1</a></sup>
+  </p>
+
+  <h2>The escape hatch is tropical — and it's a semiring</h2>
+
+  <p>
+  There is one way out, and it is exactly the tropical algebra.
+  Its addition is <span class="math-inline">min</span> (or <span class="math-inline">max</span>) — the extreme ends of the dial — and that operation is <em>idempotent</em>: <span class="math-inline">x ⊞ x = x</span>.
+  No reversible re-charting of <span class="math-inline">+</span> can be idempotent, so tropical is not in the interior of the dial at all; it is the <strong>limit at its edge</strong>, the point where the addition stops being invertible.
+  <a class="conf c-proven" href="../proofs/#tropical-edge" data-cite="<span class='cite-head'>Proven</span>No cancellative re-charting of <span class='math-inline'>+</span> can be idempotent, so tropical is not a rung — it is the boundary where reversibility fails, and what appears there is a <strong>semiring</strong>, not a field.<cite>Maclagan &amp; Sturmfels, <em>Introduction to Tropical Geometry</em>, ch. 1.</cite>">Proven</a>
+  </p>
+
+  <p>
+  At that edge the rigidity theorem no longer applies, and a genuinely new object appears — with ordinary <span class="math-inline">+</span> as its multiplication, which does distribute over <span class="math-inline">min</span> and <span class="math-inline">max</span>.
+  But the prize comes at a price: with no subtraction and no inverses, tropical is a <strong>semiring, not a field</strong>.
+  The fork is clean.
+  Keep reversibility and you are trapped at <span class="math-inline">&reals;</span>; give up reversibility and you escape — to a semiring.
+  You cannot have both.
+  </p>
+
+  <h2>Where the choice of multiplication shows: 0<sup class="smaller">ω</sup></h2>
+
+  <p>
+  Now the object that reads out the whole story.
+  In this world, twice around comes home — <span class="math-inline">0<sup class="smaller">2ω</sup> = 1</span> — so <span class="math-inline">0<sup class="smaller">ω</sup></span> squares to the multiplicative identity without being it.
+  In other words:
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">0<sup class="smaller">ω</sup> is the multiplication's own "&minus;1"</span> — its unique nontrivial square root of the identity, its order-two element.
+    <a class="conf c-proven" href="../powers-of-zero/" data-cite="<span class='cite-head'>Proven</span><span class='math-inline'>0<sup>2ω</sup> = 1</span>, so <span class='math-inline'>0<sup>ω</sup></span> is the unique nontrivial square root of the multiplicative identity — its order-two element.<cite>See Powers of the Zero.</cite>">Proven</a>
+  </div>
+
+  <p>
+  That element belongs to the multiplication, so it moves when the multiplication does.
+  Read it off three different multiplications and watch it change:
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>multiplication</th><th>its identity</th><th>0<sup class="smaller">ω</sup> = its &minus;1</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>ordinary <span class="math-inline">x·y</span></td><td>1</td><td>&minus;1</td></tr>
+      <tr><td>scaled <span class="math-inline">c·x·y</span></td><td>1/c</td><td>&minus;1/c</td></tr>
+      <tr><td>log-conjugate <span class="math-inline">exp(ln x · ln y)</span></td><td>e</td><td>1/e</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+  And the mirror fact: changing the <em>addition</em> leaves <span class="math-inline">0<sup class="smaller">ω</sup></span> completely untouched, because it is a multiplicative object.
+  So the two choices post their receipts in two different places.
+  <strong>The choice of addition shows up in the dial; the choice of multiplication shows up in <span class="math-inline">0<sup class="smaller">ω</sup></span>.</strong>
+  The famous value <span class="math-inline">0<sup class="smaller">ω</sup> = &minus;1</span> is not a fundamental constant — it is the fingerprint of ordinary multiplication.
+  </p>
+
+  <h2>Relabelled, or collapsed</h2>
+
+  <p>
+  One honest qualification keeps this from over-promising.
+  In the field regime, those different values of <span class="math-inline">0<sup class="smaller">ω</sup></span> are all the <em>same</em> <span class="math-inline">&minus;1</span> wearing different coats — the rigidity theorem guarantees the whole algebra is <span class="math-inline">&reals;</span> relabelled, and the relabelling carries <span class="math-inline">&minus;1</span> to <span class="math-inline">&minus;1/c</span> or <span class="math-inline">1/e</span>.
+  Different numbers, isomorphic structure.
+  </p>
+
+  <p>
+  The genuinely different case is, once again, tropical — and there <span class="math-inline">0<sup class="smaller">ω</sup></span> does not take a new value, it <em>vanishes</em>.
+  Tropical's multiplication is ordinary <span class="math-inline">+</span>, whose group has no element of order two at all; there is no nontrivial square root of the identity for <span class="math-inline">0<sup class="smaller">ω</sup></span> to be.
+  The imaginary unit degenerates.
+  <span class="conf c-plausible">Plausible</span>
+  And that is no accident: the tropical limit is precisely the map that <em>forgets phase</em> and keeps only magnitude.<sup class="fnref"><a href="#fn2" id="fnref2">2</a></sup>
+  <span class="math-inline">0<sup class="smaller">ω</sup></span> is the generator of phase — so it is exactly the thing that must disappear in the one limit whose whole purpose is to throw phase away.
+  </p>
+
+  <h2>The synthesis</h2>
+
+  <p>
+  Put it together and the picture is simple, and I think correct.
+  <span class="conf c-plausible">Plausible</span>
+  </p>
+
+  <p>
+  <span class="math-inline">0<sup class="smaller">ω</sup></span> is a phase generator — a readout of the multiplication's torsion, sampled at the half-turn <a href="../invertible-zero/"><span class="math-inline">ω</span></a>.
+  A nonstandard multiplication either <em>relabels</em> it, if you stay among the fields, or <em>annihilates</em> it, if you walk out to the tropical edge.
+  A nonstandard addition never touches it.
+  The value <span class="math-inline">&minus;1</span> that <a href="../powers-of-zero/">falls out of the powers of zero</a> was never fundamental; it is what ordinary multiplication happens to write there.
+  There is a second knob, too: the period — how many <span class="math-inline">ω</span>'s make a full turn — and turning it makes <span class="math-inline">0<sup class="smaller">ω</sup></span> a root of unity of some other order instead of two.
+  Between the multiplication and the period, <span class="math-inline">0<sup class="smaller">ω</sup></span> is completely determined by, and completely exposes, the arithmetic you chose to stand in.
+  </p>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">The linear-map step assumes the "multiply-by-a-fixed-element" map is continuous (or merely measurable). Without that, the axiom of choice permits pathological additive functions and correspondingly monstrous "multiplications" — but these are non-constructive artefacts, not algebra anyone computes with. The theorem is honest for every case that can actually be written down. <a href="#fnref1">↩</a></li>
+      <li id="fn2">This is the classical picture of tropicalization (the Litvinov–Maslov "dequantization," the amoeba collapsing to its spine): passing to the tropical limit discards the argument of a complex number and keeps its log-magnitude. Nothing here is new mathematics; what is being pointed out is only that <span class="math-inline">0<sup class="smaller">ω</sup></span> sits exactly on the coordinate that limit deletes. <a href="#fnref2">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="toc" href="../">Contents</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+<script src="../../lib/popover.js"></script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Appendix: The Proven Results — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Appendix &middot; <span class="part">The Proofs</span></div>
+    <h1>The Proven Results</h1>
+    <p class="sub">
+      The three theorems the book leans on, stated and proved
+    </p>
+  </div>
+
+  <p class="lead">
+  Most of the book is plain reasoning that carries itself.
+  A few claims are marked <span class="conf c-proven">Proven</span> — genuine theorems the argument rests real weight on.
+  This appendix is where they are proved, so the badge points at a derivation rather than an assertion.
+  Each result below is linked from the chapter that uses it.
+  </p>
+
+  <h2 id="distributes">One multiplication distributes over every addition</h2>
+
+  <p>
+  The <a href="../addition-dial/">addition dial</a> sweeps a whole family of additions with a single knob <span class="math-inline">p</span>:
+  </p>
+
+  <div class="eqn"><span class="dynamicexpr expression">S_{p}(x, y) = (x^p + y^p)^(1/p)</span></div>
+
+  <p>
+  The claim is that ordinary multiplication distributes over <em>every</em> setting of the dial at once — not merely over ordinary <span class="math-inline">+</span>.
+  The proof is a single line: pull the common factor through the reshaping and back.
+  </p>
+
+  <div class="eqn"><span class="dynamicexpr expression">a*S_{p}(x, y) = (a^p*(x^p + y^p))^(1/p) = ((a*x)^p + (a*y)^p)^(1/p) = S_{p}(a*x, a*y)</span></div>
+
+  <p>
+  So for every <span class="math-inline">p</span>, the triple <span class="math-inline">(&reals;₊, S_p, ×)</span> is a field, isomorphic to <span class="math-inline">(&reals;₊, +, ×)</span> through the reshaping <span class="math-inline">x ↦ xᵖ</span>.
+  The resistor rule (<span class="math-inline">p = −1</span>) is not a special case that happens to cooperate; it is one rung of an infinite family, and the one multiplication cannot tell the rungs apart.<sup class="fnref"><a href="#fn1" id="fnref1">1</a></sup>
+  </p>
+
+  <div class="aside">
+    <span class="tag">What this backs</span>
+    This is the result carried by the <span class="conf c-proven">Proven</span> badge in <a href="../addition-dial/">The Addition Dial</a> — "multiplication passes cleanly through all of them."
+  </div>
+
+  <h2 id="zero-flip">The sign of the knob chooses where "nothing" sits</h2>
+
+  <p>
+  Every addition needs an identity — the value you can combine with anything and change nothing.
+  For <span class="math-inline">S_p</span>, the identity <span class="math-inline">e</span> is the value that vanishes under the reshaping, because <span class="math-inline">S_p(x, e) = (xᵖ + eᵖ)^(1/p)</span> equals <span class="math-inline">x</span> exactly when <span class="math-inline">eᵖ = 0</span>.
+  Solving <span class="math-inline">eᵖ = 0</span> puts the identity at one of the two poles, and the sign of <span class="math-inline">p</span> decides which:
+  </p>
+
+  <div class="math">p > 0   ⟹   additive identity = 0
+p < 0   ⟹   additive identity = ω</div>
+
+  <p>
+  Turn the knob from positive to negative and the additive zero jumps from <span class="math-inline">0</span> to <span class="math-inline">ω</span>.
+  These are not two arbitrary values: they are the reciprocal pair the whole program is built on, welded by <span class="math-inline">1/0 = ω</span>.
+  The addition's choice of zero is governed by the same <span class="math-inline">0 ↔ ω</span> involution as the multiplication — the sign of the addition-parameter is that reciprocal, read off the additive side.
+  </p>
+
+  <div class="aside">
+    <span class="tag">What this backs</span>
+    This is the result carried by the <span class="conf c-proven">Proven</span> badge in <a href="../addition-dial/">The Addition Dial</a> — "the sign of the knob decides where nothing sits."
+  </div>
+
+  <h2 id="rigidity">You cannot dial a new field into being</h2>
+
+  <p>
+  Re-chart the numbers so the addition becomes ordinary <span class="math-inline">+</span>, and ask which re-charted multiplications distribute over it.
+  Fix one input <span class="math-inline">a</span> and let <span class="math-inline">m_a(x)</span> be "multiply by <span class="math-inline">a</span>."
+  Distributivity says <span class="math-inline">m_a(x + y) = m_a(x) + m_a(y)</span> — the map is <em>additive</em>.
+  A additive map on the line is linear (barring the non-measurable monsters that need the axiom of choice to build), so <span class="math-inline">m_a(x) = c(a)·x</span>, and chasing the constant back forces the multiplication to be ordinary <span class="math-inline">×</span>.<sup class="fnref"><a href="#fn2" id="fnref2">2</a></sup>
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">Rigidity.</span>
+    If the addition is any reversible re-charting of <span class="math-inline">+</span>, the only re-charted multiplication that distributes over it is ordinary multiplication.
+    Every field you reach this way is <span class="math-inline">&reals;</span> in disguise — there was never a new field to find.
+  </div>
+
+  <p id="tropical-edge">
+  There is exactly one way out, and it is not in the interior of the dial.
+  The tropical addition <span class="math-inline">min</span> (or <span class="math-inline">max</span>) is <em>idempotent</em>: <span class="math-inline">x ⊞ x = x</span>.
+  No reversible re-charting of <span class="math-inline">+</span> can be idempotent — a cancellative operation with <span class="math-inline">x ⊞ x = x</span> forces <span class="math-inline">x</span> to be the identity for every <span class="math-inline">x</span>, which is impossible.
+  So tropical is not a rung; it is the <strong>limit at the edge</strong>, the point where the addition stops being invertible.
+  There the rigidity theorem no longer applies and a genuinely new object appears — but with no inverses it is a <strong>semiring, not a field</strong>.<sup class="fnref"><a href="#fn3" id="fnref3">3</a></sup>
+  Keep reversibility and you are trapped at <span class="math-inline">&reals;</span>; give it up and you escape only as far as a semiring.
+  </p>
+
+  <div class="aside">
+    <span class="tag">What this backs</span>
+    These two results carry the <span class="conf c-proven">Proven</span> badges in <a href="../where-the-choices-show/">Where the Choices Show</a> — the rigidity theorem and the tropical edge.
+  </div>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">The <span class="math-inline">S_p</span> family is the classical <em>power mean</em> (Kolmogorov–Nagumo mean); its homogeneity is elementary. What is claimed here is the reading — one multiplication indifferent to the whole family — not the formula. <a href="#fnref1">↩</a></li>
+      <li id="fn2">The step "additive ⇒ linear" is the Cauchy functional equation: any solution that is measurable, or bounded on a set of positive measure, or monotone on an interval, is <span class="math-inline">x ↦ cx</span>. See J. Aczél, <em>Lectures on Functional Equations and Their Applications</em> (Academic Press, 1966), ch. 2. <a href="#fnref2">↩</a></li>
+      <li id="fn3">For the semiring structure at the tropical limit see D. Maclagan &amp; B. Sturmfels, <em>Introduction to Tropical Geometry</em> (AMS, 2015), ch. 1. <a href="#fnref3">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="toc" href="../">Contents</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<!-- Math rendering engine -->
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

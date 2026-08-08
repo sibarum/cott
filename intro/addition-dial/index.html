@@ -86,7 +86,7 @@ p → −∞   →   min(x, y)             keep the smaller</div>
 
   <p>
   <strong>First: multiplication passes cleanly through all of them.</strong>
-  <span class="conf c-proven">Proven</span>
+  <a class="conf c-proven" href="../proofs/#distributes" data-cite="<span class='cite-head'>Proven</span>One multiplication distributes over <em>every</em> setting of the dial at once — <span class='math-inline'>a·S_p(x,y) = S_p(a·x, a·y)</span>, and the proof is a single line.<cite>Appendix — The Proven Results, §1.</cite>">Proven</a>
   Scaling both inputs by the same factor scales the result — for <em>every</em> setting of the dial at once:
   </p>
 
@@ -100,7 +100,7 @@ p → −∞   →   min(x, y)             keep the smaller</div>
   <strong>Second: the sign of the knob decides where "nothing" sits.</strong>
   Every addition needs an identity — the value you can add without changing anything.
   For the dial, that value is wherever <span class="math-inline">xᵖ</span> vanishes, and the sign of <span class="math-inline">p</span> decides which pole that is: a positive setting puts the identity at <span class="math-inline">0</span>, a negative setting puts it at <span class="math-inline">ω</span>.
-  <span class="conf c-proven">Proven</span>
+  <a class="conf c-proven" href="../proofs/#zero-flip" data-cite="<span class='cite-head'>Proven</span>The identity solves <span class='math-inline'>eᵖ = 0</span>, so the sign of <span class='math-inline'>p</span> pins the additive zero to <span class='math-inline'>0</span> (p&gt;0) or <span class='math-inline'>ω</span> (p&lt;0) — the same 0↔ω involution the multiplication is built on.<cite>Appendix — The Proven Results, §2.</cite>">Proven</a>
   Turn the knob from positive to negative and the additive zero jumps from one pole to the other.
   </p>
 
@@ -150,5 +150,6 @@ p → −∞   →   min(x, y)             keep the smaller</div>
 <!-- Math rendering engine -->
 <script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
 <script src="../../lib/traction-interpret.js"></script>
+<script src="../../lib/popover.js"></script>
 </body>
 </html>

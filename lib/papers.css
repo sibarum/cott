@@ -151,6 +151,85 @@
 .paper .c-plausible { background: var(--steel-bg);   color: var(--steel); }
 .paper .c-wild      { background: var(--gold-bg);    color: var(--gold);  border: 1px solid var(--gold-rule); }
 
+/* A badge that links to its proof: kill the default link underline, keep the pill */
+.paper a.conf {
+    text-decoration: none;
+    cursor: help;
+    transition: filter 0.12s ease;
+}
+.paper a.conf:hover,
+.paper a.conf:focus { filter: brightness(0.94); }
+.paper a.c-proven,
+.paper a.c-solid { border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+
+/* ---------- Citation popover (see lib/popover.js) ---------- */
+.cite-popover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 50;
+    max-width: 20rem;
+    padding: 0.7rem 0.85rem;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--rule-bold);
+    border-radius: 3px;
+    box-shadow: 0 6px 22px -10px rgba(35, 32, 27, 0.45);
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(3px);
+    transition: opacity 0.13s ease, transform 0.13s ease, visibility 0.13s;
+}
+.cite-popover.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.cite-popover .cite-head {
+    display: inline;
+    font-family: var(--font-meta);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: var(--accent);
+    margin-right: 0.35em;
+}
+.cite-popover cite {
+    display: block;
+    margin-top: 0.5rem;
+    padding-top: 0.45rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+}
+/* arrow */
+.cite-popover::after {
+    content: "";
+    position: absolute;
+    left: var(--arrow-x, 50%);
+    width: 9px;
+    height: 9px;
+    margin-left: -5px;
+    background: var(--paper);
+    border: 1px solid var(--rule-bold);
+    transform: rotate(45deg);
+}
+.cite-popover:not(.below)::after {
+    bottom: -5px;
+    border-top: none;
+    border-left: none;
+}
+.cite-popover.below::after {
+    top: -5px;
+    border-bottom: none;
+    border-right: none;
+}
+
 /* ---------- Pull-quote ---------- */
 .paper .pull {
     font-family: var(--font-display);
