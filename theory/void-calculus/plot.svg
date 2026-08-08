@@ -3,7 +3,7 @@
 .pontif-plot{--pontif-fg:#e8e9ee;--pontif-grid:#4d5560;--pontif-axis:#c0c4cc;--pontif-curve:#66ccff;--pontif-asymptote:#f27373;--pontif-feature:#fad84d;--pontif-enclosure:#66ccff;color:var(--pontif-fg);font-family:sans-serif}
 .pontif-plot .gridline{stroke:var(--pontif-grid);stroke-width:1}
 .pontif-plot .frame{fill:none;stroke:var(--pontif-axis);stroke-width:1.5}
-.pontif-plot .tick-label{fill:var(--pontif-fg);font-size:13px}
+.pontif-plot .tick-label{fill:var(--pontif-fg);font-size:13px;paint-order:stroke;stroke:#0a0c10;stroke-width:2px;stroke-linejoin:round}
 .pontif-plot .tick-x{text-anchor:middle}
 .pontif-plot .tick-y{text-anchor:end;dominant-baseline:middle}
 .pontif-plot .curve{fill:none;stroke:var(--pontif-curve);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}

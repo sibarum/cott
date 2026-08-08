@@ -74,6 +74,16 @@ a:focus {
     text-decoration: underline;
 }
 
+.fullsize-image-dark {
+    width: 100%;
+    background-color: #222;
+    box-shadow: #aaa 0 0 2em;
+}
+
+.fullsize-image-dark img {
+    max-width: 100%;
+}
+
 /*************************/
 /* Formatting Extensions */
 
@@ -238,6 +248,21 @@ p .fraction {
     height: 0;
 }
 
+/* Operator glyphs for the math renderer — keep in sync with styles-v1/v3. */
+.op-minus::before     { content: "\2212"; }  /* − */
+.op-times::before     { content: "\00B7"; }  /* · */
+.op-pm::before        { content: "\00B1"; }  /* ± */
+.op-radic::before     { content: "\221A"; }  /* √ */
+.op-mp::before        { content: "\2213"; }  /* ∓ */
+.op-cross::before     { content: "\00D7"; }  /* × */
+.op-le::before        { content: "\2264"; }  /* ≤ */
+.op-ge::before        { content: "\2265"; }  /* ≥ */
+.op-dimplies::before  { content: "\21D2"; }  /* ⇒ */
+.op-dimpliedby::before{ content: "\21D0"; }  /* ⇐ */
+.op-iff::before       { content: "\21D4"; }  /* ⇔ */
+.op-oplus::before     { content: "\2295"; }  /* ⊕ */
+.op-def::before       { content: "\2254"; }  /* ≔ */
+
 .narration sup {
     margin-right: -0.2em;
     display: inline;
@@ -245,6 +270,8 @@ p .fraction {
 .w50 {
     width: 50%;
 }
+
+
 
 /* Print Media */
 @media print {
