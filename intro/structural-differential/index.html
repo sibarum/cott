@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Structural Differential — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 13 &middot; <span class="part">Calculus Without Limits</span></div>
+    <h1>The Structural Differential</h1>
+    <p class="sub">
+      Differentiation as multiplication by zero
+    </p>
+  </div>
+
+  <p class="lead">
+  The derivative is taught as a limit — creep <span class="math-inline">h</span> toward zero and hope the ratio settles.
+  But we no longer have a zero that things creep toward; we have a zero you can multiply by and later divide back out.
+  With that zero, the derivative stops being a limit and becomes an act of arithmetic: you <em>multiply by zero</em> and read a number off a shelf.
+  </p>
+
+  <h2>The limit was doing bookkeeping all along</h2>
+
+  <p>
+  Recall the shelves from <a href="../multiplication/">the multiplication chapter</a>: every value carries a <em>grade</em>, the power of zero it rides on, and multiplying adds grades.
+  Ordinary numbers sit at grade <span class="math-inline">0</span>; one factor of zero drops you to grade <span class="math-inline">1</span>; a factor of <span class="math-inline">&omega;</span> lifts you back up.
+  </p>
+
+  <p>
+  Now offset the input by a single graded zero — write <span class="math-inline">x + 0</span>, where that <span class="math-inline">0</span> is the invertible grade-<span class="math-inline">1</span> zero, not a vanishing quantity — and feed it through a function.
+  Because the offset carries a grade, the function's response sorts itself onto the shelves automatically:
+  </p>
+
+  <div class="math">f(x + 0)   =   f(x)            ← grade 0   (the value)
+             +   f′(x) · 0       ← grade 1   (the first derivative)
+             +   ½ f″(x) · 0²    ← grade 2   (the second)
+             +   …</div>
+
+  <p>
+  This is the ordinary Taylor expansion, with one difference that changes everything: the powers of <span class="math-inline">0</span> are not <em>small</em>, they are <em>graded</em>.
+  Nothing is being neglected, and nothing is being approached.
+  The information that a limit works so hard to extract was never hiding in a process; it was sitting in plain sight, filed one grade down.
+  </p>
+
+  <h2>Reading a slope off a shelf</h2>
+
+  <p>
+  The first derivative is now simply <em>the coefficient on grade&nbsp;1</em>.
+  To read it, you don't take a limit — you do two moves you already own.
+  Lift the whole expansion up one grade by multiplying by <span class="math-inline">&omega;</span> (which turns grade <span class="math-inline">1</span> into grade <span class="math-inline">0</span>), then discard whatever is left off the ground floor.
+  Call that discard the <em>projection</em> <span class="math-inline">&Qopf;</span> — keep grade <span class="math-inline">0</span>, drop the rest:
+  </p>
+
+  <div class="math">f′(x)   =   &Qopf;( &omega; · [ f(x + 0) − f(x) ] )</div>
+
+  <p>
+  Multiply by zero to spread the function across the grades; multiply by <span class="math-inline">&omega;</span> to slide the grade you want down to the floor; project to read it.
+  No <span class="math-inline">h</span>, no "arbitrarily close," no epsilon.
+  The derivative is an exact, reversible operation — the same three moves will hand you the second derivative from grade <span class="math-inline">2</span>, and the whole jet if you want it.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">The structural differential.</span>
+    Differentiation is: offset by a graded zero, then read the coefficient off the grade you care about.
+    The limit was only ever a way to recover that coefficient when your zero had no grade to file it on.
+  </div>
+
+  <h2>Why this differential has a twin</h2>
+
+  <p>
+  There is a second way to ask "how is <span class="math-inline">f</span> changing," and the theory insists on treating it as an equal.
+  The one above measures change by <em>subtraction</em> — it strips the value at grade <span class="math-inline">0</span> and normalizes.
+  Its twin measures change by <em>division</em>: form the ratio <span class="math-inline">f(x·(1+&epsilon;)) / f(x)</span> and you get the <em>logarithmic</em> derivative, <span class="math-inline">x f′/f</span> — the natural rate when the thing you compare against is <span class="math-inline">1</span>, not <span class="math-inline">0</span>.
+  </p>
+
+  <p>
+  These are not two tricks that happen to rhyme.
+  They are the same construction — strip the ground term, normalize by the increment — carried out with the two group operations we have been living in all book: additive, anchored at <span class="math-inline">0</span>, and multiplicative, anchored at <span class="math-inline">1</span>.
+  And there are exactly two, because there are exactly two one-parameter groups on the line, and <a href="../powers-of-zero/">exponentiation</a> is the single bridge between them: <span class="math-inline">b⁰ = 1</span> carries the additive identity to the multiplicative one, and <span class="math-inline">log</span> walks it back.
+  </p>
+
+  <p>
+  The two differentials do not commute, and that is the point, not a nuisance.
+  Writing <span class="math-inline">D</span> for the additive one and <span class="math-inline">&theta; = x·D</span> for the multiplicative one, their disagreement is exact and minimal:
+  </p>
+
+  <div class="math">[ D, &theta; ]   =   D</div>
+
+  <p>
+  If they commuted, one would be redundant and there would be nothing new here.
+  They don't, so the pair genuinely carries independent information — and that single non-commutation is the seam the later chapters pry open, where the residue lives and, eventually, where time comes from.
+  </p>
+
+  <h2>One honest failure, noted in advance</h2>
+
+  <p>
+  Running the derivative backward — antidifferentiation — works cleanly everywhere except one address.
+  At grade <span class="math-inline">&minus;1</span>, the pole, the reconstruction hands off to a logarithm and the tidy bookkeeping stops being polynomial.
+  That is not a flaw in the method; it is the method telling you, honestly, where the writable world ends.
+  We will return to that boundary deliberately; for now it is enough to know the structural differential is exact everywhere the antiderivative doesn't send you through the pole.
+  </p>
+
+  <h2>What this buys</h2>
+
+  <p>
+  The derivative has changed category.
+  It is no longer a limit we take on faith that it converges; it is multiplication by a graded zero, followed by a reading.
+  Every rule you know — the power rule, the product rule, the chain rule — is now grade bookkeeping rather than an epsilon argument, and it is total and reversible like the rest of the arithmetic.
+  What we have not yet said is that this one operation, read through different charts, is <em>several</em> familiar derivatives wearing one face.
+  That is the next thing to pull apart.
+  </p>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../addition-dial/">The Addition Dial</a>
+    <a class="toc" href="../">Contents</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>
