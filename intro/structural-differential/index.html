@@ -79,6 +79,38 @@
     The limit was only ever a way to recover that coefficient when your zero had no grade to file it on.
   </div>
 
+  <h2>Worked: the slope of a real function</h2>
+
+  <p>
+  Take <span class="math-inline">f(x) = x² + 3x − 4</span>.
+  Offset the input by the graded zero and multiply it out — ordinary algebra, nothing dropped and nothing approximated:
+  </p>
+
+  <div class="math">f(x + 0)  =  (x + 0)² + 3(x + 0) − 4
+          =  x² + 2·0·x + 0² + 3x + 3·0 − 4</div>
+
+  <p>
+  Now file each term on its shelf by how many factors of zero it carries:
+  </p>
+
+  <div class="math">grade 0:   x² + 3x − 4      =  f(x)
+grade 1:   (2x + 3) · 0     =  f′(x) · 0
+grade 2:   1 · 0²           =  ½ f″(x) · 0²</div>
+
+  <p>
+  The entire local behaviour of <span class="math-inline">f</span> is already here, sorted.
+  The slope is sitting on grade <span class="math-inline">1</span> as its coefficient, <span class="math-inline">2x + 3</span> — we only have to bring it down to the floor and read it.
+  Multiply by <span class="math-inline">&omega;</span>, which turns grade <span class="math-inline">1</span> into grade <span class="math-inline">0</span> (recall <span class="math-inline">0·&omega; = 1</span>), then project:
+  </p>
+
+  <div class="math">&omega; · [ f(x + 0) − f(x) ]   =   &omega; · [ (2x + 3)·0 + 0² ]   =   (2x + 3) + 0
+&Qopf;( (2x + 3) + 0 )        =   2x + 3</div>
+
+  <p>
+  So <span class="math-inline">f′(x) = 2x + 3</span> — the derivative of <span class="math-inline">x² + 3x − 4</span>, obtained with no limit, no <span class="math-inline">h &rarr; 0</span>, only multiplication and a projection.
+  And nothing extra had to be done to find the rest: the same expansion already carries the second derivative on grade <span class="math-inline">2</span>, whose coefficient is <span class="math-inline">1</span>, so <span class="math-inline">f″ = 2</span> — exactly right.
+  </p>
+
   <h2>Why this differential has a twin</h2>
 
   <p>
