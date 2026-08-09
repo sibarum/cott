@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Chart — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 14 &middot; <span class="part">Calculus Without Limits</span></div>
+    <h1>The Chart</h1>
+    <p class="sub">
+      One derivative wearing three hats
+    </p>
+  </div>
+
+  <p class="lead">
+  We built one derivative in <a href="../structural-differential/">the last chapter</a>.
+  But mathematics is full of things that look like <em>other</em> derivatives — the growth rate a banker uses, the generator that drives an iteration — and they seem to belong to different subjects.
+  They don't. They are the one derivative, read through a coordinate. That coordinate is the object worth naming.
+  </p>
+
+  <h2>A coordinate on the answer</h2>
+
+  <p>
+  To compare a function to a shifted copy of itself, you first have to decide <em>how</em> you are comparing — and that decision is a coordinate on the output line.
+  Call it a <strong>chart</strong> <span class="math-inline">&alpha;</span>.
+  The derivative <em>in the chart</em> <span class="math-inline">&alpha;</span> is just the ordinary derivative taken after re-coordinatizing the output with <span class="math-inline">&alpha;</span>:
+  </p>
+
+  <div class="math">D_α f (x)   =   (α ∘ f)′(x)   =   α′(f(x)) · f′(x)</div>
+
+  <p>
+  That is the whole instrument.
+  One rule with one slot in it — the chart — and everything below is a matter of what you drop into the slot.
+  </p>
+
+  <h2>Three hats</h2>
+
+  <p>
+  Choose the plainest chart, <span class="math-inline">&alpha; = id</span>, the one that changes nothing, and the instrument gives back the ordinary slope:
+  </p>
+
+  <div class="math">α = id     →     D_α f  =  f′            compare by subtracting</div>
+
+  <p>
+  This is the structural differential from the last chapter, the coefficient you read off grade <span class="math-inline">1</span>.
+  Now change the chart to <span class="math-inline">&alpha; = log</span>.
+  Because <span class="math-inline">(log ∘ f)′ = f′/f</span>, the same instrument now returns the <em>growth rate</em> — the quantity a population, a bank balance, or a decaying isotope actually obeys:
+  </p>
+
+  <div class="math">α = log    →     D_α f  =  f′ / f        compare by dividing</div>
+
+  <p>
+  Nothing about the function changed. We changed the ruler on the output, and "rate of change" became "rate of <em>proportional</em> change."
+  This is the multiplicative twin from the last chapter, and it is why <span class="math-inline">log</span> turns products into sums: measured through <span class="math-inline">log</span>, multiplying is adding.
+  </p>
+
+  <p>
+  The third hat is the one textbooks file under a different subject entirely.
+  Ask not "how does <span class="math-inline">f</span> change" but "what happens when I <em>iterate</em> it" — compare <span class="math-inline">f(f(x))</span> to <span class="math-inline">f(x)</span>.
+  That looks nonlinear and awkward, until you find the chart in which <span class="math-inline">f</span> becomes a plain shift.
+  Take <span class="math-inline">f(x) = x²</span>: in the <span class="math-inline">log</span> chart it reads as
+  </p>
+
+  <div class="math">log( f(x) )  =  log( x² )  =  2 · log x        "f is: double the coordinate"</div>
+
+  <p>
+  and so iterating <span class="math-inline">f</span> is just doubling that coordinate over and over — <span class="math-inline">f</span> applied <span class="math-inline">n</span> times is <span class="math-inline">x^(2ⁿ)</span>, read straight off <span class="math-inline">2ⁿ · log x</span>.
+  The wild-looking iteration was an ordinary "<span class="math-inline">×2</span> each step," wearing a coordinate.
+  Iteration is not a third kind of change; it is the same instrument in a chart chosen so that <span class="math-inline">f</span> stands still.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">One instrument, three readings.</span>
+    Subtract, divide, or compose — the slope, the growth rate, and the generator of iteration are <span class="math-inline">D_α</span> at three settings of the chart.
+    The three calculi were never three; there is one, and a coordinate.
+  </div>
+
+  <h2>The same dial, one level up</h2>
+
+  <p>
+  This should feel familiar.
+  Back at <a href="../addition-dial/">the addition dial</a>, one family of charts — raise to the power <span class="math-inline">p</span> — swept out every addition, ordinary and harmonic and the rest.
+  It is the <em>same family</em> here: the chart <span class="math-inline">&alpha; = xᵖ</span> that indexed the additions also indexes the derivatives.
+  That is not a rhyme. "Compare outputs in a given group" and "differentiate in the chart that flattens that group" are the same instruction spoken twice — once about addition, once about the derivative.
+  The dial and the three hats are one object seen from two sides.
+  </p>
+
+  <h2>Charts you write, and charts you solve</h2>
+
+  <p>
+  The three charts above — <span class="math-inline">id</span>, <span class="math-inline">log</span>, <span class="math-inline">xᵖ</span> — are ones you can look up in a table.
+  Elementary functions with elementary inverses; you write the chart, you conjugate, you are done, exactly and reversibly.
+  Most of classical manipulation never leaves this comfortable room.
+  </p>
+
+  <p>
+  But nothing guaranteed the chart would be writable.
+  Sometimes the coordinate that flattens <span class="math-inline">f</span> is fixed uniquely by a condition and yet has no closed form — you know it exists, you can compute with it, you simply cannot write it down.
+  The condition is an equation for the chart itself: "in the coordinate <span class="math-inline">&alpha;</span>, <span class="math-inline">f</span> is a shift," which pins <span class="math-inline">&alpha;</span> as tightly as any formula would, without handing you one.
+  And past that, there are charts that cannot be made to cover the whole line at all — where the coordinate is honest only locally, and refuses to close up globally.
+  Those failures are not accidents; they come in a short, exact list.
+  </p>
+
+  <h2>What this buys</h2>
+
+  <p>
+  The derivative has stopped being a menu.
+  There is one difference operator, and the slope, the growth rate, and the iteration generator are it — read through a chart you either look up or solve for.
+  The question worth asking is no longer "which derivative do I want," but "which coordinate am I in, and can I write it?"
+  Answering that second half — the ladder from charts you tabulate to charts you can only approach — is the map the rest of this part follows.
+  </p>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../structural-differential/">The Structural Differential</a>
+    <a class="toc" href="../">Contents</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>
