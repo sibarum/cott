@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Void Calculus in Practice — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 15 &middot; <span class="part">Calculus Without Limits</span></div>
+    <h1>Void Calculus in Practice</h1>
+    <p class="sub">
+      Slopes and roots without a limit
+    </p>
+  </div>
+
+  <p class="lead">
+  Enough machinery. Let us put it to work on one honest polynomial and get the things calculus is actually <em>for</em> — a slope, a turning point, the roots — using nothing but grade bookkeeping and, at the very end, a single square root.
+  No limits, no solver, no approximation creeping in anywhere.
+  </p>
+
+  <p>
+  The function, the same one we differentiated two chapters back:
+  </p>
+
+  <div class="math">f(x)  =  x² + 3x − 4</div>
+
+  <h2>The slope, without a limit</h2>
+
+  <p>
+  We already have this one.
+  Offset the input by the graded zero, sort the expansion onto grades, and the coefficient on grade <span class="math-inline">1</span> is the derivative — recovered by lifting with <span class="math-inline">&omega;</span> and projecting, exactly as in <a href="../structural-differential/">the structural differential</a>:
+  </p>
+
+  <div class="math">f(x + 0)  =  (x² + 3x − 4)  +  (2x + 3)·0  +  0²
+f′(x)     =  2x + 3</div>
+
+  <p>
+  That is the additive reading — comparing <span class="math-inline">f</span> to its neighbour by subtraction.
+  The interesting work starts when we change the chart.
+  </p>
+
+  <h2>Switching charts: the logarithmic derivative</h2>
+
+  <p>
+  Take the <em>multiplicative</em> reading from <a href="../the-chart/">the chart</a> — compare by dividing rather than subtracting.
+  Instead of <span class="math-inline">f(x+0) − f(x)</span>, form the ratio <span class="math-inline">f(x+0) / f(x)</span>.
+  Using the same offset expansion, the value in front factors straight out:
+  </p>
+
+  <div class="math">f(x + 0) / f(x)   =   [ f(x) + (2x + 3)·0 + 0² ] / f(x)
+                  =   1  +  0 · ( 2x + 3 ) / f(x)   +   …</div>
+
+  <p>
+  The ratio is <span class="math-inline">1</span> plus a grade-<span class="math-inline">1</span> term, and that term's coefficient is the <strong>logarithmic derivative</strong> — lift by <span class="math-inline">&omega;</span> and project just as before:
+  </p>
+
+  <div class="math">f′ / f   =   (2x + 3) / (x² + 3x − 4)</div>
+
+  <p>
+  This one object holds both things we are hunting.
+  Its <em>zeros</em> are where the top vanishes — the slope is flat — so they are the <strong>critical points</strong> of <span class="math-inline">f</span>.
+  Its <em>poles</em> are where the bottom vanishes — the division blows up — so they are the <strong>roots</strong> of <span class="math-inline">f</span>.
+  Extrema upstairs, roots downstairs, in a single expression.
+  </p>
+
+  <h2>The critical point — a zero of the logarithmic derivative</h2>
+
+  <p>
+  Set the numerator to zero. That is the whole calculation:
+  </p>
+
+  <div class="math">2x + 3  =  0        →        x  =  −3/2</div>
+
+  <p>
+  At <span class="math-inline">x = −3/2</span> the slope is flat — the turning point of the parabola.
+  Its height is <span class="math-inline">f(−3/2) = −25/4</span>, and that <span class="math-inline">25</span> is worth remembering: it is about to reappear on the other side of the ledger.
+  </p>
+
+  <h2>Roots without factoring — the poles</h2>
+
+  <p>
+  Now the roots. At a root, <span class="math-inline">f = 0</span>, so the logarithmic derivative <em>diverges</em> — the denominator hits the pole and the whole thing runs off to <span class="math-inline">&omega;</span>.
+  Rather than clear the fraction and factor, concentrate the unknown into the numerator's own variable.
+  Let <span class="math-inline">z = 2x + 3</span>, so <span class="math-inline">x = (z − 3)/2</span>, and rewrite the logarithmic derivative in <span class="math-inline">z</span>:
+  </p>
+
+  <div class="math">(2x + 3) / (x² + 3x − 4)   =   z / ( (z² − 25) / 4 )   =   4z / (z² − 25)</div>
+
+  <p>
+  All of the difficulty has collected into one place.
+  This diverges exactly when the denominator vanishes — and that is a single square root:
+  </p>
+
+  <div class="math">z² − 25  =  0        →        z  =  ±√25  =  ±5</div>
+
+  <p>
+  Walk each value back through <span class="math-inline">x = (z − 3)/2</span>:
+  </p>
+
+  <div class="math">z = +5   →   x = (5 − 3)/2 = 1
+z = −5   →   x = (−5 − 3)/2 = −4</div>
+
+  <p>
+  So the roots are <span class="math-inline">x = 1</span> and <span class="math-inline">x = −4</span> — and indeed <span class="math-inline">(x − 1)(x + 4) = x² + 3x − 4</span>.
+  Factoring would have found the same pair faster <em>here</em>, but that is the point in miniature: the method did not need to guess a factorization.
+  It pushed every bit of the difficulty into one square root, <span class="math-inline">√25</span> — which is exactly <span class="math-inline">√(b² − 4ac)</span>, the discriminant, the same <span class="math-inline">25</span> that set the depth of the turning point.
+  The extremum and the root-spacing were the one number, read once downstairs and once up.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">The shape of the method.</span>
+    Build the logarithmic derivative; its zeros are the extrema, its poles are the roots.
+    Extrema cost nothing; roots cost exactly one square root, wherever the polynomial's own difficulty happens to live.
+  </div>
+
+  <h2>What this buys</h2>
+
+  <p>
+  Slope, turning point, and roots — the entire first-pass analysis of a function — came out of graded arithmetic and a single surd, with no limit taken and no decimal approached at any step.
+  The logarithmic derivative did the organizing: it filed the extrema and the roots as the zeros and poles of one object, and the lone irrationality the problem truly contains showed up as one honest square root rather than smeared across a numerical search.<sup class="fnref"><a href="#fn1" id="fnref1">1</a></sup>
+  This is what "calculus without limits" looks like when it stops being a slogan and starts doing homework.
+  </p>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">The fuller, more formal development — including the projection operator's exact bookkeeping and the Laurent framing of the multiplicative differential — lives in the theory note <a href="../../theory/void-calculus/">Void Calculus</a>. This chapter is the worked tour; that page is the ledger. <a href="#fnref1">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../the-chart/">The Chart</a>
+    <a class="toc" href="../">Contents</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>
