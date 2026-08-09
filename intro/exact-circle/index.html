@@ -34,12 +34,13 @@
   It works, and this chapter does it.
   </p>
 
-  <h2>The half-step and its shadow</h2>
+  <h2>The step and its undo</h2>
 
   <p>
-  Take the smallest step around the circle we can name: the half-power <span class="math-inline">u = 0^(1/2)</span>, and its reciprocal <span class="math-inline">v = 0^(−1/2)</span>.
-  Because one is the reciprocal of the other, their product is just <span class="math-inline">1</span> — they are a matched pair, a step and its undo.
-  Add them together and you get a single number that stands in for the angle of the step:
+  First fix what a power of zero means as a point on the circle.
+  Since <span class="math-inline">0^ω = −1</span> is the half-turn, <span class="math-inline">0^(ωx)</span> is the point a fraction <span class="math-inline">x</span> of the way along it — at angle <span class="math-inline">πx</span>.
+  Take a step of that kind, <span class="math-inline">u = 0^(ωt)</span>, together with its <em>undo</em>, the reciprocal <span class="math-inline">v = 0^(−ωt)</span>.
+  Because one reverses the other their product is <span class="math-inline">1</span>, and adding a step to its undo gives a single real number that stands in for the step:
   </p>
 
   <div class="math">u · v = 1                s = u + v</div>
@@ -73,11 +74,56 @@ a₅ = s⁵ − 5s³ + 5s</div>
   Stepping it is stepping around the circle by equal angles — exactly, with no trigonometry underneath and no limit anywhere in sight.<sup class="fnref"><a href="#fn1" id="fnref1">1</a></sup>
   </p>
 
+  <h2>From the real engine to the complex corner</h2>
+
+  <p>
+  The engine only ever returns a real number — <span class="math-inline">s</span>, and the <span class="math-inline">aₙ</span> built from it.
+  The thing we actually want is a complex point on the circle.
+  Crossing from one to the other takes a single observation and one square root — still no trigonometry.
+  </p>
+
+  <p>
+  Because <span class="math-inline">u</span> and <span class="math-inline">v</span> multiply to <span class="math-inline">1</span> and lie on the unit circle, the undo is just the <em>mirror image</em> of the step across the real axis: if <span class="math-inline">u = x + i y</span>, then <span class="math-inline">v = x − i y</span>.
+  So their sum collapses to twice the horizontal coordinate, while their product only confirms the point is on the circle:
+  </p>
+
+  <div class="math">s = u + v = 2x                u · v = x² + y² = 1</div>
+
+  <p>
+  That is the whole bridge.
+  The real number the recurrence hands you is exactly twice the <span class="math-inline">x</span>-coordinate of the step; the <span class="math-inline">y</span>-coordinate is whatever keeps the point on the circle:
+  </p>
+
+  <div class="math">x = s / 2                y = √(1 − x²)</div>
+
+  <p>
+  And "divide the circle evenly" stops being a wish and becomes an equation.
+  To reach <span class="math-inline">0^(ω/3)</span> — a third of a half-turn — demand that three steps make the half-turn itself, <span class="math-inline">0^ω = −1</span>.
+  Three steps means <span class="math-inline">u³ = −1</span> (and <span class="math-inline">v³ = −1</span> with it), so <span class="math-inline">a₃ = u³ + v³</span> must equal <span class="math-inline">−2</span>.
+  We already turned the crank for <span class="math-inline">a₃ = s³ − 3s</span>, so the step-size is pinned by a polynomial:
+  </p>
+
+  <div class="math">s³ − 3s = −2     →     s³ − 3s + 2 = 0     →     (s − 1)²(s + 2) = 0     →     s = 1</div>
+
+  <p>
+  The step is not eyeballed; it is a root of that closing polynomial — the other root, <span class="math-inline">s = −2</span>, is the degenerate half-turn itself — and it lands on an exact value.
+  Send <span class="math-inline">s = 1</span> across the bridge:
+  </p>
+
+  <div class="math">x = s / 2 = 1/2                y = √(1 − 1/4) = √3 / 2</div>
+
+  <p>
+  and the corner assembles itself — derived, not announced:
+  </p>
+
+  <div class="math">0^(ω/3)  =  x + i y  =  1/2 + (√3 / 2) i</div>
+
   <h2>Roots of unity, by hand</h2>
 
   <p>
-  The payoff is concrete.
-  Choose <span class="math-inline">s</span> so the steps divide the circle evenly, and the arithmetic hands you the exact corner points — the roots of unity — as clean surds, not decimal approximations:
+  The same recipe turns the crank for any even division: close the polynomial for the division you want, then read <span class="math-inline">x = s/2</span> and <span class="math-inline">y = √(1 − x²)</span>.
+  The fifth goes exactly so — demand five steps make the half-turn, <span class="math-inline">a₅ = −2</span>, solve <span class="math-inline">s⁵ − 5s³ + 5s + 2 = 0</span> for the root <span class="math-inline">s = (1 + √5)/2</span>, and its half is the exact <span class="math-inline">cos 36°</span>.
+  Two corners, in exact surds rather than decimal approximations:
   </p>
 
   <div class="math">0^(ω/3)  =  1/2 + (√3 / 2) i                    (a third of a half-turn)
@@ -91,7 +137,7 @@ a₅ = s⁵ − 5s³ + 5s</div>
   <h2>Climbing the tower</h2>
 
   <p>
-  And you can keep halving the step — <span class="math-inline">0^(1/4)</span>, <span class="math-inline">0^(1/8)</span>, and so on — each level doubling the number of points and locking in finer angles, exactly, all the way down.
+  And you can keep halving the step — <span class="math-inline">0^(ω/4)</span>, <span class="math-inline">0^(ω/8)</span>, and so on — each level doubling the number of points and locking in finer angles, exactly, all the way down.
   This is the "dyadic tower": a staircase of ever-finer exact divisions of the circle.<sup class="fnref"><a href="#fn2" id="fnref2">2</a></sup>
   </p>
 
