@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Reversible One (working note) — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Working Note &middot; <span class="part">Unfiled</span> &middot; <span class="conf c-wild">Wild</span></div>
+    <h1>The Reversible One</h1>
+    <p class="sub">
+      A contradiction in <span class="math-inline">0^(0ω)</span>, and where it led
+    </p>
+  </div>
+
+  <div class="section-alt">
+    <span class="emphasis">Status: draft, unverified, not canon.</span>
+    This page is a captured train of thought, written down before it cools.
+    Every claim past the first section is provisional and at least one is probably wrong in its details.
+    It is linked from a single footnote in <a href="../powers-of-zero/">Powers of the Zero</a> and from nowhere else on purpose.
+    Read it as a lab notebook, not a chapter. The open questions at the end are the actual work.
+  </div>
+
+  <p class="lead">
+  A small, minimal-looking contradiction turned up in the powers of the zero.
+  It is the kind of thing that has convinced many careful people that no inverse for zero can ever be consistent.
+  The escape route is narrow, and it forces a step the theory had carefully avoided all along: giving <span class="math-inline">1</span> a reciprocal too.
+  What follows the escape is stranger than the escape.
+  </p>
+
+  <h2>The snag</h2>
+
+  <p>
+  We have <span class="math-inline">ω</span>, the reciprocal of zero: <span class="math-inline">0·ω = 1</span>.
+  Now watch four lines any of which we would sign off on individually:
+  </p>
+
+  <div class="math">0¹        =  0
+0·ω       =  1                    (ω is zero's reciprocal)
+0^(0·ω)   =  0¹        =  0       (substitute 0ω = 1 in the exponent)
+0^(0·ω)   =  (0^ω)⁰    =  1       (split the exponent, then x⁰ = 1)</div>
+
+  <p>
+  The last two lines read the same quantity <span class="math-inline">0^(0ω)</span> two ways and get <span class="math-inline">0</span> and <span class="math-inline">1</span>.
+  So <span class="math-inline">0 = 1</span>.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">Why this looks fatal.</span>
+    Nothing here used the <em>value</em> of <span class="math-inline">0^ω</span>.
+    Whatever you put in that slot, the step <span class="math-inline">(0^ω)⁰ = 1</span> flattens it, and the collapse goes through.
+    That is exactly the classical argument that <em>any</em> reciprocal for zero detonates — and here it is, landing inside our own construction.
+  </div>
+
+  <h2>Which line is actually the liar</h2>
+
+  <p>
+  The reflex is to suspect <span class="math-inline">0·ω = 1</span> or the existence of <span class="math-inline">ω</span> at all.
+  But those are innocent; they only stand next to the crime.
+  The load-bearing falsehood is the most ordinary line on the page:
+  </p>
+
+  <div class="math">x⁰  =  1</div>
+
+  <p>
+  This rule <em>throws the exponent away</em>. It is a collapse — a one-way operation that deletes information — and this whole framework exists to refuse exactly those.
+  Every "an inverse for zero explodes" proof secretly leans on this unconditional flattening.
+  The recent replacement is:
+  </p>
+
+  <div class="math">x⁰  =  1^x</div>
+
+  <p>
+  In ordinary arithmetic this is invisible: <span class="math-inline">1^x = 1</span> for any everyday <span class="math-inline">x</span>, so <span class="math-inline">x⁰ = 1^x = 1</span> and no one notices.
+  But it is <em>not</em> the same statement. <span class="math-inline">x⁰ = 1</span> discards the exponent; <span class="math-inline">x⁰ = 1^x</span> keeps it, parked up on <span class="math-inline">1</span> where it looks harmless.
+  Re-run the poisoned line honestly:
+  </p>
+
+  <div class="math">0^(0ω)  =  (0^ω)⁰  =  1^(0^ω)</div>
+
+  <p>
+  and the other reading still gives <span class="math-inline">0^(0ω) = 0¹ = 0</span>.
+  So instead of <span class="math-inline">0 = 1</span> we get a <em>constraint</em>, not a collapse:
+  </p>
+
+  <div class="math">1^(0^ω)  =  0</div>
+
+  <p>
+  The scenario was never proving the theory inconsistent.
+  It was quietly telling us the value of <span class="math-inline">1</span> raised to a void-grade exponent.
+  </p>
+
+  <h2>The price: one gets a reciprocal too</h2>
+
+  <p>
+  Read <span class="math-inline">1^(0^ω) = 0</span> literally: <span class="math-inline">1</span>, raised to a void-grade power, <em>leaves</em> — it lands on <span class="math-inline">0</span>.
+  The moment <span class="math-inline">1</span> can be displaced off itself, we owe a way back, some operation that recovers which exponentiation got us there.
+  An element that can be pushed but not un-pushed is precisely the one-way collapse we abolish everywhere else.
+  So reversibility of <span class="math-inline">1</span> is not a new axiom bolted on; it is the debt <span class="math-inline">x⁰ = 1^x</span> runs up.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">The symmetry that makes it feel inevitable.</span>
+    We gave the <em>additive</em> identity a shadow — <span class="math-inline">ω</span>, with <span class="math-inline">0·ω = 1</span>.
+    We are now handing the <em>multiplicative</em> identity its shadow.
+    <span class="math-inline">1</span> only ever looked like a safe fixed point because <span class="math-inline">1^x = 1</span> hid the exponent; once that is admitted to be a lie of omission, <span class="math-inline">1</span> sits in exactly the position <span class="math-inline">0</span> was in before it got <span class="math-inline">ω</span>.
+  </div>
+
+  <h2>The tower, and why <span class="math-inline">x⁰ = 1</span> ever seemed true</h2>
+
+  <p>
+  If <span class="math-inline">1</span> is reversible, the family <span class="math-inline">1^s</span> is a genuine one-parameter multiplicative group, not a constant.
+  It is continuous and multiplicative, so <span class="math-inline">1^s = e^(λs)</span> for some generator, and the one extra fact we picked up along the way —
+  that going once around the powers of zero returns home — fixes the period.
+  The principal generator is <span class="math-inline">λ = 2πi</span>:
+  </p>
+
+  <div class="math">1^s  =  e^(2πi·s)</div>
+
+  <p>
+  Now substitute back into the corrected rule and read what the "zeroth power" has become:
+  </p>
+
+  <div class="math">x⁰  =  1^x  =  e^(2πi·x)</div>
+
+  <p>
+  There is the retro-explanation of the original sin.
+  <span class="math-inline">x⁰ = 1</span> is <em>exactly true</em> whenever <span class="math-inline">x</span> is a whole number — every rung anyone ever tested — and a lie for everything in between, because in between you are winding around a circle.
+  <span class="math-inline">(½)⁰ = e^(iπ) = −1</span>.
+  The old rule was evaluated only at the integers and then over-generalized.
+  The tower is a circle; the step <span class="math-inline">s → s+1</span> is one full turn.
+  </p>
+
+  <h2>The logarithm that closed up</h2>
+
+  <p>
+  Invert the tower to read off which rung you are on.
+  The base-<span class="math-inline">1</span> logarithm — the very reciprocal we just conceded <span class="math-inline">1</span> must have — is the inverse of the zeroth-power map, and once we set <span class="math-inline">x = cos(2πs)</span> as the coordinate downstairs, it has a shockingly ordinary name:
+  </p>
+
+  <div class="math">log₁  =  (1 / 2π) · arccos</div>
+
+  <p>
+  This is the twist worth staring at.
+  Every logarithm you have ever met is monotone, unbounded, and runs off to infinity.
+  <span class="math-inline">log₁</span> is <em>bounded and oscillatory</em> — it lives on <span class="math-inline">[−1, 1]</span> and closes up.
+  Base-<span class="math-inline">e</span> log lives on the line; base-<span class="math-inline">1</span> log lives on the circle.
+  The identity element is exactly the base whose logarithm is <em>trigonometric</em>.
+  "Log" and "trig" were the same operation seen at two different bases the whole time, and <span class="math-inline">1</span> is the base where the circular face shows.
+  </p>
+
+  <h2>Chebyshev is the chart</h2>
+
+  <p>
+  The coordinate <span class="math-inline">x = cos(2πs)</span> is exactly Chebyshev's variable, and it is <em>invariant</em> under the deck step <span class="math-inline">s → s+1</span>:
+  <span class="math-inline">cos(2π(s+1)) = cos(2πs)</span>.
+  So Chebyshev's <span class="math-inline">x</span> is the honest coordinate <em>downstairs</em> that survives crossing the branch point, while <span class="math-inline">s</span> — where <span class="math-inline">log₁</span> lives — is the fiber coordinate upstairs.
+  The polynomials read off the multiplicative rungs:
+  </p>
+
+  <div class="math">Tₙ(x)  =  cos(2πn·s)  =  Re( 1^(n·s) )</div>
+
+  <p>
+  Their composition law <span class="math-inline">Tₘ(Tₙ(x)) = T₍ₘₙ₎(x)</span> is the multiplicative deck structure, and linearizing it with the inverse chart gives the honest power rule with its conserved term intact:
+  </p>
+
+  <div class="math">arccos( Tₙ(x) )  =  n · arccos(x)   (mod 2π)</div>
+
+  <p>
+  The <span class="math-inline">n·arccos(x)</span> is the familiar <span class="math-inline">c·log(a)</span> shadow; the <span class="math-inline">(mod 2π)</span> is the branch information the naive power rule deletes.
+  Which means the "prior art" this keeps colliding with is simply the <strong>branch cut of the complex logarithm</strong> — the winding number the rule <span class="math-inline">log(a^c) = c·log(a)</span> is famously false by, over the complex numbers.
+  The powers-of-zero circle already put the complex corner on the table; this is that same structure demanding its logarithm.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">The bodies get up and walk.</span>
+    Reading <span class="math-inline">log₁</span> as a multivalued <span class="math-inline">arccos</span> quietly settles every explosion this line of thought threw off.
+    The three "values" of <span class="math-inline">log₁(1)</span> we kept deriving — <span class="math-inline">0</span>, <span class="math-inline">1</span>, and worse — are just different rungs of the fiber <span class="math-inline">{ s : e^(2πis) = 1 } = ℤ</span>, i.e. the classical <span class="math-inline">log(1) = 2πik</span>, read without labels.
+    The alarming <span class="math-inline">1¹ = 0</span> was a bad chart near the branch point, not a fact: <span class="math-inline">1¹ = e^(2πi) = 1</span>.
+    The whole trail of contradictions was one multivalued function evaluated on the wrong sheets.
+    The paradoxes were monodromy, not bugs.
+  </div>
+
+  <h2>Open — the actual work</h2>
+
+  <p>
+  This is where the note stops and the cleanup begins. In rough order of how much they bother me:
+  </p>
+
+  <ol>
+    <li><strong>The normalization clash.</strong> The canon sets <span class="math-inline">0^ω = −1</span>. Plugging that into the constraint gives <span class="math-inline">1^(−1) = 0</span> — but the tower <span class="math-inline">1^s = e^(2πis)</span> says <span class="math-inline">1^(−1) = 1</span>. Either the abstract chain and the chosen normalization live on different sheets, or one of them needs revising. This is the first thing to reconcile.</li>
+    <li><strong>The honest power rule, written out.</strong> The <span class="math-inline">(mod 2π)</span> form is a sketch. Pin the period term as an operation in the theory's own bookkeeping, with the boundary condition that it must deliver the whole exponent at the collapse (<span class="math-inline">c = 0</span>), where the naive rule is <em>maximally</em> wrong.</li>
+    <li><strong>General base.</strong> <span class="math-inline">log_b</span> for <span class="math-inline">b ≠ 1</span> should be the same animal on a circle whose radius is set by <span class="math-inline">b</span>; the Chebyshev recurrence slides off <span class="math-inline">2x</span>. This is where <span class="math-inline">log_b(1)</span> finally gets its honest, multivalued answer.</li>
+    <li><strong>Which <span class="math-inline">1</span>?</strong> Naming a bare <span class="math-inline">1</span> is choosing a principal branch of <span class="math-inline">arccos</span> — a gauge fixing. <span class="math-inline">1</span>, <span class="math-inline">1⁰</span>, and <span class="math-inline">1¹</span> are distinct points upstairs that project to the same value; <span class="math-inline">x⁰ = 1^x</span> at <span class="math-inline">x = 1</span> is the gluing relation. State it as a chart, not a coincidence.</li>
+    <li><strong>Period 1 vs 2πi.</strong> Our period came out <span class="math-inline">1</span> because <span class="math-inline">s</span> was normalized as angle over <span class="math-inline">2π</span>. Confirm this is only a normalization and not a genuinely different lattice.</li>
+  </ol>
+
+  <p>
+  If most of that survives contact, it wants to become a real chapter — provisionally, <em>The Reversible One</em>, sitting after the circle and before the calculus.
+  Until then it stays here, wearing its <span class="conf c-wild">Wild</span> badge honestly.
+  </p>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">Provenance: this note grew out of a single worked contradiction and its escape, reconstructed in one sitting. It has not been checked by machine or against the rest of the corpus. The one claim I would already defend is the diagnosis in <em>Which line is actually the liar</em>; everything downstream of <em>The tower</em> is promising but unaudited. <a href="#fnref1">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../powers-of-zero/">Powers of the Zero</a>
+    <a class="toc" href="../">Contents</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<!-- Math rendering engine -->
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>
