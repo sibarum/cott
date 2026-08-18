@@ -206,14 +206,19 @@ Ch 2's admittedly-informal criterion (`totality-reversibility` fn2, "not yet a f
 criterion") its formal rendering. The book can therefore end by cashing the promissory note
 it opens with. That is worth a Part boundary.
 
-**7.3 — D3's fix may be the wrong fix.** The plan has Ch 4 introduce `0^ω = −1` with "this
-is the fingerprint of a *chosen* multiplication." Two notes complicate that. `anchor-shadow`
-argues the value is a **projection**, so the honest form is `0^ω ≈ −1`. And it further
-argues that once negation is geometric — a rotational involution, hence the half-turn — the
-value is **derived**, not chosen. Those pull in different directions and are not yet
-reconciled. **Until they are, Ch 4's caveat should say only that the value is a projection
-and that its status is Ch 12's subject** — which is defensible under either resolution, and
-does not commit the book to a claim that may be retracted.
+**7.3 — D3's fix is fine; the apparent conflict was a mis-reading.** `anchor-shadow` says
+both that `0^ω ≈ −1` is a **projection** and that it is **derived** once negation is
+geometric. Those are not competing claims — the torus separates them onto two floors:
+
+- **position** — `ω` is the exponent carrying `0` to the half-turn, upstairs, *derived*
+  from negation being the only nontrivial rotational involution of a circle;
+- **value** — `−1` is what the half-turn lands on downstairs, *a projection*.
+
+One claim, two floors. Ch 4's caveat therefore says both, in the same breath, without
+hedging: the position is forced, the value is a shadow, and Ch 12 is where the shadow's
+coordinate-dependence is cashed. This is a *strengthening* of D3's fix — the value stops
+being "a choice we were honest about" and becomes derived, which is a better sentence to put
+in Ch 1 as well.
 
 **7.4 — Ch 20 depends on a dissolved chapter.** `the-doubling` forces the Cayley–Dickson
 step using *Types as Operations*' rule by name — "the type is whatever must exist to keep
@@ -221,16 +226,26 @@ the operations working." Dissolving that chapter (§4) is fine, but the rule mus
 somewhere quotable, or Ch 20's central argument loses its citation. Ch 15's opening is the
 natural home.
 
-**7.5 — New back-matter material, not yet placed.** Three findings with no chapter:
+**7.5 — The torus is Part VI's organizing object, and it places most of the loose
+material.** `ℍ = ℂ ⊕ ℂj`, so a quaternion is a *pair* of complex numbers and the unit
+quaternions are `S³`. Inside `S³` sits the **Clifford torus**, `{|z| = |w| = 1/√2}`,
+coordinatized by `(arg z, arg w)` — which is exactly the phase torus of (base, exponent)
+pairs the figures draw. The two circles of the torus are the two `ℂ` factors of `ℍ`, and the
+pair structure that makes the torus is the pair structure the doubling produces.
 
-- The **correspondence principle** — every upstairs distinction must vanish downstairs into
-  exactly the classical value. This is the strongest falsifiability guard in the corpus and
-  belongs with the badging front-note or in *Judging the Work*, not buried in Ch 21.
-- **`ω^ω = 1/(−1)`** — a one-line derivation retiring a question open across six law-sets.
-  Belongs in Ch 18 or 19.
-- **`i = log₀ ∘ r`**, and that the grade *is* `log₀`. A second, independent route to the
-  imaginary unit, built from operations rather than a normalization. This is Ch 5 material
-  and would strengthen it considerably.
+That places two of the three loose findings:
+
+- **`i = log₀ ∘ r`**, and the grade *being* `log₀` — two reflections on the phase circle
+  composing to a quarter-turn. Torus geometry, and Ch 5 material: a second, independent
+  route to the imaginary unit, from operations rather than a normalization.
+- **`ω^ω = 1/(−1)`** — the one cell that is intrinsically an ordered pair, and therefore a
+  torus intersection point, since `(0,ω)` and `(ω,0)` are distinct points on the surface.
+  Ch 18 or 19.
+
+Still homeless, and *not* torus material: the **correspondence principle** — that every
+upstairs distinction must vanish downstairs into exactly the classical value. It is
+epistemics rather than geometry, it is the strongest falsifiability guard in the corpus, and
+it belongs with the badging front-note or in *Judging the Work*, not buried in Ch 21.
 
 ## 8 · Risks
 
@@ -253,7 +268,18 @@ natural home.
 ## 9 · Debts
 
 - `PROVEN-AUDIT.md` — downgrade the `0^(2ω) = 1` badge (§6, Ch 12).
-- The `0^ω` status conflict (§7.3) blocks Ch 4's final wording.
-- Whether the covering completion (Ch 21) and the doubling completion (Ch 20) combine into
-  one structure is open, and it is a gap *between* those chapters rather than inside
-  either — the kind that stays invisible.
+- **Ch 20's citation of a dissolved chapter** (§7.4). Bookkeeping, but it silently breaks an
+  argument if missed.
+- **The correspondence principle needs a home** (§7.5). The only loose finding the torus
+  does not place.
+- **The two completions: bridged, not yet joined.** Whether the covering completion (Ch 21)
+  and the doubling completion (Ch 20) form one structure was recorded here as an invisible
+  gap between chapters. The Clifford torus (§7.5) supplies the venue — the torus is where
+  the doubling becomes visible in the covering picture — which is a real narrowing, but the
+  torus is a *slice* of `S³`, the locus of equal magnitudes, so it is the meeting place
+  rather than the whole of either completion. The step that would close it: show that the
+  `ℤ/2` relating the two torus decompositions **is** conjugation by `j`, the element the
+  doubling adjoins. If so, the covering picture's twist and the doubling's generator are one
+  element. Unchecked, and worth checking first.
+
+*(§7.3's conflict is struck — it was a mis-reading, not a debt.)*
