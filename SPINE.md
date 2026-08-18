@@ -1,4 +1,21 @@
-# Proposed new spine for `intro/`
+# Proposed new spine for `intro/` — DEAD
+
+> **Superseded by [SPINE-2.md](SPINE-2.md), which is the target.** The prescription below
+> — move machinery *earlier* — is retired. Do not implement it.
+>
+> This file is retained, not deleted, because `SPINE-2.md` references it in about a dozen
+> places and does not restate what it borrows: the **D1–D4 defect analysis** below is the
+> shared diagnosis both spines were built on, and several `[RW]` rewrite obligations
+> (Ch 3's diagnosis, Ch 8's `0·ω` derivation, Ch 11's ladder, the `≈` fixes) are carried
+> into SPINE-2 by pointer. Read those sections as live; read the ordering as dead.
+>
+> Also stale on its own terms: written before the working-note thread, so its Part V
+> lists two notes where there are now five, and its argument for the new Ch 5 is weaker
+> than what `anchor-shadow` and `weaves` later established — evaluation *is* projection,
+> which makes join-don't-resolve and the `=`/`≈` discipline one rule rather than two
+> conveniences.
+
+## Original proposal (retired)
 
 A re-ordering of the book, as a diff against the current table of contents
 (`intro/index.html:54–111`), with the dependency violation motivating each move.
