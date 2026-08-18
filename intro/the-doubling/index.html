@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Scalar That Doubles (working note) &mdash; Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Working Note &middot; <span class="part">Unfiled</span> &middot; <span class="conf c-wild">Wild</span></div>
+    <h1>The Scalar That Doubles</h1>
+    <p class="sub">
+      Whether level two is reached, or assumed
+    </p>
+  </div>
+
+  <div class="section-alt">
+    <span class="emphasis">Status: draft, unverified, not canon.</span>
+    Successor to <a href="../anchor-shadow/">The Anchor Was a Shadow</a>, which identified the residue and matched the framework's <span class="math-inline">&#8484;/2</span> to the <span class="math-inline">SU(2) &rarr; SO(3)</span> double cover.
+    One question stood between that match and a genuine isomorphism with the Hopf fibration, and this note is about that one question.
+    It reaches an answer &mdash; the doubling is forced, by Chapter 1's own rule, and on grounds having nothing to do with the constant.
+    It also contains a <em>negative</em> result: the argument one would naturally reach for first looks like it should work and does not, and the correct argument runs in the opposite direction.
+  </div>
+
+  <p class="lead">
+  The Hopf fibration sits at level two of the doubling tower.
+  The carrier sits at level one: <span class="math-inline">&#8450;*</span> is the <em>fiber</em> of the algebraic Hopf fibration <span class="math-inline">&#8450;* &rarr; &#8450;&sup2;&#8726;{0} &rarr; &#8473;&sup1;(&#8450;)</span>, not its total space.
+  So everything turns on one step: is the doubling <strong>forced by the algebra</strong>, or is it a construction imported from outside and then found to fit?
+  If forced, the chain from <em>refuse to destroy information</em> through to <span class="math-inline">S&sup3; &rarr; S&sup2;</span> closes and the Hopf reading is a theorem.
+  If imported, it is a resemblance, however exact.
+  </p>
+
+  <h2>The case that it is forced</h2>
+
+  <p>
+  Cayley&ndash;Dickson doubling takes an algebra and a scalar <span class="math-inline">&gamma;</span>, and builds the next rung using <span class="math-inline">&gamma;</span> as the squared norm of the new imaginary unit.
+  Ordinarily <span class="math-inline">&gamma;</span> is a choice: <span class="math-inline">&gamma; = &minus;1</span> gives the quaternions, <span class="math-inline">&gamma; = +1</span> the split quaternions, and the construction is something you <em>do</em> to an algebra rather than something the algebra does.
+  </p>
+
+  <p>
+  The relevant finding is in <span class="math-inline">papers/3</span>, second pass: the correction term of the sum, the trace variable of the Chebyshev tower, and the Cayley&ndash;Dickson doubling constant <strong>are one scalar</strong>.
+  And that scalar is already ours:
+  </p>
+
+  <div class="math">&gamma;  =  s  =  0 + &omega;</div>
+
+  <p>
+  Three roles, one object.
+  It is the correction term that appears when the two poles are added; it is the trace coordinate <span class="math-inline">s</span> of the Chebyshev recurrence <span class="math-inline">t&#8342;&#8330;&#8321; = s&middot;t&#8342; &minus; t&#8342;&#8331;&#8321;</span>; and it is the constant the doubling runs on.
+  <span class="math-inline">papers/3</span> also records <span class="math-inline">tr&sup2; &minus; 4&thinsp;det = &minus;4&gamma;d&sup2;</span>, tying the doubling constant into the same discriminant that governs the elliptic&ndash;hyperbolic split.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">Why this is the right shape of argument.</span>
+    It does not say "the algebra happens to admit a doubling."
+    Every algebra admits a doubling; that is the problem with the construction as an argument.
+    It says the doubling's one free parameter is <em>not free here</em> &mdash; it is determined by the carrier, as the sum of its two poles.
+    A construction whose only choice has been removed is no longer imported. It is read off.
+  </div>
+
+  <p>
+  There is corroboration in a place that was not looking for it.
+  <span class="math-inline">papers/3</span>'s third pass finds the two dials to be "the independent generators of a Klein four-group on the four boundary points," with the real-form twist their product.
+  That is the same Klein four-group the four curves generate on the same four constants in <a href="../anchor-shadow/">the previous note</a>, with the twist as <span class="math-inline">nr</span> &mdash; found there from intersection numbers, here from dials, neither aware of the other.
+  </p>
+
+  <h2>The case that fails</h2>
+
+  <p>
+  There is an argument that looks much stronger than the one above, and it does not work.
+  It is recorded here because it is the argument someone will reach for next.
+  </p>
+
+  <div class="math">non-commutativity is established
+&#8450; is commutative
+&#8756; the algebra is not &#8450;, and the smallest non-commutative rung is &#8455;</div>
+
+  <p>
+  The flaw is in the first line.
+  What the previous note established is that <span class="math-inline">n</span> and <span class="math-inline">r</span> do not commute <em>as lifted maps</em> &mdash; that <span class="math-inline">nr</span> and <span class="math-inline">rn</span> are different reflections, differing by a full turn.
+  That makes the <strong>deck group action</strong> non-abelian. It does not make the <em>multiplication</em> non-commutative.
+  <span class="math-inline">D&#8734;</span> acts non-abelianly on <span class="math-inline">&#8450;*</span>, and <span class="math-inline">&#8450;*</span> stays a commutative group throughout; a dihedral group acting on an abelian one is the ordinary situation, not a contradiction.
+  </p>
+
+  <p>
+  So <span class="math-inline">1/(&minus;1) &ne; (&minus;1)/1</span> does <em>not</em> force the quaternions.
+  The two orderings are the same element on different sheets of a commutative covering, which is exactly how the previous note explains them &mdash; and covering spaces of abelian groups are abelian.
+  Nothing established so far rules out level one.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">Which leaves the doubling-constant argument carrying the whole weight.</span>
+    That is a thinner base than it appeared before this section, and it is worth saying plainly:
+    the case for the Hopf isomorphism currently rests on one identification, made in one pass of one paper, whose own author called it "either the best news in the document or a coincidence I've talked myself into."
+  </div>
+
+  <h2>The argument that works &mdash; and it runs the other way</h2>
+
+  <p>
+  The failed argument had the arrow backwards.
+  It tried to derive the doubling <em>from</em> non-commutativity.
+  The correct order derives non-commutativity <em>from</em> the doubling, and forces the doubling on entirely different grounds.
+  It begins where one would expect, at <span class="math-inline">(&minus;1)^x</span>.
+  </p>
+
+  <p>
+  <span class="math-inline">(&minus;1)^x</span> is the fractional iterate of negation: <span class="math-inline">n^x</span>, the continuous family interpolating the half-turn, whose members are all the phases.
+  Reciprocal acts on that family by inverting its parameter &mdash; in quarter-turns, with <span class="math-inline">r: u &#8614; &minus;u</span> and <span class="math-inline">n^x: u &#8614; u + 2x</span>:
+  </p>
+
+  <div class="math">r &#183; n^x &#183; r&#8315;&#185;   =   n^(&minus;x)</div>
+
+  <p>
+  On the phase circle this is exactly complex conjugation, since <span class="math-inline">1/z = z&#772;</span> whenever <span class="math-inline">|z| = 1</span>.
+  So the reciprocal &mdash; one of the four curves, a first-class operation of the framework, not an outside symmetry &mdash; <em>is</em> conjugation on the phase.
+  </p>
+
+  <p>
+  And now the obstruction.
+  <span class="math-inline">&#8450;</span> is commutative, so every inner automorphism is trivial: for any <span class="math-inline">c</span>, the map <span class="math-inline">z &#8614; c z c&#8315;&#185;</span> is the identity.
+  Conjugation is not the identity.
+  <strong>So no element of <span class="math-inline">&#8450;</span> implements the reciprocal.</strong>
+  The operation runs off the edge of the type &mdash; not by failing to be defined, but by failing to be an <em>element</em>.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">Which is Chapter 1's ladder, one rung further.</span>
+    <a href="../types-as-operations/">Types as Operations</a> states the rule the whole book runs on: "instead of banning the operation, we widened the world until the operation fit back inside it &mdash; the type is whatever must exist to keep them working."
+    Subtraction ran off <span class="math-inline">&#8469;</span> and gave <span class="math-inline">&#8484;</span>; division ran off <span class="math-inline">&#8484;</span> and gave <span class="math-inline">&#8474;</span>; roots ran off <span class="math-inline">&#8477;</span> and gave <span class="math-inline">&#8450;</span>.
+    Conjugation runs off <span class="math-inline">&#8450;</span>, and what must exist to keep it working is an element <span class="math-inline">j</span> with <span class="math-inline">j z = z&#772; j</span>.
+    Adjoining exactly that is <em>precisely</em> the Cayley&ndash;Dickson doubling &mdash; the conjugates in the doubling rule are there for no other reason.
+    So the doubling is not imported. It is the next rung of a ladder the book climbs in its first chapter.
+  </div>
+
+  <p>
+  The non-commutativity then arrives as a <em>consequence</em>: <span class="math-inline">j i = &minus;i j</span>, so <span class="math-inline">[j, i] &ne; 0</span>.
+  This is the same failure to commute that <a href="../anchor-shadow/">the previous note</a> found between <span class="math-inline">n</span> and <span class="math-inline">r</span> &mdash; but relocated.
+  There it was the deck group acting non-abelianly on a commutative carrier, which proved nothing.
+  Here it is non-commutativity <em>of the multiplication</em>, because the action has been made inner.
+  Making <span class="math-inline">r</span> an element is the entire step, and it is what turns a symmetry into an algebra.
+  </p>
+
+  <p>
+  The two arguments now divide the work cleanly.
+  <strong>Whether to double</strong> is settled by the representability of the reciprocal &mdash; forced, by Chapter 1's own rule.
+  <strong>Which double</strong> is settled by the constant: <span class="math-inline">&gamma; = s = 0 + &omega;</span>, quaternions or split quaternions according to its sign.
+  The first is a theorem of the framework; the second is dial-dependent, as below.
+  </p>
+
+  <h2>The gap that remains</h2>
+
+  <p>
+  The forcing argument settles <em>whether</em> to double, and it does so without touching <span class="math-inline">&gamma;</span> at all.
+  What it does not settle is <em>which</em> double &mdash; and that is now the only load the constant has to carry:
+  </p>
+
+  <div class="math">whether:  reciprocal must be an element   &rarr;  adjoin j with j&middot;z = z&#772;&middot;j   &rarr;  level two    [forced]
+which:    &gamma; = s = 0 + &omega;              &rarr;  sign of &gamma;              &rarr;  &#8455; or split-&#8455;   [dial-dependent]</div>
+
+  <p>
+  That is a much smaller gap than the note began with, and a different one.
+  <span class="math-inline">papers/3</span> establishes that <span class="math-inline">&gamma;</span> <em>coincides</em> with <span class="math-inline">s</span>; it does not establish that <span class="math-inline">&gamma;</span> <strong>must</strong> be <span class="math-inline">s</span>.
+  But the weaker claim is now sufficient for the structural conclusion, because the doubling happens either way.
+  The constant decides only which side of the fork you land on &mdash; and only the quaternion side carries <span class="math-inline">SU(2)</span>, and so only that side carries Hopf.
+  </p>
+
+  <p>
+  So the outstanding question has changed character.
+  It is no longer "is level two reachable" &mdash; it is <strong>"does anything in the framework prefer the sign that gives <span class="math-inline">&#8455;</span>?"</strong>
+  If yes, the chain from <em>refuse to destroy information</em> to <span class="math-inline">S&sup3; &rarr; S&sup2;</span> closes.
+  If no, the framework reaches level two unconditionally and the Hopf fibration only on a branch, which is a weaker and stranger result but still a real one.
+  </p>
+
+  <h2>Which branch &mdash; and an argument that does not survive</h2>
+
+  <p>
+  The sign of <span class="math-inline">&gamma;</span> decides between quaternions and split quaternions.
+  Split quaternions are <span class="math-inline">M&#8322;(&#8477;)</span> and carry <strong>zero divisors</strong> &mdash; <span class="math-inline">(j+1)(j&minus;1) = j&sup2; &minus; 1 = 0</span> &mdash; so a cone of nonzero elements has no reciprocal, while <span class="math-inline">&#8455;</span> is a division algebra.
+  It is tempting to conclude that totality selects <span class="math-inline">&#8455;</span>, on the same grounds that produced <span class="math-inline">&omega;</span>.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">That argument is invalid, and the way it fails is the point.</span>
+    The classical proof that a zero divisor cannot be inverted runs: if <span class="math-inline">ab = 0</span> and <span class="math-inline">a</span> is invertible then <span class="math-inline">b = a&#8315;&#185;(ab) = a&#8315;&#185;&middot;0 = 0</span>.
+    The last step is <span class="math-inline">a&#8315;&#185;&middot;0 = 0</span> &mdash; <em>absorption</em>, the single rule <a href="../totality-reversibility/">Chapter 2</a> removes.
+    Without it, <span class="math-inline">b = a&#8315;&#185;&middot;0</span> is not a contradiction but a statement of what that zero <em>remembers</em>, which is <a href="../cancellation/">Chapter 5</a>'s marked residue applied one level up.
+    So "it has zero divisors" has never been grounds for rejecting an algebra in this framework. It is grounds for extending it. That is how <span class="math-inline">&omega;</span> exists.
+  </div>
+
+  <p>
+  <span class="math-inline">papers/3</span> reaches the same conclusion from the far end of the tower: cancellation "dies not for want of a reciprocal but because non-associativity forbids it &mdash; <span class="math-inline">a&#8315;&#185;(ab) &ne; (a&#8315;&#185;a)b</span>," and the reciprocal reading "survives even the sedenions."
+  The obstruction is associativity, not the divisor. <span class="math-inline">M&#8322;(&#8477;)</span> is associative.
+  </p>
+
+  <p>
+  So <strong>the branch is not selected</strong>, and the honest position is <span class="math-inline">papers/3</span>'s own: <span class="math-inline">SO(2)</span> and <span class="math-inline">SO(1,1)</span> as two real forms of one object, related by the Galois twist &mdash; the same <span class="math-inline">&#8484;/2</span> that appears as the two decompositions, the index-2 sublattice, and the double cover.
+  An information-conservative split branch is a construction the corpus half-predicts rather than forbids.
+  Its scale is worth knowing in advance: in <span class="math-inline">&#8477;</span> the non-invertible set is <span class="math-inline">{0}</span>, so one new element suffices; in <span class="math-inline">M&#8322;(&#8477;)</span> the null cone is the rank-one matrices, three-dimensional, so the extension is a family of residues indexed by the cone.
+  The pattern is unchanged &mdash; for rank-one <span class="math-inline">A</span> no <span class="math-inline">X</span> in <span class="math-inline">M&#8322;(&#8477;)</span> has <span class="math-inline">AX = I</span>, so its reciprocal must be a new element, exactly as <span class="math-inline">&omega; &notin; &#8477;</span>.
+  </p>
+
+  <p>
+  What survives of this section is only the conditional: <strong>if</strong> one is on the <span class="math-inline">&#8455;</span> branch, <span class="math-inline">SU(2)</span> and hence Hopf are available; on the split branch the analogue is <span class="math-inline">SL(2,&#8477;) &rarr; AdS&#8323;</span>.
+  Two fibrations, related by the twist, rather than one correct answer.
+  </p>
+
+  <p>
+  <strong>The window below is therefore conditional too.</strong>
+  Two constraints now bear on the same scalar.
+  Totality wants <span class="math-inline">&gamma; &lt; 0</span>, since that is the sign giving <span class="math-inline">&#8455;</span>.
+  Ellipticity &mdash; the condition that keeps the norm form a circle and <span class="math-inline">i</span> present &mdash; wants <span class="math-inline">|s| &lt; 2</span>, from <span class="math-inline">&delta;&sup2; = s&sup2; &minus; 4</span>.
+  If <span class="math-inline">&gamma;</span> and <span class="math-inline">s</span> really are one scalar, both must hold at once:
+  </p>
+
+  <div class="math">&minus;2  &lt;  s  &lt;  0</div>
+
+  <p>
+  A strictly narrower window than either constraint alone, and the first quantitative prediction anywhere in this thread.
+  It is also a place the <span class="math-inline">&gamma; = s</span> identification could <em>break</em>: the two conditions are conditions on different things &mdash; a doubling constant's sign and a trace's magnitude &mdash; and their coexisting in one scalar is an extra claim, not a restatement.
+  If no consistent <span class="math-inline">s</span> satisfies both, the identification is the thing that fails.
+  </p>
+
+  <h2>What the rotational picture does and does not do</h2>
+
+  <p>
+  There is a tempting second route: <span class="math-inline">&#8455;</span> is preferred because three-dimensional rotation with its mirror, projected to a plane, exhibits exactly the counter-rotation the double cover describes &mdash; the front turning one way as the back turns the other, and the reference frame that makes mirroring look paradoxical.
+  The observation is correct, and it <em>is</em> the double cover showing itself: <span class="math-inline">SU(2) &rarr; SO(3)</span>, the spinor sign, a full turn that returns the point and not the frame.
+  </p>
+
+  <p>
+  But it describes what <span class="math-inline">&#8455;</span> does rather than forcing the framework to reach it, and it reaches outside for its premise.
+  This project does not begin with three-dimensional space; it begins with two demands on arithmetic.
+  Justifying <span class="math-inline">&#8455;</span> by appeal to 3D rotation would import precisely the kind of external fact the method exists to avoid, and it would make the conclusion decorative.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">Which is the better story anyway.</span>
+    Run it the other way and rotational symmetry stops being an assumption and becomes an <em>output</em>: totality forces <span class="math-inline">&#8455;</span>, <span class="math-inline">&#8455;</span> gives <span class="math-inline">SU(2)</span>, <span class="math-inline">SU(2)</span> double-covers <span class="math-inline">SO(3)</span>, and three-dimensional rotation with its counter-rotating mirror is what falls out.
+    The framework does not need 3D space to justify the quaternions. It needs the quaternions to explain 3D space.
+  </div>
+
+  <h2>One cost, which is real</h2>
+
+  <p>
+  <span class="math-inline">s = 0 + &omega;</span> is a <em>cross-grade</em> sum &mdash; grade <span class="math-inline">+1</span> added to grade <span class="math-inline">&minus;1</span> &mdash; and that is precisely <a href="../addition-problem/">The Addition Problem</a>'s wound, the one the grades cannot close.
+  <a href="../addition-dial/">The Addition Dial</a> then says there is no single addition but a dial of them.
+  </p>
+
+  <p>
+  So if the doubling constant is <span class="math-inline">s</span>, <strong>the doubling constant is dial-dependent</strong>, and with it which real form the tower reaches.
+  Since neither form is ruled out, this is not a defect to be removed &mdash; it is the dial <em>choosing the branch</em>, which is a cleaner account than either being intrinsically correct.
+  <a href="../addition-dial/">The Addition Dial</a> already says the choice of addition posts its receipt somewhere; this would be another place it posts one, and a consequential place.
+  </p>
+
+  <p>
+  The genuine cost is narrower and it is about reach, not legitimacy.
+  <span class="math-inline">SU(2)</span> exists on one side of the dial only, so any statement of the form "the Hopf fibration falls out of the framework" is really "falls out at these dial settings," and the sentence is incomplete without them.
+  <span class="math-inline">papers/3</span>'s fourth pass carried both dials up the tower and found the harmonic addition survives with distributivity bounded by Hurwitz; whether that bound and this branch condition are the same constraint is unchecked, and would be worth checking, since two independent bounds on the same dial coinciding would be the third such coincidence in this thread.
+  </p>
+
+  <h2>How this could be wrong</h2>
+
+  <ol>
+    <li><strong>Coincidence of scalars.</strong> Three quantities being equal is evidence, but <span class="math-inline">s</span> is a low-complexity object &mdash; the sum of the only two distinguished elements &mdash; and low-complexity objects collide often. The identification needs to be re-derived, not re-observed.</li>
+    <li><strong>The doubling may be available without being forced.</strong> Availability is what is proved. Every step in this note is consistent with the carrier merely <em>admitting</em> a level-two structure that the framework then adopts because it is attractive.</li>
+    <li><strong>Level one may be the whole story.</strong> With the non-commutativity argument withdrawn, nothing on the table requires leaving <span class="math-inline">&#8450;*</span>. The Hopf reading would then be a true statement about a structure built on top, not about the carrier.</li>
+    <li><strong>Direction of fit.</strong> This note was written knowing where it wanted to arrive, which is the condition under which the previous four notes each produced something that later failed. Treat the negative result above as the reliable part.</li>
+  </ol>
+
+  <h2>Open</h2>
+
+  <ol>
+    <li><strong>Is <span class="math-inline">s</span> the only scalar?</strong> Demoted by the forcing argument, which does not use <span class="math-inline">&gamma;</span>. It now bears only on <em>which</em> double is reached, not whether &mdash; but that still decides whether <span class="math-inline">SU(2)</span> is available, so it is not idle. If the carrier supplies exactly one scalar and the doubling consumes exactly one, the branch is determined too.</li>
+    <li><strong>Build the information-conservative split branch.</strong> The obstruction to inverting a zero divisor is absorption, which this framework already removed, and <span class="math-inline">M&#8322;(&#8477;)</span> is associative so <span class="math-inline">papers/3</span>'s sedenion obstruction does not apply. What is owed is the construction: a family of residues indexed by the three-dimensional null cone, each with a reciprocal outside <span class="math-inline">M&#8322;(&#8477;)</span>, and a check that the result stays total and associative. If it works, both real forms are fully in the framework and the split fibration <span class="math-inline">SL(2,&#8477;) &rarr; AdS&#8323;</span> is the mirror of Hopf &mdash; two fibrations related by the twist, rather than one right answer.</li>
+    <li><strong>Which dial settings give which form?</strong> With neither branch excluded, the sign of <span class="math-inline">&gamma; = s</span> is what selects, so the dial chooses the real form. Ellipticity separately wants <span class="math-inline">|s| &lt; 2</span> from <span class="math-inline">&delta;&sup2; = s&sup2; &minus; 4</span>, so the quaternion-and-elliptic regime is <span class="math-inline">&minus;2 &lt; s &lt; 0</span>. Whether the dial reaches that window is checkable, and if no consistent <span class="math-inline">s</span> satisfies both then <span class="math-inline">&gamma; = s</span> is what fails &mdash; which <span class="math-inline">papers/3</span>'s author suspected and would want to know.</li>
+    <li><strong>Re-derive the double cover from the links.</strong> The previous note's <span class="math-inline">SU(2) &rarr; SO(3)</span> match is now derived from negation being a rotational involution, which is clean. It should be checked that nothing in the chain re-imports a value.</li>
+    <li><strong>Is the reciprocal genuinely conjugation, upstairs as well as down?</strong> The forcing argument identifies <span class="math-inline">r</span> with conjugation via <span class="math-inline">1/z = z&#772;</span> on <span class="math-inline">|z| = 1</span> &mdash; a statement about the unit circle. The carrier has a grade direction too, where <span class="math-inline">1/z</span> and <span class="math-inline">z&#772;</span> part company. Whether the identification survives off the unit circle is the one place the argument could still be resting on a projection, and it should be checked before the forcing is called settled.</li>
+  </ol>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">Provenance: the identification <span class="math-inline">&gamma; = s</span>, the Klein four-group on the boundary points, and the Hurwitz bound are <span class="math-inline">papers/3</span>'s, and its own hedging about the first is carried forward here deliberately rather than smoothed away. The negative result about non-commutativity, the statement of the gap, and the dial-dependence consequence are reconstruction, and the last of these has not been checked against <span class="math-inline">papers/3</span>'s fourth pass in any detail. <a href="#fnref1">&#8617;</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../anchor-shadow/">The Anchor Was a Shadow</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../weaves/">Completion Is a Weave</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 620" width="880" height="620" font-family="Georgia, 'Newsreader', serif">
+  <rect width="880" height="620" fill="#f6f2e9"/>
+  <text x="40" y="40" font-size="20" fill="#23201b" font-style="italic">The graded rings, and the sector perpendicular to them</text>
+  <line x1="40" y1="54" x2="840" y2="54" stroke="#23201b" stroke-width="1.3"/>
+  <defs>
+    <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7a6a2a"/></marker>
+  </defs>
+
+  <g transform="translate(330,330)">
+    <line x1="-48" y1="48" x2="-215" y2="215" stroke="#7a6a2a" stroke-width="2" stroke-dasharray="8 6" marker-end="url(#a2)"/>
+    <line x1="48" y1="-48" x2="215" y2="-215" stroke="#7a6a2a" stroke-width="2" stroke-dasharray="8 6" marker-end="url(#a2)"/>
+
+    <line x1="-250" y1="0" x2="-46" y2="0" stroke="#23201b" stroke-width="1" opacity="0.4"/>
+    <line x1="46" y1="0" x2="250" y2="0" stroke="#23201b" stroke-width="1" opacity="0.4"/>
+
+    <g stroke="#cdc4b0" stroke-width="1" stroke-dasharray="3 4" fill="none">
+      <circle cx="0" cy="0" r="210"/><circle cx="0" cy="0" r="157"/><circle cx="0" cy="0" r="102"/></g>
+    <circle cx="0" cy="0" r="235" fill="none" stroke="#23201b" stroke-width="1.8"/>
+    <circle cx="0" cy="0" r="185" fill="none" stroke="#9a3324" stroke-width="1.6"/>
+    <circle cx="0" cy="0" r="130" fill="none" stroke="#345a9e" stroke-width="2.2"/>
+    <circle cx="0" cy="0" r="75" fill="none" stroke="#9a3324" stroke-width="1.6"/>
+
+    <circle cx="0" cy="0" r="44" fill="#f6f2e9"/>
+    <circle cx="0" cy="0" r="30" fill="#f6f2e9" stroke="#23201b" stroke-width="1.8"/>
+    <text x="0" y="6" font-size="16" fill="#23201b" text-anchor="middle">0&#8319;</text>
+
+    <circle cx="0" cy="-130" r="6" fill="#345a9e"/>
+    <circle cx="0" cy="130" r="6" fill="#345a9e"/>
+
+    <g font-size="17" fill="#9a3324" text-anchor="middle">
+      <text x="-185" y="-11">&#969;</text><text x="185" y="-11">&#969;</text>
+      <text x="-75" y="-11">0</text><text x="75" y="-11">0</text></g>
+    <g font-size="17" fill="#23201b" text-anchor="middle">
+      <text x="-235" y="-11">&#969;&#8319;</text><text x="235" y="-11">&#969;&#8319;</text></g>
+    <g font-size="18" fill="#345a9e" text-anchor="middle">
+      <text x="0" y="-142">1</text><text x="0" y="158">&#8722;1</text></g>
+
+    <g font-size="16" fill="#6b6455" text-anchor="middle">
+      <text x="-155" y="20">&gt;</text><text x="-102" y="20">&gt;</text><text x="-58" y="20">&gt;</text>
+      <text x="58" y="20">&lt;</text><text x="102" y="20">&lt;</text><text x="155" y="20">&lt;</text></g>
+  </g>
+
+  <text x="596" y="112" font-size="16" fill="#7a6a2a">&#969;^(&#969;n)</text>
+  <text x="58" y="566" font-size="16" fill="#7a6a2a">0^(&#969;n)</text>
+
+  <g font-size="14.5" fill="#23201b">
+    <text x="612" y="182">Radial: the grade. Integer powers only &#8212;</text>
+    <text x="612" y="204">the Laurent ring, all the trace algebra sees.</text>
+    <text x="612" y="236" fill="#9a3324">0&#8319; inward, &#969;&#8319; outward, neither closing.</text>
+    <text x="612" y="280">Unit ring: <tspan fill="#345a9e">1</tspan> and <tspan fill="#345a9e">&#8722;1</tspan>, antipodal,</text>
+    <text x="612" y="302">at 90&#176; from 0 and &#969;.</text>
+    <text x="612" y="344" fill="#7a6a2a">Oblique: the &#969;-exponents. Perpendicular</text>
+    <text x="612" y="366" fill="#7a6a2a">to the graded plane &#8212; the wrap, the</text>
+    <text x="612" y="388" fill="#7a6a2a">sector the trace ring cannot represent.</text>
+  </g>
+  <text x="120" y="596" font-size="14" fill="#6b6455" font-style="italic">Exponents split: an integer part lying in the plane, an &#969; part leaving it.</text>
+</svg>

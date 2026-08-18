@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Slot-Closure Formulation (working note) — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Working Note &middot; <span class="part">Unfiled</span> &middot; <span class="conf c-wild">Wild</span></div>
+    <h1>The Slot-Closure Formulation</h1>
+    <p class="sub">
+      Eight schemas, joined not resolved — and the fork underneath them
+    </p>
+  </div>
+
+  <div class="section-alt">
+    <span class="emphasis">Status: draft, unverified, not canon.</span>
+    This is the successor thread to <a href="../reversible-one/">The Reversible One</a>.
+    Where that note found <span class="math-inline">x⁰ = 1^x</span> by chasing a single contradiction, this one asks the systematic question behind it:
+    if certain identities are refused because writing them destroys structure, <em>which</em> identities close the system without collapsing it?
+    Two structural pieces below are provisional and flagged as such.
+    Read it as a lab notebook.
+  </div>
+
+  <p class="lead">
+  The governing rule is the same one that runs the whole project: information conservation, not mere consistency.
+  A system can be consistent by being small.
+  The demand here is stronger — operations must not destroy distinguishability, and the algebra must stay total.
+  The methodological consequence took a while to absorb: <strong>some classically valid identities are refused, not because they are false, but because writing them collapses structure that should be kept.</strong>
+  The model to keep in mind is split-complex arithmetic, where <span class="math-inline">j² = 1, j ≠ 1</span> refuses to reduce to <span class="math-inline">j = 1</span> — and that refusal is exactly what makes the object larger than <span class="math-inline">ℝ</span>.
+  </p>
+
+  <h2>Objects: slots, not terms</h2>
+
+  <p>
+  The carriers are not expressions but <strong>schemas</strong> — expressions with one free parameter.
+  A term like <span class="math-inline">(−1)⁰</span> is not <em>in</em> a class; it is the <em>value</em> of a schema at a point.
+  Two schemas passing through the same point no more merge than two crossing lines become one line.
+  (An earlier reading treated these as an equivalence relation on terms, let transitivity run through shared points, and collapsed eight objects to four. That was the wrong object.)
+  </p>
+
+  <p>
+  Closure means accounting for all eight schemas over the alphabet <span class="math-inline">{0, ω, 1, −1}</span> — each special value <span class="math-inline">c</span> contributing both <span class="math-inline">c^x</span> and <span class="math-inline">x^c</span>:
+  </p>
+
+  <div class="math">0^x     ω^x     1^x     (−1)^x
+x^0     x^ω     x^1     x^(−1)</div>
+
+  <p>
+  Each schema must belong to an equivalence class, additional identities may be introduced freely, and — the one hard constraint — <strong>no identity may carry a side condition of the form <span class="math-inline">x ≠ y</span></strong>.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">Join, don't resolve.</span>
+    <span class="math-inline">x¹ = x</span> and <span class="math-inline">x⁰ = 1</span> are barred — not oversights.
+    <span class="math-inline">4 + 3</span> collapses to <span class="math-inline">7</span>; <span class="math-inline">4 + x</span> has nowhere to go.
+    <span class="math-inline">x¹ = x</span> is not a relation between two slots, it is an <em>evaluation</em>: it discharges a slot to something outside the exponential language, and a discharged slot can no longer serve as a link.
+    Every slot must be <strong>joined</strong> to another schema, never <strong>resolved</strong> to arithmetic.
+    Each schema must also reference its parameter exactly once — the expression must be a function <em>of</em> <span class="math-inline">x</span>, not a collapse of it.
+  </div>
+
+  <h2>Pivots as the only inference rule</h2>
+
+  <p>
+  With evaluation barred, the sole way to derive anything is a <strong>pivot</strong>: where two schemas cross — share a point — they are constrained to agree there.
+  This is not a collision to be eliminated; it is data, and it propagates.
+  The theorem set is exactly the transitive closure over shared points, so the size of the derived table is fixed entirely by the crossing pattern of the eight schemas.
+  Few crossings means a sparse table with most cells undetermined — and <em>undetermined is a finding, not a failure</em>.
+  </p>
+
+  <p>
+  Not every new equivalence costs the same. The grading:
+  </p>
+
+  <table>
+    <thead><tr><th>Kind</th><th>Example</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Point crossing</td><td><span class="math-inline">1¹ = 0⁰</span></td><td>Information. Both schemas survive.</td></tr>
+      <tr><td>Point crossing</td><td><span class="math-inline">0^(−1) = ω¹</span></td><td>Information.</td></tr>
+      <tr><td>Slot → external</td><td><span class="math-inline">1^x = 1·x</span></td><td><strong>Major collapse.</strong> Slot becomes evaluable; the chain breaks.</td></tr>
+      <tr><td>Slot → slot</td><td><span class="math-inline">ω^x = 1^x</span> as full schemas</td><td><strong>Collapse by count.</strong> Eight anchors become seven.</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+  There is also a budget. On a finite carrier a schema pinned at enough points is determined, so two schemas may safely cross once, perhaps twice; three crossings and they are probably the same curve.
+  Lines intersecting at points, not overlapping on intervals.
+  </p>
+
+  <h2>The carrier: <span class="math-inline">−ω ≠ 0</span></h2>
+
+  <p>
+  The pivotal move of the thread: build the system in which negated-zero and <span class="math-inline">ω</span> are <strong>distinct</strong>.
+  This dissolves a standing valuation conflict rather than patching it.
+  With <span class="math-inline">val(0) = +1</span> one has <span class="math-inline">val(−0) = +1</span> but <span class="math-inline">val(0^(−1)) = −1</span>; these contradict <em>only</em> under the extra identification <span class="math-inline">ω = −0 = 0^(−1)</span>, which forces <span class="math-inline">+1 = −1</span>.
+  Drop that identification and both valuations are simply the valuations of two different elements.
+  <strong>The inconsistency was never a bug; it was an unread proof that <span class="math-inline">−0</span> and <span class="math-inline">0^(−1)</span> are distinct.</strong>
+  Whether the negated constants are separate anchors or negation is a schema-operation is still open.
+  </p>
+
+  <h2>The candidate closure</h2>
+
+  <p>
+  Four links cover all eight slots, once each, none discharged:
+  </p>
+
+  <div class="math">L1:  1^x     =  x^0
+L2:  0^x     =  ω^(−x)
+L3:  (−x)^ω  =  x^(−1)
+L4:  x^1     =  (−1)^(−x)</div>
+
+  <p>
+  <span class="math-inline">L1</span> is the <span class="math-inline">x⁰ = 1^x</span> insight from the previous note, now read as a <em>link</em> between two slots rather than a lone identity.
+  <span class="math-inline">L1–L3</span> are settled in shape; <span class="math-inline">L4</span> is the weak point.
+  Its <em>pairing</em> is forced — after <span class="math-inline">L1–L3</span> only <span class="math-inline">x¹</span> and <span class="math-inline">(−1)^x</span> remain, with nowhere to go but each other — but the <em>sign</em> (straight vs negated argument) was chosen on aesthetic grounds, not derived.
+  It is very likely the branch selection; see the fork below.
+  </p>
+
+  <p>
+  The four links close into a cycle, each pair meeting exactly once, within budget:
+  </p>
+
+  <table>
+    <thead><tr><th>Pivot</th><th>Yields</th></tr></thead>
+    <tbody>
+      <tr><td><span class="math-inline">L1 × L2</span> at <span class="math-inline">0⁰</span></td><td><span class="math-inline">1⁰ = ω^(−0)</span></td></tr>
+      <tr><td><span class="math-inline">L2 × L3</span> at <span class="math-inline">ω^ω</span></td><td><span class="math-inline">0^(−ω) = (−ω)^(−1)</span></td></tr>
+      <tr><td><span class="math-inline">L3 × L4</span> at <span class="math-inline">(−1)^ω</span></td><td><span class="math-inline">(−ω)¹ = 1^(−1)</span></td></tr>
+      <tr><td><span class="math-inline">L4 × L1</span> at <span class="math-inline">1¹</span></td><td><span class="math-inline">1⁰ = (−1)^(−1)</span></td></tr>
+    </tbody>
+  </table>
+
+  <p>
+  The first genuine output — a consequence, not an input — comes from combining the first and last pivots:
+  </p>
+
+  <div class="math">ω^(−0)  =  (−1)^(−1)</div>
+
+  <p>
+  This links the signed sector to base <span class="math-inline">−1</span>. It is lines meeting at points, not curves overlapping, so it is information rather than collapse.
+  The configuration satisfies the stated closure conditions; whether it is <em>the</em> solution or merely <em>a</em> solution is open, and hangs on <span class="math-inline">L4</span>.
+  </p>
+
+  <h2>The dual, and its fixed curve</h2>
+
+  <p>
+  There appear to be exactly two closing solutions, related by an involution <span class="math-inline">ρ</span> — "the dual lives in phase space."
+  A bare relabeling would do no work, so a substantive dual needs a fixed structure to reflect about.
+  The candidate is a fixed <em>curve</em>:
+  </p>
+
+  <div class="math">1^(−1)  =  1^1</div>
+
+  <p>
+  Base-1 is even in its exponent, and that evenness is <span class="math-inline">ρ</span>-invariant.
+  Two things make it the right kind of fixed point.
+  It is a fixed curve, not a fixed carrier element — enough to make the branches genuine reflections.
+  And it <strong>projects to the classical numbers cleanly</strong>: since <span class="math-inline">1ⁿ = 1</span> for all <span class="math-inline">n</span>, evenness in the exponent is vacuously true downstairs.
+  That suggests the axis of reflection <em>is</em> the classical part, with the deformation carried by the moving curves — which would explain why base-1 broke every earlier table: it was being asked to carry content that belongs on the axis, where content cannot live.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">Conjecture.</span>
+    <span class="math-inline">ρ</span> has exactly one fixed curve — base-1, witnessed by <span class="math-inline">1^(−1) = 1^1</span> — so the two closing chains are mirror branches, not relabelings.
+    Test: run the mirror chain (flip <span class="math-inline">L4</span>'s sign), close it, and see which curves return to themselves. More than one fixed → the axis is too big and the dual is nearly a relabeling. Only base-1 → the conjecture holds.
+  </div>
+
+  <h2>The fork underneath — the thing worth deciding first</h2>
+
+  <p>
+  A separate rebuild routes the whole structure through a valuation: take <span class="math-inline">val</span> to be integer-valued, trivial on the rationals, with <span class="math-inline">val(0) = +1</span>.
+  Grant that, and two good things follow.
+  <strong>Chebyshev stops being posited.</strong>
+  Let <span class="math-inline">σ</span> be the involution <span class="math-inline">0 ↔ ω</span>; its fixed subring is generated by <span class="math-inline">s = 0 + ω</span>, and the traces <span class="math-inline">tₙ = 0ⁿ + ωⁿ</span> obey <span class="math-inline">t₍ₙ₊₁₎ = s·tₙ − t₍ₙ₋₁₎</span> — the Chebyshev recurrence, <span class="math-inline">tₙ = 2Tₙ(s/2)</span>.
+  Chebyshev is just the trace coordinate of the norm-one subgroup <span class="math-inline">N(x) = x·σ(x)</span>, where <span class="math-inline">N(0) = 0·ω = 1</span>.
+  And the branch involution gets a name: <span class="math-inline">ρ</span> is <span class="math-inline">s ↦ −s</span>, trivial exactly at <span class="math-inline">s = 0</span>, which is exactly where <span class="math-inline">−ω = 0</span>.
+  So <em>dropping <span class="math-inline">−ω = 0</span> and freeing <span class="math-inline">s</span> are the same move.</em>
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">But grant the valuation and the geometry flips.</span>
+    <span class="math-inline">val(0) = +1</span> is the valuation at the place <span class="math-inline">s = ∞</span>: it forces <span class="math-inline">s</span> to be <span class="math-inline">ω</span>-sized, <span class="math-inline">δ² = s² − 4</span> a genuine square, and the norm form becomes the unit <em>hyperbola</em>.
+    Elliptic becomes hyperbolic, <span class="math-inline">i = 0^(ω/2)</span> loses its referent, and the quadratic tower gives <em>coquaternions, not quaternions</em>.
+    The whole complex corner of Chapters 7–9 is at stake.
+  </div>
+
+  <p>
+  Here is the point the two branches of this note turn on, and the reason to settle it before polishing <span class="math-inline">L4</span>.
+  All of those costs come from <span class="math-inline">val(0) = +1</span> — that <strong>0 is an infinitesimal</strong> — and that is <em>separable</em> from <span class="math-inline">−ω ≠ 0</span>.
+  The move <span class="math-inline">−ω ≠ 0</span> only says <span class="math-inline">s ≠ 0</span>.
+  For <span class="math-inline">s</span> in the range <span class="math-inline">(−2, 2)</span> the system stays <strong>elliptic</strong>: the norm form is still a circle, <span class="math-inline">i</span> is still present, and choosing an irrational angle makes <span class="math-inline">ω</span> infinite-order <em>without any valuation at all</em>.
+  So one can keep <span class="math-inline">−ω ≠ 0</span>, keep the circle, and keep <span class="math-inline">i</span>, all at once — a regime the valuation rebuild skips over.
+  </p>
+
+  <p>
+  And yet <span class="math-inline">val(0) = +1</span> is not an arbitrary import: it is precisely the <strong>grade</strong> from <a href="../powers-of-zero/">Powers of the Zero</a>, where <span class="math-inline">0ⁿ</span> sits at grade <span class="math-inline">+n</span>.
+  The canon already assigns it.
+  Which means the real tension is not in this extension but in the existing theory: canon wants <em>both</em> a genuinely infinitesimal, graded <span class="math-inline">0</span> (which pulls hyperbolic) <em>and</em> <span class="math-inline">0^ω = −1</span> with <span class="math-inline">i = 0^(ω/2)</span> (which pulls elliptic).
+  The likely reconciliation is the puncture from the previous note: the <em>integer</em> powers <span class="math-inline">0ⁿ</span> shrink — graded, infinitesimal, all the trace algebra can see — while <span class="math-inline">0^ω</span> is the <em>wrap</em>, living in a sector the trace ring cannot represent.
+  If that holds, the valuation rebuild is not refuting the circle; it is showing the circle never lived in the integer-power ring to begin with.
+  </p>
+
+  <h2>What is owed</h2>
+
+  <ol>
+    <li><strong>The fork itself.</strong> Decide, explicitly, whether <span class="math-inline">0</span> is an infinitesimal (graded, hyperbolic, coquaternions) or a unit on the circle (elliptic, <span class="math-inline">i</span> survives) — or whether the two sectors genuinely separate along integer-power vs wrap. Everything else is downstream.</li>
+    <li><strong>Carrier status of the negated constants.</strong> Anchors, or a schema operation? The whole signed sector rests on this.</li>
+    <li><strong>L4's sign.</strong> Probably the branch selection — and if <span class="math-inline">ρ</span> really is <span class="math-inline">s ↦ −s</span>, then "which sign in <span class="math-inline">L4</span>" and "which of the two dual solutions" are the <em>same</em> question with a coordinate attached. Testable via the mirror chain.</li>
+    <li><strong>The <span class="math-inline">0^ω = −1</span> replacement criterion.</strong> The four-element bijection argument that fixed it dies once the carrier grows past four; no replacement has been proposed.</li>
+    <li><strong>Base-1 over-determination.</strong> Evenness plus <span class="math-inline">L1</span> pins <span class="math-inline">1¹ = 1^(−1) = 1⁰</span> — three points on a small carrier, halfway to fixing the curve. Needs checking against the pivot budget.</li>
+  </ol>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">Attribution is tracked in the source note so the two hands can be separated on revision: the information-conservation principle, the eight-slot closure and no-side-conditions rule, schemas-not-terms, the collapse grading, <span class="math-inline">−ω ≠ 0</span>, the three-link sketch, and <span class="math-inline">1^(−1) = 1^1</span> as the fixed curve are the framework's; the fourth link and its sign, the pivot-budget argument, the valuation / Chebyshev rebuild, and the fork analysis above are provisional scaffolding added in reconstruction and should not survive into canon unexamined. <a href="#fnref1">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../reversible-one/">The Reversible One</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../one-curve/">One Curve, Two Rates</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<!-- Math rendering engine -->
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

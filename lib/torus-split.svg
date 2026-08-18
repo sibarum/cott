@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 760" width="880" height="760" font-family="Georgia, 'Newsreader', serif">
+  <rect width="880" height="760" fill="#f6f2e9"/>
+  <text x="40" y="44" font-size="21" fill="#23201b" font-style="italic">Two decompositions: same bases, dual exponents</text>
+  <line x1="40" y1="58" x2="840" y2="58" stroke="#23201b" stroke-width="1.4"/>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#23201b"/></marker>
+  </defs>
+
+  <!-- PANEL A -->
+  <g transform="translate(0,96)">
+    <text x="40" y="0" font-size="12.5" letter-spacing="1.6" fill="#6b6455" font-family="'IBM Plex Mono', monospace">A &#183; EXPONENTS {&#8722;1, +1} &#8594; VALUES {0, &#969;}</text>
+    <g stroke="#23201b" stroke-width="1.4" fill="none">
+      <rect x="60" y="20" width="94" height="60"/><rect x="154" y="20" width="94" height="60"/>
+      <rect x="60" y="80" width="94" height="60"/><rect x="154" y="80" width="94" height="60"/></g>
+    <text x="107" y="58" font-size="19" fill="#23201b" text-anchor="middle">&#969;<tspan font-size="13" dy="-7">&#8722;1</tspan></text>
+    <text x="201" y="58" font-size="19" fill="#23201b" text-anchor="middle">&#969;<tspan font-size="13" dy="-7">1</tspan></text>
+    <text x="107" y="118" font-size="19" fill="#23201b" text-anchor="middle">0<tspan font-size="13" dy="-7">&#8722;1</tspan></text>
+    <text x="201" y="118" font-size="19" fill="#23201b" text-anchor="middle">0<tspan font-size="13" dy="-7">1</tspan></text>
+    <line x1="285" y1="80" x2="355" y2="80" stroke="#23201b" stroke-width="1.4" marker-end="url(#ah)"/>
+    <g stroke="#23201b" stroke-width="1.4">
+      <rect x="390" y="20" width="94" height="60" fill="#f0e2df"/><rect x="484" y="20" width="94" height="60" fill="none"/>
+      <rect x="390" y="80" width="94" height="60" fill="none"/><rect x="484" y="80" width="94" height="60" fill="#f0e2df"/></g>
+    <text x="437" y="60" font-size="22" fill="#9a3324" text-anchor="middle">0</text>
+    <text x="531" y="60" font-size="22" fill="#9a3324" text-anchor="middle">&#969;</text>
+    <text x="437" y="120" font-size="22" fill="#9a3324" text-anchor="middle">&#969;</text>
+    <text x="531" y="120" font-size="22" fill="#9a3324" text-anchor="middle">0</text>
+    <text x="620" y="70" font-size="14" fill="#6b6455">bases {0, &#969;}</text>
+    <text x="620" y="94" font-size="14" fill="#6b6455">return to themselves</text>
+  </g>
+
+  <line x1="40" y1="300" x2="840" y2="300" stroke="#cdc4b0" stroke-width="1"/>
+
+  <!-- PANEL B -->
+  <g transform="translate(0,336)">
+    <text x="40" y="0" font-size="12.5" letter-spacing="1.6" fill="#6b6455" font-family="'IBM Plex Mono', monospace">B &#183; EXPONENTS {0, &#969;} &#8594; VALUES {1, &#8722;1}</text>
+    <g stroke="#23201b" stroke-width="1.4" fill="none">
+      <rect x="60" y="20" width="94" height="60"/><rect x="154" y="20" width="94" height="60"/>
+      <rect x="60" y="80" width="94" height="60"/><rect x="154" y="80" width="94" height="60"/></g>
+    <text x="107" y="58" font-size="19" fill="#23201b" text-anchor="middle">0<tspan font-size="13" dy="-7">0</tspan></text>
+    <text x="201" y="58" font-size="19" fill="#23201b" text-anchor="middle">0<tspan font-size="13" dy="-7">&#969;</tspan></text>
+    <text x="107" y="118" font-size="19" fill="#23201b" text-anchor="middle">&#969;<tspan font-size="13" dy="-7">0</tspan></text>
+    <text x="201" y="118" font-size="19" fill="#23201b" text-anchor="middle">&#969;<tspan font-size="13" dy="-7">&#969;</tspan></text>
+    <line x1="285" y1="80" x2="355" y2="80" stroke="#23201b" stroke-width="1.4" marker-end="url(#ah)"/>
+    <g stroke="#23201b" stroke-width="1.4">
+      <rect x="390" y="20" width="94" height="60" fill="#e2e8f2"/><rect x="484" y="20" width="94" height="60" fill="none"/>
+      <rect x="390" y="80" width="94" height="60" fill="none"/><rect x="484" y="80" width="94" height="60" fill="#e2e8f2"/></g>
+    <text x="437" y="60" font-size="21" fill="#345a9e" text-anchor="middle">1</text>
+    <text x="531" y="60" font-size="21" fill="#345a9e" text-anchor="middle">&#8722;1</text>
+    <text x="437" y="120" font-size="21" fill="#345a9e" text-anchor="middle">&#8722;1</text>
+    <text x="531" y="120" font-size="21" fill="#345a9e" text-anchor="middle">1</text>
+    <text x="620" y="62" font-size="14" fill="#6b6455">bases {0, &#969;}</text>
+    <text x="620" y="86" font-size="14" fill="#6b6455">become {1, &#8722;1}</text>
+    <text x="620" y="118" font-size="13" fill="#9a3324" font-style="italic">requires &#969;<tspan font-size="10" dy="-5">&#969;</tspan><tspan dy="5"> = 1</tspan></text>
+  </g>
+
+  <line x1="40" y1="540" x2="840" y2="540" stroke="#cdc4b0" stroke-width="1"/>
+
+  <!-- TORUS -->
+  <g transform="translate(0,570)">
+    <text x="40" y="0" font-size="12.5" letter-spacing="1.6" fill="#6b6455" font-family="'IBM Plex Mono', monospace">THE TWO CYCLES &#183; NEITHER IS INTRINSICALLY THE MERIDIAN</text>
+    <ellipse cx="215" cy="90" rx="145" ry="66" fill="#efe9db" stroke="#23201b" stroke-width="1.6"/>
+    <ellipse cx="215" cy="90" rx="62" ry="24" fill="#f6f2e9" stroke="#23201b" stroke-width="1.6"/>
+    <ellipse cx="215" cy="90" rx="103" ry="45" fill="none" stroke="#9a3324" stroke-width="2" stroke-dasharray="7 5"/>
+    <ellipse cx="318" cy="90" rx="17" ry="45" fill="none" stroke="#345a9e" stroke-width="2"/>
+    <text x="215" y="96" font-size="14" fill="#9a3324" text-anchor="middle">cycle I</text>
+    <text x="318" y="160" font-size="14" fill="#345a9e" text-anchor="middle">cycle II</text>
+    <text x="430" y="60" font-size="15" fill="#23201b">Call one the cross-section and the other the top-down,</text>
+    <text x="430" y="84" font-size="15" fill="#23201b">and you get decomposition A. Swap the names and</text>
+    <text x="430" y="108" font-size="15" fill="#23201b">you get B. Nothing in the torus prefers either choice &#8212;</text>
+    <text x="430" y="132" font-size="15" fill="#23201b">which is why there are exactly two, and no third.</text>
+  </g>
+</svg>

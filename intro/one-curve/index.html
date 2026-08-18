@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Curve, Two Rates (working note) — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Working Note &middot; <span class="part">Unfiled</span> &middot; <span class="conf c-wild">Wild</span></div>
+    <h1>One Curve, Two Rates</h1>
+    <p class="sub">
+      Base <span class="math-inline">−1</span> is base <span class="math-inline">0</span>, read <span class="math-inline">ω</span> times faster
+    </p>
+  </div>
+
+  <div class="section-alt">
+    <span class="emphasis">Status: SUPERSEDED by <a href="../anchor-shadow/">The Anchor Was a Shadow</a>.</span> The law it proposes was replaced the same day; the check table and the x=0 analysis are retained as working history. Draft, unverified, not canon.
+    Third in the thread that runs <a href="../reversible-one/">The Reversible One</a> → <a href="../slot-closure/">The Slot-Closure Formulation</a>.
+    Linked from nowhere on purpose.
+    Unlike its two predecessors this note makes <em>one</em> claim and spends the rest of its length checking it, so the open questions at the end are narrow rather than structural.
+    Read it as a lab notebook.
+  </div>
+
+  <p class="lead">
+  The slot-closure note tried to link all eight exponential schemas into a single closed chain and produced a chain that contradicts itself at the unit constants.
+  The repair turned out not to be a sign but a re-routing, and the re-routed link does something the original never did: it earns back two identities that <a href="../powers-of-zero/">Chapter 7</a> currently has to posit separately.
+  <strong>The imaginary unit and the closing of the circle are the same law, sampled at two points.</strong>
+  </p>
+
+  <h2>The law</h2>
+
+  <p>
+  Written as a schema identity over a free parameter <span class="math-inline">x</span>:
+  </p>
+
+  <div class="math">(−1)^x   =   0^(xω)</div>
+
+  <p>
+  In words: the base-<span class="math-inline">(−1)</span> curve and the base-<span class="math-inline">0</span> curve are the <em>same</em> curve, traversed at rates differing by a factor of <span class="math-inline">ω</span>.
+  Base <span class="math-inline">−1</span> is not a new object to be linked into the chain alongside base <span class="math-inline">0</span>; it is base <span class="math-inline">0</span> with the exponent rescaled.
+  </p>
+
+  <p>
+  It sits in a set of four, of which it is the fourth:
+  </p>
+
+  <div class="math">A:   x^1     =  x/1        ⟶   x^(−1)  =  1/x
+B:   1^x     =  x^0        ≈   1
+C:   0^x     =  ω^(−x)     ⟶   ω^x     =  0^(−x)
+D:   (−1)^x  =  0^(xω)</div>
+
+  <p>
+  Note the <span class="math-inline">≈</span> in <span class="math-inline">B</span>.
+  <span class="math-inline">1^x = x^0</span> is the reversible identity — the one <a href="../reversible-one/">The Reversible One</a> arrived at by chasing the <span class="math-inline">0^(0ω)</span> contradiction.
+  The further step to <span class="math-inline">1</span> is a <em>projection</em>, true downstairs among the classical numbers and lossy on the way, so it is written with the sign that says so.
+  Reading that step as an equality is what made base-<span class="math-inline">1</span> look like a constant, and a constant is what the failed chain tried to link a <em>sign-alternating</em> schema to.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">What went wrong before, in one line.</span>
+    The previous chain routed base-<span class="math-inline">(−1)</span> through base-<span class="math-inline">1</span>.
+    But base-<span class="math-inline">1</span> is constant on the integer exponents and base-<span class="math-inline">(−1)</span> alternates, so any pointwise identity between them fails wherever the alternating one is not sitting at <span class="math-inline">1</span> — at <span class="math-inline">x = 1</span> it reads <span class="math-inline">1 = −1</span> outright.
+    That is not a bad choice of sign; no choice of sign repairs it.
+    <span class="math-inline">D</span> routes through base-<span class="math-inline">0</span> instead, which <em>also</em> alternates, and the mismatch disappears.
+  </div>
+
+  <h2>The check</h2>
+
+  <p>
+  Against the values fixed by <a href="../powers-of-zero/">Powers of the Zero</a>:
+  </p>
+
+  <table>
+    <thead><tr><th><span class="math-inline">x</span></th><th><span class="math-inline">(−1)^x</span></th><th><span class="math-inline">0^(xω)</span></th><th></th></tr></thead>
+    <tbody>
+      <tr><td><span class="math-inline">1</span></td><td><span class="math-inline">−1</span></td><td><span class="math-inline">0^ω = −1</span></td><td>agrees</td></tr>
+      <tr><td><span class="math-inline">−1</span></td><td><span class="math-inline">−1</span></td><td><span class="math-inline">0^(−ω) = 1/(−1) = −1</span></td><td>agrees</td></tr>
+      <tr><td><span class="math-inline">0</span></td><td><span class="math-inline">1</span> downstairs</td><td><span class="math-inline">0^(0·ω) = 0¹ = 0</span></td><td><strong>constrains</strong> — see below</td></tr>
+      <tr><td><span class="math-inline">2</span></td><td><span class="math-inline">1</span></td><td><span class="math-inline">0^(2ω) = 1</span></td><td><strong>recovers canon</strong></td></tr>
+      <tr><td><span class="math-inline">½</span></td><td><span class="math-inline">i</span></td><td><span class="math-inline">0^(ω/2) = i</span></td><td><strong>recovers canon</strong></td></tr>
+      <tr><td><span class="math-inline">ω</span></td><td><span class="math-inline">?</span></td><td><span class="math-inline">0^(ω²)</span></td><td>open — see below</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+  The <span class="math-inline">x = −1</span> row uses only that reciprocals behave, which <span class="math-inline">A</span> supplies.
+  Every row but the last two is either verified or a known canon value.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">The table is downstairs; <span class="math-inline">D</span> is upstairs.</span>
+    The four-by-four table of unit constants is a <em>projection</em> — every one of its cells is reached by collapsing <span class="math-inline">B</span> across the <span class="math-inline">≈</span>, since the whole <span class="math-inline">x^0</span> column <em>is</em> the base-<span class="math-inline">1</span> curve.
+    Checking a schema identity against it therefore proves nothing on its own, and can manufacture both false agreement and false contradiction.
+    The <span class="math-inline">x = 0</span> row below is where that actually bites.
+    Everywhere else the sample point passes through the exponent untouched — <span class="math-inline">1·ω = ω</span>, <span class="math-inline">(−1)·ω = −ω</span> — and the check is honest.
+  </div>
+
+  <h2>What it earns back</h2>
+
+  <p>
+  The two bolded rows are the reason this note exists.
+  Chapter 7 currently introduces them as two separate consequences of the normalization <span class="math-inline">0^ω = −1</span>: the imaginary unit appears because <span class="math-inline">0^(ω/2)</span> squares to <span class="math-inline">−1</span>, and the circle closes because going twice around returns home.
+  Two facts, each posited, each checked by hand.
+  </p>
+
+  <div class="math">i        =  0^(ω/2)        is   D at  x = ½
+0^(2ω)   =  1              is   D at  x = 2</div>
+
+  <p>
+  Under <span class="math-inline">D</span> they are not two facts.
+  They are one law read at two points, and the points are the ordinary ones: <span class="math-inline">(−1)^½ = i</span> and <span class="math-inline">(−1)² = 1</span> are what anybody would write for base <span class="math-inline">−1</span>.
+  The content of <span class="math-inline">D</span> is that base <span class="math-inline">0</span> <em>is</em> base <span class="math-inline">−1</span>, slowed by <span class="math-inline">ω</span> — so everything already known about powers of <span class="math-inline">−1</span> transfers to powers of <span class="math-inline">0</span> for free, and the half-power landing on <span class="math-inline">i</span> stops being a happy accident of the chosen normalization.
+  </p>
+
+  <p>
+  This is the first thing in the thread that pays the canon back rather than qualifying it.
+  Both predecessors took things away — <span class="math-inline">x⁰ = 1</span> in the first, the four-element bijection argument in the second.
+  <span class="math-inline">D</span> returns something: two posits become one law.
+  </p>
+
+  <h2>The <span class="math-inline">x = 0</span> row, which is not a formality</h2>
+
+  <p>
+  At <span class="math-inline">x = 0</span> the law reads:
+  </p>
+
+  <div class="math">(−1)⁰   =   0^(0·ω)</div>
+
+  <p>
+  and the right-hand side is <em>exactly</em> the quantity <a href="../reversible-one/">The Reversible One</a> opens on — the one that classically detonates the whole construction.
+  It is also the only sample point where the exponent is not inert.
+  Everywhere else <span class="math-inline">xω</span> simply carries <span class="math-inline">x</span> along; here it lands on the definitional identity <span class="math-inline">0·ω = 1</span>, and the shortest evaluation is a single substitution:
+  </p>
+
+  <div class="math">0^(0·ω)  =  0¹  =  0</div>
+
+  <p>
+  No power rule, no splitting of the exponent, nothing contestable.
+  <span class="math-inline">0·ω = 1</span> is fixed by definition in <a href="../invertible-zero/">The Invertible Zero</a>, and <span class="math-inline">=</span> in this book means a rewrite that carries the same information both ways — so substituting it into an exponent is not merely permitted, it is the <em>obvious</em> reading, and any longer route that reaches a different answer is the one under suspicion.
+  </p>
+
+  <p>
+  So <span class="math-inline">D</span> at <span class="math-inline">x = 0</span> does not agree with the table. It <em>contradicts</em> it, and the contradiction is the interesting part:
+  </p>
+
+  <div class="math">D  at x = 0:    (−1)^0   =  0^(0·ω)  =  0
+B  at x = −1:   1^(−1)   =  (−1)^0
+─────────────────────────────────────
+                1^(−1)   =  0</div>
+
+  <p>
+  Which is precisely the constraint <a href="../reversible-one/">The Reversible One</a> derived — <span class="math-inline">1^(0^ω) = 0</span>, with <span class="math-inline">0^ω = −1</span> — reached here from an entirely different direction, and without the step that note had to argue for.
+  Two independent routes to the same constraint is the strongest evidence in the thread.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">So the disputed cell is <span class="math-inline">1^(−1)</span>, and the table has it wrong.</span>
+    <span class="math-inline">B</span> reads <span class="math-inline">1^x = x^0 ≈ 1</span>, with the collapse marked lossy — which means the entire <span class="math-inline">x^0</span> column <em>is</em> the base-<span class="math-inline">1</span> curve, equal to <span class="math-inline">1</span> only downstairs.
+    The table records <span class="math-inline">1^(−1) = 1</span>; that is the projection, not the value.
+    Upstairs, <span class="math-inline">D</span> and <span class="math-inline">B</span> together say <span class="math-inline">1^(−1) = 0</span>.
+    This does <em>not</em> settle <a href="../reversible-one/">The Reversible One</a>'s first open item — the tower <span class="math-inline">1^s = e^(2πis)</span> still says <span class="math-inline">1^(−1) = 1</span>, and now has two derivations against it rather than one.
+    The clash is unchanged in substance and sharper in outline: <strong>the tower and the constraint disagree about base <span class="math-inline">1</span> at exponent <span class="math-inline">−1</span>, and something has to give.</strong>
+  </div>
+
+  <h2>What this does not cover</h2>
+
+  <p>
+  Four laws, eight slots — but the count does not come out.
+  <span class="math-inline">A</span> covers <span class="math-inline">x^1</span> and <span class="math-inline">x^(−1)</span>; <span class="math-inline">B</span> covers <span class="math-inline">1^x</span> and <span class="math-inline">x^0</span>; <span class="math-inline">C</span> covers <span class="math-inline">0^x</span> and <span class="math-inline">ω^x</span>; <span class="math-inline">D</span> covers <span class="math-inline">(−1)^x</span> alone.
+  Seven.
+  <strong><span class="math-inline">x^ω</span> has no law.</strong>
+  </p>
+
+  <p>
+  <span class="math-inline">D</span> does put <span class="math-inline">ω</span> in an exponent, but on base <span class="math-inline">0</span> — that is the <span class="math-inline">0^x</span> schema at a rescaled argument, not the <span class="math-inline">x^ω</span> schema, which wants <span class="math-inline">ω</span> fixed upstairs and the <em>base</em> free.
+  The previous chain's third link was the only one that touched it, and the repair discarded that link.
+  </p>
+
+  <p>
+  The gap and the last row of the check table are the same gap.
+  Reducing <span class="math-inline">0^(ω²)</span> the obvious way,
+  </p>
+
+  <div class="math">0^(ω²)  =  (0^ω)^ω  =  (−1)^ω</div>
+
+  <p>
+  lands precisely on the missing schema.<sup class="fnref"><a href="#fn2" id="fnref2">2</a></sup>
+  So <span class="math-inline">0^(ω²)</span> is not an independent puzzle to be solved before the eighth link — it <em>is</em> the eighth link, wearing a different coat.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">Why guessing a value for it would be a mistake.</span>
+    Read by grade, <span class="math-inline">ω²</span> sits at grade <span class="math-inline">−2</span>, but <span class="math-inline">0^ω = −1</span> sits at grade <span class="math-inline">0</span> — the <span class="math-inline">ω</span>-exponent rotates phase rather than shifting grade, while integer exponents shift grade and do not rotate.
+    The exponent slot of base <span class="math-inline">0</span> is being read in two registers at once, and <span class="math-inline">ω²</span> asks the two to compose.
+    The prior question is therefore structural, not numerical: <strong>is the exponent register of base <span class="math-inline">0</span> closed under multiplication?</strong>
+    If it is, the tower <span class="math-inline">0 → −1 → ?</span> continues and the carrier grows past four elements.
+    If it is not, <span class="math-inline">ω²</span> does not denote, and the puncture conjectured at the end of the <a href="../slot-closure/">slot-closure note</a> — integer powers shrink, <span class="math-inline">0^ω</span> wraps, and the two live in sectors that cannot see each other — is real.
+    Either answer is a result. A value chosen to make the table close is not.
+  </div>
+
+  <p>
+  This is load-bearing further back than it looks.
+  If the carrier grows past four, the four-element bijection that fixed <span class="math-inline">0^ω = −1</span> in the first place no longer applies, and the normalization the whole circle rests on is back open — a debt the slot-closure note already recorded and nobody has paid.
+  </p>
+
+  <h2>Open</h2>
+
+  <ol>
+    <li><strong>The eighth link.</strong> <span class="math-inline">x^ω</span>, equivalently <span class="math-inline">(−1)^ω</span>, equivalently <span class="math-inline">0^(ω²)</span>. The natural place to look is not the chain but <a href="../where-the-choices-show/">Where the Choices Show</a>, which already reads <span class="math-inline">0^ω</span> as a phase generator sampled at <span class="math-inline">ω</span> and has a period knob; <span class="math-inline">x^ω</span> is that generator at arbitrary base.</li>
+    <li><strong>The register question.</strong> Closed under multiplication, or punctured. Everything in item 1 is downstream of it, and it is answerable without settling anything else in the thread.</li>
+    <li><strong>The status of <span class="math-inline">A</span>.</strong> <span class="math-inline">x^1 = x/1</span> discharges a slot into division — outside the exponential language, which is the one move the slot-closure discipline forbids. Either it is a <em>definition</em> and wants <span class="math-inline">:=</span>, or the bar is being deliberately relaxed at exponents <span class="math-inline">±1</span> on the grounds that this is exactly where exponentiation meets the multiplicative group. The second is defensible; it is not yet stated.</li>
+    <li><strong>Scope of the check.</strong> <span class="math-inline">D</span> is verified at <span class="math-inline">x ∈ {−1, ½, 1, 2}</span>, constrains at <span class="math-inline">x = 0</span>, and is open at <span class="math-inline">x = ω</span>. Nothing has tested it at a general rational, and the half-integer row is the only evidence that it behaves off the integer lattice at all.</li>
+    <li><strong><span class="math-inline">1^(−1)</span>: tower or constraint.</strong> Inherited from the first note and now sharper — <span class="math-inline">D + B</span> give <span class="math-inline">0</span>, the tower gives <span class="math-inline">1</span>. Nothing here breaks the tie, and the tie is load-bearing for base <span class="math-inline">1</span> being the fixed curve of the branch involution.</li>
+    <li><strong>Re-audit the four-by-four table.</strong> Every cell is a downstairs projection and should carry <span class="math-inline">≈</span>, not <span class="math-inline">=</span>. Until that is done, no schema identity can be honestly checked against it — the <span class="math-inline">x = 0</span> row above was found only because the collapse happened to be visible there.</li>
+    <li><strong>Whether <span class="math-inline">D</span> makes base <span class="math-inline">(−1)</span> an anchor at all.</strong> If base <span class="math-inline">−1</span> is base <span class="math-inline">0</span> rescaled, it may not deserve its own slot in the closure problem — which would make the eight-slot framing itself slightly wrong, and the target count seven.</li>
+  </ol>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">Provenance: <span class="math-inline">D</span> and the four-law set are the framework's, arrived at by reworking the failed chain after the <span class="math-inline">1 = −1</span> collision was found. The verification table, the <span class="math-inline">x = 0</span> analysis, the slot count, and the register framing are reconstruction and should be re-derived before any of this moves toward canon. <a href="#fnref1">↩</a></li>
+      <li id="fn2">This reduction is offered as a pointer, not a derivation. It uses <span class="math-inline">(a^b)^c = a^(bc)</span>, which is precisely the rule <a href="../reversible-one/">The Reversible One</a> identifies as false by a winding number over the complex numbers — the branch-cut failure of <span class="math-inline">log(a^c) = c·log(a)</span>. Any constraint on <span class="math-inline">ω²</span> extracted this way inherits that doubt, including the tempting <span class="math-inline">ω² ≡ ω (mod 2ω)</span> that follows if one also assumes <span class="math-inline">(−1)^ω = −1</span>. <a href="#fnref2">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../slot-closure/">The Slot-Closure Formulation</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../anchor-shadow/">The Anchor Was a Shadow</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<!-- Math rendering engine -->
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

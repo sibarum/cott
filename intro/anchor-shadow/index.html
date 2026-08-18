@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Anchor Was a Shadow (working note) &mdash; Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+<style>
+  .fig { margin: 2rem 0; }
+  .fig img { width: 100%; height: auto; display: block; border: 1px solid var(--rule); }
+  .fig figcaption { font-family: var(--font-meta); font-size: .78rem; color: var(--ink-soft);
+                    margin-top: .6rem; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Working Note &middot; <span class="part">Unfiled</span> &middot; <span class="conf c-wild">Wild</span></div>
+    <h1>The Anchor Was a Shadow</h1>
+    <p class="sub">
+      Why nothing closed &mdash; and what the residue turned out to be
+    </p>
+  </div>
+
+  <div class="section-alt">
+    <span class="emphasis">Status: draft, unverified, not canon.</span>
+    Fourth in the thread running <a href="../reversible-one/">The Reversible One</a> &rarr; <a href="../slot-closure/">The Slot-Closure Formulation</a> &rarr; <a href="../one-curve/">One Curve, Two Rates</a> (superseded; retained for its check table).
+    This note reports one diagnosis and one identification, both reached in a single sitting and neither audited.
+    It ends with a section on how it could be <em>wrong</em>, which is not decoration &mdash; the central move here is the kind that can quietly become unfalsifiable, and that section is the guard against it.
+  </div>
+
+  <p class="lead">
+  Six successive attempts to close the eight exponential schemas each failed at a different cell.
+  The natural reading was that six candidate law-sets were each slightly wrong.
+  The correct reading is that all six were being checked against the wrong kind of object.
+  <strong>Every value the closure problem was anchored to &mdash; including <span class="math-inline">0^&omega; = &minus;1</span> itself &mdash; is a projection, not a conserved quantity.</strong>
+  Once that is admitted the six failures become one, the residue everything was missing acquires a name, and the carrier turns out to be a familiar object rather than a mystery.
+  </p>
+
+  <h2>The diagnosis</h2>
+
+  <p>
+  The four-by-four table of unit constants was doing the work of ground truth.
+  But the link <span class="math-inline">1^x = x^0 &asymp; 1</span> has its collapse to <span class="math-inline">1</span> marked lossy &mdash; which makes the entire <span class="math-inline">x^0</span> column the base-<span class="math-inline">1</span> curve, equal to <span class="math-inline">1</span> only downstairs.
+  Follow that outward and every cell falls the same way.
+  The last to go is the anchor:
+  </p>
+
+  <div class="math">0^&omega;   &asymp;   &minus;1        not        0^&omega;  =  &minus;1</div>
+
+  <p>
+  This is not a new concession.
+  <a href="../powers-of-zero/">Powers of the Zero</a>'s first footnote already calls the value "a <em>normalization</em>, not a theorem," and notes that the <span class="math-inline">log&#8320;(&minus;1) = &omega;</span> check "just restates the choice in a mirror."
+  A gauge choice restating itself is the signature of a section through a fiber, not an equation.
+  <a href="../where-the-choices-show/">Where the Choices Show</a> says it louder &mdash; the value "is not a fundamental constant &mdash; it is the fingerprint of ordinary multiplication."
+  Coordinate-dependent is what a projection <em>is</em>.
+  Both statements were already on the page; neither was allowed to touch the anchor.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">What this explains at once.</span>
+    <span class="math-inline">1^(&minus;1)</span> produced three different answers &mdash; <span class="math-inline">0</span>, <span class="math-inline">1</span>, <span class="math-inline">&minus;1</span> &mdash; by three sound routes.
+    <span class="math-inline">&omega;^&omega;</span> refused to settle between <span class="math-inline">1</span> and <span class="math-inline">&minus;1</span>.
+    Neither is a contradiction to resolve. They are fibers to index: several points upstairs over one point downstairs.
+    (For <span class="math-inline">&omega;^&omega;</span> there is a sharper answer, found after this note was written: it is not a value at all but the ratio <span class="math-inline">1/(&minus;1)</span>, and it resolves to <span class="math-inline">&minus;1</span>. See <a href="../weaves/">Completion Is a Weave</a>.)
+    <a href="../reversible-one/">The Reversible One</a> already said the derived paradoxes "were monodromy, not bugs" &mdash; then applied that to everything except the constant it was standing on.
+  </div>
+
+  <h2>The criterion &mdash; two floors, and which claims live on each</h2>
+
+  <p>
+  A theory that can retreat upstairs whenever it collides is a theory that cannot be wrong.
+  The rule preventing that was already written, in a different chapter, for a different reason:
+  </p>
+
+  <table>
+    <thead><tr><th>Claim</th><th>Floor</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>schema <span class="math-inline">=</span> schema (a <strong>link</strong>)</td><td>upstairs</td><td>conserved; falsifiable by pivot collision</td></tr>
+      <tr><td>schema <span class="math-inline">=</span> constant (an <strong>evaluation</strong>)</td><td>downstairs</td><td>a projection; must be written <span class="math-inline">&asymp;</span></td></tr>
+    </tbody>
+  </table>
+
+  <p>
+  That is <a href="../slot-closure/">slot-closure</a>'s <em>join, don't resolve</em>, and it turns out never to have been about syntax.
+  <strong>Evaluation <em>is</em> projection.</strong>
+  Discharging a slot to something outside the exponential language is the act of stepping down a floor.
+  The bar on evaluation, and the <span class="math-inline">=</span>&thinsp;/&thinsp;<span class="math-inline">&asymp;</span> discipline of <a href="../cancellation/">Cancellation as an Operation</a>, are one rule stated twice &mdash; by two arguments, five chapters apart.
+  </p>
+
+  <p>
+  So the escape hatch closes in the right place. Links collide or they do not, and that is testable.
+  What is forbidden is checking a link against a <em>value</em> &mdash; precisely the error the six law-sets were built on.
+  </p>
+
+  <h2>The carrier</h2>
+
+  <p>
+  With the anchors gone, the shape reads off directly.
+  <span class="math-inline">0&#8319;</span> sits at grade <span class="math-inline">+n</span> and <span class="math-inline">&omega;&#8319;</span> at grade <span class="math-inline">&minus;n</span>, for every <span class="math-inline">n</span>, unbounded both ways &mdash; infinite rings inward, infinite rings outward.
+  A direction that never closes is not a cycle, so the object is not a torus:
+  </p>
+
+  <div class="math">carrier = &#8450;*        phase: S&#185;        grade: &#8484;        &pi;&#8321; = &#8484;</div>
+
+  <p>
+  A cylinder.
+  The graded part &mdash; <span class="math-inline">0</span> behaving as a formal variable with <span class="math-inline">&omega; = 0&#8315;&#185;</span>, grades adding &mdash; is a <strong>Laurent ring</strong>, which is exactly slot-closure's "trace ring"; <span class="math-inline">0^&omega;</span> is what lives outside it.<sup class="fnref"><a href="#fn2" id="fnref2">2</a></sup>
+  </p>
+
+  <figure class="fig">
+    <img src="../../lib/torus-rings.svg" alt="Graded rings, with the omega-exponent sector perpendicular to them">
+    <figcaption>Radial: the grade, integer powers only. Oblique: the &omega;-exponents, leaving the plane.</figcaption>
+  </figure>
+
+  <p>
+  Read radially, the structure is an <em>ordering</em> &mdash; a chain descending to the centre, <span class="math-inline">&omega;&#8319; &gt; &omega; &gt; 0 &gt; 0&#8319;</span> &mdash; with <span class="math-inline">1</span> and <span class="math-inline">&minus;1</span> antipodal on the unit ring, ninety degrees from <span class="math-inline">0</span> and <span class="math-inline">&omega;</span>.
+  The <span class="math-inline">&omega;</span>-exponents leave the plane entirely.
+  That is slot-closure's puncture &mdash; integer powers visible to the trace algebra, the wrap in a sector it cannot represent &mdash; put somewhere one can see what it costs.
+  </p>
+
+  <h3>Why the carrier is rank two</h3>
+
+  <p>
+  If <span class="math-inline">&omega;&sup2;</span> required a third direction perpendicular to the first two, and <span class="math-inline">&omega;&sup3;</span> a fourth, the carrier would be infinite-dimensional and <span class="math-inline">&#8450;*</span> would be the wrong object.
+  It does not.
+  <span class="math-inline">0</span> and <span class="math-inline">&omega;</span> have sum <span class="math-inline">s = 0 + &omega;</span> and product <span class="math-inline">0&middot;&omega; = 1</span>, so they are the two roots of one monic quadratic:
+  </p>
+
+  <div class="math">t&sup2; &minus; s&middot;t + 1 = 0        hence        &omega;&sup2; = s&middot;&omega; &minus; 1</div>
+
+  <p>
+  So <span class="math-inline">&omega;&sup2;</span> lies in the span of <span class="math-inline">{1, &omega;}</span>; the other root checks, <span class="math-inline">0&sup2; = s&middot;0 &minus; 1 = (0&sup2; + 1) &minus; 1</span>.
+  The nesting is therefore <em>not</em> an unbounded stack of perpendicular axes &mdash; it is unbounded winding in the <strong>one</strong> perpendicular circle, which is exactly what infinite order supplies.
+  The infinite thread-count and the rank-two carrier were never in tension.
+  </p>
+
+  <h3>What the split settles</h3>
+
+  <p>
+  If an exponent decomposes into an in-plane integer part and an out-of-plane <span class="math-inline">&omega;</span> part, then <span class="math-inline">0&middot;&omega;</span> in an exponent slot has two readings that were never the same object:
+  </p>
+
+  <div class="math">evaluate the product  &rarr;  0&middot;&omega; = 1, a scalar, lying in the plane
+read as a point      &rarr;  0 in the integer slot, &omega; in the &omega; slot, off the plane</div>
+
+  <p>
+  <a href="../reversible-one/">The Reversible One</a> opened on exactly those two readings disagreeing, and diagnosed it as a false power rule.
+  The geometry says something more specific: a point in the plane and a point off it were being written with one glyph.
+  It also gives <span class="math-inline">0^(&omega;&sup2;)</span> &mdash; stalled since it was first raised &mdash; a route:
+  </p>
+
+  <div class="math">0^(&omega;&sup2;)  =  0^(s&omega; &minus; 1)  =  0^(s&omega;) &middot; &omega;</div>
+
+  <p>
+  and <span class="math-inline">s = 0 + &omega;</span> is a cross-grade sum &mdash; <a href="../addition-problem/">The Addition Problem</a>'s wound.
+  So <span class="math-inline">0^(&omega;&sup2;)</span> is not unanswerable. It is answerable exactly as well as the addition is, and no better.
+  </p>
+
+  <p>
+  <span class="math-inline">papers/3</span> reaches the same carrier from representation theory: <span class="math-inline">SO(2)</span> and <span class="math-inline">SO(1,1)</span> "are two real forms of one complex torus <span class="math-inline">&#8450;*</span>," differing by a Galois twist &mdash; and, the line that matters, <em>every algebraic identity descends to both real forms; compactness does not.</em>
+  Algebraic identities are the links. Compactness, cancellation, values are downstairs.
+  That is the two-floor criterion above, arrived at independently and years earlier.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">And the fork dissolves.</span>
+    slot-closure held that everything was downstream of an elliptic-versus-hyperbolic decision, and stalled there.
+    It is not a fork.
+    Elliptic and hyperbolic are the two <em>real forms</em> of one object, and each is right about its own floor.
+    The thread was blocked for its whole length on a question another part of the corpus had already dissolved.
+  </div>
+
+  <h2>Four curves, and the group they generate</h2>
+
+  <p>
+  Place the constants by their behaviour under <span class="math-inline">&sigma;: x &#8614; 1/x</span>.
+  Its fixed points are <span class="math-inline">x&sup2; = 1</span>, so <span class="math-inline">1</span> and <span class="math-inline">&minus;1</span> sit antipodally; its 2-cycle is <span class="math-inline">0 &#8596; &omega;</span>, so those sit at the quarter turns between them.
+  That is the ordering <a href="../powers-of-zero/">Powers of the Zero</a> already uses for its bijection.
+  </p>
+
+  <figure class="fig">
+    <img src="../../lib/torus-curves.svg" alt="Four curves and two constant grids on the fundamental domain">
+    <figcaption>Two grids: the constants axis-aligned, the four functions at slope &plusmn;1. Phase picture &mdash; grade is quotiented out.</figcaption>
+  </figure>
+
+  <p>
+  The four functions compose:
+  </p>
+
+  <div class="math">id: y = x      n: y = &minus;x      r: y = 1/x      nr: y = &minus;1/x</div>
+
+  <p>
+  Classically this is the Klein four-group &mdash; finite, abelian, four elements, which is why there appear to be exactly four curves.
+  Two of those equalities fail here, and it is worth being exact about which.
+  In quarter-turn coordinates on the cover &mdash; constants at <span class="math-inline">u = 0, 1, 2, 3</span> for <span class="math-inline">1, 0, &minus;1, &omega;</span>, one full turn <span class="math-inline">= 2&omega; = 4</span> &mdash; reciprocal is the reflection <span class="math-inline">r: u &#8614; &minus;u</span> and negation the half-turn <span class="math-inline">n: u &#8614; u + 2</span>. Then:
+  </p>
+
+  <div class="math">nr:  u &#8614; &minus;u + 2          rn:  u &#8614; &minus;u &minus; 2</div>
+
+  <p>
+  Both are reflections, and each squares to the identity <em>exactly</em>. So <span class="math-inline">nr</span> is not where the failure lives.
+  They are, however, <strong>different</strong> reflections, differing by a translation of one full turn &mdash; and <span class="math-inline">n</span> is no longer an involution either, since <span class="math-inline">n&sup2;</span> is that same full turn: trivial downstairs, the deck generator upstairs.
+  A half-turn generator together with a reflection generates:
+  </p>
+
+  <div class="math">D&#8734;  =  &#8484;/2 &#8727; &#8484;/2  &cong;  &#8484; &#8906; &#8484;/2</div>
+
+  <table>
+    <thead><tr><th>Piece</th><th>What it is here</th></tr></thead>
+    <tbody>
+      <tr><td>the <span class="math-inline">&#8484;</span></td><td>the winding &mdash; <span class="math-inline">&pi;&#8321;</span>, the sheets, the residue generator</td></tr>
+      <tr><td>the <span class="math-inline">&#8484;/2</span></td><td>the Galois twist &mdash; the two real forms, the two decompositions, slot-closure's <span class="math-inline">&rho;</span></td></tr>
+      <tr><td>alternating words <span class="math-inline">nrn</span>, <span class="math-inline">rnr</span>, &hellip;</td><td>the nesting: bundles within bundles</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+  So the four curves are not four.
+  They are two generators and their first product, and the group they generate is infinite.
+  The infinite thread-count is not an added assumption; it is a consequence of the four curves plus non-commutation.
+  </p>
+
+  <figure class="fig">
+    <img src="../../lib/torus-split.svg" alt="Two decompositions: same bases, dual exponent-pairs">
+    <figcaption>The two decompositions. Same bases <span class="math-inline">{0, &omega;}</span>; the exponent-pair and the value-pair trade places.</figcaption>
+  </figure>
+
+  <h3>The crossings are counted, not checked</h3>
+
+  <p>
+  Glue the square's edges and the two grids become meridians and longitudes.
+  In that presentation <span class="math-inline">y = &plusmn;x</span> wind <span class="math-inline">(1, 1)</span> and <span class="math-inline">y = &plusmn;1/x</span> wind <span class="math-inline">(1, &minus;1)</span>, so any curve of the first class meets any curve of the second exactly <span class="math-inline">|det| = 2</span> times.
+  </p>
+
+  <figure class="fig">
+    <img src="../../lib/torus-surface.svg" alt="The four curves and two grids glued onto a torus surface">
+    <figcaption>The same four curves, glued. Crossing number forced by homology rather than found by inspection.</figcaption>
+  </figure>
+
+  <p>
+  This replaces a guess.
+  slot-closure had to estimate the pivot budget by feel &mdash; "two schemas may safely cross once, perhaps twice; three crossings and they are probably the same curve."
+  Intersection number settles it: two curves in each class, each pair meeting twice, is <strong>eight crossings, exactly</strong>, with no room for a ninth.
+  </p>
+
+  <table>
+    <thead><tr><th></th><th><span class="math-inline">y = 1/x</span></th><th><span class="math-inline">y = &minus;1/x</span></th></tr></thead>
+    <tbody>
+      <tr><td><span class="math-inline">y = x</span></td><td><span class="math-inline">(1,1)</span>, <span class="math-inline">(&minus;1,&minus;1)</span></td><td><span class="math-inline">(0,0)</span>, <span class="math-inline">(&omega;,&omega;)</span></td></tr>
+      <tr><td><span class="math-inline">y = &minus;x</span></td><td><strong><span class="math-inline">(0,&omega;)</span>, <span class="math-inline">(&omega;,0)</span></strong></td><td><strong><span class="math-inline">(1,&minus;1)</span>, <span class="math-inline">(&minus;1,1)</span></strong></td></tr>
+    </tbody>
+  </table>
+
+  <p>
+  The four in bold are the <em>ordered</em> pairs, and they are distinct points on the surface: <span class="math-inline">(0,&omega;)</span> is not <span class="math-inline">(&omega;,0)</span>.
+  <strong>So the non-commutation of negation and reciprocal is not a posit &mdash; it is forced by intersection theory.</strong>
+  <span class="math-inline">1/(&minus;1) &ne; (&minus;1)/1</span> entered this thread as a structural proposal in want of an argument; the count supplies one, independent of anything algebraic.
+  It also means the four crossings usually drawn are half the picture, and the half that was missing is exactly the half that carries the ordering.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">This torus is not the carrier.</span>
+    It is (base phase) &times; (exponent phase) &mdash; two genuine circles, with grade quotiented out.
+    The carrier remains <span class="math-inline">&#8450;*</span>, a cylinder with <span class="math-inline">&pi;&#8321; = &#8484;</span>, because the grade never closes.
+    Both objects are real, and the <span class="math-inline">|det|</span> argument needs the first.
+    Reading its <span class="math-inline">&pi;&#8321; = &#8484;&sup2;</span> back onto the carrier is the same error as reading "complex torus" as the genus-one surface &mdash; see the second footnote, which is about exactly this confusion.
+  </div>
+
+  <h2>The residue, identified</h2>
+
+  <p>
+  Five separate things were owed at the start of the day: the honest power rule's correction term; the index arithmetic for the sheets; the amount <span class="math-inline">0^(2&omega;)</span> fails to close by; the <span class="math-inline">(mod 2&pi;)</span> in <a href="../reversible-one/">The Reversible One</a>; and the winding number of the planned Chapter&nbsp;17.
+  They are one object, and it now has a formula:
+  </p>
+
+  <div class="math">R  =  n&sup2;  =  [n, r]  =  nr &#183; (rn)&#8315;&#185;</div>
+
+  <p>
+  &mdash; the failure of <em>negation</em> to be an involution; equivalently the commutator of negation and reciprocal; equivalently the amount by which the two orderings <span class="math-inline">1/(&minus;1)</span> and <span class="math-inline">(&minus;1)/1</span> differ.
+  All three are one translation, of one full turn, and it generates <span class="math-inline">&pi;&#8321;(&#8450;*) = &#8484;</span>. In coordinates: <span class="math-inline">n&sup2;: u &#8614; u + 4</span>, and <span class="math-inline">[n,r]: u &#8614; u + 4</span>.
+  This is an improvement in kind rather than degree: the outstanding debt is no longer <em>what is the missing object</em> but <em>how does a known object compose</em>.
+  </p>
+
+  <p>
+  It also explains why the fraction-order distinction needs the infinite structure specifically, and not merely some structure.
+  With <span class="math-inline">0^&omega;</span> of finite order <span class="math-inline">k</span>, winding is <span class="math-inline">mod k</span> and the two orderings re-identify after <span class="math-inline">k</span> turns.
+  Only with <span class="math-inline">&#8484;</span> sheets does the distinction never collapse.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">Two mechanisms for infinite order, and they cost differently.</span>
+    <strong>(a) The universal cover.</strong> The phase circle closes; the cover does not. <span class="math-inline">0^&omega; = &minus;1</span> and <span class="math-inline">0^(2&omega;) = 1</span> both hold exactly <em>downstairs</em>, and the sheet index shifts by one each time around. Every value in Chapter&nbsp;7 survives; only its floor changes.<br>
+    <strong>(b) Irrational angle</strong> &mdash; slot-closure's route, which makes <span class="math-inline">&omega;</span> infinite-order directly. But then no power of the rotation is ever exactly the identity, so <span class="math-inline">0^&omega;</span> is never exactly <span class="math-inline">&minus;1</span> and the ladder moves.<br>
+    <strong>(a) is the cheaper door</strong>, and it is the one slot-closure does not name.
+  </div>
+
+  <h3>Against the Hopf reading</h3>
+
+  <p>
+  <span class="math-inline">papers/3</span> places the Hopf fibration at level two of the doubling tower &mdash; "<span class="math-inline">b/a &#8712; &#8473;&sup1;(&#8450;) = S&sup2;</span>, unit quaternions acting through <span class="math-inline">SU(2) &rarr; SO(3)</span>."
+  Since the Hopf map is a <em>ratio</em>, and this note is about ratio order being conserved, the two are worth testing against each other rather than admired side by side.
+  </p>
+
+  <p>
+  <strong>The Euler-class test passes, but proves little.</strong>
+  For the bundle <span class="math-inline">S&sup1; &rarr; S&sup3; &rarr; S&sup2;</span> the connecting map <span class="math-inline">&pi;&#8322;(S&sup2;) &rarr; &pi;&#8321;(S&sup1;)</span> is an isomorphism <span class="math-inline">&#8484; &rarr; &#8484;</span>, so the fiber's winding is the bundle's Euler class.
+  <span class="math-inline">R</span> is the deck generator, so it corresponds to Euler class <span class="math-inline">&plusmn;1</span> &mdash; which the Hopf bundle has.
+  But both sides of that comparison are "the generator," so agreement was close to guaranteed and carries almost no information.
+  </p>
+
+  <p>
+  <strong>The discriminating test is the index.</strong>
+  Negation translates by <em>two</em> quarter-turns and the deck group is generated by <em>four</em>, so <span class="math-inline">n</span> is a square root of the deck generator and the translation group properly contains the deck group at index&nbsp;2.
+  That is a double cover, and the algebra notices it: a full turn is <span class="math-inline">n&sup2;</span>, which acts trivially downstairs and nontrivially upstairs.
+  This is the behaviour of <span class="math-inline">SU(2) &rarr; SO(3)</span> &mdash; a <span class="math-inline">2&pi;</span> rotation is the identity below and <span class="math-inline">&minus;1</span> above.
+  The double cover was named in <span class="math-inline">papers/3</span> and the index-2 sublattice was noticed here as a lattice fact; they are the same <span class="math-inline">&#8484;/2</span>.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">The half-turn is not borrowed from the normalization.</span>
+    It would be circular to place <span class="math-inline">&minus;1</span> by appeal to <span class="math-inline">0^&omega; &asymp; &minus;1</span>, since that value is a projection.
+    It is also unnecessary.
+    <span class="math-inline">n</span> is a rotation of the phase circle and an involution downstairs, and the only nontrivial rotational involution of a circle is the half-turn &mdash; so <span class="math-inline">n</span> sits there by virtue of being negation, and nothing else.
+    <span class="math-inline">r</span> is forced from the other side: reciprocal reverses both grade and phase, so it is a reflection rather than a rotation, and its fixed points are the two antipodal units.
+    All four constants are placed by the two operations, with no value imported.
+  </div>
+
+  <p>
+  So the direction of explanation runs the other way.
+  <strong><span class="math-inline">0^&omega; &asymp; &minus;1</span> is an output, not an input</strong> &mdash; <span class="math-inline">&omega;</span> is the exponent carrying <span class="math-inline">0</span> to the half-turn, and <span class="math-inline">&minus;1</span> is where the half-turn lands downstairs.
+  <a href="../powers-of-zero/">Chapter 7</a> had to <em>choose</em> that value and said so in a footnote.
+  Once negation is geometric, it is derived.
+  </p>
+
+  <p>
+  The same reversal covers the exponent rule.
+  <span class="math-inline">x^0 = 1^x</span> was introduced to stop <span class="math-inline">x^0 = 1</span> from discarding the exponent; the geometry says why it <em>cannot</em> be collapsed further.
+  The base-<span class="math-inline">1</span> family is a genuine curve upstairs &mdash; it winds &mdash; and only a point downstairs.
+  Writing <span class="math-inline">x^0 = 1</span> is projecting that curve onto its image, which is a loss and not an identity.
+  So the invariants the older algebra treated as constants are exactly the coordinates this structure has directions for, and each is removed by exhibiting the direction it was hiding.
+  </p>
+
+  <h2>What it costs</h2>
+
+  <ul>
+    <li><strong>The circle closes downstairs only.</strong> <span class="math-inline">0^(2&omega;) &asymp; 1</span>. The <span class="conf c-proven">Proven</span> badge in <a href="../where-the-choices-show/">Where the Choices Show</a> &mdash; that <span class="math-inline">0^&omega;</span> is "the unique nontrivial square root of the identity" &mdash; rests on a normalization now known to be a projection, and wants downgrading in <span class="math-inline">PROVEN-AUDIT.md</span>.</li>
+    <li><strong>The carrier is infinite</strong>, so slot-closure's closure problem is posed over the wrong object. Eight schemas over four constants was never the shape, and the four-element bijection that fixed <span class="math-inline">0^&omega; = &minus;1</span> is definitively dead &mdash; as that note's own fourth open item predicted.</li>
+    <li><strong>"Find the closure" changes meaning.</strong> There is no finite <em>carrier</em> to close over, and the finite tables stay true only the way the classical table stays true: as a window, downstairs. But the <em>pivots</em> are finite even though the carrier is not &mdash; eight of them, forced &mdash; so the problem is relocated rather than abandoned.</li>
+  </ul>
+
+  <h2>What it saves</h2>
+
+  <p>
+  Chapters 7&ndash;9 are not damaged. They are <em>downstairs, and exact there</em> &mdash; which is what "exact" was always describing.
+  <span class="math-inline">i = 0^(&omega;/2)</span>, the closing circle, the roots of unity by hand: all true, all shadows, none disturbed.
+  What was wrong was borrowing them upward as ground truth for schema identities.
+  slot-closure guessed this ending in its final paragraph: the valuation rebuild "is not refuting the circle; it is showing the circle never lived in the integer-power ring to begin with."
+  </p>
+
+  <h2>How this could be wrong</h2>
+
+  <p>
+  The central move &mdash; that apparent contradictions are distinct points over one projection &mdash; can absorb any collision whatsoever.
+  Used without discipline it converts a falsifiable theory into an unfalsifiable one, which is a worse outcome than a broken theory.
+  Three guards, each of which can fail:
+  </p>
+
+  <ol>
+    <li><strong>The two-floor criterion must be applied before the fact, not after.</strong> A collision between two <em>links</em> is a refutation and may not be resolved by sheets. Only evaluations may be reinterpreted as projections. If a link-collision is ever explained away by monodromy, the theory has stopped saying anything.</li>
+    <li><strong>The index arithmetic is owed, and its absence is not neutral.</strong> Until there is an explicit rule for when two upstairs values are equal &mdash; not merely when they project alike &mdash; "<span class="math-inline">&asymp;</span> not <span class="math-inline">=</span>" is a diagnosis and not a theory. <span class="math-inline">R = n&sup2;</span> names the object; it does not yet say how it composes.</li>
+    <li><strong>The figures do not stand on the same floor.</strong> The curve and two-decomposition diagrams have grade quotiented out &mdash; which is why the first appears to show <span class="math-inline">0&sup2; = &minus;1</span>, contradicting <span class="math-inline">0&sup2;</span> at grade <span class="math-inline">+2</span>. The ring diagram keeps grade and suppresses phase instead. The glued surface carries a genuine proof, but about the <em>phase torus</em>, not the carrier. So three of the four are illustrations and are evidence about nothing; the fourth is evidence about exactly one thing, and it is not the thing the other three depict. Any argument that moves a conclusion from one figure to another is invalid unless it names the projection it crossed.</li>
+  </ol>
+
+  <h2>Open</h2>
+
+  <ol>
+    <li><strong>How <span class="math-inline">R</span> composes.</strong> The one remaining debt. Boundary conditions already known: it vanishes at integer exponents; it delivers the whole exponent at exponent <span class="math-inline">0</span>; and it must leave the two base-<span class="math-inline">0</span> laws intact &mdash; those <em>are</em> the power rule, applied to <span class="math-inline">&omega; = 0&#8315;&#185;</span>, which is why exponent-splitting cannot simply be barred.</li>
+    <li><strong>Is the <span class="math-inline">&#8484;/2</span> complex conjugation?</strong> Writing the two orderings as <span class="math-inline">&#10216;&omega;|0&#10217;</span> and <span class="math-inline">&#10216;0|&omega;&#10217;</span> suggests they are conjugate rather than merely distinct &mdash; which fits, since conjugates share a real projection. If so, the Galois twist is pinned concretely. Unverified.</li>
+    <li><strong>The index-2 sublattice.</strong> The function grid is the constant grid rotated 45&deg;, which on <span class="math-inline">&#8484;&sup2;</span> is an index-2 sublattice. If its coset representative is <span class="math-inline">n</span>, the two grids are one lattice and its sublattice, and the "two decompositions" <em>is</em> that quotient.</li>
+    <li><strong><span class="math-inline">&minus;0</span> versus <span class="math-inline">&omega;</span>.</strong> The half-turn identifies them downstairs, contradicting slot-closure's pivotal move &mdash; unless the sheet index separates them, which would make <span class="math-inline">&minus;0 &ne; &omega;</span> a consequence rather than a posit. Worth confirming: it would remove an axiom.</li>
+    <li><strong>Are the eight pivot classes independent?</strong> The closure problem now has a shape: downstairs the crossings are exactly eight, forced by <span class="math-inline">|det| = 2</span>; upstairs each carries a <span class="math-inline">&#8484;</span> fiber. The object to classify is therefore <strong>eight pivot classes, each a <span class="math-inline">&#8484;</span>-torsor</strong> &mdash; a finite classification of an infinite structure, which is a good deal better than the note's earlier suspicion that nothing finite survives. What is open is whether the <span class="math-inline">D&#8734;</span> action identifies some of the eight, and how many orbits remain.</li>
+  </ol>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">Provenance: the diagnosis, the fraction-order distinction, the infinite thread-count, and the four curves are the framework's, reached in one sitting. The two-floor criterion, the <span class="math-inline">D&#8734;</span> identification, <span class="math-inline">R = n&sup2;</span>, and the falsifiability guards are reconstruction, and should be re-derived independently before any of this approaches canon. Nothing here has been checked by machine. <a href="#fnref1">&#8617;</a></li>
+      <li id="fn2">Two senses of "torus" collided during this work, and the distinction matters. <span class="math-inline">papers/3</span>'s "complex torus <span class="math-inline">&#8450;*</span>" is the <em>algebraic</em> torus &mdash; the multiplicative group, a cylinder, <span class="math-inline">&pi;&#8321; = &#8484;</span>. The <em>complex-manifold</em> sense, <span class="math-inline">&#8450;/&Lambda;</span>, is the genus-one surface with <span class="math-inline">&pi;&#8321; = &#8484;&sup2;</span>. Reading the first as the second suggests a modular <span class="math-inline">SL(2,&#8484;)</span> structure that is not there; the correct symmetry is the order-two Galois twist. <a href="#fnref2">&#8617;</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../slot-closure/">The Slot-Closure Formulation</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../the-doubling/">The Scalar That Doubles</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

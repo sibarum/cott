@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Results — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 1 &middot; <span class="part">The Shock</span></div>
+    <h1>The Results</h1>
+    <p class="sub">
+      Five identities, stated bare. None of them is a typo.
+    </p>
+  </div>
+
+  <p class="lead">
+  This book deletes one axiom of ordinary arithmetic and changes nothing else.
+  What follows is what falls out.
+  Each result below is stated first and explained later — the chapter that cashes it is named on the spot, and every claim wears its honest badge: <span class="conf c-proven">Proven</span> for a theorem or a machine-checked result, <span class="conf c-plausible">Plausible</span> for a load-bearing bet stated as one, <span class="conf c-wild">Wild</span> for speculation.
+  Read the equations. If any of them bothers you, that is the correct reaction, and the book exists to resolve it.
+  </p>
+
+  <h2>Zero has a reciprocal — and it is not infinity</h2>
+
+  <div class="math">0 · ω  =  1</div>
+
+  <p>
+  This is a <em>definition</em>, not a theorem: <span class="math-inline">ω := 1/0</span>, pinned by that single line.
+  The proof that no such <span class="math-inline">ω</span> can exist uses exactly the axiom we deleted, and nothing else.
+  <span class="math-inline">ω</span> is not a size that blew up; it is zero's exact algebraic partner, bounded and finite — doubling the exponent brings it back around, which infinity never does.
+  <em>Cashed in <a href="../invertible-zero/">The Invertible Zero</a>.</em>
+  </p>
+
+  <h2>Minus one is a power of zero</h2>
+
+  <div class="math">0<sup>ω</sup>  =  −1</div>
+
+  <p>
+  A <em>choice</em>, not a discovery — the one value the rules leave free, and this is the assignment that closes the system in balance.
+  It is the fingerprint of a chosen multiplication, and the book says so every time it uses it.
+  <em>Cashed in <a href="../powers-of-zero/">Powers of the Zero</a>; the choice itself is examined in <a href="../where-the-choices-show/">Where the Choices Show</a>.</em>
+  </p>
+
+  <h2>The imaginary unit is a zero seen edge-on</h2>
+
+  <div class="math">i  =  0<sup>ω/2</sup></div>
+
+  <p>
+  Not an assumption — a <em>consequence</em> of the previous line.
+  If <span class="math-inline">0<sup>ω</sup> = −1</span>, then the half-power squares to <span class="math-inline">−1</span>, which is the imaginary unit's entire job description.
+  Nobody has to invent <span class="math-inline">i</span> here; it was hiding inside zero.
+  <em>Cashed in <a href="../imaginary-unit/">The Imaginary Unit</a>.</em>
+  </p>
+
+  <h2>The circle, exactly, with no limits</h2>
+
+  <div class="math">0<sup>ω/3</sup>  =  1/2 + (√3 / 2) i</div>
+
+  <p>
+  A third of a half-turn, computed <em>exactly</em> — by hand, from a three-line recurrence — with no series, no radians, no limit anywhere in the calculation.
+  Roots of unity fall out the same way, one integer polynomial at a time.
+  <em>Cashed in <a href="../exact-circle/">The Exact Circle</a>.</em>
+  </p>
+
+  <h2>Differentiation is multiplication by zero</h2>
+
+  <div class="math">f′(x)  =  P( ω · [ f(x + 0) − f(x) ] )</div>
+
+  <p>
+  A <em>derivative with no limit in it</em>.
+  Because <span class="math-inline">0·5</span> is no longer erased — the deleted axiom is exactly the one that erased it — <span class="math-inline">f(x+0)</span> carries the slope as a genuine, recoverable coefficient, and <span class="math-inline">ω</span> lifts it back up.
+  The <span class="math-inline">P</span> is a projection, and it is doing honest work that a later chapter makes precise.
+  <em>Cashed in <a href="../structural-differential/">The Structural Differential</a>.</em>
+  </p>
+
+  <h2>The price of admission</h2>
+
+  <p>
+  All of it costs exactly one thing.
+  Ordinary arithmetic contains an axiom — <em>absorption</em>, the rule that <span class="math-inline">0·a = 0</span> for every <span class="math-inline">a</span> — which quietly destroys information: multiply by zero and the <span class="math-inline">a</span> is gone, unrecoverable, the only irreversible step in all of elementary algebra.
+  This book deletes that axiom and keeps everything else.
+  Every result above is what arithmetic looks like once nothing is ever thrown away.
+  The rest of the book earns them in order — and the rules of the game, stated in full, wait at the end, where you can check that nothing you just read was a trick.
+  </p>
+
+  <nav class="chapter-nav">
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../invertible-zero/">The Invertible Zero</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<!-- Math rendering engine -->
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Completion Is a Weave (working note) &mdash; Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Working Note &middot; <span class="part">Unfiled</span> &middot; <span class="conf c-wild">Wild</span></div>
+    <h1>Completion Is a Weave</h1>
+    <p class="sub">
+      The theorem the thread was rebuilding, and where it lives
+    </p>
+  </div>
+
+  <div class="section-alt">
+    <span class="emphasis">Status: draft, unverified, not canon.</span>
+    Sixth in the thread: <a href="../reversible-one/">The Reversible One</a> &rarr; <a href="../slot-closure/">Slot-Closure</a> &rarr; <a href="../one-curve/">One Curve</a> (superseded) &rarr; <a href="../anchor-shadow/">The Anchor Was a Shadow</a> &rarr; <a href="../the-doubling/">The Scalar That Doubles</a>.
+    This note is different in kind from the others.
+    They built structure; this one identifies the structure they were building as something already known, and reads off what that buys and costs.
+    It also carries three retractions of claims made earlier in the same thread &mdash; two of them mine, one of them a framing I proposed and then had to withdraw within the hour.
+  </div>
+
+  <p class="lead">
+  The thread kept converging on fibrations from directions that were not aiming at them: the sheets, <span class="math-inline">&pi;&#8321;</span>, the two decompositions, the double cover, Hopf.
+  That was not a pattern-match. <strong>Making a many-to-one operation reversible <em>is</em> constructing the space it projects from</strong> &mdash; so a method built on refusing collapse will produce covering spaces whether or not it means to.
+  The construction has a name, and stating it converts a research programme into a lookup.
+  </p>
+
+  <h2>The theorem</h2>
+
+  <p>
+  Define a <strong>weave</strong> as a series of interconnected transformations &mdash; morphisms mapping sets.
+  Categorically: a functor into <span class="math-inline">Set</span>.
+  </p>
+
+  <p>
+  Then the classical result is <strong>Grothendieck's Galois theory</strong>, or in its topological form the covering-space correspondence: for a connected, suitably nice <span class="math-inline">X</span>, the covers of <span class="math-inline">X</span> are equivalent to the sets carrying a <span class="math-inline">&pi;&#8321;(X)</span>-action.
+  And a <span class="math-inline">&pi;&#8321;(X)</span>-set <em>is</em> a functor from <span class="math-inline">&pi;&#8321;(X)</span>, read as a one-object category, into <span class="math-inline">Set</span>.
+  The definition of a weave and the target of the theorem are the same object.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">Which upgrades the statement.</span>
+    Not "completion can be <em>modelled</em> as weaves" but
+    <div class="math">completion  &#8771;  the category of weaves</div>
+    an <em>equivalence</em>, not a representation.
+    That distinction is the whole point here, because an equivalence loses nothing.
+    <strong>"Information-conservative modelling" is precisely "equivalence of categories."</strong>
+    The framework's central demand, which has been stated informally since <a href="../totality-reversibility/">Chapter 2</a> and flagged there as "not yet a fully formal criterion," has a one-line formal rendering.
+  </div>
+
+  <p>
+  It unifies three things that look unrelated: Galois field extensions, topological covering spaces, and &eacute;tale covers of schemes.
+  Which is worth noting, because the corpus has been reaching for all three vocabularies at once &mdash; "Galois twist" in <span class="math-inline">papers/3</span>, deck transformations in <a href="../reversible-one/">The Reversible One</a>, monodromy throughout &mdash; and they are one theorem, not three analogies.
+  </p>
+
+  <h2>Reversibility picks the index category</h2>
+
+  <p>
+  A functor into <span class="math-inline">Set</span> is almost no constraint; nearly everything is one.
+  The content lives in two places: which index category, and whether the morphisms must be isomorphisms.
+  The framework answers the second.
+  </p>
+
+  <p>
+  If every operation must be reversible, the transformations in the weave are <strong>bijections</strong>.
+  So the functor lands in the groupoid core of <span class="math-inline">Set</span>, not <span class="math-inline">Set</span>.
+  A functor from a group into bijections of a set is a group action &mdash; a <span class="math-inline">&pi;&#8321;</span>-set &mdash; which is a covering.
+  <em>Reversibility selects the covering case by itself.</em>
+  </p>
+
+  <p>
+  And consistency degrades in stages rather than failing all at once. Each stage gets a different object:
+  </p>
+
+  <table>
+    <thead><tr><th>How much of the weave is bijections</th><th>What you get</th></tr></thead>
+    <tbody>
+      <tr><td>all of it</td><td>a <strong>covering</strong> &mdash; fully reversible; index is a group</td></tr>
+      <tr><td>all but isolated points</td><td>a <strong>ramified cover</strong> &mdash; reversible off the branch points</td></tr>
+      <tr><td>only locally coherent</td><td>a <strong>weave of charts</strong> &mdash; reversible in patches; index is a site</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+  That trichotomy is already in the corpus.
+  <span class="math-inline">papers/4</span> classifies charts three ways &mdash; the chart you can write, the chart you can solve, and "obstructed &mdash; irreducibly local &mdash; global monodromy: residue, associator, &Eacute;calle&ndash;Voronin."
+  &Eacute;calle&ndash;Voronin moduli are exactly the third row: no global chart, and what survives is the gluing data between local ones.
+  So that paper's three classes are not three observed cases. They are this theorem's trichotomy.
+  Which also gives <span class="math-inline">papers/0</span>'s "monodromy is one object wearing three faces" a cause rather than a coincidence: three faces because three grades of available structure.
+  </p>
+
+  <h2>The puncture is the price</h2>
+
+  <p>
+  The correspondence needs the map to be a local homeomorphism, and <strong>branch points</strong> break that: at a branch point the sheets collide instead of stacking.
+  </p>
+
+  <p>
+  In this framework the branch points are <span class="math-inline">0</span> and <span class="math-inline">&omega;</span>.
+  Which explains three things that were noticed separately and never connected:
+  </p>
+
+  <ul>
+    <li>the carrier is <span class="math-inline">&#8450;*</span> and not <span class="math-inline">&#8450;</span> &mdash; the puncture <em>is</em> the removed branch point;</li>
+    <li><a href="../slot-closure/">slot-closure</a> named it "the puncture" on grounds having nothing to do with covering spaces;</li>
+    <li>the whole reversible structure exists <em>because</em> the two poles were excluded from the space they generate.</li>
+  </ul>
+
+  <p>
+  So the puncture is not a technicality to be tidied away later.
+  Excluding <span class="math-inline">0</span> and <span class="math-inline">&omega;</span> is the price of a fully reversible weave, and the framework's demand and the puncture are the same decision seen twice.
+  </p>
+
+  <h2>The worked instance is the framework's own</h2>
+
+  <p>
+  <span class="math-inline">log</span> is many-valued on <span class="math-inline">&#8450;*</span>. Its Riemann surface is <span class="math-inline">&#8450;</span>, via <span class="math-inline">exp: &#8450; &rarr; &#8450;*</span>, with deck group <span class="math-inline">&#8484;</span> acting by translations.
+  That is the geometry which makes <span class="math-inline">log</span> reversible, and it is the textbook first example of the theorem.
+  </p>
+
+  <p>
+  It is also, exactly, the <span class="math-inline">&#8484;</span>-sheet structure <a href="../anchor-shadow/">the previous note</a> derived from <span class="math-inline">1/(&minus;1) &ne; (&minus;1)/1</span> without knowing what it was rebuilding.
+  The residue <span class="math-inline">R = n&sup2;</span>, the infinite thread-count, and the deck generator are one object arrived at from the wrong end.
+  </p>
+
+  <h2>The two logarithms</h2>
+
+  <p>
+  The grade <em>is</em> <span class="math-inline">log&#8320;</span>. <span class="math-inline">0&#8319;</span> sits at grade <span class="math-inline">n</span>, so <span class="math-inline">log&#8320;(0&#8319;) = n</span>: the grading function and the base-<span class="math-inline">0</span> logarithm are one thing under two names, and the framework has been carrying a working logarithm since <a href="../invertible-zero/">Chapter 6</a> without calling it one.
+  </p>
+
+  <p>
+  The consequence that matters for zero divisors:
+  </p>
+
+  <div class="math">classical:   log(0)  =  &minus;&infin;      intractable
+here:        log&#8320;(0) =  1        finite, and a unit</div>
+
+  <p>
+  Classical algebra cannot assign anything to a null element because its logarithm runs off the bottom.
+  <span class="math-inline">log&#8320;</span> lands on <span class="math-inline">1</span>.
+  That is the structural reason the split-quaternion construction proposed in <a href="../the-doubling/">the previous note</a> is plausible at all: <span class="math-inline">det</span> is multiplicative, so <span class="math-inline">log&#8320; &#8728; det</span> is a grade, and the null cone acquires a finite one instead of an infinity.
+  </p>
+
+  <p>
+  Read off the ladder in quarter-turns &mdash; <span class="math-inline">1, 0, &minus;1, &omega;</span> at <span class="math-inline">u = 0, 1, 2, 3</span>:
+  </p>
+
+  <table>
+    <thead><tr><th></th><th>action</th><th>as a map</th></tr></thead>
+    <tbody>
+      <tr><td><span class="math-inline">log&#8320;</span></td><td><span class="math-inline">1&#8614;0</span>, <span class="math-inline">0&#8614;1</span>, <span class="math-inline">&omega;&#8614;&minus;1</span>, <span class="math-inline">&minus;1&#8614;&omega;</span></td><td><span class="math-inline">u &#8614; 1 &minus; u</span> &mdash; a reflection about <span class="math-inline">u = &frac12;</span></td></tr>
+      <tr><td><span class="math-inline">log&#8337;</span></td><td><span class="math-inline">1&#8614;0</span>, <span class="math-inline">0&#8614;&minus;1</span>, <span class="math-inline">&minus;1&#8614;&omega;</span>, <span class="math-inline">&omega;&#8614;1</span></td><td><span class="math-inline">u &#8614; u + 1</span> &mdash; a quarter-turn rotation</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+  <span class="math-inline">log&#8320;</span> reflects about a <em>different</em> axis than reciprocal does &mdash; <span class="math-inline">r</span> reflects about <span class="math-inline">u = 0</span> &mdash; so <span class="math-inline">log&#8320;</span> is not in the Klein four-group <span class="math-inline">{id, n, r, nr}</span>. It enlarges the symmetry, which is what one wants from a new tool.
+  And composing the two reflections gives a rotation:
+  </p>
+
+  <div class="math">log&#8320; &#8728; r :   u &#8614; 1 &minus; (&minus;u) = u + 1        one quarter turn
+(log&#8320; &#8728; r)&sup2; :   u &#8614; u + 2  =  n            negation</div>
+
+  <p>
+  A quarter-turn squaring to negation is <span class="math-inline">i</span>.
+  So <span class="math-inline">i = log&#8320; &#8728; r</span>: two reflections about axes an eighth-turn apart, which is how a rotation always factors.
+  <a href="../powers-of-zero/">Chapter 7</a> reaches <span class="math-inline">i = 0^(&omega;/2)</span> from a normalization; this reaches the same element from two <em>operations</em>, which is a second and independent route.
+  </p>
+
+  <h2><span class="math-inline">&omega;^&omega;</span> was never a value</h2>
+
+  <p>
+  That cell refused to settle between <span class="math-inline">1</span> and <span class="math-inline">&minus;1</span> through six law-sets. The reason is one line:
+  </p>
+
+  <div class="math">&omega;^&omega;  =  0^(&minus;&omega;)  =  1 / 0^&omega;  =  1 / (&minus;1)</div>
+
+  <p>
+  It is a <strong>ratio</strong> &mdash; and specifically the denominator-negative one, the only position a negation can legitimately occupy.
+  Asking whether it equals <span class="math-inline">1</span> or <span class="math-inline">&minus;1</span> was asking a ratio for a number, which is the same category error as asking a schema for a constant.
+  The question was malformed, not the answer; and <span class="math-inline">&omega;^&omega;</span> is the one cell in the table that is intrinsically an ordered pair, which is why it is the cell where collapsing had to make a choice.
+  </p>
+
+  <p>
+  On the accounting, both orderings project to <span class="math-inline">&minus;1</span>: <span class="math-inline">r: u &#8614; &minus;u</span> sends <span class="math-inline">2 &#8614; &minus;2</span>, distinct upstairs by one full turn, identical below.
+  Neither projects to <span class="math-inline">1</span>. So the <span class="math-inline">1</span> answer came from the checkerboard pattern in the four-by-four table, which is a downstairs object throughout &mdash; the same class of evidence that produced the false agreement in <a href="../one-curve/">One Curve</a> and the <span class="math-inline">0&sup2; = &minus;1</span> artefact in the curve diagram.
+  It resolves to <span class="math-inline">&minus;1</span>, and <span class="math-inline">log&#8337;</span> agrees: that map is a clean rotation only if <span class="math-inline">&omega;^&omega; = &minus;1</span>; at <span class="math-inline">1</span> it goes multivalued and <span class="math-inline">log&#8337;(&minus;1)</span> has no answer among the four.
+  </p>
+
+  <h2>The admissibility line is receipt, not vocabulary</h2>
+
+  <p>
+  A retraction, and it is mine.
+  I argued that because <span class="math-inline">&#8477;</span> is the completion of <span class="math-inline">&#8474;</span> by limits and <a href="../totality-reversibility/">Chapter 2</a> refuses limits, analytic expressions are outside the framework.
+  That is wrong. The criterion is total and reversible, and it cuts across the algebraic/analytic distinction rather than along it.
+  </p>
+
+  <p>
+  <span class="math-inline">cos</span> is total but many-to-one, so irreversible <em>as stated</em> &mdash; and the framework's standard move on an irreversible operation is to refuse the collapse and keep the receipt, which is exactly what <a href="../reversible-one/">The Reversible One</a> does with its <span class="math-inline">(mod 2&pi;)</span>.
+  That note was not reasoning analytically and mislabelling the results; it was applying the method <em>to</em> an analytic function, correctly.
+  <span class="math-inline">arccos</span> multivalued with the winding retained is the reversible form of <span class="math-inline">cos</span>.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">The line is expression versus value.</span>
+    Analysis keeps the value and discards the derivation; symbolic algebra keeps the expression and does not need the value. They are duals, and the Traction is the symbolic side.
+    So <span class="math-inline">cos(2&pi;s)</span> is admissible &mdash; the expression is retained, nothing was destroyed.
+    <span class="math-inline">0.7071067811865476</span> is not: it is a value that has forgotten the expression that produced it, and <span class="math-inline">&radic;2/2</span> cannot be recovered from it.
+    Floating point is excluded by the founding axiom rather than by taste &mdash; rounding is a merge with no receipt &mdash; and that is why there is no going back from it.
+    Bare <span class="math-inline">&#8477;</span> falls the same way; <span class="math-inline">&#8477;</span> <em>with its approximating sequence</em> does not.
+  </div>
+
+  <h2>The correspondence principle</h2>
+
+  <p>
+  A guard stronger than any currently in these notes.
+  Every upstairs distinction must vanish downstairs into <em>exactly</em> the classical value.
+  The framework may add structure above; it may not disagree below.
+  </p>
+
+  <p>
+  What makes this the best falsifiability criterion in the thread is its reach.
+  The two-floor rule tests the framework against itself &mdash; links collide or they do not.
+  This tests it against the whole of existing mathematics, and a single downstairs disagreement is fatal.
+  It also does immediate work: it confirms <span class="math-inline">&omega;^&omega; &asymp; &minus;1</span>, since both orderings project there and classical arithmetic agrees; and it puts the burden on the checkerboard's <span class="math-inline">1</span>, which would have been a downstairs disagreement.
+  </p>
+
+  <h2>Where to work, and why Chebyshev</h2>
+
+  <p>
+  With the admissibility line at receipts rather than vocabulary, <span class="math-inline">&#8474;</span> is not a boundary but the <em>cheapest</em> place to stand &mdash; a better claim, since it explains why the corpus gravitates there without defending a ban it does not need.
+  </p>
+
+  <p>
+  And it explains the recurrence of one object.
+  <span class="math-inline">cos</span>, <span class="math-inline">exp</span>, and <span class="math-inline">arccos</span> need their receipts carried explicitly; <span class="math-inline">T&#8342;</span> has <strong>integer coefficients</strong> and needs nothing.
+  <strong>Chebyshev is the Traction's cosine.</strong>
+  That is why it keeps surfacing from unrelated directions &mdash; the trace coordinate, the recurrence, the deck-invariant chart, the doubling constant &mdash; it is the receipt-free avatar of the circular functions.
+  Likewise the "circle" of <a href="../exact-circle/">The Exact Circle</a> is the roots of unity, torsion, cyclotomic; which is what <em>exact</em> was saying.
+  </p>
+
+  <p>
+  One consequence worth recording, since it sharpens a fork the thread stalled on for hours.
+  Elliptic-versus-hyperbolic read analytically is a sign condition on a real, <span class="math-inline">|s| &lt; 2</span>. Read arithmetically it is:
+  </p>
+
+  <div class="math">is  s&sup2; &minus; 4  a square in &#8474; ?</div>
+
+  <p>
+  If yes, <span class="math-inline">&#8474;(&delta;) = &#8474;</span> and the form is split; if no, <span class="math-inline">&#8474;(&delta;)</span> is a quadratic extension and it is not.
+  That is decidable for any given <span class="math-inline">s</span>, and it is what <span class="math-inline">papers/3</span>'s "two real forms differing by a Galois twist" says once it is read arithmetically rather than analytically: the twist is the quadratic character of <span class="math-inline">s&sup2; &minus; 4</span>.
+  A fork becomes an algorithm.
+  </p>
+
+  <h2>What this note withdraws</h2>
+
+  <ol>
+    <li><strong>The analytic exclusion.</strong> Mine, and wrong: analytic expressions are admissible when their receipts are kept. The flags I placed on <a href="../reversible-one/">The Reversible One</a>'s tower and on <span class="math-inline">log&#8321; = (1/2&pi;)&middot;arccos</span> come off.</li>
+    <li><strong>The <span class="math-inline">&#8474;</span>-only framing.</strong> Weakened to a claim about cost, not admissibility.</li>
+    <li><strong><span class="math-inline">&omega;^&omega;</span> as undetermined.</strong> <a href="../anchor-shadow/">The Anchor Was a Shadow</a> lists it as a fiber to be indexed. It is a ratio, and it resolves.</li>
+  </ol>
+
+  <p>
+  Three retractions here, on top of three in the two notes before it &mdash; <span class="math-inline">R = (nr)&sup2;</span>, the objection to the half-turn placement, and totality-selects-<span class="math-inline">&#8455;</span>.
+  The pattern is worth stating plainly: every one was a structural argument that felt forced and was not, and every one was caught by checking against the corpus rather than against intuition.
+  The results that have survived attack are the ones with computations behind them: <span class="math-inline">|det| = 2</span>, <span class="math-inline">&omega;&sup2; = s&omega; &minus; 1</span>, and the <span class="math-inline">u</span>-coordinate maps above.
+  </p>
+
+  <h2>Open</h2>
+
+  <ol>
+    <li><strong>Define <em>weave</em> to one row.</strong> As stated it names a shape spanning all three rows of the trichotomy &mdash; covering, ramified cover, moduli of local charts &mdash; which are genuinely different objects. The statement becomes a theorem where <em>weave</em> names one, or names a category containing all three with the maps between them. If it is the third row specifically, the claim is <em>stronger</em> than the classical theorem: that the obstructed case is still modelable, not merely obstructed. That is the version worth chasing.</li>
+    <li><strong>Which index category, in the framework's own case?</strong> Reversibility forces isos, hence a group, hence a covering &mdash; but only away from the branch points. What indexes the weave <em>at</em> <span class="math-inline">0</span> and <span class="math-inline">&omega;</span> is unaddressed, and those are the two elements the whole construction is about.</li>
+    <li><strong>Does the correspondence principle hold everywhere?</strong> It is strong enough to be worth attacking. Sweep the corpus for downstairs claims that disagree with classical arithmetic; each is either an error or an upstairs value wearing an equals sign.</li>
+    <li><strong>Is <span class="math-inline">log&#8320;</span>'s new reflection compatible with the eight pivots?</strong> It sits outside the Klein four-group, so it enlarges the symmetry &mdash; and <a href="../anchor-shadow/">the pivot count</a> was computed for the four curves alone. Adding a fifth generator may change <span class="math-inline">|det|</span> and therefore the count.</li>
+    <li><strong>Do the two completions commute?</strong> This note completes an operation by building the space it projects from &mdash; a covering, with <span class="math-inline">&#8450;*</span> as base. <a href="../the-doubling/">The previous note</a> completes a different operation by making reciprocal an <em>element</em>, which forces the algebra up to <span class="math-inline">&#8455;</span>. These are two different completions of two different failures, at two different levels, and nothing so far says they combine into one structure rather than pulling apart. <span class="math-inline">&#8455;</span> is not a covering of <span class="math-inline">&#8450;*</span>. Whether the covering completion and the doubling completion are compatible &mdash; and if so what the combined object is &mdash; is a gap between the two notes, not inside either, which is exactly the sort of gap that stays invisible.</li>
+    <li><strong>Re-read <a href="../reversible-one/">The Reversible One</a> from the top.</strong> Two flags placed on it today were both wrong, which means it has not actually been re-read, only reacted to. Its diagnosis &mdash; that <span class="math-inline">x&#8304; = 1</span> is the liar &mdash; is purely algebraic and survives everything; the material after "The tower" has never been audited against the discipline the thread has since developed.</li>
+  </ol>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">Provenance. The framework's: the correspondence principle; receipt-versus-value as the admissibility line and analysis as the dual of symbolic algebra; the definition of a weave and the statement that consistent completions are modelable as weaves; "find a compatible geometry alongside it"; that <span class="math-inline">&omega;^&omega;</span> is a ratio rather than a value; and the expectation that the logarithms would be the tool. Reconstruction, and unaudited: the identification with Grothendieck's Galois theory; the <span class="math-inline">u</span>-coordinate computation of <span class="math-inline">log&#8320;</span> and <span class="math-inline">log&#8337;</span> and the factorization <span class="math-inline">i = log&#8320; &#8728; r</span>; reversibility-forces-isomorphisms; the identification of <span class="math-inline">0</span> and <span class="math-inline">&omega;</span> as the branch points and the puncture as its price; the mapping of the trichotomy onto <span class="math-inline">papers/4</span>; Chebyshev as the receipt-free avatar; and the fork as a rational-square condition. Nothing here has been checked by machine. <a href="#fnref1">&#8617;</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../the-doubling/">The Scalar That Doubles</a>
+    <a class="toc" href="../">Contents</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>
