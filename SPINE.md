@@ -264,7 +264,7 @@ chapters of preparation to one chapter of frame.
 | 8 | `exact-circle` | State inline the two grade facts it uses, flagged "full bookkeeping is Ch 9." "Exact" means roots of unity — torsion, cyclotomic — not `S¹`; and the circle closes *downstairs*, so `0^(2ω) ≈ 1`. |
 | 9 | `multiplication` | Collecting opening ("you have been doing this since Chapter 5"). The `0·ω` derivation at `:66` routes through two barred evaluations — demote to a consistency check, since Ch 5 fixes the identity by `:=`. The grade-zero worry at `:83` points back to Ch 6 and is satisfied there. |
 | 10 | `slot-closure` | Promote out of working-note voice into chapter voice; keep the Wild badge. Absorb the refusal-as-principle prose from the dissolved Ch 2. Its "fork underneath" stays an open question, stated as one. |
-| 11 | `reversible-one` | Promote. Reframe the lead: the contradiction is not evidence against an invertible zero, it is a stage violation with a named line. Keep the escape (`x⁰ = 1^x`) and the reciprocal-of-one consequence flagged provisional. Reach `one-curve` for the check table. |
+| 11 | `reversible-one` | Promote, and **retitle to *How This Goes Wrong*** — Ch 2 already links it under that name. Reframe the lead: the contradiction is not evidence against an invertible zero, it is a stage violation with a named line. Keep the escape (`x⁰ = 1^x`) and the reciprocal-of-one consequence flagged provisional. Reach `one-curve` for the check table. |
 | 12 | *new* | Write from `reversible-one:166–187`. The old title collision (*The Invariant Coordinate* vs. *Three Hats*) is gone — Ch 17 keeps *The Chart*, so no rename is needed. |
 | 14 | `anchor-shadow` | Promote; lead with the two-floor criterion, then the identity *evaluation = projection*. This chapter is why the `≈`/`=`/`:=` discipline exists, so it must state the discipline, not merely use it. |
 | 16 | `where-the-choices-show` | The **Proven** badge at `:93` rests on a projection — downgrade it and record in `PROVEN-AUDIT.md`. Open by discharging D3's pointer. The "fingerprint of a chosen multiplication" thesis now reads as the measurement-stage half of a two-stage claim, not a correction of Ch 6. |
@@ -297,8 +297,13 @@ parts are named for which one is under the microscope.*
 ## 9 · Risks
 
 1. **Three stages is still an abstraction on page two.** Mitigation: Ch 1 comes first, and Ch
-   2 is short, concrete, and immediately cashed — its examples are the identities the reader
-   just saw. If Ch 2 runs longer than the shortest existing chapter, it is too long.
+   2 is short, concrete, and immediately cashed — the mistake it diagnoses is one the reader
+   can check by eye. **Length rule, revised:** the original wording ("shorter than the
+   shortest existing chapter", 588 words) was unrealistic for a chapter that replaces two —
+   the dissolved Chs 2 and 4 are ~1,700 words between them. The real constraint is **under
+   1,000 words**: it must not grow into a third chapter. Drafted at 937, against 916 for the
+   longest existing chapter (`cancellation`). Any further growth means cutting, not
+   re-reasoning.
 2. **The cold open can read as crankery.** Mitigation unchanged, and strengthened: each "not
    a typo" gloss states what *kind* of claim it is and which stage it lives in. "Minus one is
    a power of zero — the position is derived, the value is a projection" is a sentence a

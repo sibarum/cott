@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Three Stages — Beige Papers</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter 2 &middot; <span class="part">The Frame</span></div>
+    <h1>The Three Stages</h1>
+    <p class="sub">
+      Invent, manipulate, measure — and which one of them can be exact
+    </p>
+  </div>
+
+  <p class="lead">
+  One distinction before the results, and it is the only thing in this book you have to keep in your head.
+  Doing algebra is three separate acts.
+  They run on different rules, only one of them can be exact, and nearly every mistake in the subject — including three of mine, later in this book — is one act's move performed during another.
+  </p>
+
+  <h2>Three things you do</h2>
+
+  <p>
+  You want to know how much paint the wall takes.
+  </p>
+
+  <p>
+  First you decide the wall is a rectangle — a decision, not a fact.
+  You left out the light switch, the texture, the corner that isn't square, and nothing forced any of it.
+  Then you multiply <span class="math-inline">3.2</span> by <span class="math-inline">2.4</span>, and that part has rules: do it right and nothing is lost, do it wrong and it is simply wrong.
+  Then you read off <span class="math-inline">7.68</span> and buy eight litres.
+  Whatever that number knew about the wall, the tin does not.
+  </p>
+
+  <p>
+  You <strong>invented</strong> an expression, you <strong>manipulated</strong> it, and you <strong>measured</strong> it.
+  Everybody does all three, every time, and the middle one is the only one anybody has ever called exact.
+  </p>
+
+  <h2>Only the middle can be clean</h2>
+
+  <p>
+  Manipulation loses nothing when the operations keep two promises.
+  We ask them of the <em>operations</em>, not of the numbers — "total" and "reversible" are not properties a number has.
+  </p>
+
+  <div class="section-alt">
+    <span class="emphasis">Totality.</span> Every operation is defined on every value. Nothing is off-limits, no case throws up its hands. There are no holes.<br>
+    <span class="emphasis">Reversibility.</span> No operation destroys information. Whatever you did, there is a way back.<sup class="fnref"><a href="#fn1" id="fnref1">1</a></sup>
+  </div>
+
+  <p>
+  Ordinary arithmetic keeps neither promise, and we have learned to live with both gaps.
+  Division refuses a zero denominator: a hole.
+  And one operation shreds the page without anyone flagging it —
+  </p>
+
+  <div class="math">a = b   ⟶   0·a = 0·b   ⟶   0 = 0</div>
+
+  <p>
+  Every step is legal, and the last line has forgotten everything; it is true whatever <span class="math-inline">a</span> and <span class="math-inline">b</span> were.
+  The rule responsible is <strong>absorption</strong> — <span class="math-inline">0·a = 0</span>, zero swallowing whatever it touches — and it is the one thing this book removes.
+  </p>
+
+  <h2>Both ends are yours</h2>
+
+  <p>
+  Invention and measurement are the same act facing opposite directions.
+  Both decide what to keep.
+  Neither is forced, neither is precise, and nothing here makes them so — that is not a gap in the theory, it is what the two ends <em>are</em>.
+  </p>
+
+  <p>
+  The honest form of the claim, then, and it is narrow:
+  <strong>This book does not make mathematics exact. It makes the middle exact and the two ends visible.</strong>
+  The price still gets paid — once, where you can watch it being charged, instead of a little at a time on every line.
+  Later the two ends turn out to be one knob, and you can watch it turn: <a href="../addition-dial/">The Addition Dial</a>.
+  </p>
+
+  <h2>The mistake, which is always the same mistake</h2>
+
+  <p>
+  Four lines, any of which looks fine on its own:
+  </p>
+
+  <div class="math">0¹        =  0
+0·ω       =  1                    (ω is zero's reciprocal)
+0^(0·ω)   =  0¹        =  0       (substitute 0ω = 1 in the exponent)
+0^(0·ω)   =  (0^ω)⁰    =  1       (split the exponent, then x⁰ = 1)</div>
+
+  <p>
+  The last two read the same thing two ways and get <span class="math-inline">0</span> and <span class="math-inline">1</span>, so <span class="math-inline">0 = 1</span>.
+  </p>
+
+  <p>
+  The fourth line is the culprit, and with the stages named the reason is one sentence: <span class="math-inline">x⁰ = 1</span> is a <em>measurement</em>.
+  It reads a value out and throws the exponent away — and the exponent is what the third line was using.
+  A reading taken in the middle of a manipulation, which is the one thing the middle does not allow.
+  Name the stage and you see it on sight instead of after an afternoon.
+  The full account, and the escape, is <a href="../reversible-one/">How This Goes Wrong</a>.
+  </p>
+
+  <h2>The price of admission</h2>
+
+  <p>
+  One axiom goes, and nothing is added back in its place.
+  </p>
+
+  <p>
+  An axiom costs more than itself: it costs every caveat it forces downstream.
+  Each time a theorem says "for all <span class="math-inline">x</span>, provided <span class="math-inline">x</span> isn't the troublesome one," that <em>provided</em> is a tax the whole landscape pays forever.
+  By that accounting the absorbing zero is the most expensive object in mathematics — a fence on every theorem that divides by a variable, and every exact value sitting on it outsourced to a limit.
+  It buys tidiness: one well-behaved zero, a clean field.
+  Not worth the sprawl.
+  </p>
+
+  <p>
+  So we don't fence it.
+  We remove the line that planted it, delete nothing else,<sup class="fnref"><a href="#fn2" id="fnref2">2</a></sup> and watch what had been held out of reach come back unbidden — the reciprocal of zero, the imaginary unit, an exact circle.
+  Refusing to destroy information does not only forbid things.
+  It forces new values into existence, because the result an operation used to refuse now has to go somewhere.
+  </p>
+
+  <h2>How to read the rest</h2>
+
+  <p>
+  Every chapter says at the top which stage it is working in.
+  The parts are named for whichever stage is under the microscope, not for chunks of the book — you are always doing all three.
+  </p>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">Not a tidy undo button — that is more than we need. What is forbidden is fusing genuinely different inputs into one result and keeping <em>no record</em> of the difference. An operation may take several steps to undo and still be perfectly reversible. <a href="#fnref1">↩</a></li>
+      <li id="fn2">The taste behind that move — fewer things declared, more falling out on their own — has a name elsewhere in this corpus and an acronym I will spare you. It is a compass, not a calibrated instrument: "fewer axioms" is a direction to walk, not a number you can always compute. <a href="#fnref2">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="prev" href="../the-results/">The Results</a>
+    <a class="toc" href="../">Contents</a>
+    <a class="next" href="../types-as-operations/">Types as Operations</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+</body>
+</html>
