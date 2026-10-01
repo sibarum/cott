@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample Chapter — Intro</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Math&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+
+<link rel="stylesheet" href="../../lib/styles-v3.css">
+<link rel="stylesheet" href="../../lib/papers.css">
+</head>
+<body>
+
+<div class="icon-back" onclick="if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back()}else{location.href='../'}"></div>
+
+<div class="paper">
+
+  <div class="cover">
+    <div class="chapter-meta">Chapter N &middot; <span class="part">Part Name</span></div>
+    <h1>Sample Chapter</h1>
+    <p class="sub">
+      Every building block the intro uses, in one place
+    </p>
+  </div>
+
+  <p class="lead">
+  The lead paragraph sets up the chapter in a few sentences.
+  Copy this file to start a new chapter, then delete whatever you don't need.
+  Inline math is written either as plain Unicode in a <code>math-inline</code> span, like <span class="math-inline">a + b = c</span>, or as ASCII that the engine formats for you, like <span class="dynamicexpr expression-inline">x^2 + y_{1} = 0^(w/2)</span>.
+  </p>
+
+  <h2>Auto-formatted expressions</h2>
+
+  <p>
+  Write the ASCII source inside a <code>dynamicexpr</code> span and the engine replaces it on load.
+  Display equations go in a <code>.eqn</code> wrapper:
+  </p>
+
+  <div class="eqn"><span class="dynamicexpr expression">0^w = -1</span></div>
+  <div class="eqn"><span class="dynamicexpr expression">i = 0^(w/2)</span></div>
+  <div class="eqn"><span class="dynamicexpr expression">a (+) b := 1/(1/a + 1/b) = a*b/(a+b)</span></div>
+  <div class="eqn"><span class="dynamicexpr expression">S_{p}(x, y) = (x^p + y^p)^(1/p)</span></div>
+  <div class="eqn"><span class="dynamicexpr expression">x (+/-) y = z (-/+) y</span></div>
+  <div class="eqn"><span class="dynamicexpr expression">a (><) b = -(b (><) a)</span></div>
+  <div class="eqn"><span class="dynamicexpr expression">sqrt(x^2 + y^2) = r</span></div>
+
+  <p>
+  Operators: <code>(+)</code> ⊕, <code>(+/-)</code> ±, <code>(-/+)</code> ∓, <code>(><)</code> ×, <code>(*)</code> explicit dot.
+  <code>w</code> becomes ω, <code>*</code> becomes a dot (or juxtaposition), <code>/</code> stacks into a fraction, and <code>^</code> / <code>_</code> raise and lower.
+  Use braces for multi-character scripts: <code>S_{p}</code>, <code>0^{2*w}</code>.
+  </p>
+
+  <h2>Hand-set math</h2>
+
+  <p>
+  For an aligned block that the engine shouldn't parse, use <code>.math</code> with Unicode:
+  </p>
+
+  <div class="math">0⁰ = 1          0¹ = 0          0⁻¹ = ω          0⁻ⁿ = ωⁿ
+ω⁰ = 1          ω¹ = ω          ω⁻¹ = 0          ω⁻ⁿ = 0ⁿ</div>
+
+  <h2>Confidence badges</h2>
+
+  <p>
+  <span class="conf c-proven">Proven</span> a theorem or machine-checked result.
+  <span class="conf c-plausible">Plausible</span> a load-bearing bet.
+  <span class="conf c-wild">Wild</span> speculation.
+  A badge can carry a hover citation:
+  <span class="conf c-proven" data-cite="Source, <em>Title</em>, §3">Proven</span>
+  </p>
+
+  <h2>Callouts, notes, and footnotes</h2>
+
+  <div class="section-alt">
+    <span class="emphasis">A callout.</span>
+    Use <code>.section-alt</code> for an aside that deserves a box, with <span class="math-inline">math</span> allowed inside.
+  </div>
+
+  <p>
+  Footnotes use a superscript reference<sup class="fnref"><a href="#fn1" id="fnref1">1</a></sup> and a list at the end of the chapter.
+  Links to other chapters are ordinary relative links, like <a href="../">the contents</a>.
+  </p>
+
+  <div class="footnotes">
+    <ol>
+      <li id="fn1">The footnote text, with a return link. <a href="#fnref1">↩</a></li>
+    </ol>
+  </div>
+
+  <nav class="chapter-nav">
+    <a class="toc" href="../">Contents</a>
+  </nav>
+
+  <div class="section-footer">
+    Published under the
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> license.
+  </div>
+
+</div>
+
+<!-- Math rendering engine -->
+<script src="https://unpkg.com/ohm-js@17/dist/ohm.min.js"></script>
+<script src="../../lib/traction-interpret.js"></script>
+<script src="../../lib/popover.js"></script>
+</body>
+</html>
